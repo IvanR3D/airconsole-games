@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>AirConsole Controller</title>
+    <script type="text/javascript" src="https://www.airconsole.com/api/airconsole-1.7.0.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            touch-action: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        #waitingScreen {
+            text-align: center;
+            color: white;
+        }
+
+        .waiting-title {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .waiting-icon {
+            font-size: 80px;
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
+        }
+
+        .player-info {
+            background: rgba(255,255,255,0.2);
+            padding: 20px 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .player-name {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .player-color {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        #gameController {
+            display: none;
+            width: 100%;
+            height: 100%;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+        }
+
+        .game-title {
+            font-size: 28px;
+            color: white;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .player-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .player-color-badge {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .player-header-text {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .control-layout {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 40px;
+        }
+
+        .jump-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .jump-button {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            border: 6px solid white;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 70px;
+            cursor: pointer;
+            transition: all 0.1s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            user-select: none;
+        }
+
+        .jump-button:active,
+        .jump-button.pressed {
+            background: rgba(255,255,255,0.4);
+            transform: scale(0.95);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .jump-text {
+            font-size: 28px;
+            color: white;
+            font-weight: bold;
+            margin-top: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .movement-container {
+            display: flex;
+            gap: 60px;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .control-button {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            border: 5px solid white;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            cursor: pointer;
+            transition: all 0.1s;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            user-select: none;
+        }
+
+        .control-button:active,
+        .control-button.pressed {
+            background: rgba(255,255,255,0.4);
+            transform: scale(0.95);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .instruction {
+            color: white;
+            font-size: 18px;
+            text-align: center;
+            opacity: 0.9;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            margin-top: 20px;
+        }
+
+        .results-screen {
+            display: none;
+            text-align: center;
+            color: white;
+            padding: 30px;
+        }
+
+        .results-title {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .result-item {
+            background: rgba(255,255,255,0.2);
+            padding: 20px;
+            border-radius: 20px;
+            margin: 15px 0;
+            font-size: 22px;
+        }
+
+        .result-item.winner {
+            background: rgba(255, 215, 0, 0.3);
+            border: 2px solid gold;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @media (max-width: 600px) {
+            .waiting-title {
+                font-size: 28px;
+            }
+            
+            .game-title {
+                font-size: 24px;
+            }
+            
+            .jump-button {
+                width: 180px;
+                height: 180px;
+                font-size: 60px;
+            }
+            
+            .control-button {
+                width: 110px;
+                height: 110px;
+                font-size: 50px;
+            }
+            
+            .movement-container {
+                gap: 40px;
+            }
+        }
+
+        @media (max-height: 700px) {
+            .control-layout {
+                margin-bottom: 20px;
+            }
+            
+            .jump-button {
+                width: 180px;
+                height: 180px;
+                font-size: 60px;
+            }
+            
+            .control-button {
+                width: 100px;
+                height: 100px;
+                font-size: 45px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="waitingScreen">
+        <div class="waiting-icon">🎮</div>
+        <div class="waiting-title">Waiting for Game...</div>
+        <div class="player-info">
+            <div class="player-name" id="playerName">Player</div>
+            <div class="player-color" id="playerColor"></div>
+        </div>
+        <div class="instruction">Join code: <strong id="joinCode">----</strong></div>
+    </div>
+
+    <div id="gameController">
+        <div>
+            <div class="game-title">🎮 Platformer Challenge</div>
+            <div class="player-header">
+                <div class="player-color-badge" id="gamePlayerColor"></div>
+                <div class="player-header-text" id="gamePlayerName"></div>
+            </div>
+        </div>
+        
+        <div class="control-layout">
+            <div class="jump-container">
+                <div class="jump-button" id="jumpBtn">
+                    ⬆️
+                    <div class="jump-text">JUMP</div>
+                </div>
+            </div>
+            
+            <div class="movement-container">
+                <div class="control-button" id="leftBtn">⬅️</div>
+                <div class="control-button" id="rightBtn">➡️</div>
+            </div>
+        </div>
+        
+        <div class="instruction">Use buttons to control your character</div>
+    </div>
+
+    <div id="resultsScreen" class="results-screen">
+        <div class="results-title">🏆 Game Results</div>
+        <div id="resultsList"></div>
+        <div class="instruction" style="margin-top: 30px;">Waiting for next game...</div>
+    </div>
+
+    <script>
+        const airconsole = new AirConsole();
+        let playerInfo = {
+            number: null,
+            color: null,
+            name: null
+        };
+        
+        let isLeftPressed = false;
+        let isRightPressed = false;
+        let isJumpPressed = false;
+
+        airconsole.onReady = function() {
+            console.log("AirConsole controller ready");
+            airconsole.message(AirConsole.SCREEN, { action: 'ready' });
+        };
+
+        airconsole.onMessage = function(device_id, data) {
+            if (data.type === 'gameState') {
+                updatePlayerInfo(data);
+            } else if (data.type === 'gameStart') {
+                showGameController();
+            } else if (data.type === 'gameRestart') {
+                showWaitingScreen();
+            } else if (data.type === 'gameResults') {
+                showResults(data.results);
+            }
+        };
+
+        function updatePlayerInfo(gameState) {
+            // Find which player this controller is
+            for (let playerNum in gameState.players) {
+                if (gameState.players[playerNum].deviceId === airconsole.device_id) {
+                    playerInfo.number = playerNum;
+                    playerInfo.color = gameState.players[playerNum].color;
+                    playerInfo.name = gameState.players[playerNum].name;
+                    
+                    // Update UI
+                    document.getElementById('playerName').textContent = playerInfo.name;
+                    document.getElementById('playerColor').style.backgroundColor = playerInfo.color;
+                    
+                    document.getElementById('gamePlayerName').textContent = playerInfo.name;
+                    document.getElementById('gamePlayerColor').style.backgroundColor = playerInfo.color;
+                    
+                    // Update join code display
+                    if (airconsole.getServerTime) {
+                        const code = Math.abs(airconsole.getServerTime() % 10000).toString().padStart(4, '0');
+                        document.getElementById('joinCode').textContent = code;
+                    }
+                    break;
+                }
+            }
+        }
+
+        function showWaitingScreen() {
+            document.getElementById('waitingScreen').style.display = 'block';
+            document.getElementById('gameController').style.display = 'none';
+            document.getElementById('resultsScreen').style.display = 'none';
+            
+            // Reset button states
+            isLeftPressed = false;
+            isRightPressed = false;
+            isJumpPressed = false;
+        }
+
+        function showGameController() {
+            document.getElementById('waitingScreen').style.display = 'none';
+            document.getElementById('gameController').style.display = 'flex';
+            document.getElementById('resultsScreen').style.display = 'none';
+            
+            setupControls();
+        }
+
+        function showResults(results) {
+            document.getElementById('waitingScreen').style.display = 'none';
+            document.getElementById('gameController').style.display = 'none';
+            document.getElementById('resultsScreen').style.display = 'block';
+            
+            const resultsList = document.getElementById('resultsList');
+            resultsList.innerHTML = '';
+            
+            results.forEach((result, index) => {
+                const resultDiv = document.createElement('div');
+                resultDiv.className = `result-item ${index === 0 ? 'winner' : ''}`;
+                resultDiv.innerHTML = `
+                    <strong>#${index + 1} ${result.name}</strong><br>
+                    Coins: ${result.coins} | Time: ${result.time}s<br>
+                    Score: <strong>${result.score}</strong>
+                `;
+                resultsList.appendChild(resultDiv);
+            });
+        }
+
+        function setupControls() {
+            const leftBtn = document.getElementById('leftBtn');
+            const rightBtn = document.getElementById('rightBtn');
+            const jumpBtn = document.getElementById('jumpBtn');
+
+            // Touch events for mobile
+            setupTouchControl(leftBtn, 'left');
+            setupTouchControl(rightBtn, 'right');
+            setupTouchControl(jumpBtn, 'jump');
+
+            // Mouse events for testing
+            setupMouseControl(leftBtn, 'left');
+            setupMouseControl(rightBtn, 'right');
+            setupMouseControl(jumpBtn, 'jump');
+        }
+
+        function setupTouchControl(element, action) {
+            element.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                handleActionStart(action, element);
+            });
+
+            element.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                handleActionEnd(action, element);
+            });
+
+            element.addEventListener('touchcancel', (e) => {
+                e.preventDefault();
+                handleActionEnd(action, element);
+            });
+        }
+
+        function setupMouseControl(element, action) {
+            element.addEventListener('mousedown', () => {
+                handleActionStart(action, element);
+            });
+
+            element.addEventListener('mouseup', () => {
+                handleActionEnd(action, element);
+            });
+
+            element.addEventListener('mouseleave', () => {
+                handleActionEnd(action, element);
+            });
+        }
+
+        function handleActionStart(action, element) {
+            element.classList.add('pressed');
+            vibrate(30);
+            
+            switch(action) {
+                case 'left':
+                    if (!isLeftPressed) {
+                        isLeftPressed = true;
+                        airconsole.message(AirConsole.SCREEN, { action: 'move', direction: 'left' });
+                    }
+                    break;
+                case 'right':
+                    if (!isRightPressed) {
+                        isRightPressed = true;
+                        airconsole.message(AirConsole.SCREEN, { action: 'move', direction: 'right' });
+                    }
+                    break;
+                case 'jump':
+                    if (!isJumpPressed) {
+                        isJumpPressed = true;
+                        airconsole.message(AirConsole.SCREEN, { action: 'jump', pressed: true });
+                    }
+                    break;
+            }
+        }
+
+        function handleActionEnd(action, element) {
+            element.classList.remove('pressed');
+            
+            switch(action) {
+                case 'left':
+                    if (isLeftPressed) {
+                        isLeftPressed = false;
+                        airconsole.message(AirConsole.SCREEN, { action: 'stop' });
+                    }
+                    break;
+                case 'right':
+                    if (isRightPressed) {
+                        isRightPressed = false;
+                        airconsole.message(AirConsole.SCREEN, { action: 'stop' });
+                    }
+                    break;
+                case 'jump':
+                    if (isJumpPressed) {
+                        isJumpPressed = false;
+                        airconsole.message(AirConsole.SCREEN, { action: 'jump', pressed: false });
+                    }
+                    break;
+            }
+        }
+
+        function vibrate(duration = 30) {
+            if (navigator.vibrate) {
+                navigator.vibrate(duration);
+            }
+        }
+
+        // Prevent scrolling and zooming
+        document.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+        }, { passive: false });
+
+        document.addEventListener('gesturestart', (e) => {
+            e.preventDefault();
+        });
+
+        // Start with waiting screen
+        showWaitingScreen();
+    </script>
+</body>
+</html>
