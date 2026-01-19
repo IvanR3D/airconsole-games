@@ -19,17 +19,14 @@
             width: 100vw;
             height: 100vh;
             overflow: hidden;
-            font-family: 'Courier New', monospace;
-            background: 
-                linear-gradient(135deg, rgba(26,26,26,0.85) 0%, rgba(26,26,26,0.9) 100%),
-                url('../Gemini_Generated_Image_z06tlhz06tlhz06t.png');
+            font-family: 'Arial', sans-serif;
+            background:
+                linear-gradient(135deg, #87CEEB 0%, #98FB98 50%, #FFB6C1 100%),
+                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="3" fill="%23FFD700" opacity="0.6"/><circle cx="80" cy="30" r="2" fill="%23FF69B4" opacity="0.4"/><circle cx="60" cy="80" r="4" fill="%2300CED1" opacity="0.5"/><circle cx="10" cy="70" r="2" fill="%23FFA500" opacity="0.7"/></svg>');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            image-rendering: pixelated;
-            image-rendering: -moz-crisp-edges;
-            image-rendering: crisp-edges;
             touch-action: none;
             display: flex;
             flex-direction: column;
@@ -54,9 +51,9 @@
             font-size: 32px;
             font-weight: bold;
             margin-bottom: 0;
-            color: #ff8c00;
-            text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
-            font-family: 'Courier New', monospace;
+            color: #FF6B6B;
+            text-shadow: 2px 2px 0 #FFF, -2px -2px 0 #FFF, 2px -2px 0 #FFF, -2px 2px 0 #FFF;
+            font-family: 'Comic Sans MS', cursive;
             letter-spacing: 2px;
             width: 100%;
             text-align: center;
@@ -64,15 +61,16 @@
 
 
         .player-info {
-            background: rgba(42,42,42,0.7);
-            border: 3px solid #000;
+            background: rgba(255,255,255,0.9);
+            border: 4px solid #FF69B4;
             padding: 20px 30px;
-            border-radius: 0;
+            border-radius: 20px;
             margin-bottom: 0;
             text-align: center;
             box-shadow:
-                0 4px 0 #222,
-                inset 0 1px 0 rgba(255,255,255,0.1);
+                0 6px 0 #FF1493,
+                inset 0 1px 0 rgba(255,255,255,0.8),
+                0 0 20px rgba(255,105,180,0.3);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -84,9 +82,9 @@
             font-size: 24px;
             font-weight: bold;
             margin: 0;
-            color: #ff8c00;
-            text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
-            font-family: 'Courier New', monospace;
+            color: #4169E1;
+            text-shadow: 2px 2px 0 #FFF, -1px -1px 0 #FFF, 1px -1px 0 #FFF, -1px 1px 0 #FFF;
+            font-family: 'Comic Sans MS', cursive;
             letter-spacing: 1px;
             text-align: center;
             width: 100%;
@@ -95,12 +93,13 @@
         .player-color {
             width: 40px;
             height: 40px;
-            border: 2px solid #000;
+            border: 3px solid #FFD700;
             display: block;
             margin: 0;
-            box-shadow: 
-                0 2px 0 #333,
-                inset 0 1px 0 rgba(255,255,255,0.1);
+            box-shadow:
+                0 3px 0 #FFA500,
+                inset 0 1px 0 rgba(255,255,255,0.8),
+                0 0 10px rgba(255,215,0,0.5);
         }
 
         #gameController {
@@ -117,12 +116,12 @@
 
         .game-title {
             font-size: 24px;
-            color: #ff8c00;
+            color: #32CD32;
             text-align: center;
             font-weight: bold;
             margin: 0;
-            text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
-            font-family: 'Courier New', monospace;
+            text-shadow: 2px 2px 0 #FFF, -2px -2px 0 #FFF, 2px -2px 0 #FFF, -2px 2px 0 #FFF;
+            font-family: 'Comic Sans MS', cursive;
             letter-spacing: 1px;
             width: 100%;
         }
@@ -180,9 +179,9 @@
         .jump-button {
             width: 200px;
             height: 200px;
-            border-radius: 0;
-            border: 4px solid #ff8c00;
-            background: #333;
+            border-radius: 50%;
+            border: 4px solid #FF1493;
+            background: linear-gradient(135deg, #FF69B4, #FF1493);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -190,9 +189,9 @@
             cursor: pointer;
             transition: all 0.1s;
             box-shadow:
-                0 8px 0 #222,
-                0 8px 20px rgba(0,0,0,0.5),
-                inset 0 1px 0 rgba(255,255,255,0.1);
+                0 8px 0 #C71585,
+                0 8px 20px rgba(255,20,147,0.4),
+                inset 0 1px 0 rgba(255,255,255,0.3);
             user-select: none;
             position: relative;
         }
@@ -230,10 +229,10 @@
 
         .jump-text {
             font-size: 24px;
-            color: #ff8c00;
+            color: #FFF;
             font-weight: 900;
             text-shadow: 2px 2px 0 #000, 1px 1px 0 #000;
-            font-family: 'Courier New', monospace;
+            font-family: 'Comic Sans MS', cursive;
             letter-spacing: 2px;
             text-transform: uppercase;
         }
@@ -249,9 +248,9 @@
         .control-button {
             width: 120px;
             height: 120px;
-            border-radius: 0;
-            border: 3px solid #666;
-            background: #2a2a2a;
+            border-radius: 20px;
+            border: 3px solid #FFD700;
+            background: linear-gradient(135deg, #87CEEB, #4169E1);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -259,17 +258,17 @@
             cursor: pointer;
             transition: all 0.1s;
             box-shadow:
-                0 6px 0 #1a1a1a,
-                0 6px 15px rgba(0,0,0,0.4),
-                inset 0 1px 0 rgba(255,255,255,0.05);
+                0 6px 0 #000080,
+                0 6px 15px rgba(65,105,225,0.4),
+                inset 0 1px 0 rgba(255,255,255,0.3);
             user-select: none;
             position: relative;
         }
 
         .button-text {
             font-size: 18px;
-            color: #ff8c00;
-            font-family: 'Courier New', monospace;
+            color: #FFF;
+            font-family: 'Comic Sans MS', cursive;
             font-weight: 900;
             text-shadow: 2px 2px 0 #000;
             margin-bottom: 5px;
@@ -283,6 +282,24 @@
             text-shadow: 1px 1px 0 #000;
         }
 
+        .left-button {
+            background: linear-gradient(135deg, #FF6B6B, #DC143C);
+            border-color: #FFD700;
+            box-shadow:
+                0 6px 0 #8B0000,
+                0 6px 15px rgba(220,20,60,0.4),
+                inset 0 1px 0 rgba(255,255,255,0.3);
+        }
+
+        .right-button {
+            background: linear-gradient(135deg, #32CD32, #228B22);
+            border-color: #FFD700;
+            box-shadow:
+                0 6px 0 #006400,
+                0 6px 15px rgba(34,139,34,0.4),
+                inset 0 1px 0 rgba(255,255,255,0.3);
+        }
+
         .control-button::before {
             content: '';
             position: absolute;
@@ -290,8 +307,8 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%);
-            border-radius: 9px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%);
+            border-radius: 17px;
             pointer-events: none;
         }
 
@@ -306,15 +323,16 @@
         }
 
         .instruction {
-            color: #888;
+            color: #4169E1;
             font-size: 16px;
             text-align: center;
             opacity: 0.9;
-            text-shadow: 1px 1px 0 #000;
+            text-shadow: 1px 1px 0 #FFF;
             margin: 0;
-            font-family: 'Courier New', monospace;
+            font-family: 'Comic Sans MS', cursive;
             letter-spacing: 0.5px;
             width: 100%;
+            font-weight: bold;
         }
 
         .results-screen {
@@ -333,32 +351,39 @@
             font-size: 32px;
             font-weight: bold;
             margin-bottom: 30px;
-            color: #ff8c00;
-            text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
-            font-family: 'Courier New', monospace;
+            color: #FFD700;
+            text-shadow: 2px 2px 0 #FF1493, -2px -2px 0 #FF1493, 2px -2px 0 #FF1493, -2px 2px 0 #FF1493;
+            font-family: 'Comic Sans MS', cursive;
             letter-spacing: 2px;
         }
 
         .result-item {
-            background: #2a2a2a;
+            background: linear-gradient(135deg, #FFFACD, #F0E68C);
             padding: 18px;
-            border-radius: 0;
+            border-radius: 15px;
             margin: 12px 0;
             font-size: 18px;
-            border: 3px solid #000;
-            box-shadow: 
-                0 4px 0 #1a1a1a,
-                inset 0 1px 0 rgba(255,255,255,0.05);
-            font-family: 'Courier New', monospace;
-            color: #ccc;
-            text-shadow: 1px 1px 0 #000;
+            border: 3px solid #FFD700;
+            box-shadow:
+                0 4px 0 #FFA500,
+                inset 0 1px 0 rgba(255,255,255,0.8),
+                0 0 15px rgba(255,215,0,0.3);
+            font-family: 'Comic Sans MS', cursive;
+            color: #8B4513;
+            text-shadow: 1px 1px 0 #FFF;
         }
 
         .result-item.winner {
-            background: #3a2a1a;
-            border: 3px solid #ff8c00;
-            box-shadow: 0 4px 0 #1a1a1a, 0 0 15px rgba(255,140,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
-            color: #ff8c00;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            border: 4px solid #FF1493;
+            box-shadow: 0 6px 0 #C71585, 0 0 25px rgba(255,20,147,0.6), inset 0 1px 0 rgba(255,255,255,0.9);
+            color: #8B0000;
+            animation: winnerGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes winnerGlow {
+            from { box-shadow: 0 6px 0 #C71585, 0 0 25px rgba(255,20,147,0.6), inset 0 1px 0 rgba(255,255,255,0.9); }
+            to { box-shadow: 0 6px 0 #C71585, 0 0 35px rgba(255,20,147,0.9), inset 0 1px 0 rgba(255,255,255,0.9); }
         }
 
         @keyframes pulse {
@@ -817,7 +842,7 @@
 
     <div id="gameController">
         <div>
-            <div class="game-title">PLATFORMER CHALLENGE</div>
+            <div class="game-title">🎮 ¡AVENTURA DE SALTOS! 🎈</div>
             <div class="player-header">
                 <div class="player-color-badge" id="gamePlayerColor"></div>
                 <div class="player-header-text" id="gamePlayerName"></div>
@@ -833,24 +858,24 @@
             </div>
             
             <div class="movement-container">
-                <div class="control-button" id="leftBtn">
+                <div class="control-button left-button" id="leftBtn">
                     <span class="button-text">LEFT</span>
                     <span class="button-key">A</span>
                 </div>
-                <div class="control-button" id="rightBtn">
+                <div class="control-button right-button" id="rightBtn">
                     <span class="button-text">RIGHT</span>
                     <span class="button-key">D</span>
                 </div>
             </div>
         </div>
         
-        <div class="instruction">Use buttons to control your character</div>
+            <div class="instruction">¡Usa los botones para controlar a tu personaje! 🎯</div>
     </div>
 
         <div id="resultsScreen" class="results-screen">
-            <div class="results-title">GAME RESULTS</div>
+            <div class="results-title">🏆 ¡RESULTADOS FINALES! 🏆</div>
         <div id="resultsList"></div>
-        <div class="instruction" style="margin-top: 30px;">Waiting for next game...</div>
+        <div class="instruction" style="margin-top: 30px;">¡Esperando la próxima aventura! 🎪</div>
     </div>
 
     <script>

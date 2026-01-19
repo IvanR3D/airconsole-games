@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AirConsole Platformer - Screen</title>
-    <script type="text/javascript" src="https://www.airconsole.com/api/airconsole-1.7.0.js"></script>
+    <title>STEAM Platformer - Pantalla Principal</title>
+    <script type="text/javascript" src="https://www.airconsole.com/api/airconsole-1.8.0.js"></script>
     <style>
         * {
             margin: 0;
@@ -21,26 +21,19 @@
         }
 
         body {
-            font-family: 'Courier New', monospace;
-            background: #000;
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+            background: linear-gradient(180deg, #1B4D3E 0%, #0D2818 100%);
             position: fixed;
             top: 0;
             left: 0;
+            color: white;
         }
 
+        /* START SCREEN */
         #startScreen {
             width: 100vw;
             height: 100vh;
-            background: 
-                linear-gradient(135deg, rgba(42,42,42,0.85) 0%, rgba(26,26,26,0.85) 100%),
-                url('../Gemini_Generated_Image_z06tlhz06tlhz06t.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            image-rendering: pixelated;
-            image-rendering: -moz-crisp-edges;
-            image-rendering: crisp-edges;
+            background: linear-gradient(180deg, #1B4D3E 0%, #0D2818 100%);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -59,141 +52,99 @@
             text-align: center;
         }
 
-        .start-container h1 {
-            font-size: 72px;
-            color: #ff8c00;
-            margin-bottom: 40px;
-            text-shadow: 
-                4px 4px 0 #000,
-                3px 3px 0 #000,
-                2px 2px 0 #000,
-                1px 1px 0 #000,
-                0 0 15px rgba(255,140,0,0.6);
-            font-family: 'Courier New', monospace;
-            letter-spacing: 4px;
+        .logo {
+            font-size: 4em;
             font-weight: 900;
-            text-transform: uppercase;
+            background: linear-gradient(45deg, #F4D03F, #FF6B6B, #4ECDC4, #45B7D1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(3px 3px 0px rgba(0,0,0,0.3));
+            margin-bottom: 20px;
         }
 
-        .start-container p {
-            font-size: 32px;
-            color: #999;
+        .subtitle {
+            font-size: 1.5em;
+            color: #F4D03F;
             margin-bottom: 50px;
-            font-family: 'Courier New', monospace;
-            text-shadow: 2px 2px 0 #000;
-            font-weight: 700;
+            opacity: 0.9;
         }
 
         .player-slots {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 40px;
-            margin-bottom: 60px;
+            gap: 20px;
+            margin-bottom: 40px;
             width: 100%;
-            max-width: 1200px;
+            max-width: 800px;
         }
 
         .player-slot {
-            background: transparent;
-            border: none;
-            border-radius: 0;
-            padding: 30px;
-            transition: all 0.1s;
-            box-shadow: none;
-        }
-
-        .player-slot:hover {
-            background: transparent;
-            transform: none;
-            box-shadow: none;
+            background: rgba(255, 255, 255, 0.1);
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 25px;
+            transition: all 0.3s ease;
         }
 
         .player-slot.filled {
-            border: none;
-            background: transparent;
-            box-shadow: none;
-        }
-
-        .player-slot.filled:hover {
-            background: transparent;
-            box-shadow: none;
+            border-color: #4CAF50;
+            background: rgba(76, 175, 80, 0.2);
         }
 
         .player-slot h3 {
-            font-size: 42px;
-            color: #ff8c00;
-            margin-bottom: 15px;
-            font-family: 'Courier New', monospace;
-            text-shadow: 3px 3px 0 #000, 2px 2px 0 #000, 1px 1px 0 #000;
-            font-weight: 900;
+            font-size: 1.5em;
+            color: #F4D03F;
+            margin-bottom: 10px;
         }
 
         .player-slot p {
-            font-size: 28px;
-            color: #999;
-            margin: 0;
-            font-family: 'Courier New', monospace;
-            text-shadow: 2px 2px 0 #000;
-            font-weight: 700;
+            font-size: 1.1em;
+            opacity: 0.8;
+        }
+
+        .player-slot .player-color-indicator {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin: 10px auto;
+            border: 3px solid white;
         }
 
         .start-btn {
-            background: #666;
-            color: #ff8c00;
-            border: 5px solid #000;
-            padding: 30px 80px;
-            font-size: 36px;
-            font-weight: 900;
-            border-radius: 0;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 20px 60px;
+            font-size: 1.5em;
+            font-weight: bold;
+            border-radius: 50px;
             cursor: pointer;
-            box-shadow:
-                0 10px 0 #333,
-                0 10px 25px rgba(0,0,0,0.5),
-                inset 0 1px 0 rgba(255,255,255,0.1);
-            transition: all 0.1s;
-            margin-bottom: 30px;
-            font-family: 'Courier New', monospace;
-            letter-spacing: 2px;
-            text-shadow: 3px 3px 0 #000, 2px 2px 0 #000, 1px 1px 0 #000;
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+            transition: all 0.3s ease;
             text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         .start-btn:hover:not(:disabled) {
-            background: #777;
-            transform: translateY(-2px);
-            box-shadow:
-                0 10px 0 #333,
-                0 10px 25px rgba(0,0,0,0.6),
-                inset 0 1px 0 rgba(255,255,255,0.2);
-        }
-
-        .start-btn:active:not(:disabled) {
-            transform: translateY(4px);
-            box-shadow:
-                0 4px 0 #333,
-                0 4px 15px rgba(0,0,0,0.4),
-                inset 0 1px 0 rgba(255,255,255,0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.6);
         }
 
         .start-btn:disabled {
-            background: #444;
-            color: #666;
-            box-shadow:
-                0 4px 0 #222,
-                0 4px 15px rgba(0,0,0,0.3),
-                inset 0 1px 0 rgba(0,0,0,0.2);
+            background: #666;
             cursor: not-allowed;
+            box-shadow: none;
         }
 
         .waiting-text {
-            color: #ff8c00;
-            font-size: 28px;
+            color: #F4D03F;
+            font-size: 1.2em;
             margin-top: 20px;
-            font-family: 'Courier New', monospace;
-            text-shadow: 2px 2px 0 #000;
-            font-weight: 700;
+            opacity: 0.8;
         }
 
+        /* GAME CONTAINER */
         #gameContainer {
             display: none;
             width: 100vw;
@@ -204,16 +155,7 @@
             overflow: hidden;
             margin: 0;
             padding: 0;
-            background: 
-                linear-gradient(135deg, rgba(42,42,42,0.7) 0%, rgba(26,26,26,0.7) 100%),
-                url('../Gemini_Generated_Image_z06tlhz06tlhz06t.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            image-rendering: pixelated;
-            image-rendering: -moz-crisp-edges;
-            image-rendering: crisp-edges;
+            background: linear-gradient(180deg, #1B4D3E 0%, #0D2818 100%);
         }
 
         .screen-split {
@@ -284,54 +226,39 @@
             width: 100%;
             height: 100%;
             image-rendering: pixelated;
-            image-rendering: -moz-crisp-edges;
             image-rendering: crisp-edges;
-            image-rendering: -webkit-optimize-contrast;
         }
 
         .player-hud {
             position: absolute;
             top: 20px;
             left: 20px;
-            background: #333;
-            border: 4px solid #000;
-            padding: 20px 30px;
-            border-radius: 0;
-            box-shadow:
-                0 8px 0 #000,
-                0 8px 20px rgba(0,0,0,0.5),
-                inset 0 1px 0 rgba(255,255,255,0.1);
-            font-size: 32px;
-            font-weight: 900;
+            background: rgba(0, 0, 0, 0.5);
+            border: 3px solid;
+            padding: 15px 25px;
+            border-radius: 15px;
+            font-size: 1.5em;
+            font-weight: bold;
             z-index: 10;
             display: flex;
             align-items: center;
-            gap: 15px;
-            min-width: 250px;
-            font-family: 'Courier New', monospace;
-            color: #ff8c00;
-            text-shadow: 3px 3px 0 #000, 2px 2px 0 #000, 1px 1px 0 #000;
+            gap: 10px;
         }
 
-        .player-name {
+        .player-name-badge {
             position: absolute;
             top: 20px;
             right: 20px;
-            background: #666;
-            border: 4px solid #000;
-            color: #ff8c00;
-            padding: 15px 25px;
-            border-radius: 0;
-            font-size: 28px;
-            font-weight: 900;
+            background: rgba(0, 0, 0, 0.5);
+            border: 3px solid;
+            padding: 12px 20px;
+            border-radius: 15px;
+            font-size: 1.3em;
+            font-weight: bold;
             z-index: 10;
-            font-family: 'Courier New', monospace;
-            text-shadow: 3px 3px 0 #000, 2px 2px 0 #000, 1px 1px 0 #000;
-            box-shadow:
-                0 6px 0 #333,
-                0 6px 15px rgba(0,0,0,0.4);
         }
 
+        /* RESULTS SCREEN */
         #resultsScreen {
             display: none;
             position: fixed;
@@ -339,682 +266,119 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: 
-                linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.95) 100%),
-                url('../Gemini_Generated_Image_z06tlhz06tlhz06t.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            image-rendering: pixelated;
-            image-rendering: -moz-crisp-edges;
-            image-rendering: crisp-edges;
+            background: linear-gradient(180deg, #1B4D3E 0%, #0D2818 100%);
             align-items: center;
             justify-content: center;
             z-index: 100;
         }
 
         .results-container {
-            background: transparent;
-            border: none;
-            border-radius: 0;
-            padding: 40px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            padding: 50px;
             text-align: center;
-            box-shadow: none;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            width: 90%;
+            max-width: 800px;
         }
 
-        .results-container h2 {
-            font-size: 72px;
-            color: #ff8c00;
-            margin-bottom: 50px;
-            text-shadow: 
-                4px 4px 0 #000,
-                3px 3px 0 #000,
-                2px 2px 0 #000,
-                1px 1px 0 #000,
-                0 0 15px rgba(255,140,0,0.6);
-            font-family: 'Courier New', monospace;
-            letter-spacing: 4px;
-            font-weight: 900;
-            text-transform: uppercase;
+        .results-title {
+            font-size: 3em;
+            color: #F4D03F;
+            margin-bottom: 40px;
         }
 
         .results-table {
             width: 100%;
-            margin: 30px 0;
             border-collapse: collapse;
-        }
-
-        .results-table {
-            max-width: 1200px;
-            width: 100%;
+            margin-bottom: 40px;
         }
 
         .results-table th {
-            background: transparent;
-            border: none;
-            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
             text-align: left;
-            font-size: 32px;
-            color: #ff8c00;
-            font-family: 'Courier New', monospace;
-            text-shadow: 3px 3px 0 #000, 2px 2px 0 #000, 1px 1px 0 #000;
-            font-weight: 900;
+            font-size: 1.2em;
+            color: #F4D03F;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
         }
 
         .results-table td {
-            padding: 20px;
-            border: none;
-            border-top: none;
-            font-size: 28px;
-            background: transparent;
-            color: #999;
-            font-family: 'Courier New', monospace;
-            font-weight: 700;
-            text-shadow: 2px 2px 0 #000;
+            padding: 15px;
+            font-size: 1.1em;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .results-table tr:first-child td {
-            background: transparent;
-            border: none;
-            font-weight: 900;
-            color: #ff8c00;
-            box-shadow: none;
-            text-shadow: 3px 3px 0 #000, 2px 2px 0 #000, 1px 1px 0 #000;
+            background: linear-gradient(135deg, rgba(244, 208, 63, 0.3), rgba(255, 107, 107, 0.3));
+            font-weight: bold;
+            font-size: 1.3em;
         }
 
         .player-color {
             display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #000;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
             margin-right: 10px;
             vertical-align: middle;
-            box-shadow: 
-                0 2px 0 #333,
-                inset 0 1px 0 rgba(255,255,255,0.1);
+            border: 2px solid white;
+        }
+
+        .restart-btn {
+            background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+            color: white;
+            border: none;
+            padding: 20px 60px;
+            font-size: 1.5em;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(156, 39, 176, 0.4);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(156, 39, 176, 0.6);
         }
 
         .hidden {
             display: none !important;
-        }
-
-        /* Responsive Design - Large Screens / TV / Desktop */
-        @media (min-width: 1920px) {
-            .start-container h1 {
-                font-size: 96px;
-                letter-spacing: 5px;
-                margin-bottom: 60px;
-            }
-
-            .start-container p {
-                font-size: 42px;
-                margin-bottom: 70px;
-            }
-
-            .player-slots {
-                gap: 60px;
-                margin-bottom: 80px;
-                max-width: 1600px;
-            }
-
-            .player-slot h3 {
-                font-size: 56px;
-                margin-bottom: 20px;
-            }
-
-            .player-slot p {
-                font-size: 36px;
-            }
-
-            .start-btn {
-                font-size: 48px;
-                padding: 40px 100px;
-                letter-spacing: 3px;
-                margin-bottom: 40px;
-            }
-
-            .waiting-text {
-                font-size: 36px;
-                margin-top: 30px;
-            }
-
-            .results-container h2 {
-                font-size: 96px;
-                letter-spacing: 5px;
-                margin-bottom: 70px;
-            }
-
-            .results-table {
-                max-width: 1600px;
-            }
-
-            .results-table th {
-                font-size: 42px;
-                padding: 30px;
-            }
-
-            .results-table td {
-                font-size: 36px;
-                padding: 30px;
-            }
-
-            .player-hud {
-                font-size: 42px;
-                padding: 25px 40px;
-                min-width: 350px;
-                top: 30px;
-                left: 30px;
-            }
-
-            .player-name {
-                font-size: 36px;
-                padding: 20px 35px;
-                top: 30px;
-                right: 30px;
-            }
-        }
-
-        /* Responsive Design - Desktop / Large Monitors */
-        @media (min-width: 1440px) and (max-width: 1919px) {
-            .start-container h1 {
-                font-size: 84px;
-                letter-spacing: 4px;
-                margin-bottom: 50px;
-            }
-
-            .start-container p {
-                font-size: 36px;
-                margin-bottom: 60px;
-            }
-
-            .player-slots {
-                gap: 50px;
-                margin-bottom: 70px;
-                max-width: 1400px;
-            }
-
-            .player-slot h3 {
-                font-size: 48px;
-                margin-bottom: 18px;
-            }
-
-            .player-slot p {
-                font-size: 32px;
-            }
-
-            .start-btn {
-                font-size: 42px;
-                padding: 35px 90px;
-                letter-spacing: 2px;
-                margin-bottom: 35px;
-            }
-
-            .waiting-text {
-                font-size: 32px;
-                margin-top: 25px;
-            }
-
-            .results-container h2 {
-                font-size: 84px;
-                letter-spacing: 4px;
-                margin-bottom: 60px;
-            }
-
-            .results-table {
-                max-width: 1400px;
-            }
-
-            .results-table th {
-                font-size: 36px;
-                padding: 25px;
-            }
-
-            .results-table td {
-                font-size: 32px;
-                padding: 25px;
-            }
-
-            .player-hud {
-                font-size: 36px;
-                padding: 22px 35px;
-                min-width: 300px;
-                top: 25px;
-                left: 25px;
-            }
-
-            .player-name {
-                font-size: 32px;
-                padding: 18px 30px;
-                top: 25px;
-                right: 25px;
-            }
-        }
-
-        /* Responsive Design - Tablets */
-        @media (max-width: 1024px) {
-            .start-container h1 {
-                font-size: 56px;
-                letter-spacing: 3px;
-                margin-bottom: 30px;
-            }
-
-            .start-container p {
-                font-size: 26px;
-                margin-bottom: 40px;
-            }
-
-            .player-slots {
-                gap: 30px;
-                margin-bottom: 50px;
-            }
-
-            .player-slot h3 {
-                font-size: 36px;
-            }
-
-            .player-slot p {
-                font-size: 24px;
-            }
-
-            .start-btn {
-                font-size: 30px;
-                padding: 25px 60px;
-            }
-
-            .waiting-text {
-                font-size: 24px;
-            }
-
-            .results-container h2 {
-                font-size: 56px;
-                letter-spacing: 3px;
-            }
-
-            .results-table th {
-                font-size: 26px;
-            }
-
-            .results-table td {
-                font-size: 24px;
-            }
-
-            .player-hud {
-                font-size: 26px;
-                padding: 15px 25px;
-                min-width: 200px;
-            }
-
-            .player-name {
-                font-size: 24px;
-                padding: 12px 20px;
-            }
-        }
-
-        /* Responsive Design - Mobile Landscape */
-        @media (max-width: 768px) {
-            #startScreen {
-                padding: 20px;
-            }
-
-            .start-container h1 {
-                font-size: 42px;
-                letter-spacing: 2px;
-                margin-bottom: 25px;
-            }
-
-            .start-container p {
-                font-size: 20px;
-                margin-bottom: 30px;
-            }
-
-            .player-slots {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 20px;
-                margin-bottom: 40px;
-            }
-
-            .player-slot {
-                padding: 20px;
-            }
-
-            .player-slot h3 {
-                font-size: 28px;
-                margin-bottom: 10px;
-            }
-
-            .player-slot p {
-                font-size: 20px;
-            }
-
-            .start-btn {
-                font-size: 24px;
-                padding: 20px 50px;
-                letter-spacing: 1px;
-            }
-
-            .waiting-text {
-                font-size: 20px;
-            }
-
-            .results-container {
-                padding: 30px 20px;
-            }
-
-            .results-container h2 {
-                font-size: 42px;
-                letter-spacing: 2px;
-                margin-bottom: 40px;
-            }
-
-            .results-table {
-                margin: 20px 0;
-            }
-
-            .results-table th {
-                font-size: 20px;
-                padding: 12px;
-            }
-
-            .results-table td {
-                font-size: 18px;
-                padding: 12px;
-            }
-
-            .player-hud {
-                font-size: 20px;
-                padding: 12px 18px;
-                min-width: 180px;
-                top: 10px;
-                left: 10px;
-            }
-
-            .player-name {
-                font-size: 18px;
-                padding: 10px 16px;
-                top: 10px;
-                right: 10px;
-            }
-        }
-
-        /* Responsive Design - Mobile Portrait */
-        @media (max-width: 480px) {
-            #startScreen {
-                padding: 15px;
-            }
-
-            .start-container h1 {
-                font-size: 32px;
-                letter-spacing: 1px;
-                margin-bottom: 20px;
-            }
-
-            .start-container p {
-                font-size: 16px;
-                margin-bottom: 25px;
-            }
-
-            .player-slots {
-                grid-template-columns: 1fr;
-                gap: 15px;
-                margin-bottom: 30px;
-            }
-
-            .player-slot {
-                padding: 15px;
-            }
-
-            .player-slot h3 {
-                font-size: 24px;
-                margin-bottom: 8px;
-            }
-
-            .player-slot p {
-                font-size: 18px;
-            }
-
-            .start-btn {
-                font-size: 20px;
-                padding: 18px 40px;
-                letter-spacing: 1px;
-                margin-bottom: 20px;
-            }
-
-            .waiting-text {
-                font-size: 16px;
-                margin-top: 15px;
-            }
-
-            .results-container {
-                padding: 20px 15px;
-            }
-
-            .results-container h2 {
-                font-size: 32px;
-                letter-spacing: 1px;
-                margin-bottom: 30px;
-            }
-
-            .results-table {
-                margin: 15px 0;
-            }
-
-            .results-table th {
-                font-size: 16px;
-                padding: 10px;
-            }
-
-            .results-table td {
-                font-size: 14px;
-                padding: 10px;
-            }
-
-            .player-hud {
-                font-size: 16px;
-                padding: 10px 15px;
-                min-width: 150px;
-                top: 8px;
-                left: 8px;
-                gap: 8px;
-            }
-
-            .player-name {
-                font-size: 14px;
-                padding: 8px 12px;
-                top: 8px;
-                right: 8px;
-            }
-        }
-
-        /* Responsive Design - Very Small Screens */
-        @media (max-width: 360px) {
-            .start-container h1 {
-                font-size: 28px;
-            }
-
-            .start-container p {
-                font-size: 14px;
-            }
-
-            .player-slot h3 {
-                font-size: 20px;
-            }
-
-            .player-slot p {
-                font-size: 16px;
-            }
-
-            .start-btn {
-                font-size: 18px;
-                padding: 15px 30px;
-            }
-
-            .waiting-text {
-                font-size: 14px;
-            }
-
-            .results-container h2 {
-                font-size: 28px;
-            }
-
-            .results-table th {
-                font-size: 14px;
-                padding: 8px;
-            }
-
-            .results-table td {
-                font-size: 12px;
-                padding: 8px;
-            }
-
-            .player-hud {
-                font-size: 14px;
-                padding: 8px 12px;
-                min-width: 120px;
-            }
-
-            .player-name {
-                font-size: 12px;
-                padding: 6px 10px;
-            }
-        }
-
-        /* Responsive Design - Split Screen Adjustments */
-        @media (max-width: 1024px) {
-            .screen-split.two-players {
-                height: 50vh;
-            }
-
-            .screen-split.three-players {
-                width: 50vw;
-                height: 50vh;
-            }
-
-            .screen-split.four-players {
-                width: 50vw;
-                height: 50vh;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .screen-split.three-players:nth-child(1) {
-                width: 100vw;
-                height: 40vh;
-            }
-
-            .screen-split.three-players:nth-child(2),
-            .screen-split.three-players:nth-child(3) {
-                width: 50vw;
-                height: 60vh;
-            }
-
-            .screen-split.four-players {
-                width: 50vw;
-                height: 50vh;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .screen-split.one-player {
-                width: 100vw;
-                height: 100vh;
-            }
-
-            .screen-split.two-players {
-                width: 100vw;
-                height: 50vh;
-            }
-
-            .screen-split.three-players:nth-child(1) {
-                width: 100vw;
-                height: 33vh;
-            }
-
-            .screen-split.three-players:nth-child(2),
-            .screen-split.three-players:nth-child(3) {
-                width: 50vw;
-                height: 67vh;
-            }
-
-            .screen-split.four-players {
-                width: 50vw;
-                height: 50vh;
-            }
-        }
-
-        /* Landscape Orientation Adjustments */
-        @media (orientation: landscape) and (max-height: 600px) {
-            #startScreen {
-                padding: 15px;
-            }
-
-            .start-container h1 {
-                font-size: 36px;
-                margin-bottom: 15px;
-            }
-
-            .start-container p {
-                font-size: 18px;
-                margin-bottom: 20px;
-            }
-
-            .player-slots {
-                gap: 15px;
-                margin-bottom: 25px;
-            }
-
-            .player-slot h3 {
-                font-size: 22px;
-            }
-
-            .player-slot p {
-                font-size: 16px;
-            }
-
-            .start-btn {
-                font-size: 20px;
-                padding: 15px 40px;
-                margin-bottom: 15px;
-            }
-
-            .waiting-text {
-                font-size: 16px;
-                margin-top: 10px;
-            }
         }
     </style>
 </head>
 <body>
     <div id="startScreen">
         <div class="start-container">
-            <h1>PLATFORMER CHALLENGE</h1>
-            <p>1-4 Players • Race to the Finish • Collect Coins</p>
+            <div class="logo">🎮 STEAM PLATFORMER 🎮</div>
+            <p class="subtitle">1-4 Jugadores • Carrera a la Meta • Colecta Monedas</p>
             <div class="player-slots">
                 <div class="player-slot" id="playerSlot1">
-                    <h3>Player 1</h3>
-                    <p>Waiting...</p>
+                    <h3>Jugador 1</h3>
+                    <div class="player-color-indicator" style="background: #8B9A46;"></div>
+                    <p>Esperando...</p>
                 </div>
                 <div class="player-slot" id="playerSlot2">
-                    <h3>Player 2</h3>
-                    <p>Waiting...</p>
+                    <h3>Jugador 2</h3>
+                    <div class="player-color-indicator" style="background: #C94C4C;"></div>
+                    <p>Esperando...</p>
                 </div>
                 <div class="player-slot" id="playerSlot3">
-                    <h3>Player 3</h3>
-                    <p>Waiting...</p>
+                    <h3>Jugador 3</h3>
+                    <div class="player-color-indicator" style="background: #4A8B8B;"></div>
+                    <p>Esperando...</p>
                 </div>
                 <div class="player-slot" id="playerSlot4">
-                    <h3>Player 4</h3>
-                    <p>Waiting...</p>
+                    <h3>Jugador 4</h3>
+                    <div class="player-color-indicator" style="background: #D4A44C;"></div>
+                    <p>Esperando...</p>
                 </div>
             </div>
-            <button class="start-btn" id="startBtn" disabled>Waiting for Players...</button>
-            <p class="waiting-text" id="waitingText">Need at least 1 player to start</p>
+            <button class="start-btn" id="startBtn" disabled>Esperando jugadores...</button>
+            <p class="waiting-text" id="waitingText">Necesitas al menos 1 jugador para empezar</p>
         </div>
     </div>
 
@@ -1022,27 +386,26 @@
 
     <div id="resultsScreen">
         <div class="results-container">
-            <h2>GAME RESULTS</h2>
+            <h2 class="results-title">🏆 ¡Resultados Finales! 🏆</h2>
             <table class="results-table">
                 <thead>
                     <tr>
                         <th>Rank</th>
-                        <th>Player</th>
-                        <th>Coins</th>
-                        <th>Time</th>
-                        <th>Score</th>
+                        <th>Jugador</th>
+                        <th>Monedas</th>
+                        <th>Tiempo</th>
+                        <th>Puntos</th>
                     </tr>
                 </thead>
                 <tbody id="resultsBody"></tbody>
             </table>
-            <button class="start-btn" id="restartBtn">PLAY AGAIN</button>
+            <button class="restart-btn" id="restartBtn">🔄 JUGAR DE NUEVO</button>
         </div>
     </div>
 
     <script>
         const airconsole = new AirConsole();
         
-        // Game configuration (matches index.html)
         const LEVEL = {
             floorSegments: [
                 { x: 0, width: 300 },
@@ -1083,18 +446,8 @@
             games: {},
             started: false,
             startTime: null,
-            playerColors: [
-                '#000000', // Black
-                '#666666', // Dark Gray
-                '#999999', // Light Gray
-                '#ff8c00'  // Orange
-            ],
-            playerNames: [
-                'Shadow',
-                'Stone',
-                'Steel',
-                'Flame'
-            ]
+            playerColors: ['#8B9A46', '#C94C4C', '#4A8B8B', '#D4A44C'],
+            playerNames: ['Verde', 'Rojo', 'Azul', 'Naranja']
         };
 
         airconsole.onReady = function() {
@@ -1104,13 +457,12 @@
         airconsole.onConnect = function(device_id) {
             console.log("Player connected:", device_id);
             
-            // Assign player to next available slot
             let assigned = false;
             for (let i = 0; i < 4; i++) {
                 if (!gameState.players[i+1]) {
                     gameState.players[i+1] = {
                         deviceId: device_id,
-                        nickname: `Player ${i+1}`,
+                        nickname: `Jugador ${i+1}`,
                         color: gameState.playerColors[i],
                         name: gameState.playerNames[i],
                         connected: true,
@@ -1130,7 +482,6 @@
         airconsole.onDisconnect = function(device_id) {
             console.log("Player disconnected:", device_id);
             
-            // Remove disconnected player
             for (let playerNum in gameState.players) {
                 if (gameState.players[playerNum].deviceId === device_id) {
                     delete gameState.players[playerNum];
@@ -1143,7 +494,6 @@
         };
 
         airconsole.onMessage = function(device_id, data) {
-            // Handle control inputs
             for (let playerNum in gameState.players) {
                 if (gameState.players[playerNum].deviceId === device_id) {
                     const game = gameState.games[playerNum];
@@ -1172,25 +522,32 @@
                 
                 if (player) {
                     slot.classList.add('filled');
-                    slot.innerHTML = `<h3>${player.name}</h3><p>Ready ✓</p>`;
+                    slot.innerHTML = `
+                        <h3>${player.name}</h3>
+                        <div class="player-color-indicator" style="background: ${player.color};"></div>
+                        <p>✓ Listo</p>
+                    `;
                 } else {
                     slot.classList.remove('filled');
-                    slot.innerHTML = `<h3>Player ${i}</h3><p>Waiting...</p>`;
+                    slot.innerHTML = `
+                        <h3>Jugador ${i}</h3>
+                        <div class="player-color-indicator" style="background: ${gameState.playerColors[i-1]};"></div>
+                        <p>Esperando...</p>
+                    `;
                 }
             }
             
-            // Update start button
             const startBtn = document.getElementById('startBtn');
             const waitingText = document.getElementById('waitingText');
             
             if (connectedPlayers > 0) {
                 startBtn.disabled = false;
-                startBtn.textContent = `START GAME (${connectedPlayers} Players)`;
-                waitingText.textContent = `${connectedPlayers} player(s) ready`;
+                startBtn.textContent = `¡INICIAR JUEGO! (${connectedPlayers} Jugador${connectedPlayers > 1 ? 'es' : ''})`;
+                waitingText.textContent = `${connectedPlayers} jugador${connectedPlayers > 1 ? 'es' : ''} listo${connectedPlayers > 1 ? 's' : ''}`;
             } else {
                 startBtn.disabled = true;
-                startBtn.textContent = 'Waiting for Players...';
-                waitingText.textContent = 'Need at least 1 player to start';
+                startBtn.textContent = 'Esperando jugadores...';
+                waitingText.textContent = 'Necesitas al menos 1 jugador para empezar';
             }
         }
 
@@ -1216,14 +573,12 @@
             const playerCount = Object.keys(gameState.players).length;
             setupGameScreen(playerCount);
             
-            // Initialize games for each player
             for (let playerNum in gameState.players) {
                 const player = gameState.players[playerNum];
                 gameState.games[playerNum] = new Game(playerNum, player.color);
                 gameState.games[playerNum].init();
             }
             
-            // Notify all players game is starting
             airconsole.broadcast({ type: 'gameStart' });
         }
 
@@ -1240,11 +595,11 @@
                 splitDiv.innerHTML = `
                     <div class="game-canvas">
                         <canvas id="canvas${i}"></canvas>
-                        <div class="player-hud" style="background: ${player.color}22; border: 2px solid ${player.color};">
-                            <span>COINS:</span>
+                        <div class="player-hud" style="border-color: ${player.color};">
+                            <span>🪙</span>
                             <span id="coinCount${i}">0</span>/${LEVEL.coins.length}
                         </div>
-                        <div class="player-name" style="background: ${player.color};">
+                        <div class="player-name-badge" style="border-color: ${player.color}; color: ${player.color};">
                             ${player.name}
                         </div>
                     </div>
@@ -1268,11 +623,9 @@
             document.getElementById('resultsScreen').style.display = 'none';
             document.getElementById('startScreen').style.display = 'flex';
             
-            // Reset game state
             gameState.started = false;
             gameState.games = {};
             
-            // Notify players
             airconsole.broadcast({ type: 'gameRestart' });
         }
 
@@ -1299,17 +652,16 @@
                 }
             }
             
-            // Sort by score (highest first)
             results.sort((a, b) => b.score - a.score);
             
-            // Update results table
             const resultsBody = document.getElementById('resultsBody');
             resultsBody.innerHTML = '';
             
+            const medals = ['🥇', '🥈', '🥉'];
             results.forEach((result, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${index + 1}</td>
+                    <td>${medals[index] || `#${index + 1}`}</td>
                     <td><span class="player-color" style="background: ${result.color};"></span>${result.name}</td>
                     <td>${result.coins}</td>
                     <td>${result.time}s</td>
@@ -1330,7 +682,6 @@
                 this.keys = { left: false, right: false, jump: false };
                 this.finishTime = null;
                 
-                // Initialize player properties
                 this.player = {
                     x: 50,
                     y: 250,
@@ -1340,11 +691,9 @@
                     velY: 0,
                     stunned: false,
                     stunTimer: 0,
-                    color: color,
-                    strokeColor: this.darkenColor(color, 0.3)
+                    color: color
                 };
                 
-                // Game properties
                 this.GRAVITY = 0.5;
                 this.JUMP_FORCE = -12;
                 this.MOVE_SPEED = 4;
@@ -1354,7 +703,6 @@
                 this.cameraX = 0;
                 this.particles = [];
                 
-                // Copy level data
                 this.floorSegments = JSON.parse(JSON.stringify(LEVEL.floorSegments));
                 this.platforms = JSON.parse(JSON.stringify(LEVEL.platforms));
                 this.coinList = JSON.parse(JSON.stringify(LEVEL.coins));
@@ -1363,32 +711,17 @@
                 this.finishY = LEVEL.finishY;
             }
 
-            darkenColor(color, amount) {
-                const hex = color.replace('#', '');
-                const num = parseInt(hex, 16);
-                const r = Math.max(0, (num >> 16) - Math.floor(amount * 255));
-                const g = Math.max(0, ((num >> 8) & 0x00FF) - Math.floor(amount * 255));
-                const b = Math.max(0, (num & 0x0000FF) - Math.floor(amount * 255));
-                return `#${(r << 16 | g << 8 | b).toString(16).padStart(6, '0')}`;
-            }
-
             init() {
                 this.canvas = document.getElementById(`canvas${this.playerNum}`);
                 this.ctx = this.canvas.getContext('2d');
-                // Pixel art rendering
                 this.ctx.imageSmoothingEnabled = false;
-                this.ctx.webkitImageSmoothingEnabled = false;
-                this.ctx.mozImageSmoothingEnabled = false;
-                this.ctx.msImageSmoothingEnabled = false;
                 this.resizeCanvas();
                 
-                // Get container dimensions
                 const container = document.getElementById(`player${this.playerNum}Screen`);
                 this.canvas.width = container.clientWidth;
                 this.canvas.height = container.clientHeight;
                 
-                // Adjust level Y positions for split screen
-                const heightRatio = this.canvas.height / 700; // Original game height
+                const heightRatio = this.canvas.height / 700;
                 
                 this.floorSegments.forEach(segment => {
                     segment.y = this.canvas.height - 50;
@@ -1416,15 +749,9 @@
                 if (this.canvas) {
                     const container = document.getElementById(`player${this.playerNum}Screen`);
                     if (container) {
-                        // Asegurar que ocupe toda la pantalla
                         this.canvas.width = container.clientWidth || window.innerWidth;
                         this.canvas.height = container.clientHeight || window.innerHeight;
-                        
-                        // Re-aplicar pixel art rendering
                         this.ctx.imageSmoothingEnabled = false;
-                        this.ctx.webkitImageSmoothingEnabled = false;
-                        this.ctx.mozImageSmoothingEnabled = false;
-                        this.ctx.msImageSmoothingEnabled = false;
                     }
                 }
             }
@@ -1432,14 +759,12 @@
             update() {
                 if (this.gameWon) return;
 
-                // Update keys
                 this.player.velX = 0;
                 if (!this.player.stunned) {
                     if (this.keys.left) this.player.velX = -this.MOVE_SPEED;
                     if (this.keys.right) this.player.velX = this.MOVE_SPEED;
                 }
 
-                // Stun timer
                 if (this.player.stunned) {
                     this.player.stunTimer--;
                     if (this.player.stunTimer <= 0) {
@@ -1447,21 +772,17 @@
                     }
                 }
 
-                // Gravity
                 this.player.velY += this.GRAVITY;
 
-                // Jump
                 if (this.keys.jump && this.isGrounded && !this.player.stunned) {
                     this.player.velY = this.JUMP_FORCE;
                     this.playSound('jump');
                     this.keys.jump = false;
                 }
 
-                // Update position
                 this.player.x += this.player.velX;
                 this.player.y += this.player.velY;
 
-                // Collision with platforms
                 this.isGrounded = false;
                 this.platforms.forEach(platform => {
                     if (this.player.x + this.player.width > platform.x &&
@@ -1475,7 +796,6 @@
                     }
                 });
 
-                // Collision with floor segments
                 const floorHeight = this.canvas.height - 50;
                 let onFloorSegment = false;
                 
@@ -1492,10 +812,9 @@
                     }
                 });
 
-                // Fall through gaps
                 if (!onFloorSegment && this.player.y + this.player.height > floorHeight - 10) {
                     if (this.player.y > this.canvas.height) {
-                        this.createHitParticles(this.player.x + this.player.width/2, this.player.y + this.player.height/2);
+                        this.createParticles(this.player.x + this.player.width/2, this.player.y + this.player.height/2, ['#f44336', '#ff5722', '#ff9800']);
                         this.player.x = 50;
                         this.player.y = 250 * (this.canvas.height / 700);
                         this.player.velX = 0;
@@ -1505,14 +824,12 @@
                     }
                 }
 
-                // Update obstacles
                 this.obstacles.forEach(obs => {
                     obs.x += obs.direction * obs.speed;
                     if (Math.abs(obs.x - obs.startX) > obs.range) {
                         obs.direction *= -1;
                     }
                     
-                    // Collision with player
                     if (!this.player.stunned &&
                         this.player.x + this.player.width > obs.x &&
                         this.player.x < obs.x + obs.width &&
@@ -1521,17 +838,13 @@
                         this.player.stunned = true;
                         this.player.stunTimer = 60;
                         this.playSound('hit');
-                        this.createHitParticles(this.player.x + this.player.width/2, this.player.y + this.player.height/2);
+                        this.createParticles(this.player.x + this.player.width/2, this.player.y + this.player.height/2, ['#f44336', '#ff5722']);
                     }
                 });
 
-                // Boundaries
                 this.player.x = Math.max(0, this.player.x);
-
-                // Camera follow
                 this.cameraX = Math.max(0, Math.min(this.player.x - this.canvas.width / 2, this.finishX - this.canvas.width + 100));
 
-                // Coin collection
                 this.coinList.forEach(coin => {
                     if (!coin.collected &&
                         Math.abs(this.player.x + this.player.width/2 - coin.x) < 30 &&
@@ -1539,12 +852,11 @@
                         coin.collected = true;
                         this.coins++;
                         document.getElementById(`coinCount${this.playerNum}`).textContent = this.coins;
-                        this.createParticles(coin.x, coin.y);
+                        this.createParticles(coin.x, coin.y, ['#F4D03F', '#FFC107', '#FFEB3B']);
                         this.playSound('coin');
                     }
                 });
 
-                // Win condition
                 if (this.player.x > this.finishX && 
                     this.player.y + this.player.height > this.finishY - 100 &&
                     this.player.y < this.finishY + 100) {
@@ -1552,7 +864,6 @@
                     this.finishTime = Date.now();
                     this.playSound('win');
                     
-                    // Check if all players are finished
                     let allFinished = true;
                     for (let playerNum in gameState.games) {
                         if (!gameState.games[playerNum].gameWon) {
@@ -1566,10 +877,10 @@
                     }
                 }
 
-                // Update particles
                 this.particles = this.particles.filter(p => {
                     p.x += p.vx;
                     p.y += p.vy;
+                    p.vy += 0.1;
                     p.life--;
                     return p.life > 0;
                 });
@@ -1581,327 +892,232 @@
                 this.ctx.save();
                 this.ctx.translate(-this.cameraX, 0);
 
-                // Background - semi-transparente para mostrar imagen de fondo
-                this.ctx.fillStyle = 'rgba(26, 26, 26, 0.6)';
+                // Background - green theme
+                const gradient = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
+                gradient.addColorStop(0, '#1B4D3E');
+                gradient.addColorStop(1, '#0D2818');
+                this.ctx.fillStyle = gradient;
                 this.ctx.fillRect(this.cameraX, 0, this.canvas.width, this.canvas.height);
                 
-                // Patrón de fondo tipo Terraria - más transparente
-                this.ctx.fillStyle = 'rgba(42, 42, 42, 0.4)';
-                for (let x = Math.floor(this.cameraX / 32) * 32; x < this.cameraX + this.canvas.width; x += 32) {
-                    for (let y = 0; y < this.canvas.height; y += 32) {
-                        if ((x + y) % 64 === 0) {
-                            this.ctx.fillRect(x, y, 32, 32);
+                // Grid pattern
+                this.ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+                for (let x = Math.floor(this.cameraX / 50) * 50; x < this.cameraX + this.canvas.width; x += 50) {
+                    for (let y = 0; y < this.canvas.height; y += 50) {
+                        if ((x + y) % 100 === 0) {
+                            this.ctx.fillRect(x, y, 50, 50);
                         }
                     }
                 }
 
-                // Draw floor segments - estilo bloques Minecraft/Terraria
+                // Floor segments
                 const floorHeight = this.canvas.height - 50;
                 this.floorSegments.forEach(segment => {
-                    // Base del bloque (gris oscuro)
-                    this.ctx.fillStyle = '#333';
+                    // Main block
+                    this.ctx.fillStyle = '#2D5A4A';
                     this.ctx.fillRect(segment.x, floorHeight, segment.width, 50);
                     
-                    // Borde superior (gris claro)
-                    this.ctx.fillStyle = '#555';
-                    this.ctx.fillRect(segment.x, floorHeight, segment.width, 5);
+                    // Top edge
+                    this.ctx.fillStyle = '#4CAF50';
+                    this.ctx.fillRect(segment.x, floorHeight, segment.width, 8);
                     
-                    // Borde inferior (negro)
-                    this.ctx.fillStyle = '#000';
-                    this.ctx.fillRect(segment.x, floorHeight + 45, segment.width, 5);
-                    
-                    // Líneas de textura tipo bloques
-                    this.ctx.fillStyle = '#222';
-                    for (let i = 0; i < segment.width / 16; i++) {
-                        this.ctx.fillRect(segment.x + i * 16, floorHeight + 5, 1, 40);
-                    }
-                    
-                    // Hierba superior (naranja oscuro)
-                    this.ctx.fillStyle = '#cc6600';
-                    this.ctx.fillRect(segment.x, floorHeight - 8, segment.width, 8);
-                    
-                    // Detalles de hierba
-                    this.ctx.fillStyle = '#ff8c00';
-                    for (let i = 0; i < segment.width / 8; i++) {
+                    // Grass details
+                    this.ctx.fillStyle = '#81C784';
+                    for (let i = 0; i < segment.width / 12; i++) {
                         if (i % 2 === 0) {
-                            this.ctx.fillRect(segment.x + i * 8, floorHeight - 8, 4, 4);
+                            this.ctx.fillRect(segment.x + i * 12, floorHeight - 4, 6, 4);
                         }
                     }
+                    
+                    // Bottom edge
+                    this.ctx.fillStyle = '#1B3D2F';
+                    this.ctx.fillRect(segment.x, floorHeight + 42, segment.width, 8);
                 });
 
-                // Draw platforms - estilo bloques pixel art
+                // Platforms
                 this.platforms.forEach(platform => {
-                    // Base del bloque
-                    this.ctx.fillStyle = '#666';
+                    this.ctx.fillStyle = '#37474F';
                     this.ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
                     
-                    // Borde superior (gris claro)
-                    this.ctx.fillStyle = '#888';
-                    this.ctx.fillRect(platform.x, platform.y, platform.width, 3);
+                    this.ctx.fillStyle = '#546E7A';
+                    this.ctx.fillRect(platform.x, platform.y, platform.width, 4);
                     
-                    // Borde inferior (negro)
-                    this.ctx.fillStyle = '#000';
-                    this.ctx.fillRect(platform.x, platform.y + platform.height - 3, platform.width, 3);
-                    
-                    // Líneas de textura
-                    this.ctx.fillStyle = '#555';
-                    for (let i = 0; i < platform.width / 8; i++) {
-                        this.ctx.fillRect(platform.x + i * 8, platform.y + 3, 1, platform.height - 6);
-                    }
+                    this.ctx.fillStyle = '#263238';
+                    this.ctx.fillRect(platform.x, platform.y + platform.height - 4, platform.width, 4);
                 });
 
-                // Draw obstacles - estilo bloques pixel art
+                // Obstacles
                 this.obstacles.forEach(obs => {
-                    // Base del bloque (naranja oscuro)
-                    this.ctx.fillStyle = '#cc6600';
+                    this.ctx.fillStyle = '#C94C4C';
                     this.ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
                     
-                    // Borde superior (naranja claro)
-                    this.ctx.fillStyle = '#ff8c00';
-                    this.ctx.fillRect(obs.x, obs.y, obs.width, 3);
+                    this.ctx.fillStyle = '#E57373';
+                    this.ctx.fillRect(obs.x, obs.y, obs.width, 4);
                     
-                    // Borde inferior (negro)
-                    this.ctx.fillStyle = '#000';
-                    this.ctx.fillRect(obs.x, obs.y + obs.height - 3, obs.width, 3);
+                    this.ctx.fillStyle = '#B71C1C';
+                    this.ctx.fillRect(obs.x, obs.y + obs.height - 4, obs.width, 4);
                     
-                    // Lados oscuros
-                    this.ctx.fillStyle = '#994400';
-                    this.ctx.fillRect(obs.x, obs.y + 3, 3, obs.height - 6);
-                    this.ctx.fillRect(obs.x + obs.width - 3, obs.y + 3, 3, obs.height - 6);
-                    
-                    // Detalles tipo púas
-                    this.ctx.fillStyle = '#ffaa00';
+                    // Spikes
+                    this.ctx.fillStyle = '#FFCDD2';
                     for (let i = 0; i < 3; i++) {
-                        this.ctx.fillRect(obs.x + i * 10 + 5, obs.y, 5, 6);
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(obs.x + 5 + i * 10, obs.y);
+                        this.ctx.lineTo(obs.x + 10 + i * 10, obs.y - 6);
+                        this.ctx.lineTo(obs.x + 15 + i * 10, obs.y);
+                        this.ctx.fill();
                     }
                 });
 
-                // Draw coins - estilo pixel art
+                // Coins
                 this.coinList.forEach(coin => {
                     if (!coin.collected) {
                         const offsetY = Math.sin(Date.now() / 200) * 3;
-                        const coinSize = 16;
-                        const coinX = Math.floor(coin.x - coinSize / 2);
-                        const coinY = Math.floor(coin.y - coinSize / 2 + offsetY);
                         
-                        // Base de la moneda (naranja)
-                        this.ctx.fillStyle = '#ff8c00';
-                        this.ctx.fillRect(coinX, coinY, coinSize, coinSize);
+                        this.ctx.fillStyle = '#F4D03F';
+                        this.ctx.beginPath();
+                        this.ctx.arc(coin.x, coin.y + offsetY, 12, 0, Math.PI * 2);
+                        this.ctx.fill();
                         
-                        // Borde
-                        this.ctx.fillStyle = '#000';
-                        this.ctx.fillRect(coinX, coinY, coinSize, 2);
-                        this.ctx.fillRect(coinX, coinY + coinSize - 2, coinSize, 2);
-                        this.ctx.fillRect(coinX, coinY, 2, coinSize);
-                        this.ctx.fillRect(coinX + coinSize - 2, coinY, 2, coinSize);
+                        this.ctx.fillStyle = '#FFF176';
+                        this.ctx.beginPath();
+                        this.ctx.arc(coin.x - 3, coin.y - 3 + offsetY, 4, 0, Math.PI * 2);
+                        this.ctx.fill();
                         
-                        // Detalles internos
-                        this.ctx.fillStyle = '#ffaa00';
-                        this.ctx.fillRect(coinX + 4, coinY + 4, 8, 8);
-                        
-                        // Símbolo $
-                        this.ctx.fillStyle = '#000';
-                        this.ctx.font = 'bold 12px Courier New';
-                        this.ctx.textAlign = 'center';
-                        this.ctx.fillText('$', coin.x, coin.y + 5 + offsetY);
-                        this.ctx.textAlign = 'left';
+                        this.ctx.fillStyle = '#F9A825';
+                        this.ctx.strokeStyle = '#F9A825';
+                        this.ctx.lineWidth = 2;
+                        this.ctx.beginPath();
+                        this.ctx.arc(coin.x, coin.y + offsetY, 12, 0, Math.PI * 2);
+                        this.ctx.stroke();
                     }
                 });
 
-                // Draw particles - estilo pixel art
+                // Particles
                 this.particles.forEach(p => {
                     this.ctx.fillStyle = p.color;
                     this.ctx.globalAlpha = p.life / 30;
-                    const px = Math.floor(p.x);
-                    const py = Math.floor(p.y);
-                    this.ctx.fillRect(px, py, 4, 4);
-                    // Borde para efecto pixel
-                    this.ctx.fillStyle = '#000';
-                    this.ctx.globalAlpha = (p.life / 30) * 0.3;
-                    this.ctx.fillRect(px, py, 4, 1);
-                    this.ctx.fillRect(px, py + 3, 4, 1);
-                    this.ctx.fillRect(px, py, 1, 4);
-                    this.ctx.fillRect(px + 3, py, 1, 4);
+                    this.ctx.beginPath();
+                    this.ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+                    this.ctx.fill();
                 });
                 this.ctx.globalAlpha = 1;
 
-                // Draw player - estilo bloque pixel art
+                // Player
                 if (this.player.stunned) {
                     this.ctx.globalAlpha = 0.3 + Math.sin(Date.now() / 50) * 0.3;
                 }
                 
-                const px = Math.floor(this.player.x);
-                const py = Math.floor(this.player.y);
-                const pw = this.player.width;
-                const ph = this.player.height;
-                
-                // Cuerpo principal
+                // Body
                 this.ctx.fillStyle = this.player.color;
-                this.ctx.fillRect(px, py, pw, ph);
+                this.ctx.beginPath();
+                this.ctx.roundRect(this.player.x, this.player.y, this.player.width, this.player.height, 8);
+                this.ctx.fill();
                 
-                // Borde superior (más claro)
-                const lightColor = this.lightenColor(this.player.color, 0.3);
-                this.ctx.fillStyle = lightColor;
-                this.ctx.fillRect(px, py, pw, 4);
-                this.ctx.fillRect(px, py, 4, ph);
+                // Highlight
+                this.ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                this.ctx.beginPath();
+                this.ctx.roundRect(this.player.x + 3, this.player.y + 3, this.player.width - 6, 8, 4);
+                this.ctx.fill();
                 
-                // Borde inferior (más oscuro)
-                this.ctx.fillStyle = '#000';
-                this.ctx.fillRect(px, py + ph - 4, pw, 4);
-                this.ctx.fillRect(px + pw - 4, py, 4, ph);
-                
-                // Ojos (píxeles)
+                // Eyes
                 this.ctx.fillStyle = '#fff';
-                this.ctx.fillRect(px + 8, py + 8, 4, 4);
-                this.ctx.fillRect(px + 20, py + 8, 4, 4);
+                this.ctx.beginPath();
+                this.ctx.arc(this.player.x + 10, this.player.y + 12, 5, 0, Math.PI * 2);
+                this.ctx.arc(this.player.x + 25, this.player.y + 12, 5, 0, Math.PI * 2);
+                this.ctx.fill();
                 
-                // Pupilas
                 this.ctx.fillStyle = '#000';
-                this.ctx.fillRect(px + 9, py + 9, 2, 2);
-                this.ctx.fillRect(px + 21, py + 9, 2, 2);
-                
-                // Detalles tipo bloque
-                this.ctx.fillStyle = this.darkenColor(this.player.color, 0.2);
-                this.ctx.fillRect(px + 4, py + 16, pw - 8, 2);
+                this.ctx.beginPath();
+                this.ctx.arc(this.player.x + 11, this.player.y + 13, 2, 0, Math.PI * 2);
+                this.ctx.arc(this.player.x + 26, this.player.y + 13, 2, 0, Math.PI * 2);
+                this.ctx.fill();
                 
                 this.ctx.globalAlpha = 1;
 
-                // Draw finish flag - estilo pixel art
-                const flagX = Math.floor(this.finishX);
-                const flagY = Math.floor(this.finishY - 150);
+                // Finish flag
+                const flagX = this.finishX;
+                const flagY = this.finishY - 120;
                 
-                // Poste
-                this.ctx.fillStyle = '#333';
-                this.ctx.fillRect(flagX, flagY, 4, 150);
-                this.ctx.fillStyle = '#000';
-                this.ctx.fillRect(flagX, flagY, 4, 6);
-                this.ctx.fillRect(flagX, flagY + 144, 4, 6);
+                this.ctx.fillStyle = '#37474F';
+                this.ctx.fillRect(flagX, flagY, 6, 120);
                 
-                // Bandera (naranja)
-                this.ctx.fillStyle = '#ff8c00';
-                this.ctx.fillRect(flagX + 4, flagY, 40, 30);
+                this.ctx.fillStyle = '#4CAF50';
+                this.ctx.beginPath();
+                this.ctx.moveTo(flagX + 6, flagY);
+                this.ctx.lineTo(flagX + 50, flagY + 20);
+                this.ctx.lineTo(flagX + 6, flagY + 40);
+                this.ctx.fill();
                 
-                // Borde de la bandera
-                this.ctx.fillStyle = '#000';
-                this.ctx.fillRect(flagX + 4, flagY, 40, 3);
-                this.ctx.fillRect(flagX + 4, flagY + 27, 40, 3);
-                this.ctx.fillRect(flagX + 4, flagY, 3, 30);
-                this.ctx.fillRect(flagX + 41, flagY, 3, 30);
-                
-                // Patrón de bandera
-                this.ctx.fillStyle = '#ffaa00';
-                for (let i = 0; i < 4; i++) {
-                    this.ctx.fillRect(flagX + 8 + i * 8, flagY + 6, 4, 18);
-                }
-                
-                // Símbolo de meta
-                this.ctx.fillStyle = '#000';
-                this.ctx.font = 'bold 16px Courier New';
+                this.ctx.fillStyle = '#81C784';
+                this.ctx.font = 'bold 16px Arial';
                 this.ctx.textAlign = 'center';
-                this.ctx.fillText('✓', flagX + 24, flagY + 20);
-                this.ctx.textAlign = 'left';
+                this.ctx.fillText('META', flagX + 28, flagY + 25);
 
-                // Draw death pit warnings - estilo pixel art
-                this.ctx.fillStyle = '#ff8c00';
-                this.ctx.font = 'bold 20px Courier New';
+                // Pit warnings
+                this.ctx.fillStyle = '#F4D03F';
+                this.ctx.font = 'bold 18px Arial';
                 this.ctx.textAlign = 'center';
-                this.ctx.textBaseline = 'middle';
-                
-                // Sombra negra para efecto pixel
-                this.ctx.fillStyle = '#000';
-                this.ctx.fillText('PIT!', 401, floorHeight + 81);
-                this.ctx.fillText('PIT!', 826, floorHeight + 81);
-                this.ctx.fillText('PIT!', 1326, floorHeight + 81);
-                
-                // Texto principal
-                this.ctx.fillStyle = '#ff8c00';
-                this.ctx.fillText('PIT!', 400, floorHeight + 80);
-                this.ctx.fillText('PIT!', 825, floorHeight + 80);
-                this.ctx.fillText('PIT!', 1325, floorHeight + 80);
-                
-                this.ctx.textBaseline = 'alphabetic';
+                this.ctx.fillText('⚠️ PIT', 400, floorHeight + 80);
+                this.ctx.fillText('⚠️ PIT', 825, floorHeight + 80);
+                this.ctx.fillText('⚠️ PIT', 1325, floorHeight + 80);
 
                 this.ctx.restore();
             }
 
-            lightenColor(color, amount) {
-                const hex = color.replace('#', '');
-                const num = parseInt(hex, 16);
-                const r = Math.min(255, (num >> 16) + Math.floor(amount * 255));
-                const g = Math.min(255, ((num >> 8) & 0x00FF) + Math.floor(amount * 255));
-                const b = Math.min(255, (num & 0x0000FF) + Math.floor(amount * 255));
-                return `#${(r << 16 | g << 8 | b).toString(16).padStart(6, '0')}`;
-            }
-
-            createParticles(x, y) {
-                const colors = ['#ff8c00', '#ffaa00', '#cc6600', '#ff9900'];
+            createParticles(x, y, colors) {
                 for (let i = 0; i < 12; i++) {
                     this.particles.push({
                         x: x,
                         y: y,
-                        vx: (Math.random() - 0.5) * 5,
-                        vy: (Math.random() - 0.5) * 5,
+                        vx: (Math.random() - 0.5) * 6,
+                        vy: (Math.random() - 0.5) * 6 - 2,
                         life: 30,
                         color: colors[Math.floor(Math.random() * colors.length)]
                     });
                 }
             }
 
-            createHitParticles(x, y) {
-                const colors = ['#666', '#999', '#333', '#000'];
-                for (let i = 0; i < 20; i++) {
-                    this.particles.push({
-                        x: x,
-                        y: y,
-                        vx: (Math.random() - 0.5) * 8,
-                        vy: (Math.random() - 0.5) * 8,
-                        life: 25,
-                        color: colors[Math.floor(Math.random() * colors.length)]
-                    });
-                }
-            }
-
             playSound(type) {
-                // Basic sound implementation
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
-                oscillator.connect(gainNode);
-                gainNode.connect(audioContext.destination);
+                try {
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
 
-                if (type === 'jump') {
-                    oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
-                    oscillator.frequency.exponentialRampToValueAtTime(800, audioContext.currentTime + 0.1);
-                    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-                } else if (type === 'coin') {
-                    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-                    oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.05);
-                    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-                } else if (type === 'hit') {
-                    oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
-                    oscillator.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 0.2);
-                    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
-                } else if (type === 'win') {
-                    const notes = [523.25, 587.33, 659.25, 783.99];
-                    notes.forEach((freq, i) => {
-                        const osc = audioContext.createOscillator();
-                        const gain = audioContext.createGain();
-                        osc.connect(gain);
-                        gain.connect(audioContext.destination);
-                        osc.frequency.value = freq;
-                        gain.gain.setValueAtTime(0.15, audioContext.currentTime + i * 0.1);
-                        gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + i * 0.1 + 0.3);
-                        osc.start(audioContext.currentTime + i * 0.1);
-                        osc.stop(audioContext.currentTime + i * 0.1 + 0.3);
-                    });
-                    return;
-                }
-                
-                oscillator.start(audioContext.currentTime);
-                oscillator.stop(audioContext.currentTime + 0.2);
+                    if (type === 'jump') {
+                        oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+                        oscillator.frequency.exponentialRampToValueAtTime(800, audioContext.currentTime + 0.1);
+                        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                    } else if (type === 'coin') {
+                        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                        oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.05);
+                        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                    } else if (type === 'hit') {
+                        oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+                        oscillator.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 0.2);
+                        gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                    } else if (type === 'win') {
+                        const notes = [523.25, 587.33, 659.25, 783.99];
+                        notes.forEach((freq, i) => {
+                            const osc = audioContext.createOscillator();
+                            const gain = audioContext.createGain();
+                            osc.connect(gain);
+                            gain.connect(audioContext.destination);
+                            osc.frequency.value = freq;
+                            gain.gain.setValueAtTime(0.15, audioContext.currentTime + i * 0.1);
+                            gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + i * 0.1 + 0.3);
+                            osc.start(audioContext.currentTime + i * 0.1);
+                            osc.stop(audioContext.currentTime + i * 0.1 + 0.3);
+                        });
+                        return;
+                    }
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.2);
+                } catch (e) {}
             }
 
             animate() {
@@ -1911,7 +1127,6 @@
             }
         }
 
-        // Handle window resize
         window.addEventListener('resize', () => {
             if (gameState.started) {
                 for (let playerNum in gameState.games) {

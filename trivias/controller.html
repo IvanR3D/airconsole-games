@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Trivia Rápida - Control</title>
+    <title>STEAM Trivia - Control</title>
     <script src="https://www.airconsole.com/api/airconsole-1.8.0.js"></script>
     <style>
         * {
@@ -14,15 +14,12 @@
         }
 
         body {
-            font-family: 'Courier New', monospace;
-            background: #1a1a1a;
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+            background: linear-gradient(180deg, #1B4D3E 0%, #0D2818 100%);
             min-height: 100vh;
-            padding: 15px;
-            color: #ccc;
+            color: white;
             overflow: hidden;
-            background-image:
-                radial-gradient(circle at 20% 80%, rgba(255,165,0,0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(128,128,128,0.1) 0%, transparent 50%);
+            touch-action: manipulation;
         }
 
         .container {
@@ -30,18 +27,12 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-            max-width: 500px;
-            margin: 0 auto;
         }
 
-        /* ALL SCREENS */
         .screen {
             display: none;
             flex: 1;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
         }
 
         .screen.active {
@@ -49,239 +40,222 @@
         }
 
         /* JOIN SCREEN */
-        .join-screen .content {
-            width: 100%;
+        .join-screen {
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
             text-align: center;
         }
 
-        .emoji-large {
+        .join-logo {
             font-size: 4em;
             margin-bottom: 20px;
-            animation: bounce 2s infinite;
         }
 
-        .title {
+        .join-title {
+            font-size: 2em;
+            color: #F4D03F;
+            margin-bottom: 10px;
+        }
+
+        .join-subtitle {
+            font-size: 1.2em;
+            opacity: 0.8;
+            margin-bottom: 30px;
+        }
+
+        .join-button {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 20px 50px;
+            font-size: 1.5em;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .join-button:active {
+            transform: scale(0.95);
+        }
+
+        .join-button:disabled {
+            background: #666;
+            box-shadow: none;
+        }
+
+        /* WAITING SCREEN */
+        .waiting-screen {
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .player-info {
+            margin-bottom: 30px;
+        }
+
+        .player-avatar-large {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            margin: 0 auto 15px;
+            border: 4px solid white;
+        }
+
+        .player-name-display {
             font-size: 1.8em;
             font-weight: bold;
-            margin-bottom: 15px;
-            color: #ff8c00;
-            text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
-            letter-spacing: 1px;
+            margin-bottom: 5px;
         }
 
-        .subtitle {
-            font-size: 1em;
-            margin-bottom: 25px;
-            opacity: 0.9;
-            color: #888;
-            text-shadow: 1px 1px 0 #000;
-            letter-spacing: 0.5px;
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 18px;
-            font-size: 1.2em;
-            border: none;
-            border-radius: 12px;
-            text-align: center;
+        .admin-badge {
+            background: #F4D03F;
+            color: #000;
+            padding: 5px 15px;
+            border-radius: 20px;
             font-weight: bold;
-            background: rgba(255,255,255,0.1);
-            color: white;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .waiting-message {
+            font-size: 1.5em;
+            color: #F4D03F;
             margin-bottom: 20px;
         }
 
-        .input-field::placeholder {
-            color: rgba(255,255,255,0.5);
+        .waiting-animation {
+            font-size: 3em;
+            animation: bounce 1s ease infinite;
         }
 
-        .button {
-            width: 100%;
-            padding: 18px;
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        /* PLAYING SCREEN */
+        .playing-screen {
+            padding: 20px;
+        }
+
+        .game-info {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .select-answer-text {
             font-size: 1.3em;
-            font-weight: bold;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.1s;
-            font-family: 'Courier New', monospace;
-            letter-spacing: 1px;
-            box-shadow: 0 6px 0 #1a1a1a, inset 0 1px 0 rgba(255,255,255,0.1);
-            position: relative;
+            color: #F4D03F;
+            margin-bottom: 15px;
         }
 
-        .button::before {
+        /* ANSWER BUTTONS - ESTILO AIRCONSOLE */
+        .answer-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            flex: 1;
+            max-height: 400px;
+        }
+
+        .answer-button {
+            border: none;
+            border-radius: 15px;
+            font-size: 3em;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 0 rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .answer-button::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
-            border-radius: 6px;
-            pointer-events: none;
+            height: 50%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 100%);
+            border-radius: 15px 15px 0 0;
         }
 
-        .button:active {
-            transform: translateY(3px);
-            box-shadow: 0 3px 0 #1a1a1a, inset 0 1px 0 rgba(255,255,255,0.1);
+        .answer-button:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.3);
         }
 
-        .button-primary {
-            background: #ff8c00;
-            color: #000;
-            border: 2px solid #cc7000;
-        }
-
-        .button-success {
-            background: #666;
-            color: #ff8c00;
-            border: 2px solid #888;
-        }
-
-        .button:disabled {
+        .answer-button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
 
-        /* EMOJI SCREEN */
-        .emoji-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-            margin: 20px 0;
-            width: 100%;
+        .answer-button.selected {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.3);
+            filter: brightness(0.8);
         }
 
-        .emoji-button {
-            aspect-ratio: 1;
-            font-size: 1.8em;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.1s;
-            background: #2a2a2a;
-            color: #ccc;
-            box-shadow: 0 4px 0 #1a1a1a, inset 0 1px 0 rgba(255,255,255,0.05);
+        .answer-button.correct-highlight {
+            animation: correctPulse 0.5s ease infinite;
         }
 
-        .emoji-button:hover {
-            background: #3a3a3a;
+        .answer-button.wrong-highlight {
+            animation: wrongShake 0.5s ease;
         }
 
-        .emoji-button.selected {
-            background: #ff8c00;
-            color: #000;
-            transform: translateY(2px);
-            box-shadow: 0 2px 0 #1a1a1a, inset 0 1px 0 rgba(255,255,255,0.1);
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
 
-        .emoji-button:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
+        @keyframes wrongShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
         }
 
-        /* CATEGORY SCREEN */
-        .category-list {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin: 20px 0;
-        }
+        /* Colores de los botones */
+        .answer-a { background: #8B9A46; box-shadow: 0 6px 0 #6B7A36; }
+        .answer-b { background: #C94C4C; box-shadow: 0 6px 0 #A93C3C; }
+        .answer-c { background: #4A8B8B; box-shadow: 0 6px 0 #3A7B7B; }
+        .answer-d { background: #D4A44C; box-shadow: 0 6px 0 #B4843C; }
 
-        .category-item {
-            padding: 18px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: center;
-        }
+        .answer-a:active, .answer-a.selected { box-shadow: 0 2px 0 #6B7A36; }
+        .answer-b:active, .answer-b.selected { box-shadow: 0 2px 0 #A93C3C; }
+        .answer-c:active, .answer-c.selected { box-shadow: 0 2px 0 #3A7B7B; }
+        .answer-d:active, .answer-d.selected { box-shadow: 0 2px 0 #B4843C; }
 
-        .category-item:hover {
-            background: rgba(255,255,255,0.15);
-            transform: translateY(-2px);
-        }
-
-        .category-item.selected {
-            background: rgba(251, 191, 36, 0.3);
-            border: 2px solid #fbbf24;
-        }
-
-        .category-item-emoji {
-            font-size: 2em;
-            margin-bottom: 8px;
-        }
-
-        .category-item-name {
-            font-size: 1.2em;
-            font-weight: bold;
-        }
-
-        /* WAITING SCREEN */
-        .player-info {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .player-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
+        /* PLAYER STATUS */
+        .player-status-bar {
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 2.5em;
-            margin: 0 auto 15px;
-            border: 4px solid white;
-            animation: pulse 1.5s infinite;
-        }
-
-        .player-details h3 {
-            font-size: 1.4em;
-            margin-bottom: 5px;
-        }
-
-        .admin-badge {
-            background: #fbbf24;
-            color: #1a1a2e;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            display: inline-block;
-        }
-
-        /* PLAYING SCREEN */
-        .playing-screen {
-            justify-content: flex-start;
-            padding-top: 20px;
-        }
-
-        .game-header {
-            width: 100%;
-            display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding: 0 10px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px 20px;
+            border-radius: 15px;
+            margin-top: 20px;
         }
 
-        .player-indicator {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(255,255,255,0.1);
-            padding: 8px 15px;
-            border-radius: 20px;
-        }
-
-        .player-indicator .avatar {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
+        .player-mini-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -289,175 +263,126 @@
             border: 2px solid white;
         }
 
-        .question-info {
-            text-align: center;
-            margin-bottom: 15px;
-        }
-
-        .question-number {
-            font-size: 0.9em;
-            opacity: 0.7;
-        }
-
-        .answer-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            width: 100%;
-            margin-bottom: 20px;
-        }
-
-        .answer-button {
-            aspect-ratio: 1;
-            font-size: 3em;
-            font-weight: bold;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.1s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-
-        .answer-button:active {
-            transform: scale(0.95);
-        }
-
-        .answer-button:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-
-        .answer-button.selected {
-            transform: scale(0.9);
-            box-shadow: 0 0 0 5px rgba(255,255,255,0.5);
-        }
-
-        .answer-button.a {
-            background: #ef4444;
-            color: white;
-        }
-
-        .answer-button.b {
-            background: #3b82f6;
-            color: white;
-        }
-
-        .answer-button.c {
-            background: #f59e0b;
-            color: white;
-        }
-
-        .answer-button.d {
-            background: #10b981;
-            color: white;
-        }
-
-        /* Leaderboard */
-        .leaderboard {
-            background: rgba(0,0,0,0.2);
-            border-radius: 15px;
-            padding: 15px;
-            margin-top: auto;
-            width: 100%;
-        }
-
-        .leaderboard-title {
-            font-size: 0.9em;
-            text-align: center;
-            margin-bottom: 10px;
-            opacity: 0.7;
-        }
-
-        .leaderboard-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px;
-            border-radius: 10px;
-            margin-bottom: 5px;
-            font-size: 0.9em;
-        }
-
-        .leaderboard-item.current-player {
-            background: rgba(251, 191, 36, 0.3);
-        }
-
-        .leaderboard-avatar {
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8em;
-            border: 1px solid white;
-        }
-
-        .leaderboard-name {
+        .player-mini-info {
             flex: 1;
+            margin-left: 15px;
         }
 
-        .leaderboard-score {
+        .player-mini-name {
             font-weight: bold;
         }
 
-        /* Result Feedback */
-        .result-feedback {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            color: #333;
-            text-align: center;
-            display: none;
-            z-index: 100;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        .player-mini-rank {
+            font-size: 0.9em;
+            opacity: 0.8;
         }
 
-        .result-feedback.active {
-            display: block;
+        .player-mini-score {
+            background: #F4D03F;
+            color: #000;
+            padding: 8px 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        /* QUIT BUTTON */
+        .quit-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 15px 30px;
+            font-size: 1em;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .quit-button:active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* RESULT FEEDBACK */
+        .result-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .result-overlay.active {
+            display: flex;
+        }
+
+        .result-content {
+            text-align: center;
             animation: popIn 0.3s ease;
         }
 
         @keyframes popIn {
-            from {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(0.5);
-            }
-            to {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1);
-            }
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
 
-        /* END SCREEN */
-        .final-rank {
-            font-size: 3em;
-            margin-bottom: 15px;
-        }
-
-        .final-score {
-            font-size: 2em;
-            color: #fbbf24;
-            font-weight: bold;
+        .result-icon {
+            font-size: 5em;
             margin-bottom: 20px;
         }
 
-        /* ANIMATIONS */
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+        .result-text {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 10px;
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+        .result-points {
+            font-size: 1.5em;
+            color: #F4D03F;
+        }
+
+        .result-correct {
+            color: #4CAF50;
+        }
+
+        .result-incorrect {
+            color: #f44336;
+        }
+
+        /* END SCREEN */
+        .end-screen {
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .final-rank {
+            font-size: 5em;
+            margin-bottom: 20px;
+        }
+
+        .final-message {
+            font-size: 1.8em;
+            color: #F4D03F;
+            margin-bottom: 10px;
+        }
+
+        .final-score {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        .waiting-next {
+            font-size: 1.2em;
+            opacity: 0.7;
         }
     </style>
 </head>
@@ -465,87 +390,63 @@
     <div class="container">
         <!-- JOIN SCREEN -->
         <div class="screen join-screen active" id="joinScreen">
-            <div class="content">
-                <div class="emoji-large">🎮</div>
-                <h1 class="title">Trivia Rápida</h1>
-                <p class="subtitle">Únete al juego</p>
-                <input type="text" id="playerName" class="input-field" placeholder="Escribe tu nombre" maxlength="15">
-                <button class="button button-primary" id="joinButton">¡UNIRSE!</button>
-            </div>
-        </div>
-
-        <!-- EMOJI SCREEN -->
-        <div class="screen emoji-screen" id="emojiScreen">
-            <div class="emoji-large">😊</div>
-            <h2 class="title">Elige tu emoji</h2>
-            <p class="subtitle">Selecciona tu avatar</p>
-            <div class="emoji-grid" id="emojiGrid"></div>
-            <button class="button button-primary" id="confirmEmojiButton" disabled>CONFIRMAR</button>
-        </div>
-
-        <!-- CATEGORY SCREEN -->
-        <div class="screen category-screen" id="categoryScreen">
-            <div class="emoji-large">👑</div>
-            <h2 class="title">Administrador</h2>
-            <p class="subtitle">Selecciona categoría</p>
-            <div class="category-list" id="categoryList"></div>
-            <button class="button button-success" id="startGameAdminButton">INICIAR JUEGO</button>
+            <div class="join-logo">🎯</div>
+            <h1 class="join-title">STEAM Trivia</h1>
+            <p class="join-subtitle">¡Demuestra tus conocimientos!</p>
+            <button class="join-button" id="joinButton">¡UNIRSE!</button>
         </div>
 
         <!-- WAITING SCREEN -->
         <div class="screen waiting-screen" id="waitingScreen">
             <div class="player-info">
-                <div class="player-avatar" id="playerAvatar"></div>
-                <div class="player-details">
-                    <h3 id="playerNameDisplay"></h3>
-                    <p id="playerStatus"></p>
-                </div>
+                <div class="player-avatar-large" id="playerAvatar"></div>
+                <div class="player-name-display" id="playerNameDisplay"></div>
+                <div class="admin-badge" id="adminBadge" style="display: none;">👑 ADMIN</div>
             </div>
-            <div class="emoji-large">⏳</div>
-            <h2 class="title">Esperando...</h2>
-            <p class="subtitle" id="waitingMessage">Partida no iniciada</p>
-            <div class="leaderboard" id="waitingLeaderboard">
-                <div class="leaderboard-title">Jugadores conectados</div>
-                <div id="waitingPlayersList"></div>
-            </div>
+            <div class="waiting-animation">⏳</div>
+            <p class="waiting-message">Esperando que inicie el juego...</p>
         </div>
 
         <!-- PLAYING SCREEN -->
         <div class="screen playing-screen" id="playingScreen">
-            <div class="game-header">
-                <div class="question-info">
-                    <div class="question-number" id="questionNumber">Pregunta 1/5</div>
+            <div class="game-info">
+                <p class="select-answer-text">Selecciona tu respuesta:</p>
+            </div>
+
+            <div class="answer-grid" id="answerGrid">
+                <button class="answer-button answer-a" data-option="0">A</button>
+                <button class="answer-button answer-b" data-option="1">B</button>
+                <button class="answer-button answer-c" data-option="2">C</button>
+                <button class="answer-button answer-d" data-option="3">D</button>
+            </div>
+
+            <div class="player-status-bar">
+                <div class="player-mini-avatar" id="miniAvatar"></div>
+                <div class="player-mini-info">
+                    <div class="player-mini-name" id="miniName"></div>
+                    <div class="player-mini-rank" id="miniRank">Rank 1</div>
                 </div>
-                <div class="player-indicator">
-                    <div class="avatar" id="currentPlayerAvatar"></div>
-                </div>
+                <div class="player-mini-score" id="miniScore">0</div>
             </div>
 
-            <div class="answer-buttons" id="answerButtons"></div>
-
-            <div class="leaderboard">
-                <div class="leaderboard-title">🏆 Puntuación</div>
-                <div id="leaderboardList"></div>
-            </div>
-
-            <div class="result-feedback" id="resultFeedback">
-                <div class="result-icon" id="resultIcon"></div>
-                <div class="result-text" id="resultText"></div>
-                <div class="result-points" id="resultPoints"></div>
-            </div>
+            <button class="quit-button" id="quitButton">Salir del juego</button>
         </div>
 
         <!-- END SCREEN -->
         <div class="screen end-screen" id="endScreen">
-            <div class="final-rank" id="finalRank"></div>
-            <h2 class="title">¡Juego Terminado!</h2>
-            <p class="subtitle" id="endMessage"></p>
-            <div class="final-score" id="finalScore"></div>
-            <div class="leaderboard" id="finalLeaderboard">
-                <div class="leaderboard-title">Resultados finales</div>
-                <div id="finalPlayersList"></div>
+            <div class="final-rank" id="finalRank">🥇</div>
+            <p class="final-message" id="finalMessage">¡Felicidades!</p>
+            <div class="final-score" id="finalScore">0 puntos</div>
+            <p class="waiting-next">Esperando nueva partida...</p>
+        </div>
+
+        <!-- RESULT OVERLAY -->
+        <div class="result-overlay" id="resultOverlay">
+            <div class="result-content">
+                <div class="result-icon" id="resultIcon">✓</div>
+                <div class="result-text" id="resultText">¡Correcto!</div>
+                <div class="result-points" id="resultPoints">+500 pts</div>
             </div>
-            <p class="subtitle" style="margin-top: 20px;">Esperando nueva partida...</p>
         </div>
     </div>
 
@@ -555,22 +456,15 @@
         let playerEmoji = '';
         let playerColor = '';
         let isAdmin = false;
-        let currentQuestion = null;
         let hasAnswered = false;
-        let playerRank = 1;
-        let leaderboardData = [];
+        let myScore = 0;
+        let myRank = 1;
 
         function init() {
             airconsole = new AirConsole();
 
             airconsole.onReady = function() {
                 console.log('Controller ready');
-                generateEmojiGrid();
-                setupCategories();
-                setTimeout(() => {
-                    const firstCategory = document.querySelector('.category-item');
-                    if (firstCategory) firstCategory.classList.add('selected');
-                }, 100);
             };
 
             airconsole.onMessage = function(from, data) {
@@ -581,229 +475,165 @@
                     playerEmoji = data.emoji;
                     isAdmin = data.isAdmin;
                     
-                    if (isAdmin) {
-                        showScreen('category');
-                    } else {
-                        showScreen('waiting');
-                        document.getElementById('currentPlayerAvatar').style.backgroundColor = playerColor;
-                        document.getElementById('currentPlayerAvatar').textContent = playerEmoji;
-                        document.getElementById('playerAvatar').style.backgroundColor = playerColor;
-                        document.getElementById('playerAvatar').textContent = playerEmoji;
-                        document.getElementById('playerNameDisplay').textContent = playerName;
-                        document.getElementById('playerStatus').innerHTML = 'Jugador conectado';
-                    }
-                } else if (data.action === 'emojiTaken') {
-                    alert('¡Emoji ya tomado!');
-                    document.getElementById('confirmEmojiButton').disabled = false;
+                    document.getElementById('playerAvatar').style.backgroundColor = playerColor;
+                    document.getElementById('playerAvatar').textContent = playerEmoji;
+                    document.getElementById('playerNameDisplay').textContent = playerName;
+                    document.getElementById('adminBadge').style.display = isAdmin ? 'inline-block' : 'none';
+                    
+                    document.getElementById('miniAvatar').style.backgroundColor = playerColor;
+                    document.getElementById('miniAvatar').textContent = playerEmoji;
+                    document.getElementById('miniName').textContent = playerName;
+                    
+                    showScreen('waiting');
                 } else if (data.action === 'gameStart') {
-                    currentQuestion = data.question;
                     showScreen('playing');
-                    setupAnswerButtons();
-                    hasAnswered = false;
-                    document.getElementById('resultFeedback').classList.remove('active');
+                    resetAnswer();
                 } else if (data.action === 'nextQuestion') {
-                    currentQuestion = data.question;
-                    hasAnswered = false;
-                    document.getElementById('resultFeedback').classList.remove('active');
-                    setupAnswerButtons();
+                    resetAnswer();
                 } else if (data.action === 'result') {
                     showResult(data.correct, data.points);
-                } else if (data.action === 'gameEnd') {
-                    showScreen('end');
-                    const winner = data.winner;
-                    const myScore = data.players.find(p => p.name === playerName)?.score || 0;
-                    const myRank = data.players.findIndex(p => p.name === playerName) + 1;
-                    
-                    document.getElementById('finalRank').textContent = myRank === 1 ? '🥇' : myRank === 2 ? '🥈' : myRank === 3 ? '🥉' : `#${myRank}`;
-                    document.getElementById('endMessage').textContent = winner.name === playerName ? '¡Ganaste!' : `Ganó ${winner.emoji} ${winner.name}`;
-                    document.getElementById('finalScore').textContent = `${myScore} puntos`;
-                    updateLeaderboard(data.players, 'finalPlayersList');
-                } else if (data.action === 'reset') {
-                    resetController();
-                } else if (data.action === 'selectCategory') {
-                    if (isAdmin) {
-                        document.querySelectorAll('.category-item').forEach(item => item.classList.remove('selected'));
-                        document.querySelector(`[data-category="${data.category}"]`)?.classList.add('selected');
+                    if (data.correct) {
+                        myScore += data.points;
+                        document.getElementById('miniScore').textContent = myScore;
                     }
                 } else if (data.action === 'leaderboardUpdate') {
-                    updateLeaderboard(data.players, 'leaderboardList');
-                } else if (data.action === 'waitingPlayersUpdate') {
-                    updateWaitingPlayers(data.players);
+                    updateRank(data.players);
+                } else if (data.action === 'gameEnd') {
+                    showEndScreen(data.winner, data.players);
+                } else if (data.action === 'reset') {
+                    resetController();
                 }
             };
 
             document.getElementById('joinButton').addEventListener('click', joinGame);
-            document.getElementById('confirmEmojiButton').addEventListener('click', confirmEmoji);
-            document.getElementById('startGameAdminButton').addEventListener('click', startGameFromAdmin);
-            document.getElementById('playerName').addEventListener('keypress', e => {
-                if (e.key === 'Enter') joinGame();
+            
+            // Setup answer buttons
+            document.querySelectorAll('.answer-button').forEach(btn => {
+                btn.addEventListener('click', () => selectAnswer(parseInt(btn.dataset.option)));
             });
-        }
 
-        function generateEmojiGrid() {
-            const grid = document.getElementById('emojiGrid');
-            const emojis = ['😀', '😎', '🤓', '🤠', '😺', '🐶', '🐱', '🦊', '🐼', '🐸', '🦁', '🐯', '🦄', '🐙', '🦋', '🐢', '🦀', '🐺', '🦅', '🐧', '🐨', '🐵', '🐸', '🦉'];
-            grid.innerHTML = '';
-            emojis.forEach(emoji => {
-                const button = document.createElement('button');
-                button.className = 'emoji-button';
-                button.textContent = emoji;
-                button.dataset.emoji = emoji;
-                button.addEventListener('click', () => selectEmoji(emoji, button));
-                grid.appendChild(button);
-            });
-        }
-
-        function selectEmoji(emoji, button) {
-            document.querySelectorAll('.emoji-button').forEach(btn => {
-                btn.classList.remove('selected');
-                btn.disabled = false;
-            });
-            button.classList.add('selected');
-            playerEmoji = emoji;
-            document.getElementById('confirmEmojiButton').disabled = false;
-        }
-
-        function setupCategories() {
-            const categoryList = document.getElementById('categoryList');
-            const categories = [
-                { key: 'general', name: 'General', emoji: '🌍' },
-                { key: 'science', name: 'Ciencia', emoji: '🔬' },
-                { key: 'entertainment', name: 'Entretenimiento', emoji: '🎬' },
-                { key: 'sports', name: 'Deportes', emoji: '⚽' },
-                { key: 'mathematics', name: 'Matemáticas', emoji: '📐' },
-                { key: 'robotics', name: 'Robótica', emoji: '🤖' },
-                { key: 'chemistry', name: 'Química', emoji: '⚗️' },
-                { key: 'history', name: 'Historia', emoji: '📜' },
-                { key: 'geography', name: 'Geografía', emoji: '🌍' },
-                { key: 'literature', name: 'Literatura', emoji: '📚' },
-                { key: 'technology', name: 'Tecnología', emoji: '💻' }
-            ];
-            categoryList.innerHTML = '';
-            categories.forEach(cat => {
-                const item = document.createElement('div');
-                item.className = 'category-item';
-                item.dataset.category = cat.key;
-                item.innerHTML = `
-                    <div class="category-item-emoji">${cat.emoji}</div>
-                    <div class="category-item-name">${cat.name}</div>
-                `;
-                item.addEventListener('click', () => {
-                    document.querySelectorAll('.category-item').forEach(i => i.classList.remove('selected'));
-                    item.classList.add('selected');
-                    airconsole.message(AirConsole.SCREEN, { action: 'selectCategory', category: cat.key });
-                });
-                categoryList.appendChild(item);
+            document.getElementById('quitButton').addEventListener('click', () => {
+                showScreen('waiting');
             });
         }
 
         function joinGame() {
-            playerName = document.getElementById('playerName').value.trim();
-            if (!playerName) return alert('Escribe tu nombre');
-            showScreen('emoji');
-        }
-
-        function confirmEmoji() {
-            if (!playerEmoji) return alert('Selecciona un emoji');
-            airconsole.message(AirConsole.SCREEN, { action: 'join', name: playerName, emoji: playerEmoji });
-            document.getElementById('confirmEmojiButton').disabled = true;
-        }
-
-        function startGameFromAdmin() {
-            airconsole.message(AirConsole.SCREEN, { action: 'start' });
-        }
-
-        function setupAnswerButtons() {
-            const buttonsContainer = document.getElementById('answerButtons');
-            const letters = ['A', 'B', 'C', 'D'];
-            const classes = ['a', 'b', 'c', 'd'];
+            playerName = airconsole.getNickname() || `Jugador ${airconsole.device_id}`;
+            const emojis = ['😀', '😎', '🤓', '🤠', '😺', '🐶', '🦊', '🐼', '🐸', '🦁', '🦄', '🐙', '🦋', '🐢'];
+            playerEmoji = emojis[Math.floor(Math.random() * emojis.length)];
             
-            buttonsContainer.innerHTML = '';
-            letters.forEach((letter, index) => {
-                const button = document.createElement('button');
-                button.className = `answer-button ${classes[index]}`;
-                button.textContent = letter;
-                button.addEventListener('click', () => selectAnswer(index, button));
-                buttonsContainer.appendChild(button);
+            airconsole.message(AirConsole.SCREEN, { 
+                action: 'join', 
+                name: playerName, 
+                emoji: playerEmoji 
             });
-
-            document.getElementById('questionNumber').textContent = `Pregunta ${currentQuestion.index + 1}/${currentQuestion.total}`;
+            
+            document.getElementById('joinButton').disabled = true;
+            document.getElementById('joinButton').textContent = 'Conectando...';
         }
 
-        function selectAnswer(optionIndex, button) {
+        function selectAnswer(optionIndex) {
             if (hasAnswered) return;
             hasAnswered = true;
-            button.classList.add('selected');
-            document.querySelectorAll('.answer-button').forEach(btn => btn.disabled = true);
             
+            // Visual feedback
+            document.querySelectorAll('.answer-button').forEach(btn => {
+                btn.disabled = true;
+                if (parseInt(btn.dataset.option) === optionIndex) {
+                    btn.classList.add('selected');
+                }
+            });
+            
+            // Vibrate
+            if (navigator.vibrate) navigator.vibrate(50);
+            
+            // Send answer
             airconsole.message(AirConsole.SCREEN, {
                 action: 'answer',
                 option: optionIndex,
                 timestamp: Date.now()
             });
+        }
 
-            if (navigator.vibrate) navigator.vibrate(50);
+        function resetAnswer() {
+            hasAnswered = false;
+            document.querySelectorAll('.answer-button').forEach(btn => {
+                btn.disabled = false;
+                btn.classList.remove('selected', 'correct-highlight', 'wrong-highlight');
+            });
+            document.getElementById('resultOverlay').classList.remove('active');
         }
 
         function showResult(correct, points) {
-            const feedback = document.getElementById('resultFeedback');
-            feedback.className = `result-feedback active ${correct ? 'result-correct' : 'result-incorrect'}`;
+            const overlay = document.getElementById('resultOverlay');
+            const icon = document.getElementById('resultIcon');
+            const text = document.getElementById('resultText');
+            const pts = document.getElementById('resultPoints');
             
-            document.getElementById('resultIcon').textContent = correct ? '✅' : '❌';
-            document.getElementById('resultText').textContent = correct ? '¡Correcto!' : 'Incorrecto';
-            document.getElementById('resultPoints').textContent = correct ? `+${points} pts` : '0 pts';
-
-            if (navigator.vibrate) navigator.vibrate(correct ? [50, 50, 50] : [100]);
+            if (correct) {
+                icon.textContent = '✓';
+                icon.className = 'result-icon result-correct';
+                text.textContent = '¡Correcto!';
+                text.className = 'result-text result-correct';
+                pts.textContent = `+${points} pts`;
+                if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
+            } else {
+                icon.textContent = '✗';
+                icon.className = 'result-icon result-incorrect';
+                text.textContent = 'Incorrecto';
+                text.className = 'result-text result-incorrect';
+                pts.textContent = '0 pts';
+                if (navigator.vibrate) navigator.vibrate(200);
+            }
+            
+            overlay.classList.add('active');
+            
+            setTimeout(() => {
+                overlay.classList.remove('active');
+            }, 2000);
         }
 
-        function updateLeaderboard(players, listId) {
-            const list = document.getElementById(listId);
-            const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
-            
-            list.innerHTML = '';
-            sortedPlayers.forEach((player, index) => {
-                const item = document.createElement('div');
-                item.className = `leaderboard-item ${player.name === playerName ? 'current-player' : ''}`;
-                
-                item.innerHTML = `
-                    <div class="leaderboard-avatar" style="background-color: ${player.color}">
-                        ${player.emoji}
-                    </div>
-                    <div class="leaderboard-name">${player.name}</div>
-                    <div class="leaderboard-score">${player.score}</div>
-                `;
-                list.appendChild(item);
-            });
+        function updateRank(players) {
+            const myPlayer = players.find(p => p.name === playerName);
+            if (myPlayer) {
+                myRank = players.indexOf(myPlayer) + 1;
+                myScore = myPlayer.score;
+                document.getElementById('miniRank').textContent = `Rank ${myRank}`;
+                document.getElementById('miniScore').textContent = myScore;
+            }
         }
 
-        function updateWaitingPlayers(players) {
-            const list = document.getElementById('waitingPlayersList');
-            list.innerHTML = '';
+        function showEndScreen(winner, players) {
+            showScreen('end');
             
-            Object.values(players).forEach(player => {
-                const item = document.createElement('div');
-                item.className = 'leaderboard-item';
-                item.innerHTML = `
-                    <div class="leaderboard-avatar" style="background-color: ${player.color}">
-                        ${player.emoji}
-                    </div>
-                    <div class="leaderboard-name">${player.name}</div>
-                    <div class="leaderboard-score">${player.isAdmin ? '👑' : ''}</div>
-                `;
-                list.appendChild(item);
-            });
+            const myPlayer = players.find(p => p.name === playerName);
+            const rank = players.indexOf(myPlayer) + 1;
+            
+            const medals = ['🥇', '🥈', '🥉'];
+            document.getElementById('finalRank').textContent = medals[rank - 1] || `#${rank}`;
+            
+            if (winner.name === playerName) {
+                document.getElementById('finalMessage').textContent = '¡Ganaste!';
+            } else {
+                document.getElementById('finalMessage').textContent = `Ganó ${winner.emoji} ${winner.name}`;
+            }
+            
+            document.getElementById('finalScore').textContent = `${myPlayer?.score || 0} puntos`;
+        }
+
+        function resetController() {
+            hasAnswered = false;
+            myScore = 0;
+            myRank = 1;
+            document.getElementById('miniScore').textContent = '0';
+            document.getElementById('miniRank').textContent = 'Rank 1';
+            showScreen('waiting');
+            resetAnswer();
         }
 
         function showScreen(screen) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screen + 'Screen').classList.add('active');
-        }
-
-        function resetController() {
-            hasAnswered = false;
-            currentQuestion = null;
-            showScreen('waiting');
-            document.getElementById('resultFeedback').classList.remove('active');
         }
 
         window.onload = init;
