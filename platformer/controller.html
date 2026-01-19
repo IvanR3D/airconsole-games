@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>AirConsole Controller</title>
-    <script type="text/javascript" src="https://www.airconsole.com/api/airconsole-1.7.0.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>STEAM Platformer - Control</title>
+    <script type="text/javascript" src="https://www.airconsole.com/api/airconsole-1.8.0.js"></script>
     <style>
         * {
             margin: 0;
@@ -15,110 +15,341 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        :root {
+            --steam-turquesa: #0595AE;
+            --steam-morado: #AB3D8B;
+            --steam-naranja: #EB8225;
+            --steam-verde: #73A03F;
+            --steam-negro: #010101;
+            --steam-blanco: #FFFFFF;
+        }
+
         body {
             width: 100vw;
             height: 100vh;
             overflow: hidden;
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+            background: var(--steam-blanco);
             touch-action: none;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            color: var(--steam-negro);
         }
 
-        #waitingScreen {
-            text-align: center;
-            color: white;
-        }
-
-        .waiting-title {
-            font-size: 36px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .waiting-icon {
-            font-size: 80px;
-            margin-bottom: 30px;
-            animation: pulse 2s infinite;
-        }
-
-        .player-info {
-            background: rgba(255,255,255,0.2);
-            padding: 20px 30px;
-            border-radius: 20px;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .player-name {
-            font-size: 28px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .player-color {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: inline-block;
-            margin: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        #gameController {
+        .screen {
             display: none;
             width: 100%;
             height: 100%;
             flex-direction: column;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
             padding: 20px;
         }
 
-        .game-title {
-            font-size: 28px;
-            color: white;
-            text-align: center;
-            font-weight: bold;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        .screen.active {
+            display: flex;
         }
 
-        .player-header {
+        /* JOIN SCREEN */
+        .join-screen {
+            text-align: center;
+            gap: 20px;
+        }
+
+        .join-logo {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .join-title {
+            font-size: 1.6em;
+            color: var(--steam-turquesa);
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .join-subtitle {
+            font-size: 1em;
+            color: var(--steam-negro);
+            opacity: 0.7;
+            margin-bottom: 15px;
+        }
+
+        .join-button {
+            background: var(--steam-verde);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            font-size: 1.3em;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #5a8030;
+            transition: all 0.1s ease;
+            text-transform: uppercase;
+        }
+
+        .join-button:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #5a8030;
+        }
+
+        .join-button:disabled {
+            background: #ccc;
+            box-shadow: 0 4px 0 #999;
+        }
+
+        /* AVATAR SELECT SCREEN */
+        .avatar-select-screen {
+            gap: 15px;
+        }
+
+        .avatar-title {
+            font-size: 1.4em;
+            color: var(--steam-turquesa);
+            margin-bottom: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .current-avatar {
+            font-size: 4em;
+            margin-bottom: 10px;
+        }
+
+        .player-color-display {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 4px solid white;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .avatar-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            max-width: 300px;
+            margin-bottom: 15px;
+        }
+
+        .avatar-btn {
+            width: 60px;
+            height: 60px;
+            font-size: 2em;
+            background: white;
+            border: 3px solid #E0E0E0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.15s ease;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+
+        .avatar-btn.selected {
+            border-color: var(--steam-verde);
+            background: #F5FAF0;
+        }
+
+        .avatar-btn:active {
+            transform: scale(0.95);
+        }
+
+        .color-section {
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .color-title {
+            font-size: 1.2em;
+            color: var(--steam-turquesa);
+            margin-bottom: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .color-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 4px solid white;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .color-btn.selected {
+            border-color: var(--steam-naranja);
+            transform: scale(1.15);
+            box-shadow: 0 0 0 4px var(--steam-naranja), 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .color-btn:active {
+            transform: scale(1.1);
+        }
+
+        .color-name {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7em;
+            color: var(--steam-negro);
+            white-space: nowrap;
+            font-weight: bold;
+        }
+
+        .ready-status {
+            font-size: 1.1em;
+            color: var(--steam-verde);
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .admin-start-section {
+            margin-top: 15px;
+        }
+
+        .start-game-btn {
+            background: var(--steam-turquesa);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #047a91;
+            transition: all 0.1s ease;
+            text-transform: uppercase;
+        }
+
+        .start-game-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #047a91;
+        }
+
+        .admin-badge {
+            background: var(--steam-naranja);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .waiting-hint {
+            background: #F5F5F5;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            margin-top: 15px;
+            border: 2px solid #E0E0E0;
+        }
+
+        .waiting-hint p {
+            font-size: 0.95em;
+            color: #666;
+        }
+
+        /* GAME CONTROLLER */
+        .game-controller {
             gap: 15px;
-            margin-bottom: 30px;
+            padding: 15px;
+            background: linear-gradient(180deg, #1B4D3E 0%, #0D2818 100%);
+        }
+
+        .orientation-warning {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .orientation-warning.active {
+            display: flex;
+        }
+
+        .orientation-warning-icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+            animation: rotate 2s ease-in-out infinite;
+        }
+
+        @keyframes rotate {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(90deg); }
+        }
+
+        .orientation-warning-text {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .orientation-warning-subtext {
+            font-size: 1.1em;
+            opacity: 0.8;
+        }
+
+        .game-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .player-avatar-badge {
+            font-size: 2em;
         }
 
         .player-color-badge {
-            width: 50px;
-            height: 50px;
+            width: 35px;
+            height: 35px;
             border-radius: 50%;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            border: 3px solid white;
         }
 
-        .player-header-text {
-            color: white;
-            font-size: 24px;
+        .player-name-text {
+            font-size: 1.2em;
             font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            color: white;
         }
 
+        /* CONTROL BUTTONS */
         .control-layout {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 30px;
+            gap: 20px;
             width: 100%;
-            max-width: 500px;
-            margin-bottom: 40px;
+            max-width: 400px;
         }
 
         .jump-container {
@@ -128,289 +359,475 @@
         }
 
         .jump-button {
-            width: 220px;
-            height: 220px;
+            width: 160px;
+            height: 160px;
             border-radius: 50%;
-            border: 6px solid white;
-            background: rgba(255,255,255,0.2);
+            border: none;
+            background: var(--steam-verde);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 70px;
             cursor: pointer;
-            transition: all 0.1s;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            user-select: none;
+            transition: all 0.08s ease;
+            box-shadow: 0 8px 0 #5a8030;
+            position: relative;
+        }
+
+        .jump-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 100%);
+            border-radius: 50% 50% 0 0;
         }
 
         .jump-button:active,
         .jump-button.pressed {
-            background: rgba(255,255,255,0.4);
-            transform: scale(0.95);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 #5a8030;
+        }
+
+        .jump-icon {
+            font-size: 2.5em;
+            margin-bottom: 5px;
         }
 
         .jump-text {
-            font-size: 28px;
+            font-size: 1.3em;
             color: white;
             font-weight: bold;
-            margin-top: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
         }
 
         .movement-container {
             display: flex;
-            gap: 60px;
+            gap: 50px;
             align-items: center;
             justify-content: center;
             width: 100%;
         }
 
         .control-button {
-            width: 130px;
-            height: 130px;
-            border-radius: 50%;
-            border: 5px solid white;
-            background: rgba(255,255,255,0.2);
+            width: 100px;
+            height: 100px;
+            border-radius: 20px;
+            border: none;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 60px;
             cursor: pointer;
-            transition: all 0.1s;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-            user-select: none;
+            transition: all 0.08s ease;
+            position: relative;
+        }
+
+        .control-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 100%);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .left-button {
+            background: var(--steam-morado);
+            box-shadow: 0 6px 0 #8a3070;
+        }
+
+        .right-button {
+            background: var(--steam-turquesa);
+            box-shadow: 0 6px 0 #047a91;
         }
 
         .control-button:active,
         .control-button.pressed {
-            background: rgba(255,255,255,0.4);
-            transform: scale(0.95);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transform: translateY(4px);
         }
 
-        .instruction {
+        .left-button:active, .left-button.pressed { box-shadow: 0 2px 0 #8a3070; }
+        .right-button:active, .right-button.pressed { box-shadow: 0 2px 0 #047a91; }
+
+        .button-icon {
+            font-size: 2em;
             color: white;
-            font-size: 18px;
-            text-align: center;
-            opacity: 0.9;
+        }
+
+        .button-text {
+            font-size: 0.9em;
+            color: white;
+            font-weight: bold;
+            margin-top: 5px;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-            margin-top: 20px;
         }
 
+        /* RESULTS SCREEN */
         .results-screen {
-            display: none;
             text-align: center;
-            color: white;
-            padding: 30px;
+            gap: 20px;
         }
 
         .results-title {
-            font-size: 36px;
+            font-size: 1.8em;
+            color: var(--steam-turquesa);
             font-weight: bold;
-            margin-bottom: 30px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
 
-        .result-item {
-            background: rgba(255,255,255,0.2);
-            padding: 20px;
-            border-radius: 20px;
-            margin: 15px 0;
-            font-size: 22px;
+        .final-rank {
+            font-size: 4em;
+            margin-bottom: 10px;
         }
 
-        .result-item.winner {
-            background: rgba(255, 215, 0, 0.3);
-            border: 2px solid gold;
+        .final-message {
+            font-size: 1.4em;
+            margin-bottom: 5px;
+            color: var(--steam-turquesa);
+            font-weight: bold;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+        .final-score {
+            font-size: 1.6em;
+            font-weight: bold;
+            color: var(--steam-verde);
+            margin-bottom: 20px;
         }
 
-        @media (max-width: 600px) {
-            .waiting-title {
-                font-size: 28px;
-            }
-            
-            .game-title {
-                font-size: 24px;
-            }
-            
+        .play-again-btn {
+            background: var(--steam-morado);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #8a3070;
+            transition: all 0.1s ease;
+            text-transform: uppercase;
+        }
+
+        .play-again-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #8a3070;
+        }
+
+        .waiting-next {
+            font-size: 0.95em;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 380px) {
             .jump-button {
-                width: 180px;
-                height: 180px;
-                font-size: 60px;
+                width: 140px;
+                height: 140px;
             }
-            
+
             .control-button {
-                width: 110px;
-                height: 110px;
-                font-size: 50px;
+                width: 85px;
+                height: 85px;
             }
-            
+
             .movement-container {
-                gap: 40px;
+                gap: 35px;
             }
         }
 
-        @media (max-height: 700px) {
+        @media (orientation: landscape) and (max-height: 450px) {
             .control-layout {
-                margin-bottom: 20px;
+                flex-direction: row;
+                justify-content: space-around;
             }
-            
+
             .jump-button {
-                width: 180px;
-                height: 180px;
-                font-size: 60px;
+                width: 120px;
+                height: 120px;
             }
-            
+
             .control-button {
-                width: 100px;
-                height: 100px;
-                font-size: 45px;
+                width: 80px;
+                height: 80px;
+            }
+
+            .movement-container {
+                gap: 25px;
+            }
+
+            .game-header {
+                display: none;
             }
         }
     </style>
 </head>
 <body>
-    <div id="waitingScreen">
-        <div class="waiting-icon">🎮</div>
-        <div class="waiting-title">Waiting for Game...</div>
-        <div class="player-info">
-            <div class="player-name" id="playerName">Player</div>
-            <div class="player-color" id="playerColor"></div>
-        </div>
-        <div class="instruction">Join code: <strong id="joinCode">----</strong></div>
+    <!-- JOIN SCREEN -->
+    <div class="screen join-screen active" id="joinScreen">
+        <div class="join-logo">🎮</div>
+        <h1 class="join-title">STEAM Platformer</h1>
+        <p class="join-subtitle">Fundación STEAM RD</p>
+        <button class="join-button" id="joinButton">¡UNIRSE!</button>
     </div>
 
-    <div id="gameController">
-        <div>
-            <div class="game-title">🎮 Platformer Challenge</div>
-            <div class="player-header">
-                <div class="player-color-badge" id="gamePlayerColor"></div>
-                <div class="player-header-text" id="gamePlayerName"></div>
-            </div>
+    <!-- AVATAR SELECT SCREEN -->
+    <div class="screen avatar-select-screen" id="avatarSelectScreen">
+        <div class="admin-badge" id="adminBadge" style="display: none;">👑 ADMIN</div>
+        <h2 class="avatar-title">Elige tu Avatar</h2>
+        <div class="current-avatar" id="currentAvatar">🦊</div>
+        <div class="player-color-display" id="playerColorDisplay"></div>
+        <div class="avatar-grid" id="avatarGrid"></div>
+        
+        <div class="color-section">
+            <h3 class="color-title">Elige tu Color</h3>
+            <div class="color-grid" id="colorGrid"></div>
+        </div>
+        
+        <p class="ready-status">✓ Listo para jugar</p>
+        
+        <div class="admin-start-section" id="adminStartSection" style="display: none;">
+            <button class="start-game-btn" id="startGameBtn">🚀 ¡INICIAR JUEGO!</button>
+        </div>
+        
+        <div class="waiting-hint" id="waitingHint">
+            <p>⏳ Esperando que el Jugador 1 inicie el juego...</p>
+        </div>
+    </div>
+
+    <!-- GAME CONTROLLER -->
+    <div class="screen game-controller" id="gameController">
+        <div class="orientation-warning" id="orientationWarning">
+            <div class="orientation-warning-icon">📱</div>
+            <div class="orientation-warning-text">¡Rota tu dispositivo!</div>
+            <div class="orientation-warning-subtext">Coloca el teléfono en posición horizontal para jugar</div>
+        </div>
+        
+        <div class="game-header">
+            <span class="player-avatar-badge" id="gameAvatar">🦊</span>
+            <div class="player-color-badge" id="gameColorBadge"></div>
+            <span class="player-name-text" id="gamePlayerName">Verde</span>
         </div>
         
         <div class="control-layout">
             <div class="jump-container">
                 <div class="jump-button" id="jumpBtn">
-                    ⬆️
-                    <div class="jump-text">JUMP</div>
+                    <div class="jump-icon">⬆️</div>
+                    <div class="jump-text">SALTAR</div>
                 </div>
             </div>
             
             <div class="movement-container">
-                <div class="control-button" id="leftBtn">⬅️</div>
-                <div class="control-button" id="rightBtn">➡️</div>
+                <div class="control-button left-button" id="leftBtn">
+                    <span class="button-icon">◀️</span>
+                    <span class="button-text">IZQ</span>
+                </div>
+                <div class="control-button right-button" id="rightBtn">
+                    <span class="button-icon">▶️</span>
+                    <span class="button-text">DER</span>
+                </div>
             </div>
         </div>
-        
-        <div class="instruction">Use buttons to control your character</div>
     </div>
 
-    <div id="resultsScreen" class="results-screen">
-        <div class="results-title">🏆 Game Results</div>
-        <div id="resultsList"></div>
-        <div class="instruction" style="margin-top: 30px;">Waiting for next game...</div>
+    <!-- RESULTS SCREEN -->
+    <div class="screen results-screen" id="resultsScreen">
+        <h2 class="results-title">🏆 ¡Carrera Terminada!</h2>
+        <div class="final-rank" id="finalRank">🥇</div>
+        <p class="final-message" id="finalMessage">¡Felicidades!</p>
+        <div class="final-score" id="finalScore">0 puntos</div>
+        <button class="play-again-btn" id="playAgainBtn" style="display: none;">🔄 JUGAR DE NUEVO</button>
+        <p class="waiting-next" id="waitingNext">Esperando al Jugador 1...</p>
     </div>
 
     <script>
         const airconsole = new AirConsole();
+        
         let playerInfo = {
-            number: null,
+            playerNum: null,
             color: null,
-            name: null
+            colorName: null,
+            avatar: '🦊',
+            isAdmin: false
         };
         
+        let availableAvatars = ['🦊', '🐼', '🐸', '🦁', '🐯', '🐻', '🐨', '🐵', '🦄', '🐙', '🐲', '🦅'];
+        const availableColors = [
+            { color: '#73A03F', name: 'Verde' },
+            { color: '#AB3D8B', name: 'Morado' },
+            { color: '#0595AE', name: 'Turquesa' },
+            { color: '#EB8225', name: 'Naranja' }
+        ];
         let isLeftPressed = false;
         let isRightPressed = false;
         let isJumpPressed = false;
-
-        airconsole.onReady = function() {
-            console.log("AirConsole controller ready");
-            airconsole.message(AirConsole.SCREEN, { action: 'ready' });
-        };
-
-        airconsole.onMessage = function(device_id, data) {
-            if (data.type === 'gameState') {
-                updatePlayerInfo(data);
-            } else if (data.type === 'gameStart') {
-                showGameController();
-            } else if (data.type === 'gameRestart') {
-                showWaitingScreen();
-            } else if (data.type === 'gameResults') {
-                showResults(data.results);
+        
+        // Performance: throttling y estado de mensajes
+        let lastMoveTime = 0;
+        const MOVE_THROTTLE = 16; // ~60fps
+        let pendingMessage = null;
+        
+        // Envío optimizado de mensajes
+        function sendMessage(msg) {
+            airconsole.message(AirConsole.SCREEN, msg);
+        }
+        
+        function sendThrottledMove(direction) {
+            const now = performance.now();
+            if (now - lastMoveTime >= MOVE_THROTTLE) {
+                lastMoveTime = now;
+                sendMessage({ action: 'move', direction: direction });
             }
-        };
+        }
 
-        function updatePlayerInfo(gameState) {
-            // Find which player this controller is
-            for (let playerNum in gameState.players) {
-                if (gameState.players[playerNum].deviceId === airconsole.device_id) {
-                    playerInfo.number = playerNum;
-                    playerInfo.color = gameState.players[playerNum].color;
-                    playerInfo.name = gameState.players[playerNum].name;
-                    
-                    // Update UI
-                    document.getElementById('playerName').textContent = playerInfo.name;
-                    document.getElementById('playerColor').style.backgroundColor = playerInfo.color;
-                    
-                    document.getElementById('gamePlayerName').textContent = playerInfo.name;
-                    document.getElementById('gamePlayerColor').style.backgroundColor = playerInfo.color;
-                    
-                    // Update join code display
-                    if (airconsole.getServerTime) {
-                        const code = Math.abs(airconsole.getServerTime() % 10000).toString().padStart(4, '0');
-                        document.getElementById('joinCode').textContent = code;
-                    }
-                    break;
+        function init() {
+            airconsole.onReady = function() {
+                console.log('Controller ready');
+            };
+
+            airconsole.onMessage = function(from, data) {
+                console.log("Received:", data);
+                
+                if (data.action === 'joined') {
+                    handleJoined(data);
+                } else if (data.type === 'gameState') {
+                    // Update state
+                } else if (data.type === 'gameStart') {
+                    showScreen('gameController');
+                    setupControls();
+                    requestOrientationLock();
+                } else if (data.type === 'gameRestart') {
+                    unlockOrientation();
+                    showScreen('avatarSelect');
+                } else if (data.type === 'gameResults') {
+                    showResults(data.results, data.winner);
+                } else if (data.action === 'colorUpdated') {
+                    playerInfo.color = data.color;
+                    playerInfo.colorName = data.colorName;
+                    updateColorDisplays();
                 }
-            }
+            };
+
+            document.getElementById('joinButton').addEventListener('click', joinGame);
+            document.getElementById('startGameBtn').addEventListener('click', startGame);
+            document.getElementById('playAgainBtn').addEventListener('click', playAgain);
         }
 
-        function showWaitingScreen() {
-            document.getElementById('waitingScreen').style.display = 'block';
-            document.getElementById('gameController').style.display = 'none';
-            document.getElementById('resultsScreen').style.display = 'none';
+        function joinGame() {
+            const randomAvatar = availableAvatars[Math.floor(Math.random() * availableAvatars.length)];
             
-            // Reset button states
-            isLeftPressed = false;
-            isRightPressed = false;
-            isJumpPressed = false;
-        }
-
-        function showGameController() {
-            document.getElementById('waitingScreen').style.display = 'none';
-            document.getElementById('gameController').style.display = 'flex';
-            document.getElementById('resultsScreen').style.display = 'none';
-            
-            setupControls();
-        }
-
-        function showResults(results) {
-            document.getElementById('waitingScreen').style.display = 'none';
-            document.getElementById('gameController').style.display = 'none';
-            document.getElementById('resultsScreen').style.display = 'block';
-            
-            const resultsList = document.getElementById('resultsList');
-            resultsList.innerHTML = '';
-            
-            results.forEach((result, index) => {
-                const resultDiv = document.createElement('div');
-                resultDiv.className = `result-item ${index === 0 ? 'winner' : ''}`;
-                resultDiv.innerHTML = `
-                    <strong>#${index + 1} ${result.name}</strong><br>
-                    Coins: ${result.coins} | Time: ${result.time}s<br>
-                    Score: <strong>${result.score}</strong>
-                `;
-                resultsList.appendChild(resultDiv);
+            airconsole.message(AirConsole.SCREEN, { 
+                action: 'join',
+                avatar: randomAvatar
             });
+            
+            document.getElementById('joinButton').disabled = true;
+            document.getElementById('joinButton').textContent = 'Conectando...';
+        }
+
+        function handleJoined(data) {
+            playerInfo.playerNum = data.playerNum;
+            playerInfo.color = data.color;
+            playerInfo.colorName = data.colorName;
+            playerInfo.avatar = data.avatar;
+            playerInfo.isAdmin = data.isAdmin;
+            
+            if (data.availableAvatars) {
+                availableAvatars = data.availableAvatars;
+            }
+            
+            setupAvatarScreen();
+            showScreen('avatarSelect');
+        }
+
+        function setupAvatarScreen() {
+            document.getElementById('currentAvatar').textContent = playerInfo.avatar;
+            updateColorDisplays();
+            
+            document.getElementById('adminBadge').style.display = playerInfo.isAdmin ? 'block' : 'none';
+            document.getElementById('adminStartSection').style.display = playerInfo.isAdmin ? 'block' : 'none';
+            document.getElementById('waitingHint').style.display = playerInfo.isAdmin ? 'none' : 'block';
+            
+            const avatarGrid = document.getElementById('avatarGrid');
+            avatarGrid.innerHTML = '';
+            
+            availableAvatars.forEach(avatar => {
+                const btn = document.createElement('div');
+                btn.className = 'avatar-btn' + (avatar === playerInfo.avatar ? ' selected' : '');
+                btn.textContent = avatar;
+                btn.addEventListener('click', () => selectAvatar(avatar));
+                avatarGrid.appendChild(btn);
+            });
+            
+            const colorGrid = document.getElementById('colorGrid');
+            colorGrid.innerHTML = '';
+            
+            availableColors.forEach((colorData, index) => {
+                const btn = document.createElement('div');
+                btn.className = 'color-btn' + (colorData.color === playerInfo.color ? ' selected' : '');
+                btn.style.backgroundColor = colorData.color;
+                btn.dataset.color = colorData.color;
+                btn.dataset.colorName = colorData.name;
+                
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'color-name';
+                nameSpan.textContent = colorData.name;
+                btn.appendChild(nameSpan);
+                
+                btn.addEventListener('click', () => selectColor(colorData.color, colorData.name));
+                colorGrid.appendChild(btn);
+            });
+        }
+
+        function updateColorDisplays() {
+            document.getElementById('playerColorDisplay').style.backgroundColor = playerInfo.color;
+            document.getElementById('gameColorBadge').style.backgroundColor = playerInfo.color;
+            document.getElementById('gamePlayerName').textContent = playerInfo.colorName;
+        }
+
+        function selectAvatar(avatar) {
+            playerInfo.avatar = avatar;
+            
+            document.getElementById('currentAvatar').textContent = avatar;
+            document.getElementById('gameAvatar').textContent = avatar;
+            
+            document.querySelectorAll('.avatar-btn').forEach(btn => {
+                btn.classList.toggle('selected', btn.textContent === avatar);
+            });
+            
+            airconsole.message(AirConsole.SCREEN, {
+                action: 'selectAvatar',
+                avatar: avatar
+            });
+            
+            if (navigator.vibrate) navigator.vibrate(30);
+        }
+
+        function selectColor(color, colorName) {
+            playerInfo.color = color;
+            playerInfo.colorName = colorName;
+            
+            updateColorDisplays();
+            
+            document.querySelectorAll('.color-btn').forEach(btn => {
+                btn.classList.toggle('selected', btn.dataset.color === color);
+            });
+            
+            airconsole.message(AirConsole.SCREEN, {
+                action: 'selectColor',
+                color: color,
+                colorName: colorName
+            });
+            
+            if (navigator.vibrate) navigator.vibrate(30);
+        }
+
+        function startGame() {
+            airconsole.message(AirConsole.SCREEN, { action: 'startGame' });
         }
 
         function setupControls() {
@@ -418,69 +835,132 @@
             const rightBtn = document.getElementById('rightBtn');
             const jumpBtn = document.getElementById('jumpBtn');
 
-            // Touch events for mobile
             setupTouchControl(leftBtn, 'left');
             setupTouchControl(rightBtn, 'right');
             setupTouchControl(jumpBtn, 'jump');
 
-            // Mouse events for testing
             setupMouseControl(leftBtn, 'left');
             setupMouseControl(rightBtn, 'right');
             setupMouseControl(jumpBtn, 'jump');
+        }
+
+        function requestOrientationLock() {
+            // Intentar bloquear la orientación en horizontal (landscape)
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('landscape').catch(err => {
+                    console.log('No se pudo bloquear la orientación:', err);
+                    checkOrientation();
+                });
+            } else if (screen.lockOrientation) {
+                try {
+                    screen.lockOrientation('landscape');
+                } catch (err) {
+                    console.log('No se pudo bloquear la orientación:', err);
+                    checkOrientation();
+                }
+            } else if (screen.mozLockOrientation) {
+                try {
+                    screen.mozLockOrientation('landscape');
+                } catch (err) {
+                    console.log('No se pudo bloquear la orientación:', err);
+                    checkOrientation();
+                }
+            } else if (screen.msLockOrientation) {
+                try {
+                    screen.msLockOrientation('landscape');
+                } catch (err) {
+                    console.log('No se pudo bloquear la orientación:', err);
+                    checkOrientation();
+                }
+            } else {
+                checkOrientation();
+            }
+
+            // Verificar orientación periódicamente
+            const orientationCheck = setInterval(() => {
+                if (document.getElementById('gameController').classList.contains('active')) {
+                    checkOrientation();
+                } else {
+                    clearInterval(orientationCheck);
+                    unlockOrientation();
+                }
+            }, 500);
+
+            // Escuchar cambios de orientación
+            window.addEventListener('orientationchange', checkOrientation);
+            window.addEventListener('resize', checkOrientation);
+        }
+
+        function checkOrientation() {
+            const warning = document.getElementById('orientationWarning');
+            const isPortrait = window.innerHeight > window.innerWidth;
+            
+            if (isPortrait && document.getElementById('gameController').classList.contains('active')) {
+                warning.classList.add('active');
+            } else {
+                warning.classList.remove('active');
+            }
+        }
+
+        function unlockOrientation() {
+            // Desbloquear la orientación cuando se sale del juego
+            if (screen.orientation && screen.orientation.unlock) {
+                screen.orientation.unlock();
+            } else if (screen.unlockOrientation) {
+                screen.unlockOrientation();
+            } else if (screen.mozUnlockOrientation) {
+                screen.mozUnlockOrientation();
+            } else if (screen.msUnlockOrientation) {
+                screen.msUnlockOrientation();
+            }
         }
 
         function setupTouchControl(element, action) {
             element.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 handleActionStart(action, element);
-            });
+            }, { passive: false });
 
             element.addEventListener('touchend', (e) => {
                 e.preventDefault();
                 handleActionEnd(action, element);
-            });
+            }, { passive: false });
 
             element.addEventListener('touchcancel', (e) => {
                 e.preventDefault();
                 handleActionEnd(action, element);
-            });
+            }, { passive: false });
         }
 
         function setupMouseControl(element, action) {
-            element.addEventListener('mousedown', () => {
-                handleActionStart(action, element);
-            });
-
-            element.addEventListener('mouseup', () => {
-                handleActionEnd(action, element);
-            });
-
-            element.addEventListener('mouseleave', () => {
-                handleActionEnd(action, element);
-            });
+            element.addEventListener('mousedown', () => handleActionStart(action, element));
+            element.addEventListener('mouseup', () => handleActionEnd(action, element));
+            element.addEventListener('mouseleave', () => handleActionEnd(action, element));
         }
 
         function handleActionStart(action, element) {
             element.classList.add('pressed');
-            vibrate(30);
+            if (navigator.vibrate) navigator.vibrate(15);
             
             switch(action) {
                 case 'left':
                     if (!isLeftPressed) {
                         isLeftPressed = true;
-                        airconsole.message(AirConsole.SCREEN, { action: 'move', direction: 'left' });
+                        isRightPressed = false; // Prevenir conflictos
+                        sendMessage({ action: 'move', direction: 'left' });
                     }
                     break;
                 case 'right':
                     if (!isRightPressed) {
                         isRightPressed = true;
-                        airconsole.message(AirConsole.SCREEN, { action: 'move', direction: 'right' });
+                        isLeftPressed = false; // Prevenir conflictos
+                        sendMessage({ action: 'move', direction: 'right' });
                     }
                     break;
                 case 'jump':
                     if (!isJumpPressed) {
                         isJumpPressed = true;
-                        airconsole.message(AirConsole.SCREEN, { action: 'jump', pressed: true });
+                        sendMessage({ action: 'jump', pressed: true });
                     }
                     break;
             }
@@ -493,41 +973,75 @@
                 case 'left':
                     if (isLeftPressed) {
                         isLeftPressed = false;
-                        airconsole.message(AirConsole.SCREEN, { action: 'stop' });
+                        // Si el otro botón está presionado, enviar ese movimiento
+                        if (isRightPressed) {
+                            sendMessage({ action: 'move', direction: 'right' });
+                        } else {
+                            sendMessage({ action: 'stop' });
+                        }
                     }
                     break;
                 case 'right':
                     if (isRightPressed) {
                         isRightPressed = false;
-                        airconsole.message(AirConsole.SCREEN, { action: 'stop' });
+                        if (isLeftPressed) {
+                            sendMessage({ action: 'move', direction: 'left' });
+                        } else {
+                            sendMessage({ action: 'stop' });
+                        }
                     }
                     break;
                 case 'jump':
                     if (isJumpPressed) {
                         isJumpPressed = false;
-                        airconsole.message(AirConsole.SCREEN, { action: 'jump', pressed: false });
+                        sendMessage({ action: 'jump', pressed: false });
                     }
                     break;
             }
         }
 
-        function vibrate(duration = 30) {
-            if (navigator.vibrate) {
-                navigator.vibrate(duration);
+        function showResults(results, winner) {
+            unlockOrientation();
+            showScreen('results');
+            
+            const myResult = results.find(r => r.playerNum == playerInfo.playerNum);
+            const myRank = myResult ? results.indexOf(myResult) + 1 : results.length;
+            
+            const medals = ['🥇', '🥈', '🥉'];
+            document.getElementById('finalRank').textContent = medals[myRank - 1] || `#${myRank}`;
+            
+            if (winner && winner.playerNum == playerInfo.playerNum) {
+                document.getElementById('finalMessage').textContent = '¡GANASTE!';
+                if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 100]);
+            } else if (winner) {
+                document.getElementById('finalMessage').textContent = `Ganó ${winner.avatar} ${winner.name}`;
+            }
+            
+            document.getElementById('finalScore').textContent = `${myResult?.score || 0} puntos`;
+            
+            document.getElementById('playAgainBtn').style.display = playerInfo.isAdmin ? 'block' : 'none';
+            document.getElementById('waitingNext').style.display = playerInfo.isAdmin ? 'none' : 'block';
+        }
+
+        function playAgain() {
+            airconsole.message(AirConsole.SCREEN, { action: 'playAgain' });
+        }
+
+        function showScreen(screen) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screen + 'Screen').classList.add('active');
+            
+            if (screen !== 'gameController') {
+                isLeftPressed = false;
+                isRightPressed = false;
+                isJumpPressed = false;
             }
         }
 
-        // Prevent scrolling and zooming
-        document.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-        }, { passive: false });
+        document.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
+        document.addEventListener('gesturestart', (e) => e.preventDefault());
 
-        document.addEventListener('gesturestart', (e) => {
-            e.preventDefault();
-        });
-
-        // Start with waiting screen
-        showWaitingScreen();
+        window.onload = init;
     </script>
 </body>
 </html>

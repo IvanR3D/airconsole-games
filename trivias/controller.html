@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Trivia Rápida - Control</title>
+    <title>STEAM Trivia - Control</title>
     <script src="https://www.airconsole.com/api/airconsole-1.8.0.js"></script>
     <style>
         * {
@@ -13,13 +13,22 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        :root {
+            --steam-turquesa: #0595AE;
+            --steam-morado: #AB3D8B;
+            --steam-naranja: #EB8225;
+            --steam-verde: #73A03F;
+            --steam-negro: #010101;
+            --steam-blanco: #FFFFFF;
+        }
+
         body {
-            font-family: 'Arial', sans-serif;
-            background: #1a1a2e;
+            font-family: 'Segoe UI', 'Arial', sans-serif;
             min-height: 100vh;
-            padding: 15px;
-            color: white;
+            color: var(--steam-negro);
             overflow: hidden;
+            touch-action: manipulation;
+            background: var(--steam-blanco);
         }
 
         .container {
@@ -27,407 +36,481 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-            max-width: 500px;
-            margin: 0 auto;
         }
 
-        /* ALL SCREENS */
         .screen {
             display: none;
             flex: 1;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
+            opacity: 0;
+            transition: opacity 0.2s ease;
         }
 
         .screen.active {
             display: flex;
+            opacity: 1;
         }
 
         /* JOIN SCREEN */
-        .join-screen .content {
-            width: 100%;
+        .join-screen {
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
             text-align: center;
         }
 
-        .emoji-large {
-            font-size: 4em;
-            margin-bottom: 20px;
-            animation: bounce 2s infinite;
-        }
-
-        .title {
-            font-size: 2em;
-            font-weight: bold;
+        .join-logo {
+            font-size: 3.5em;
             margin-bottom: 15px;
         }
 
-        .subtitle {
-            font-size: 1.1em;
-            margin-bottom: 25px;
-            opacity: 0.8;
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 18px;
-            font-size: 1.2em;
-            border: none;
-            border-radius: 12px;
-            text-align: center;
-            font-weight: bold;
-            background: rgba(255,255,255,0.1);
-            color: white;
-            margin-bottom: 20px;
-        }
-
-        .input-field::placeholder {
-            color: rgba(255,255,255,0.5);
-        }
-
-        .button {
-            width: 100%;
-            padding: 20px;
-            font-size: 1.5em;
-            font-weight: bold;
-            border: none;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .button:active {
-            transform: scale(0.95);
-        }
-
-        .button-primary {
-            background: #fbbf24;
-            color: #1a1a2e;
-        }
-
-        .button-success {
-            background: #10b981;
-            color: white;
-        }
-
-        .button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        /* EMOJI SCREEN */
-        .emoji-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-            margin: 20px 0;
-            width: 100%;
-        }
-
-        .emoji-button {
-            aspect-ratio: 1;
-            font-size: 2em;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-            background: rgba(255,255,255,0.1);
-            color: white;
-        }
-
-        .emoji-button:hover {
-            transform: scale(1.05);
-            background: rgba(255,255,255,0.2);
-        }
-
-        .emoji-button.selected {
-            background: #fbbf24;
-            transform: scale(0.9);
-        }
-
-        .emoji-button:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-
-        /* CATEGORY SCREEN */
-        .category-list {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin: 20px 0;
-        }
-
-        .category-item {
-            padding: 18px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: center;
-        }
-
-        .category-item:hover {
-            background: rgba(255,255,255,0.15);
-            transform: translateY(-2px);
-        }
-
-        .category-item.selected {
-            background: rgba(251, 191, 36, 0.3);
-            border: 2px solid #fbbf24;
-        }
-
-        .category-item-emoji {
-            font-size: 2em;
+        .join-title {
+            font-size: 1.8em;
+            color: var(--steam-turquesa);
             margin-bottom: 8px;
+            font-weight: bold;
         }
 
-        .category-item-name {
-            font-size: 1.2em;
+        .join-subtitle {
+            font-size: 1.1em;
+            color: var(--steam-negro);
+            opacity: 0.7;
+            margin-bottom: 25px;
+        }
+
+        .join-button {
+            background: var(--steam-verde);
+            color: white;
+            border: none;
+            padding: 18px 45px;
+            font-size: 1.4em;
             font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #5a8030;
+            transition: all 0.1s ease;
+            text-transform: uppercase;
+        }
+
+        .join-button:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #5a8030;
+        }
+
+        .join-button:disabled {
+            background: #ccc;
+            box-shadow: 0 4px 0 #999;
         }
 
         /* WAITING SCREEN */
-        .player-info {
+        .waiting-screen {
+            align-items: center;
+            justify-content: center;
+            padding: 25px;
             text-align: center;
-            margin-bottom: 30px;
         }
 
-        .player-avatar {
-            width: 80px;
-            height: 80px;
+        .player-info {
+            margin-bottom: 25px;
+        }
+
+        .player-avatar-large {
+            width: 90px;
+            height: 90px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: bold;
             font-size: 2.5em;
-            margin: 0 auto 15px;
+            margin: 0 auto 12px;
             border: 4px solid white;
-            animation: pulse 1.5s infinite;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
         }
 
-        .player-details h3 {
-            font-size: 1.4em;
+        .player-name-display {
+            font-size: 1.6em;
+            font-weight: bold;
+            color: var(--steam-negro);
             margin-bottom: 5px;
         }
 
         .admin-badge {
-            background: #fbbf24;
-            color: #1a1a2e;
+            background: var(--steam-naranja);
+            color: white;
             padding: 5px 15px;
             border-radius: 20px;
             font-weight: bold;
             display: inline-block;
+            margin-top: 8px;
+            font-size: 0.9em;
+        }
+
+        .waiting-message {
+            font-size: 1.3em;
+            color: var(--steam-turquesa);
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .waiting-animation {
+            font-size: 2.5em;
+            animation: bounce 1s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* ADMIN CATEGORY SELECTION */
+        .category-select-screen {
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .category-title {
+            text-align: center;
+            font-size: 1.4em;
+            color: var(--steam-turquesa);
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .category-btn {
+            background: white;
+            border: 3px solid #E0E0E0;
+            border-radius: 12px;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+
+        .category-btn.selected {
+            border-color: var(--steam-verde);
+            background: #F5FAF0;
+        }
+
+        .category-btn:active {
+            transform: scale(0.95);
+        }
+
+        .category-btn-emoji {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .category-btn-name {
+            font-size: 0.95em;
+            font-weight: bold;
+            color: var(--steam-negro);
+        }
+
+        .start-game-btn {
+            background: var(--steam-turquesa);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 1.3em;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #047a91;
+            transition: all 0.1s ease;
+            width: 100%;
+            text-transform: uppercase;
+        }
+
+        .start-game-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #047a91;
         }
 
         /* PLAYING SCREEN */
         .playing-screen {
-            justify-content: flex-start;
-            padding-top: 20px;
+            padding: 15px;
         }
 
-        .game-header {
-            width: 100%;
+        .game-info {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .question-indicator {
+            font-size: 1em;
+            color: var(--steam-turquesa);
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .select-answer-text {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            color: var(--steam-negro);
+        }
+
+        /* ANSWER BUTTONS */
+        .answer-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            flex: 1;
+            max-height: 350px;
+        }
+
+        .answer-button {
+            border: none;
+            border-radius: 15px;
+            font-size: 2.5em;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.1s ease;
             display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .answer-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 100%);
+            border-radius: 15px 15px 0 0;
+        }
+
+        .answer-button:active:not(:disabled),
+        .answer-button.selected {
+            transform: translateY(4px);
+        }
+
+        .answer-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .answer-button.correct-highlight {
+            animation: correctPulse 0.4s ease infinite;
+        }
+
+        .answer-button.wrong-highlight {
+            animation: wrongShake 0.4s ease;
+        }
+
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+
+        @keyframes wrongShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        /* Button colors */
+        .answer-a { background: var(--steam-verde); box-shadow: 0 6px 0 #5a8030; }
+        .answer-b { background: var(--steam-morado); box-shadow: 0 6px 0 #8a3070; }
+        .answer-c { background: var(--steam-turquesa); box-shadow: 0 6px 0 #047a91; }
+        .answer-d { background: var(--steam-naranja); box-shadow: 0 6px 0 #c46d1d; }
+
+        .answer-a:active:not(:disabled), .answer-a.selected { box-shadow: 0 2px 0 #5a8030; }
+        .answer-b:active:not(:disabled), .answer-b.selected { box-shadow: 0 2px 0 #8a3070; }
+        .answer-c:active:not(:disabled), .answer-c.selected { box-shadow: 0 2px 0 #047a91; }
+        .answer-d:active:not(:disabled), .answer-d.selected { box-shadow: 0 2px 0 #c46d1d; }
+
+        /* PLAYER STATUS BAR */
+        .player-status-bar {
+            display: flex;
+            align-items: center;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding: 0 10px;
+            background: #F5F5F5;
+            padding: 12px 15px;
+            border-radius: 12px;
+            margin-top: 15px;
+            border: 2px solid #E0E0E0;
         }
 
-        .player-indicator {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(255,255,255,0.1);
-            padding: 8px 15px;
-            border-radius: 20px;
-        }
-
-        .player-indicator .avatar {
-            width: 35px;
-            height: 35px;
+        .player-mini-avatar {
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.2em;
             border: 2px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        .question-info {
-            text-align: center;
-            margin-bottom: 15px;
-        }
-
-        .question-number {
-            font-size: 0.9em;
-            opacity: 0.7;
-        }
-
-        .answer-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            width: 100%;
-            margin-bottom: 20px;
-        }
-
-        .answer-button {
-            aspect-ratio: 1;
-            font-size: 3em;
-            font-weight: bold;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.1s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-
-        .answer-button:active {
-            transform: scale(0.95);
-        }
-
-        .answer-button:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-
-        .answer-button.selected {
-            transform: scale(0.9);
-            box-shadow: 0 0 0 5px rgba(255,255,255,0.5);
-        }
-
-        .answer-button.a {
-            background: #ef4444;
-            color: white;
-        }
-
-        .answer-button.b {
-            background: #3b82f6;
-            color: white;
-        }
-
-        .answer-button.c {
-            background: #f59e0b;
-            color: white;
-        }
-
-        .answer-button.d {
-            background: #10b981;
-            color: white;
-        }
-
-        /* Leaderboard */
-        .leaderboard {
-            background: rgba(0,0,0,0.2);
-            border-radius: 15px;
-            padding: 15px;
-            margin-top: auto;
-            width: 100%;
-        }
-
-        .leaderboard-title {
-            font-size: 0.9em;
-            text-align: center;
-            margin-bottom: 10px;
-            opacity: 0.7;
-        }
-
-        .leaderboard-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px;
-            border-radius: 10px;
-            margin-bottom: 5px;
-            font-size: 0.9em;
-        }
-
-        .leaderboard-item.current-player {
-            background: rgba(251, 191, 36, 0.3);
-        }
-
-        .leaderboard-avatar {
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8em;
-            border: 1px solid white;
-        }
-
-        .leaderboard-name {
+        .player-mini-info {
             flex: 1;
+            margin-left: 12px;
         }
 
-        .leaderboard-score {
+        .player-mini-name {
             font-weight: bold;
+            font-size: 0.95em;
+            color: var(--steam-negro);
         }
 
-        /* Result Feedback */
-        .result-feedback {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            color: #333;
-            text-align: center;
+        .player-mini-rank {
+            font-size: 0.8em;
+            color: #666;
+        }
+
+        .player-mini-score {
+            background: var(--steam-naranja);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        /* RESULT OVERLAY */
+        .result-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
             display: none;
+            align-items: center;
+            justify-content: center;
             z-index: 100;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
-        .result-feedback.active {
-            display: block;
-            animation: popIn 0.3s ease;
+        .result-overlay.active {
+            display: flex;
+        }
+
+        .result-content {
+            text-align: center;
+            animation: popIn 0.25s ease;
         }
 
         @keyframes popIn {
-            from {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(0.5);
-            }
-            to {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1);
-            }
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
 
-        /* END SCREEN */
-        .final-rank {
-            font-size: 3em;
+        .result-icon {
+            font-size: 4em;
             margin-bottom: 15px;
+        }
+
+        .result-text {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .result-points {
+            font-size: 1.4em;
+        }
+
+        .result-correct .result-icon,
+        .result-correct .result-text { color: var(--steam-verde); }
+        .result-incorrect .result-icon,
+        .result-incorrect .result-text { color: var(--steam-morado); }
+        .result-correct .result-points { color: var(--steam-naranja); }
+
+        /* END SCREEN */
+        .end-screen {
+            align-items: center;
+            justify-content: center;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .final-rank {
+            font-size: 4em;
+            margin-bottom: 15px;
+        }
+
+        .final-message {
+            font-size: 1.6em;
+            color: var(--steam-turquesa);
+            margin-bottom: 8px;
+            font-weight: bold;
         }
 
         .final-score {
             font-size: 2em;
-            color: #fbbf24;
             font-weight: bold;
-            margin-bottom: 20px;
+            color: var(--steam-verde);
+            margin-bottom: 25px;
         }
 
-        /* ANIMATIONS */
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+        .play-again-btn {
+            background: var(--steam-morado);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 1.3em;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #8a3070;
+            transition: all 0.1s ease;
+            text-transform: uppercase;
+            margin-bottom: 15px;
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+        .play-again-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #8a3070;
+        }
+
+        .waiting-next {
+            font-size: 1em;
+            color: #666;
+        }
+
+        /* NON-ADMIN WAITING */
+        .non-admin-waiting {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .non-admin-waiting p {
+            font-size: 1.1em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .selected-category-display {
+            background: #F5F5F5;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 15px;
+            border: 2px solid #E0E0E0;
+        }
+
+        .selected-category-emoji {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .selected-category-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: var(--steam-turquesa);
         }
     </style>
 </head>
@@ -435,338 +518,464 @@
     <div class="container">
         <!-- JOIN SCREEN -->
         <div class="screen join-screen active" id="joinScreen">
-            <div class="content">
-                <div class="emoji-large">🎮</div>
-                <h1 class="title">Trivia Rápida</h1>
-                <p class="subtitle">Únete al juego</p>
-                <input type="text" id="playerName" class="input-field" placeholder="Escribe tu nombre" maxlength="15">
-                <button class="button button-primary" id="joinButton">¡UNIRSE!</button>
-            </div>
+            <div class="join-logo">🎯</div>
+            <h1 class="join-title">STEAM Trivia</h1>
+            <p class="join-subtitle">Fundación STEAM RD</p>
+            <button class="join-button" id="joinButton">¡UNIRSE!</button>
         </div>
 
-        <!-- EMOJI SCREEN -->
-        <div class="screen emoji-screen" id="emojiScreen">
-            <div class="emoji-large">😊</div>
-            <h2 class="title">Elige tu emoji</h2>
-            <p class="subtitle">Selecciona tu avatar</p>
-            <div class="emoji-grid" id="emojiGrid"></div>
-            <button class="button button-primary" id="confirmEmojiButton" disabled>CONFIRMAR</button>
-        </div>
-
-        <!-- CATEGORY SCREEN -->
-        <div class="screen category-screen" id="categoryScreen">
-            <div class="emoji-large">👑</div>
-            <h2 class="title">Administrador</h2>
-            <p class="subtitle">Selecciona categoría</p>
-            <div class="category-list" id="categoryList"></div>
-            <button class="button button-success" id="startGameAdminButton">INICIAR JUEGO</button>
-        </div>
-
-        <!-- WAITING SCREEN -->
+        <!-- WAITING SCREEN (Non-admin) -->
         <div class="screen waiting-screen" id="waitingScreen">
             <div class="player-info">
-                <div class="player-avatar" id="playerAvatar"></div>
-                <div class="player-details">
-                    <h3 id="playerNameDisplay"></h3>
-                    <p id="playerStatus"></p>
+                <div class="player-avatar-large" id="playerAvatar"></div>
+                <div class="player-name-display" id="playerNameDisplay"></div>
+            </div>
+            <div class="waiting-animation">⏳</div>
+            <p class="waiting-message">Esperando que inicie el juego...</p>
+            <div class="non-admin-waiting" id="nonAdminWaiting">
+                <p>El Jugador 1 está seleccionando la categoría</p>
+                <div class="selected-category-display" id="selectedCategoryDisplay" style="display: none;">
+                    <div class="selected-category-emoji" id="selectedCategoryEmoji">🌍</div>
+                    <div class="selected-category-name" id="selectedCategoryName">General</div>
                 </div>
             </div>
-            <div class="emoji-large">⏳</div>
-            <h2 class="title">Esperando...</h2>
-            <p class="subtitle" id="waitingMessage">Partida no iniciada</p>
-            <div class="leaderboard" id="waitingLeaderboard">
-                <div class="leaderboard-title">Jugadores conectados</div>
-                <div id="waitingPlayersList"></div>
+        </div>
+
+        <!-- ADMIN CATEGORY SELECT SCREEN -->
+        <div class="screen category-select-screen" id="categorySelectScreen">
+            <div class="player-info" style="margin-bottom: 15px;">
+                <div class="player-avatar-large" id="adminAvatar"></div>
+                <div class="player-name-display" id="adminNameDisplay"></div>
+                <div class="admin-badge">👑 ADMIN</div>
             </div>
+            <h2 class="category-title">Selecciona una Categoría</h2>
+            <div class="category-grid" id="categoryGrid"></div>
+            <button class="start-game-btn" id="startGameBtn">🚀 ¡INICIAR JUEGO!</button>
         </div>
 
         <!-- PLAYING SCREEN -->
         <div class="screen playing-screen" id="playingScreen">
-            <div class="game-header">
-                <div class="question-info">
-                    <div class="question-number" id="questionNumber">Pregunta 1/5</div>
-                </div>
-                <div class="player-indicator">
-                    <div class="avatar" id="currentPlayerAvatar"></div>
-                </div>
+            <div class="game-info">
+                <div class="question-indicator" id="questionIndicator">Pregunta 1 de 5</div>
+                <p class="select-answer-text">Selecciona tu respuesta:</p>
             </div>
 
-            <div class="answer-buttons" id="answerButtons"></div>
-
-            <div class="leaderboard">
-                <div class="leaderboard-title">🏆 Puntuación</div>
-                <div id="leaderboardList"></div>
+            <div class="answer-grid" id="answerGrid">
+                <button class="answer-button answer-a" data-option="0">A</button>
+                <button class="answer-button answer-b" data-option="1">B</button>
+                <button class="answer-button answer-c" data-option="2">C</button>
+                <button class="answer-button answer-d" data-option="3">D</button>
             </div>
 
-            <div class="result-feedback" id="resultFeedback">
-                <div class="result-icon" id="resultIcon"></div>
-                <div class="result-text" id="resultText"></div>
-                <div class="result-points" id="resultPoints"></div>
+            <div class="player-status-bar">
+                <div class="player-mini-avatar" id="miniAvatar"></div>
+                <div class="player-mini-info">
+                    <div class="player-mini-name" id="miniName"></div>
+                    <div class="player-mini-rank" id="miniRank">Rank 1</div>
+                </div>
+                <div class="player-mini-score" id="miniScore">0</div>
             </div>
         </div>
 
         <!-- END SCREEN -->
         <div class="screen end-screen" id="endScreen">
-            <div class="final-rank" id="finalRank"></div>
-            <h2 class="title">¡Juego Terminado!</h2>
-            <p class="subtitle" id="endMessage"></p>
-            <div class="final-score" id="finalScore"></div>
-            <div class="leaderboard" id="finalLeaderboard">
-                <div class="leaderboard-title">Resultados finales</div>
-                <div id="finalPlayersList"></div>
+            <div class="final-rank" id="finalRank">🥇</div>
+            <p class="final-message" id="finalMessage">¡Felicidades!</p>
+            <div class="final-score" id="finalScore">0 puntos</div>
+            <button class="play-again-btn" id="playAgainBtn" style="display: none;">🔄 JUGAR DE NUEVO</button>
+            <p class="waiting-next" id="waitingNextText">Esperando al Jugador 1...</p>
+        </div>
+
+        <!-- RESULT OVERLAY -->
+        <div class="result-overlay" id="resultOverlay">
+            <div class="result-content" id="resultContent">
+                <div class="result-icon">✓</div>
+                <div class="result-text">¡Correcto!</div>
+                <div class="result-points">+500 pts</div>
             </div>
-            <p class="subtitle" style="margin-top: 20px;">Esperando nueva partida...</p>
         </div>
     </div>
 
     <script>
+        const categories = {
+            general: { name: "General", emoji: "🌍" },
+            science: { name: "Ciencia", emoji: "🔬" },
+            mathematics: { name: "Matemáticas", emoji: "📐" },
+            robotics: { name: "Robótica", emoji: "🤖" },
+            chemistry: { name: "Química", emoji: "⚗️" },
+            technology: { name: "Tecnología", emoji: "💻" },
+            history: { name: "Historia", emoji: "📜" },
+            geography: { name: "Geografía", emoji: "🗺️" }
+        };
+
         let airconsole;
         let playerName = '';
         let playerEmoji = '';
         let playerColor = '';
         let isAdmin = false;
-        let currentQuestion = null;
         let hasAnswered = false;
-        let playerRank = 1;
-        let leaderboardData = [];
+        let myScore = 0;
+        let myRank = 1;
+        let selectedCategory = 'general';
+
+        // Performance: cache de elementos DOM
+        const domCache = {};
+        
+        function cacheDom() {
+            domCache.joinButton = document.getElementById('joinButton');
+            domCache.playerAvatar = document.getElementById('playerAvatar');
+            domCache.playerNameDisplay = document.getElementById('playerNameDisplay');
+            domCache.adminAvatar = document.getElementById('adminAvatar');
+            domCache.adminNameDisplay = document.getElementById('adminNameDisplay');
+            domCache.miniAvatar = document.getElementById('miniAvatar');
+            domCache.miniName = document.getElementById('miniName');
+            domCache.miniScore = document.getElementById('miniScore');
+            domCache.miniRank = document.getElementById('miniRank');
+            domCache.questionIndicator = document.getElementById('questionIndicator');
+            domCache.resultOverlay = document.getElementById('resultOverlay');
+            domCache.resultContent = document.getElementById('resultContent');
+            domCache.answerButtons = document.querySelectorAll('.answer-button');
+        }
+
+        // Performance: envío rápido de mensajes
+        function sendMessage(msg) {
+            airconsole.message(AirConsole.SCREEN, msg);
+        }
 
         function init() {
             airconsole = new AirConsole();
+            cacheDom();
 
             airconsole.onReady = function() {
                 console.log('Controller ready');
-                generateEmojiGrid();
-                setupCategories();
-                setTimeout(() => {
-                    const firstCategory = document.querySelector('.category-item');
-                    if (firstCategory) firstCategory.classList.add('selected');
-                }, 100);
+                setupCategoryGrid();
+                setupAnswerButtons();
             };
 
             airconsole.onMessage = function(from, data) {
-                console.log("Controller received:", data.action, data);
+                console.log("Received:", data.action);
                 
-                if (data.action === 'joined') {
-                    playerColor = data.color;
-                    playerEmoji = data.emoji;
-                    isAdmin = data.isAdmin;
-                    
-                    if (isAdmin) {
-                        showScreen('category');
-                    } else {
-                        showScreen('waiting');
-                        document.getElementById('currentPlayerAvatar').style.backgroundColor = playerColor;
-                        document.getElementById('currentPlayerAvatar').textContent = playerEmoji;
-                        document.getElementById('playerAvatar').style.backgroundColor = playerColor;
-                        document.getElementById('playerAvatar').textContent = playerEmoji;
-                        document.getElementById('playerNameDisplay').textContent = playerName;
-                        document.getElementById('playerStatus').innerHTML = 'Jugador conectado';
-                    }
-                } else if (data.action === 'emojiTaken') {
-                    alert('¡Emoji ya tomado!');
-                    document.getElementById('confirmEmojiButton').disabled = false;
-                } else if (data.action === 'gameStart') {
-                    currentQuestion = data.question;
-                    showScreen('playing');
-                    setupAnswerButtons();
-                    hasAnswered = false;
-                    document.getElementById('resultFeedback').classList.remove('active');
-                } else if (data.action === 'nextQuestion') {
-                    currentQuestion = data.question;
-                    hasAnswered = false;
-                    document.getElementById('resultFeedback').classList.remove('active');
-                    setupAnswerButtons();
-                } else if (data.action === 'result') {
-                    showResult(data.correct, data.points);
-                } else if (data.action === 'gameEnd') {
-                    showScreen('end');
-                    const winner = data.winner;
-                    const myScore = data.players.find(p => p.name === playerName)?.score || 0;
-                    const myRank = data.players.findIndex(p => p.name === playerName) + 1;
-                    
-                    document.getElementById('finalRank').textContent = myRank === 1 ? '🥇' : myRank === 2 ? '🥈' : myRank === 3 ? '🥉' : `#${myRank}`;
-                    document.getElementById('endMessage').textContent = winner.name === playerName ? '¡Ganaste!' : `Ganó ${winner.emoji} ${winner.name}`;
-                    document.getElementById('finalScore').textContent = `${myScore} puntos`;
-                    updateLeaderboard(data.players, 'finalPlayersList');
-                } else if (data.action === 'reset') {
-                    resetController();
-                } else if (data.action === 'selectCategory') {
-                    if (isAdmin) {
-                        document.querySelectorAll('.category-item').forEach(item => item.classList.remove('selected'));
-                        document.querySelector(`[data-category="${data.category}"]`)?.classList.add('selected');
-                    }
-                } else if (data.action === 'leaderboardUpdate') {
-                    updateLeaderboard(data.players, 'leaderboardList');
-                } else if (data.action === 'waitingPlayersUpdate') {
-                    updateWaitingPlayers(data.players);
+                switch(data.action) {
+                    case 'joined':
+                        handleJoined(data);
+                        break;
+                    case 'gameStateUpdate':
+                        handleGameStateUpdate(data);
+                        break;
+                    case 'categorySelected':
+                        updateSelectedCategory(data.category);
+                        break;
+                    case 'gameStart':
+                        handleGameStart(data);
+                        break;
+                    case 'showQuestion':
+                        handleShowQuestion(data);
+                        break;
+                    case 'result':
+                        showResult(data.correct, data.points);
+                        break;
+                    case 'showAnswer':
+                        handleShowAnswer(data.correctIndex);
+                        break;
+                    case 'nextQuestion':
+                        handleNextQuestion(data);
+                        break;
+                    case 'leaderboardUpdate':
+                        updateRank(data.players);
+                        break;
+                    case 'gameEnd':
+                        showEndScreen(data.winner, data.players);
+                        break;
+                    case 'reset':
+                        handleReset(data);
+                        break;
                 }
             };
 
             document.getElementById('joinButton').addEventListener('click', joinGame);
-            document.getElementById('confirmEmojiButton').addEventListener('click', confirmEmoji);
-            document.getElementById('startGameAdminButton').addEventListener('click', startGameFromAdmin);
-            document.getElementById('playerName').addEventListener('keypress', e => {
-                if (e.key === 'Enter') joinGame();
-            });
+            document.getElementById('startGameBtn').addEventListener('click', startGame);
+            document.getElementById('playAgainBtn').addEventListener('click', playAgain);
         }
 
-        function generateEmojiGrid() {
-            const grid = document.getElementById('emojiGrid');
-            const emojis = ['😀', '😎', '🤓', '🤠', '😺', '🐶', '🐱', '🦊', '🐼', '🐸', '🦁', '🐯', '🦄', '🐙', '🦋', '🐢', '🦀', '🐺', '🦅', '🐧', '🐨', '🐵', '🐸', '🦉'];
+        function setupCategoryGrid() {
+            const grid = document.getElementById('categoryGrid');
             grid.innerHTML = '';
-            emojis.forEach(emoji => {
-                const button = document.createElement('button');
-                button.className = 'emoji-button';
-                button.textContent = emoji;
-                button.dataset.emoji = emoji;
-                button.addEventListener('click', () => selectEmoji(emoji, button));
-                grid.appendChild(button);
-            });
-        }
-
-        function selectEmoji(emoji, button) {
-            document.querySelectorAll('.emoji-button').forEach(btn => {
-                btn.classList.remove('selected');
-                btn.disabled = false;
-            });
-            button.classList.add('selected');
-            playerEmoji = emoji;
-            document.getElementById('confirmEmojiButton').disabled = false;
-        }
-
-        function setupCategories() {
-            const categoryList = document.getElementById('categoryList');
-            const categories = [
-                { key: 'general', name: 'General', emoji: '🌍' },
-                { key: 'science', name: 'Ciencia', emoji: '🔬' },
-                { key: 'entertainment', name: 'Entretenimiento', emoji: '🎬' },
-                { key: 'sports', name: 'Deportes', emoji: '⚽' }
-            ];
-            categoryList.innerHTML = '';
-            categories.forEach(cat => {
-                const item = document.createElement('div');
-                item.className = 'category-item';
-                item.dataset.category = cat.key;
-                item.innerHTML = `
-                    <div class="category-item-emoji">${cat.emoji}</div>
-                    <div class="category-item-name">${cat.name}</div>
+            
+            Object.entries(categories).forEach(([key, cat]) => {
+                const btn = document.createElement('div');
+                btn.className = 'category-btn' + (key === selectedCategory ? ' selected' : '');
+                btn.dataset.category = key;
+                btn.innerHTML = `
+                    <div class="category-btn-emoji">${cat.emoji}</div>
+                    <div class="category-btn-name">${cat.name}</div>
                 `;
-                item.addEventListener('click', () => {
-                    document.querySelectorAll('.category-item').forEach(i => i.classList.remove('selected'));
-                    item.classList.add('selected');
-                    airconsole.message(AirConsole.SCREEN, { action: 'selectCategory', category: cat.key });
+                btn.addEventListener('click', () => selectCategory(key));
+                grid.appendChild(btn);
+            });
+        }
+
+        function setupAnswerButtons() {
+            document.querySelectorAll('.answer-button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (!hasAnswered && !btn.disabled) {
+                        selectAnswer(parseInt(btn.dataset.option));
+                    }
                 });
-                categoryList.appendChild(item);
             });
         }
 
         function joinGame() {
-            playerName = document.getElementById('playerName').value.trim();
-            if (!playerName) return alert('Escribe tu nombre');
-            showScreen('emoji');
-        }
-
-        function confirmEmoji() {
-            if (!playerEmoji) return alert('Selecciona un emoji');
-            airconsole.message(AirConsole.SCREEN, { action: 'join', name: playerName, emoji: playerEmoji });
-            document.getElementById('confirmEmojiButton').disabled = true;
-        }
-
-        function startGameFromAdmin() {
-            airconsole.message(AirConsole.SCREEN, { action: 'start' });
-        }
-
-        function setupAnswerButtons() {
-            const buttonsContainer = document.getElementById('answerButtons');
-            const letters = ['A', 'B', 'C', 'D'];
-            const classes = ['a', 'b', 'c', 'd'];
+            playerName = airconsole.getNickname() || `Jugador ${airconsole.device_id}`;
+            const emojis = ['😀', '😎', '🤓', '🤠', '😺', '🐶', '🦊', '🐼', '🐸', '🦁', '🦄', '🐙'];
+            playerEmoji = emojis[Math.floor(Math.random() * emojis.length)];
             
-            buttonsContainer.innerHTML = '';
-            letters.forEach((letter, index) => {
-                const button = document.createElement('button');
-                button.className = `answer-button ${classes[index]}`;
-                button.textContent = letter;
-                button.addEventListener('click', () => selectAnswer(index, button));
-                buttonsContainer.appendChild(button);
-            });
-
-            document.getElementById('questionNumber').textContent = `Pregunta ${currentQuestion.index + 1}/${currentQuestion.total}`;
+            sendMessage({ action: 'join', name: playerName, emoji: playerEmoji });
+            
+            if (domCache.joinButton) {
+                domCache.joinButton.disabled = true;
+                domCache.joinButton.textContent = 'Conectando...';
+            }
         }
 
-        function selectAnswer(optionIndex, button) {
+        function handleJoined(data) {
+            playerColor = data.color;
+            playerEmoji = data.emoji;
+            isAdmin = data.isAdmin;
+            
+            updateAvatarDisplays();
+            
+            if (data.selectedCategory) {
+                updateSelectedCategory(data.selectedCategory);
+            }
+            
+            if (isAdmin) {
+                showScreen('categorySelect');
+            } else {
+                showScreen('waiting');
+            }
+        }
+
+        function updateAvatarDisplays() {
+            if (domCache.playerAvatar) {
+                domCache.playerAvatar.style.backgroundColor = playerColor;
+                domCache.playerAvatar.textContent = playerEmoji;
+            }
+            if (domCache.playerNameDisplay) domCache.playerNameDisplay.textContent = playerName;
+            
+            if (domCache.adminAvatar) {
+                domCache.adminAvatar.style.backgroundColor = playerColor;
+                domCache.adminAvatar.textContent = playerEmoji;
+            }
+            if (domCache.adminNameDisplay) domCache.adminNameDisplay.textContent = playerName;
+            
+            if (domCache.miniAvatar) {
+                domCache.miniAvatar.style.backgroundColor = playerColor;
+                domCache.miniAvatar.textContent = playerEmoji;
+            }
+            if (domCache.miniName) domCache.miniName.textContent = playerName;
+        }
+
+        function handleGameStateUpdate(data) {
+            if (data.selectedCategory) {
+                updateSelectedCategory(data.selectedCategory);
+            }
+        }
+
+        function selectCategory(category) {
+            selectedCategory = category;
+            
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.toggle('selected', btn.dataset.category === category);
+            });
+            
+            sendMessage({ action: 'selectCategory', category: category });
+        }
+
+        function updateSelectedCategory(category) {
+            selectedCategory = category;
+            
+            const cat = categories[category];
+            if (cat) {
+                document.getElementById('selectedCategoryEmoji').textContent = cat.emoji;
+                document.getElementById('selectedCategoryName').textContent = cat.name;
+                document.getElementById('selectedCategoryDisplay').style.display = 'block';
+            }
+            
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.toggle('selected', btn.dataset.category === category);
+            });
+        }
+
+        function startGame() {
+            sendMessage({ action: 'startGame' });
+        }
+
+        function handleGameStart(data) {
+            myScore = 0;
+            myRank = 1;
+            if (domCache.miniScore) domCache.miniScore.textContent = '0';
+            if (domCache.miniRank) domCache.miniRank.textContent = 'Rank 1';
+            
+            showScreen('playing');
+            resetAnswer();
+        }
+
+        function handleShowQuestion(data) {
+            if (domCache.questionIndicator) {
+                domCache.questionIndicator.textContent = `Pregunta ${data.questionIndex + 1} de ${data.totalQuestions}`;
+            }
+            resetAnswer();
+        }
+
+        function handleNextQuestion(data) {
+            if (domCache.questionIndicator) {
+                domCache.questionIndicator.textContent = `Pregunta ${data.question.index + 1} de ${data.question.total}`;
+            }
+            resetAnswer();
+        }
+
+        function selectAnswer(optionIndex) {
             if (hasAnswered) return;
             hasAnswered = true;
-            button.classList.add('selected');
-            document.querySelectorAll('.answer-button').forEach(btn => btn.disabled = true);
             
-            airconsole.message(AirConsole.SCREEN, {
+            // Enviar respuesta PRIMERO para mejor sincronización
+            sendMessage({
                 action: 'answer',
                 option: optionIndex,
                 timestamp: Date.now()
             });
+            
+            // Luego actualizar UI
+            if (domCache.answerButtons) {
+                domCache.answerButtons.forEach(btn => {
+                    btn.disabled = true;
+                    if (parseInt(btn.dataset.option) === optionIndex) {
+                        btn.classList.add('selected');
+                    }
+                });
+            }
+            
+            if (navigator.vibrate) navigator.vibrate(40);
+        }
 
-            if (navigator.vibrate) navigator.vibrate(50);
+        function resetAnswer() {
+            hasAnswered = false;
+            if (domCache.answerButtons) {
+                domCache.answerButtons.forEach(btn => {
+                    btn.disabled = false;
+                    btn.classList.remove('selected', 'correct-highlight', 'wrong-highlight');
+                });
+            }
+            if (domCache.resultOverlay) domCache.resultOverlay.classList.remove('active');
         }
 
         function showResult(correct, points) {
-            const feedback = document.getElementById('resultFeedback');
-            feedback.className = `result-feedback active ${correct ? 'result-correct' : 'result-incorrect'}`;
+            const overlay = domCache.resultOverlay;
+            const content = domCache.resultContent;
+            if (!overlay || !content) return;
             
-            document.getElementById('resultIcon').textContent = correct ? '✅' : '❌';
-            document.getElementById('resultText').textContent = correct ? '¡Correcto!' : 'Incorrecto';
-            document.getElementById('resultPoints').textContent = correct ? `+${points} pts` : '0 pts';
-
-            if (navigator.vibrate) navigator.vibrate(correct ? [50, 50, 50] : [100]);
-        }
-
-        function updateLeaderboard(players, listId) {
-            const list = document.getElementById(listId);
-            const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
-            
-            list.innerHTML = '';
-            sortedPlayers.forEach((player, index) => {
-                const item = document.createElement('div');
-                item.className = `leaderboard-item ${player.name === playerName ? 'current-player' : ''}`;
-                
-                item.innerHTML = `
-                    <div class="leaderboard-avatar" style="background-color: ${player.color}">
-                        ${player.emoji}
-                    </div>
-                    <div class="leaderboard-name">${player.name}</div>
-                    <div class="leaderboard-score">${player.score}</div>
+            if (correct) {
+                content.className = 'result-content result-correct';
+                content.innerHTML = `
+                    <div class="result-icon">✓</div>
+                    <div class="result-text">¡Correcto!</div>
+                    <div class="result-points">+${points} pts</div>
                 `;
-                list.appendChild(item);
-            });
-        }
-
-        function updateWaitingPlayers(players) {
-            const list = document.getElementById('waitingPlayersList');
-            list.innerHTML = '';
-            
-            Object.values(players).forEach(player => {
-                const item = document.createElement('div');
-                item.className = 'leaderboard-item';
-                item.innerHTML = `
-                    <div class="leaderboard-avatar" style="background-color: ${player.color}">
-                        ${player.emoji}
-                    </div>
-                    <div class="leaderboard-name">${player.name}</div>
-                    <div class="leaderboard-score">${player.isAdmin ? '👑' : ''}</div>
+                myScore += points;
+                if (domCache.miniScore) domCache.miniScore.textContent = myScore;
+                if (navigator.vibrate) navigator.vibrate([40, 20, 40]);
+            } else {
+                content.className = 'result-content result-incorrect';
+                content.innerHTML = `
+                    <div class="result-icon">✗</div>
+                    <div class="result-text">Incorrecto</div>
+                    <div class="result-points">0 pts</div>
                 `;
-                list.appendChild(item);
-            });
+                if (navigator.vibrate) navigator.vibrate(150);
+            }
+            
+            overlay.classList.add('active');
+            
+            setTimeout(() => {
+                overlay.classList.remove('active');
+            }, 1200);
         }
 
+        function handleShowAnswer(correctIndex) {
+            if (domCache.answerButtons) {
+                domCache.answerButtons.forEach(btn => {
+                    const idx = parseInt(btn.dataset.option);
+                    if (idx === correctIndex) {
+                        btn.classList.add('correct-highlight');
+                    } else if (btn.classList.contains('selected')) {
+                        btn.classList.add('wrong-highlight');
+                    }
+                });
+            }
+        }
+
+        function updateRank(players) {
+            const myPlayer = players.find(p => p.name === playerName);
+            if (myPlayer) {
+                myRank = players.indexOf(myPlayer) + 1;
+                myScore = myPlayer.score;
+                if (domCache.miniRank) domCache.miniRank.textContent = `Rank ${myRank}`;
+                if (domCache.miniScore) domCache.miniScore.textContent = myScore;
+            }
+        }
+
+        function showEndScreen(winner, players) {
+            showScreen('end');
+            
+            const myPlayer = players.find(p => p.name === playerName);
+            const rank = myPlayer ? players.indexOf(myPlayer) + 1 : players.length;
+            
+            const medals = ['🥇', '🥈', '🥉'];
+            document.getElementById('finalRank').textContent = medals[rank - 1] || `#${rank}`;
+            
+            if (winner && winner.name === playerName) {
+                document.getElementById('finalMessage').textContent = '¡GANASTE!';
+                if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 100]);
+            } else if (winner) {
+                document.getElementById('finalMessage').textContent = `Ganó ${winner.emoji} ${winner.name}`;
+            }
+            
+            document.getElementById('finalScore').textContent = `${myPlayer?.score || 0} puntos`;
+            
+            document.getElementById('playAgainBtn').style.display = isAdmin ? 'block' : 'none';
+            document.getElementById('waitingNextText').style.display = isAdmin ? 'none' : 'block';
+        }
+
+        function playAgain() {
+            sendMessage({ action: 'playAgain' });
+        }
+
+        function handleReset(data) {
+            hasAnswered = false;
+            myScore = 0;
+            myRank = 1;
+            if (domCache.miniScore) domCache.miniScore.textContent = '0';
+            if (domCache.miniRank) domCache.miniRank.textContent = 'Rank 1';
+            
+            if (isAdmin) {
+                showScreen('categorySelect');
+            } else {
+                showScreen('waiting');
+            }
+            resetAnswer();
+        }
+
+        // Performance: cache de pantallas
+        const screenCache = {};
         function showScreen(screen) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screen + 'Screen').classList.add('active');
-        }
-
-        function resetController() {
-            hasAnswered = false;
-            currentQuestion = null;
-            showScreen('waiting');
-            document.getElementById('resultFeedback').classList.remove('active');
+            
+            if (!screenCache[screen]) {
+                screenCache[screen] = document.getElementById(screen + 'Screen');
+            }
+            if (screenCache[screen]) {
+                screenCache[screen].classList.add('active');
+            }
         }
 
         window.onload = init;
