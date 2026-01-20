@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>STEAM Platformer - Fundación STEAM RD</title>
+    <title>STEAM Platformer - Fundacion STEAM RD</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <script type="text/javascript" src="https://www.airconsole.com/api/airconsole-1.8.0.js"></script>
     <script>
         tailwind.config = {
@@ -25,428 +26,507 @@
         }
     </script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { width: 100%; height: 100%; overflow: hidden; }
+        body { position: fixed; top: 0; left: 0; font-family: 'Segoe UI', system-ui, sans-serif; background: #f8f9fa; }
+
+        /* Clean title with colored letters */
+        .title-steam { color: #0595AE; }
+        .title-platformer { color: #73A03F; }
+
+        /* Player avatar - clean flat design */
+        .player-avatar {
+            width: clamp(50px, 8vw, 80px);
+            height: clamp(50px, 8vw, 80px);
+            border-radius: 16px;
+            position: relative;
+            box-shadow: 0 6px 0 rgba(0,0,0,0.15), 0 8px 25px rgba(0,0,0,0.1);
         }
 
-        html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            margin: 0;
-            padding: 0;
+        /* Eyes for avatar - simple centered with idle blink */
+        .player-avatar::before,
+        .player-avatar::after {
+            content: '';
+            position: absolute;
+            width: 24%;
+            height: 24%;
+            top: 32%;
+            background: radial-gradient(circle at 50% 50%, #222 35%, transparent 36%),
+                        white;
+            border-radius: 50%;
+            animation: idleBlink 4s ease-in-out infinite;
+        }
+        .player-avatar::before { left: 18%; }
+        .player-avatar::after { right: 18%; animation-delay: 0.05s; }
+
+        /* Idle blink - natural blinking */
+        @keyframes idleBlink {
+            0%, 42%, 48%, 100% { transform: scaleY(1); }
+            45% { transform: scaleY(0.05); }
         }
 
-        body {
+        /* Happy blink when player connects */
+        .player-card.ready .player-avatar::before,
+        .player-card.ready .player-avatar::after,
+        .player-card.admin .player-avatar::before,
+        .player-card.admin .player-avatar::after {
+            animation: blinkHappy 0.6s ease-out, idleBlink 4s ease-in-out 0.6s infinite;
+        }
+        @keyframes blinkHappy {
+            0% { transform: scaleY(1); }
+            20% { transform: scaleY(0.05); }
+            40% { transform: scaleY(1); }
+            60% { transform: scaleY(0.05); }
+            80% { transform: scaleY(1); }
+            100% { transform: scaleY(1); }
+        }
+
+        /* Jump when connected */
+        .player-card.ready .player-avatar,
+        .player-card.admin .player-avatar {
+            animation: happyJump 0.5s ease-out;
+        }
+        @keyframes happyJump {
+            0% { transform: scale(1); }
+            40% { transform: scale(1.15) translateY(-12px); }
+            70% { transform: scale(0.95) translateY(0); }
+            100% { transform: scale(1) translateY(0); }
+        }
+
+        .player-avatar-small {
+            width: clamp(35px, 5vw, 50px);
+            height: clamp(35px, 5vw, 50px);
+            border-radius: 10px;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.15);
+        }
+
+        /* Float animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        .float { animation: float 3s ease-in-out infinite; }
+
+        /* Player card */
+        .player-card {
+            background: white;
+            border-radius: 20px;
+            padding: clamp(16px, 3vw, 28px);
+            border: 4px solid #e5e7eb;
+            transition: all 0.3s ease;
+        }
+
+        .player-card.ready {
+            border-color: #73A03F;
+            background: #f0fdf4;
+        }
+
+        .player-card.admin {
+            border-color: #EB8225;
+            background: #fff7ed;
+        }
+
+        /* Countdown */
+        .countdown-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
+            inset: 0;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
         }
 
-        @keyframes gradientMove {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        .countdown-number {
+            font-size: clamp(120px, 30vw, 250px);
+            font-weight: 900;
+            color: white;
+            text-shadow: 0 0 60px currentColor;
+            animation: countPop 0.6s ease-out;
         }
 
-        .logo-gradient {
-            background: linear-gradient(45deg, #0595AE, #AB3D8B, #EB8225, #73A03F);
-            background-size: 300% 300%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: gradientMove 3s ease infinite;
-        }
-
-        @keyframes winnerBounce {
-            0% { transform: scale(0); opacity: 0; }
-            50% { transform: scale(1.1); }
+        @keyframes countPop {
+            0% { transform: scale(2.5); opacity: 0; }
+            60% { transform: scale(0.9); }
             100% { transform: scale(1); opacity: 1; }
         }
 
-        .winner-bounce {
-            animation: winnerBounce 0.5s ease;
+        /* Confetti */
+        @keyframes fall {
+            to { transform: translateY(100vh) rotate(720deg); opacity: 0; }
         }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        .pulse-anim {
-            animation: pulse 2s ease infinite;
-        }
-
-        @keyframes confettiFall {
-            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-        }
-
         .confetti {
             position: absolute;
-            width: 10px;
-            height: 10px;
-            animation: confettiFall 3s ease-out forwards;
+            animation: fall 3s ease-out forwards;
         }
 
-        /* Player avatar visual representation */
-        .player-avatar-visual {
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
-            position: relative;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        /* Pulse */
+        @keyframes pulse {
+            50% { opacity: 0.6; }
         }
+        .pulse { animation: pulse 2s ease infinite; }
 
-        .player-avatar-visual::before {
-            content: '';
-            position: absolute;
-            top: 3px;
-            left: 3px;
-            right: 3px;
-            height: 10px;
-            background: rgba(255,255,255,0.3);
-            border-radius: 6px 6px 0 0;
+        /* Winner animation */
+        @keyframes winner {
+            0% { transform: scale(0) rotate(-10deg); }
+            70% { transform: scale(1.1) rotate(5deg); }
+            100% { transform: scale(1) rotate(0deg); }
         }
-
-        .player-avatar-visual-small {
-            width: 35px;
-            height: 35px;
-            border-radius: 8px;
-        }
-
-        .player-avatar-visual-small::before {
-            height: 7px;
-            border-radius: 4px 4px 0 0;
-        }
-
-        .player-avatar-visual-large {
-            width: 70px;
-            height: 70px;
-            border-radius: 14px;
-        }
-
-        .player-avatar-visual-large::before {
-            height: 14px;
-            top: 5px;
-            left: 5px;
-            right: 5px;
-            border-radius: 8px 8px 0 0;
-        }
+        .winner-anim { animation: winner 0.6s ease-out; }
     </style>
 </head>
-<body class="font-sans bg-white text-steam-negro">
+<body>
     <!-- START SCREEN -->
-    <div id="startScreen" class="w-screen h-screen bg-white flex flex-col items-center justify-center p-8 text-center">
-        <h1 class="text-4xl md:text-5xl font-black logo-gradient drop-shadow mb-4">STEAM PLATFORMER</h1>
-        <p class="text-lg text-steam-turquesa mb-8">1-4 Jugadores - Carrera a la Meta - Colecta Monedas</p>
+    <div id="startScreen" class="w-screen h-screen flex flex-col items-center justify-center p-6 text-center bg-gray-50">
+        <div class="mb-6">
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black mb-2 flex items-center justify-center gap-3">
+                <iconify-icon icon="mdi:gamepad-variant" class="text-steam-turquesa"></iconify-icon>
+                <span class="title-steam">STEAM</span> <span class="title-platformer">PLATFORMER</span>
+            </h1>
+            <p class="text-gray-500 text-lg flex items-center justify-center gap-3">
+                <iconify-icon icon="mdi:run-fast"></iconify-icon>
+                Corre
+                <iconify-icon icon="mdi:arrow-up-bold-box"></iconify-icon>
+                Salta
+                <iconify-icon icon="mdi:cash-multiple"></iconify-icon>
+                Colecta
+            </p>
+        </div>
         
-        <div class="grid grid-cols-2 gap-4 mb-8 w-full max-w-2xl">
-            <div class="player-slot bg-white border-4 border-gray-200 rounded-2xl p-5 shadow-lg transition-all" id="playerSlot1">
-                <h3 class="text-xl font-bold text-steam-turquesa mb-2">Jugador 1</h3>
-                <div class="flex justify-center mb-2">
-                    <div class="player-avatar-visual bg-gray-300"></div>
+        <div class="grid grid-cols-2 gap-4 sm:gap-6 mb-8 w-full max-w-xl lg:max-w-3xl">
+            <div class="player-card" id="playerSlot1">
+                <div class="text-lg sm:text-xl font-bold text-steam-turquesa mb-3 flex items-center justify-center gap-2">
+                    <iconify-icon icon="mdi:controller" class="text-xl"></iconify-icon>
+                    Jugador 1
                 </div>
-                <p class="text-sm opacity-70">Esperando...</p>
+                <div class="flex justify-center mb-3 float">
+                    <div class="player-avatar bg-gray-300"></div>
+                </div>
+                <div class="text-sm text-gray-400 flex items-center justify-center gap-1">
+                    <iconify-icon icon="mdi:timer-sand" class="animate-pulse"></iconify-icon>
+                    Esperando...
+                </div>
             </div>
-            <div class="player-slot bg-white border-4 border-gray-200 rounded-2xl p-5 shadow-lg transition-all" id="playerSlot2">
-                <h3 class="text-xl font-bold text-steam-turquesa mb-2">Jugador 2</h3>
-                <div class="flex justify-center mb-2">
-                    <div class="player-avatar-visual bg-gray-300"></div>
+            <div class="player-card" id="playerSlot2">
+                <div class="text-lg sm:text-xl font-bold text-steam-turquesa mb-3 flex items-center justify-center gap-2">
+                    <iconify-icon icon="mdi:controller" class="text-xl"></iconify-icon>
+                    Jugador 2
                 </div>
-                <p class="text-sm opacity-70">Esperando...</p>
+                <div class="flex justify-center mb-3 float">
+                    <div class="player-avatar bg-gray-300"></div>
+                </div>
+                <div class="text-sm text-gray-400 flex items-center justify-center gap-1">
+                    <iconify-icon icon="mdi:timer-sand" class="animate-pulse"></iconify-icon>
+                    Esperando...
+                </div>
             </div>
-            <div class="player-slot bg-white border-4 border-gray-200 rounded-2xl p-5 shadow-lg transition-all" id="playerSlot3">
-                <h3 class="text-xl font-bold text-steam-turquesa mb-2">Jugador 3</h3>
-                <div class="flex justify-center mb-2">
-                    <div class="player-avatar-visual bg-gray-300"></div>
+            <div class="player-card" id="playerSlot3">
+                <div class="text-lg sm:text-xl font-bold text-steam-turquesa mb-3 flex items-center justify-center gap-2">
+                    <iconify-icon icon="mdi:controller" class="text-xl"></iconify-icon>
+                    Jugador 3
                 </div>
-                <p class="text-sm opacity-70">Esperando...</p>
+                <div class="flex justify-center mb-3 float">
+                    <div class="player-avatar bg-gray-300"></div>
+                </div>
+                <div class="text-sm text-gray-400 flex items-center justify-center gap-1">
+                    <iconify-icon icon="mdi:timer-sand" class="animate-pulse"></iconify-icon>
+                    Esperando...
+                </div>
             </div>
-            <div class="player-slot bg-white border-4 border-gray-200 rounded-2xl p-5 shadow-lg transition-all" id="playerSlot4">
-                <h3 class="text-xl font-bold text-steam-turquesa mb-2">Jugador 4</h3>
-                <div class="flex justify-center mb-2">
-                    <div class="player-avatar-visual bg-gray-300"></div>
+            <div class="player-card" id="playerSlot4">
+                <div class="text-lg sm:text-xl font-bold text-steam-turquesa mb-3 flex items-center justify-center gap-2">
+                    <iconify-icon icon="mdi:controller" class="text-xl"></iconify-icon>
+                    Jugador 4
                 </div>
-                <p class="text-sm opacity-70">Esperando...</p>
+                <div class="flex justify-center mb-3 float">
+                    <div class="player-avatar bg-gray-300"></div>
+                </div>
+                <div class="text-sm text-gray-400 flex items-center justify-center gap-1">
+                    <iconify-icon icon="mdi:timer-sand" class="animate-pulse"></iconify-icon>
+                    Esperando...
+                </div>
             </div>
         </div>
         
-        <div class="bg-orange-50 border-2 border-steam-naranja rounded-2xl py-4 px-6 max-w-lg hidden" id="adminHint">
-            <p class="text-steam-naranja font-bold">El Jugador 1 controla el juego desde su telefono</p>
+        <div class="bg-steam-naranja/10 border-2 border-steam-naranja rounded-2xl py-4 px-8 hidden flex items-center gap-3" id="adminHint">
+            <iconify-icon icon="mdi:cellphone" class="text-steam-naranja text-2xl"></iconify-icon>
+            <p class="text-steam-naranja font-bold">El Jugador 1 inicia desde su telefono</p>
         </div>
     </div>
 
     <!-- GAME CONTAINER -->
-    <div id="gameContainer" class="hidden w-screen h-screen fixed top-0 left-0 overflow-hidden bg-[#0D2818]"></div>
+    <div id="gameContainer" class="hidden w-screen h-screen fixed inset-0 overflow-hidden"></div>
+
+    <!-- COUNTDOWN -->
+    <div id="countdownOverlay" class="countdown-overlay hidden">
+        <div class="countdown-number" id="countdownNumber">3</div>
+    </div>
 
     <!-- RESULTS SCREEN -->
-    <div id="resultsScreen" class="hidden fixed top-0 left-0 w-screen h-screen bg-white items-center justify-center z-50">
-        <div class="bg-white border-4 border-gray-200 rounded-3xl p-10 text-center w-11/12 max-w-2xl shadow-xl">
-            <h2 class="text-3xl font-bold text-steam-turquesa mb-6">Carrera Terminada!</h2>
-            <div class="winner-bounce mb-8" id="winnerSection"></div>
-            <table class="w-full mb-8 border-collapse">
+    <div id="resultsScreen" class="hidden fixed inset-0 flex items-center justify-center z-50 p-4 bg-gray-50">
+        <div class="bg-white rounded-3xl p-6 sm:p-10 text-center w-full max-w-2xl shadow-2xl max-h-[95vh] overflow-y-auto">
+            <h2 class="text-3xl sm:text-4xl font-black text-steam-turquesa mb-6 flex items-center justify-center gap-3">
+                <iconify-icon icon="mdi:flag-checkered"></iconify-icon>
+                Fin de Carrera!
+            </h2>
+            <div class="winner-anim mb-8" id="winnerSection"></div>
+            <table class="w-full mb-8 text-left">
                 <thead>
-                    <tr class="bg-gray-100">
-                        <th class="p-3 text-left text-steam-turquesa border-b-2 border-gray-200">Rank</th>
-                        <th class="p-3 text-left text-steam-turquesa border-b-2 border-gray-200">Jugador</th>
-                        <th class="p-3 text-left text-steam-turquesa border-b-2 border-gray-200">Monedas</th>
-                        <th class="p-3 text-left text-steam-turquesa border-b-2 border-gray-200">Tiempo</th>
-                        <th class="p-3 text-left text-steam-turquesa border-b-2 border-gray-200">Puntos</th>
+                    <tr class="border-b-4 border-gray-100">
+                        <th class="py-3 px-2 text-steam-turquesa font-bold">#</th>
+                        <th class="py-3 px-2 text-steam-turquesa font-bold">
+                            <span class="flex items-center gap-1">
+                                <iconify-icon icon="mdi:account"></iconify-icon>
+                                Jugador
+                            </span>
+                        </th>
+                        <th class="py-3 px-2 text-steam-turquesa font-bold text-center">
+                            <span class="flex items-center justify-center gap-1">
+                                <iconify-icon icon="mdi:cash"></iconify-icon>
+                                Monedas
+                            </span>
+                        </th>
+                        <th class="py-3 px-2 text-steam-turquesa font-bold text-center">
+                            <span class="flex items-center justify-center gap-1">
+                                <iconify-icon icon="mdi:timer"></iconify-icon>
+                                Tiempo
+                            </span>
+                        </th>
+                        <th class="py-3 px-2 text-steam-turquesa font-bold text-right">
+                            <span class="flex items-center justify-end gap-1">
+                                <iconify-icon icon="mdi:star"></iconify-icon>
+                                Puntos
+                            </span>
+                        </th>
                     </tr>
                 </thead>
                 <tbody id="resultsBody"></tbody>
             </table>
-            <div class="bg-orange-50 border-2 border-steam-naranja rounded-2xl py-4 px-6 pulse-anim">
-                <p class="text-steam-naranja font-bold">Esperando que el Jugador 1 decida...</p>
+            <div class="bg-steam-naranja/10 border-2 border-steam-naranja rounded-xl py-4 px-6 pulse flex items-center justify-center gap-2">
+                <iconify-icon icon="mdi:cellphone" class="text-steam-naranja text-xl"></iconify-icon>
+                <p class="text-steam-naranja font-bold">Esperando al Jugador 1...</p>
             </div>
         </div>
     </div>
 
     <!-- CONFETTI -->
-    <div class="fixed top-0 left-0 w-full h-full pointer-events-none z-[1000] overflow-hidden" id="confettiContainer"></div>
+    <div class="fixed inset-0 pointer-events-none z-[1000] overflow-hidden" id="confettiContainer"></div>
 
     <script>
         const airconsole = new AirConsole();
         
+        // Level design - more interesting and varied
         const LEVEL = {
+            length: 3000,
             floorSegments: [
-                { x: 0, width: 300 },
-                { x: 500, width: 250 },
-                { x: 900, width: 350 },
-                { x: 1400, width: 300 },
-                { x: 1800, width: 400 },
+                { x: 0, width: 400 },
+                { x: 600, width: 300 },
+                { x: 1100, width: 450 },
+                { x: 1750, width: 350 },
+                { x: 2300, width: 700 },
             ],
             platforms: [
-                { x: 200, y: 580, width: 120, height: 15 },
-                { x: 400, y: 530, width: 120, height: 15 },
-                { x: 600, y: 560, width: 120, height: 15 },
-                { x: 800, y: 510, width: 120, height: 15 },
-                { x: 1000, y: 550, width: 120, height: 15 },
-                { x: 1200, y: 500, width: 120, height: 15 },
-                { x: 1400, y: 540, width: 150, height: 15 },
+                { x: 300, y: 550, width: 150 },
+                { x: 520, y: 480, width: 120 },
+                { x: 800, y: 530, width: 180 },
+                { x: 1050, y: 460, width: 140 },
+                { x: 1350, y: 510, width: 160 },
+                { x: 1600, y: 440, width: 130 },
+                { x: 1900, y: 490, width: 200 },
+                { x: 2150, y: 530, width: 150 },
+                { x: 2500, y: 470, width: 180 },
             ],
             coins: [
-                { x: 260, y: 540 },
-                { x: 460, y: 490 },
-                { x: 660, y: 520 },
-                { x: 860, y: 470 },
-                { x: 1060, y: 510 },
-                { x: 1260, y: 460 },
-                { x: 1475, y: 500 },
+                { x: 375, y: 510 }, { x: 580, y: 440 }, { x: 890, y: 490 },
+                { x: 1120, y: 420 }, { x: 1430, y: 470 }, { x: 1665, y: 400 },
+                { x: 2000, y: 450 }, { x: 2225, y: 490 }, { x: 2590, y: 430 },
+                { x: 2800, y: 550 },
             ],
             obstacles: [
-                { x: 350, y: 380, width: 30, height: 30, direction: 1, speed: 2, range: 100, startX: 350 },
-                { x: 700, y: 360, width: 30, height: 30, direction: 1, speed: 1.5, range: 80, startX: 700 },
-                { x: 1100, y: 350, width: 30, height: 30, direction: -1, speed: 2.5, range: 120, startX: 1100 },
+                { x: 450, y: 320, startX: 450 },
+                { x: 950, y: 300, startX: 950 },
+                { x: 1500, y: 280, startX: 1500 },
+                { x: 2050, y: 310, startX: 2050 },
             ],
-            finishX: 2000,
-            finishY: 650
         };
 
-        const playerColors = ['#73A03F', '#AB3D8B', '#0595AE', '#EB8225'];
-        const playerColorNames = ['Verde', 'Morado', 'Turquesa', 'Naranja'];
+        const COLORS = ['#73A03F', '#AB3D8B', '#0595AE', '#EB8225'];
+        const NAMES = ['Verde', 'Morado', 'Turquesa', 'Naranja'];
 
-        const gameState = {
+        const state = {
             players: {},
             games: {},
             started: false,
             startTime: null,
-            adminDeviceId: null
+            admin: null
         };
 
-        let audioContext;
-        function initAudio() {
-            if (!audioContext) {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            }
-        }
-
-        function playSound(type) {
+        let audioCtx;
+        const initAudio = () => { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); };
+        
+        function sound(type) {
             initAudio();
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-
+            const o = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            o.connect(g);
+            g.connect(audioCtx.destination);
+            
+            const t = audioCtx.currentTime;
             switch(type) {
                 case 'jump':
-                    oscillator.frequency.setValueAtTime(300, audioContext.currentTime);
-                    oscillator.frequency.exponentialRampToValueAtTime(600, audioContext.currentTime + 0.15);
-                    gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
-                    oscillator.start();
-                    oscillator.stop(audioContext.currentTime + 0.15);
+                    o.frequency.setValueAtTime(400, t);
+                    o.frequency.exponentialRampToValueAtTime(800, t + 0.1);
+                    g.gain.setValueAtTime(0.1, t);
+                    g.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+                    o.start(t); o.stop(t + 0.1);
                     break;
                 case 'coin':
-                    [800, 1000, 1200].forEach((freq, i) => {
-                        const osc = audioContext.createOscillator();
-                        const gain = audioContext.createGain();
-                        osc.connect(gain);
-                        gain.connect(audioContext.destination);
-                        osc.frequency.value = freq;
-                        gain.gain.setValueAtTime(0.1, audioContext.currentTime + i * 0.05);
-                        gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + i * 0.05 + 0.1);
-                        osc.start(audioContext.currentTime + i * 0.05);
-                        osc.stop(audioContext.currentTime + i * 0.05 + 0.1);
+                    [1000, 1250, 1500].forEach((f, i) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.connect(gain); gain.connect(audioCtx.destination);
+                        osc.frequency.value = f;
+                        gain.gain.setValueAtTime(0.08, t + i * 0.05);
+                        gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.05 + 0.1);
+                        osc.start(t + i * 0.05); osc.stop(t + i * 0.05 + 0.1);
                     });
                     break;
                 case 'hit':
-                    oscillator.type = 'sawtooth';
-                    oscillator.frequency.setValueAtTime(150, audioContext.currentTime);
-                    oscillator.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 0.25);
-                    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.25);
-                    oscillator.start();
-                    oscillator.stop(audioContext.currentTime + 0.25);
+                    o.type = 'sawtooth';
+                    o.frequency.setValueAtTime(200, t);
+                    o.frequency.exponentialRampToValueAtTime(80, t + 0.15);
+                    g.gain.setValueAtTime(0.12, t);
+                    g.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+                    o.start(t); o.stop(t + 0.15);
                     break;
                 case 'win':
-                    [523, 659, 784, 1047].forEach((freq, i) => {
-                        const osc = audioContext.createOscillator();
-                        const gain = audioContext.createGain();
-                        osc.connect(gain);
-                        gain.connect(audioContext.destination);
-                        osc.frequency.value = freq;
-                        gain.gain.setValueAtTime(0.15, audioContext.currentTime + i * 0.12);
-                        gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + i * 0.12 + 0.25);
-                        osc.start(audioContext.currentTime + i * 0.12);
-                        osc.stop(audioContext.currentTime + i * 0.12 + 0.25);
+                    [523, 659, 784, 1047].forEach((f, i) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.connect(gain); gain.connect(audioCtx.destination);
+                        osc.frequency.value = f;
+                        gain.gain.setValueAtTime(0.1, t + i * 0.12);
+                        gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.12 + 0.25);
+                        osc.start(t + i * 0.12); osc.stop(t + i * 0.12 + 0.25);
+                    });
+                    break;
+                case 'count':
+                    o.frequency.value = 500;
+                    g.gain.setValueAtTime(0.1, t);
+                    g.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+                    o.start(t); o.stop(t + 0.12);
+                    break;
+                case 'go':
+                    [600, 900, 1200].forEach((f, i) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.connect(gain); gain.connect(audioCtx.destination);
+                        osc.frequency.value = f;
+                        gain.gain.setValueAtTime(0.12, t + i * 0.04);
+                        gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.04 + 0.15);
+                        osc.start(t + i * 0.04); osc.stop(t + i * 0.04 + 0.15);
                     });
                     break;
             }
         }
 
-        function createConfetti() {
-            const container = document.getElementById('confettiContainer');
-            container.innerHTML = '';
-            const colors = ['#0595AE', '#AB3D8B', '#EB8225', '#73A03F'];
-            
+        function confetti() {
+            const c = document.getElementById('confettiContainer');
+            c.innerHTML = '';
+            const colors = ['#0595AE', '#AB3D8B', '#EB8225', '#73A03F', '#FFD700'];
             for (let i = 0; i < 150; i++) {
-                const confetti = document.createElement('div');
-                confetti.className = 'confetti';
-                confetti.style.left = Math.random() * 100 + '%';
-                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                confetti.style.animationDelay = Math.random() * 2 + 's';
-                confetti.style.animationDuration = (2 + Math.random() * 2) + 's';
-                container.appendChild(confetti);
+                const el = document.createElement('div');
+                el.className = 'confetti';
+                el.style.cssText = `left:${Math.random()*100}%;top:-20px;width:${8+Math.random()*8}px;height:${8+Math.random()*8}px;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:${Math.random()>0.5?'50%':'2px'};animation-delay:${Math.random()*2}s;animation-duration:${2+Math.random()*2}s;`;
+                c.appendChild(el);
             }
-            
-            setTimeout(() => container.innerHTML = '', 5000);
+            setTimeout(() => c.innerHTML = '', 5000);
         }
 
-        airconsole.onReady = function() {
-            console.log("Screen ready");
-        };
-
-        airconsole.onConnect = function(device_id) {
-            console.log("Device connected:", device_id);
-        };
-
-        airconsole.onDisconnect = function(device_id) {
-            console.log("Device disconnected:", device_id);
+        async function countdown() {
+            const overlay = document.getElementById('countdownOverlay');
+            const num = document.getElementById('countdownNumber');
+            overlay.classList.remove('hidden');
             
-            for (let playerNum in gameState.players) {
-                if (gameState.players[playerNum].deviceId === device_id) {
-                    gameState.players[playerNum].disconnected = true;
-                    updatePlayerSlots();
-                    
-                    if (gameState.started) {
-                        const overlay = document.querySelector(`#player${playerNum}Screen .disconnect-overlay`);
-                        if (overlay) overlay.classList.add('active');
-                    }
+            for (const [val, color] of [['3', '#EB8225'], ['2', '#AB3D8B'], ['1', '#0595AE'], ['GO!', '#73A03F']]) {
+                num.textContent = val;
+                num.style.color = color;
+                num.style.animation = 'none';
+                num.offsetHeight;
+                num.style.animation = 'countPop 0.6s ease-out';
+                sound(val === 'GO!' ? 'go' : 'count');
+                await new Promise(r => setTimeout(r, 750));
+            }
+            
+            overlay.classList.add('hidden');
+        }
+
+        airconsole.onReady = () => console.log("Screen ready");
+        airconsole.onConnect = (id) => console.log("Connected:", id);
+        
+        airconsole.onDisconnect = (id) => {
+            for (let n in state.players) {
+                if (state.players[n].deviceId === id) {
+                    state.players[n].disconnected = true;
+                    updateSlots();
                     break;
                 }
             }
         };
 
-        airconsole.onMessage = function(device_id, data) {
-            console.log("Received:", data.action, "from", device_id);
-            
+        airconsole.onMessage = (id, data) => {
             if (data.action === 'join') {
-                let assigned = false;
                 for (let i = 0; i < 4; i++) {
-                    if (!gameState.players[i+1]) {
-                        const isAdmin = gameState.adminDeviceId === null;
-                        if (isAdmin) gameState.adminDeviceId = device_id;
+                    if (!state.players[i+1]) {
+                        const isAdmin = !state.admin;
+                        if (isAdmin) state.admin = id;
                         
-                        gameState.players[i+1] = {
-                            deviceId: device_id,
-                            name: playerColorNames[i],
-                            color: playerColors[i],
-                            isAdmin: isAdmin,
-                            connected: true,
+                        state.players[i+1] = {
+                            deviceId: id,
+                            name: NAMES[i],
+                            color: COLORS[i],
+                            isAdmin,
                             disconnected: false
                         };
-                        assigned = true;
                         
-                        airconsole.message(device_id, {
+                        airconsole.message(id, {
                             action: 'joined',
                             playerNum: i + 1,
-                            color: playerColors[i],
-                            colorName: playerColorNames[i],
-                            isAdmin: isAdmin,
-                            availableColors: playerColors.map((c, idx) => ({ color: c, name: playerColorNames[idx] }))
+                            color: COLORS[i],
+                            colorName: NAMES[i],
+                            isAdmin
                         });
-                        break;
-                    }
-                }
-                
-                if (assigned) {
-                    updatePlayerSlots();
-                    broadcastGameState();
-                }
-                
-            } else if (data.action === 'selectColor') {
-                for (let playerNum in gameState.players) {
-                    if (gameState.players[playerNum].deviceId === device_id) {
-                        gameState.players[playerNum].color = data.color;
-                        gameState.players[playerNum].name = data.colorName;
-                        if (gameState.games[playerNum]) {
-                            gameState.games[playerNum].player.color = data.color;
-                            gameState.games[playerNum].color = data.color;
-                            
-                            const badge = document.querySelector(`#player${playerNum}Screen .player-name-badge`);
-                            if (badge) {
-                                badge.style.borderColor = data.color;
-                                badge.style.color = data.color;
-                                const nameSpan = badge.querySelector('span:last-child');
-                                if (nameSpan) nameSpan.textContent = data.colorName;
-                            }
-                        }
-                        updatePlayerSlots();
-                        broadcastGameState();
                         
-                        airconsole.message(device_id, {
-                            action: 'colorUpdated',
-                            color: data.color,
-                            colorName: data.colorName
-                        });
+                        updateSlots();
+                        airconsole.broadcast({ type: 'gameState', players: state.players });
                         break;
                     }
                 }
-                
-            } else if (data.action === 'startGame' && device_id === gameState.adminDeviceId) {
+            } else if (data.action === 'selectColor') {
+                for (let n in state.players) {
+                    if (state.players[n].deviceId === id) {
+                        state.players[n].color = data.color;
+                        state.players[n].name = data.colorName;
+                        updateSlots();
+                        airconsole.message(id, { action: 'colorUpdated', color: data.color, colorName: data.colorName });
+                        break;
+                    }
+                }
+            } else if (data.action === 'startGame' && id === state.admin) {
                 startGame();
-                
-            } else if (data.action === 'playAgain' && device_id === gameState.adminDeviceId) {
-                restartGame();
-                
+            } else if (data.action === 'playAgain' && id === state.admin) {
+                restart();
             } else {
-                for (let playerNum in gameState.players) {
-                    if (gameState.players[playerNum].deviceId === device_id) {
-                        const game = gameState.games[playerNum];
-                        if (game && gameState.started && !gameState.players[playerNum].disconnected) {
-                            if (data.action === 'move') {
-                                game.keys.left = data.direction === 'left';
-                                game.keys.right = data.direction === 'right';
-                            } else if (data.action === 'stop') {
-                                game.keys.left = false;
-                                game.keys.right = false;
-                            } else if (data.action === 'jump') {
-                                game.keys.jump = data.pressed;
-                            }
+                for (let n in state.players) {
+                    if (state.players[n].deviceId === id && state.games[n] && state.started) {
+                        const g = state.games[n];
+                        if (data.action === 'move') {
+                            g.keys.left = data.direction === 'left';
+                            g.keys.right = data.direction === 'right';
+                        } else if (data.action === 'stop') {
+                            g.keys.left = g.keys.right = false;
+                        } else if (data.action === 'jump') {
+                            g.keys.jump = data.pressed;
                         }
                         break;
                     }
@@ -454,644 +534,585 @@
             }
         };
 
-        function updatePlayerSlots() {
-            const connectedPlayers = Object.keys(gameState.players).length;
-            
+        function updateSlots() {
+            const count = Object.keys(state.players).length;
             for (let i = 1; i <= 4; i++) {
                 const slot = document.getElementById(`playerSlot${i}`);
-                const player = gameState.players[i];
+                const p = state.players[i];
                 
-                slot.className = 'bg-white border-4 rounded-2xl p-5 shadow-lg transition-all';
+                slot.className = 'player-card';
                 
-                if (player) {
-                    if (player.disconnected) {
-                        slot.classList.add('border-steam-morado', 'bg-pink-50');
-                    } else if (player.isAdmin) {
-                        slot.classList.add('border-steam-naranja', 'bg-orange-50');
-                    } else {
-                        slot.classList.add('border-steam-verde', 'bg-green-50');
-                    }
-                    
+                if (p) {
+                    slot.classList.add(p.isAdmin ? 'admin' : 'ready');
                     slot.innerHTML = `
-                        <h3 class="text-xl font-bold text-steam-turquesa mb-2">${player.name}${player.isAdmin ? ' (Admin)' : ''}</h3>
-                        <div class="flex justify-center mb-2">
-                            <div class="player-avatar-visual" style="background-color: ${player.color};"></div>
+                        <div class="text-lg sm:text-xl font-bold flex items-center justify-center gap-2" style="color:${p.color}">
+                            ${p.isAdmin ? '<iconify-icon icon="mdi:crown" class="text-steam-naranja text-2xl"></iconify-icon>' : '<iconify-icon icon="mdi:account-check" class="text-xl"></iconify-icon>'}
+                            ${p.name}
                         </div>
-                        <p class="text-sm ${player.disconnected ? 'text-steam-morado' : 'text-steam-verde'} font-semibold">
-                            ${player.disconnected ? 'Desconectado' : 'Listo'}
-                        </p>
+                        <div class="flex justify-center my-3 float">
+                            <div class="player-avatar" style="background:${p.color}"></div>
+                        </div>
+                        <div class="text-sm font-bold flex items-center justify-center gap-1 ${p.disconnected ? 'text-steam-morado' : 'text-steam-verde'}">
+                            ${p.disconnected 
+                                ? '<iconify-icon icon="mdi:wifi-off"></iconify-icon> Desconectado' 
+                                : '<iconify-icon icon="mdi:check-circle"></iconify-icon> Listo!'}
+                        </div>
                     `;
                 } else {
-                    slot.classList.add('border-gray-200');
                     slot.innerHTML = `
-                        <h3 class="text-xl font-bold text-steam-turquesa mb-2">Jugador ${i}</h3>
-                        <div class="flex justify-center mb-2">
-                            <div class="player-avatar-visual bg-gray-300"></div>
+                        <div class="text-lg sm:text-xl font-bold text-gray-400 flex items-center justify-center gap-2">
+                            <iconify-icon icon="mdi:controller" class="text-xl"></iconify-icon>
+                            Jugador ${i}
                         </div>
-                        <p class="text-sm opacity-70">Esperando...</p>
+                        <div class="flex justify-center my-3 float">
+                            <div class="player-avatar bg-gray-200"></div>
+                        </div>
+                        <div class="text-sm text-gray-400 flex items-center justify-center gap-1">
+                            <iconify-icon icon="mdi:timer-sand" class="animate-pulse"></iconify-icon>
+                            Esperando...
+                        </div>
                     `;
                 }
             }
             
-            document.getElementById('adminHint').classList.toggle('hidden', connectedPlayers === 0);
+            document.getElementById('adminHint').classList.toggle('hidden', count === 0);
         }
 
-        function broadcastGameState() {
-            airconsole.broadcast({
-                type: 'gameState',
-                connectedPlayers: Object.keys(gameState.players).length,
-                players: gameState.players,
-                adminId: gameState.adminDeviceId
-            });
-        }
-
-        function startGame() {
-            gameState.started = true;
-            gameState.startTime = Date.now();
-            
+        async function startGame() {
             document.getElementById('startScreen').style.display = 'none';
             document.getElementById('gameContainer').style.display = 'block';
             
-            const playerCount = Object.values(gameState.players).filter(p => !p.disconnected).length;
-            setupGameScreen(playerCount);
+            const players = Object.values(state.players).filter(p => !p.disconnected);
+            setupScreens(players.length);
             
-            let idx = 0;
-            for (let playerNum in gameState.players) {
-                if (!gameState.players[playerNum].disconnected) {
-                    const player = gameState.players[playerNum];
-                    gameState.games[playerNum] = new Game(playerNum, player.color);
-                    gameState.games[playerNum].init();
-                    idx++;
+            let i = 0;
+            for (let n in state.players) {
+                if (!state.players[n].disconnected) {
+                    state.games[n] = new Game(n, state.players[n].color, state.players[n].name);
+                    state.games[n].init();
+                    i++;
                 }
             }
             
+            await countdown();
+            
+            state.started = true;
+            state.startTime = Date.now();
             airconsole.broadcast({ type: 'gameStart' });
         }
 
-        function setupGameScreen(playerCount) {
+        function setupScreens(count) {
             const container = document.getElementById('gameContainer');
             container.innerHTML = '';
             
-            const splitClasses = {
-                1: 'w-screen h-screen border-0',
-                2: 'w-screen h-[calc(50vh-2px)]',
-                3: 'screen-split-3',
-                4: 'w-[calc(50vw-2px)] h-[calc(50vh-2px)]'
-            };
-            
-            let idx = 0;
-            for (let playerNum in gameState.players) {
-                if (gameState.players[playerNum].disconnected) continue;
+            let i = 0;
+            for (let n in state.players) {
+                if (state.players[n].disconnected) continue;
+                const p = state.players[n];
                 
-                const player = gameState.players[playerNum];
-                const splitDiv = document.createElement('div');
-                splitDiv.className = `absolute overflow-hidden border-4 border-steam-naranja`;
-                splitDiv.id = `player${playerNum}Screen`;
+                const div = document.createElement('div');
+                div.id = `screen${n}`;
+                div.className = 'absolute overflow-hidden';
                 
-                // Position based on player count and index
-                if (playerCount === 1) {
-                    splitDiv.className = 'absolute w-screen h-screen overflow-hidden';
-                } else if (playerCount === 2) {
-                    splitDiv.className = `absolute w-screen h-[calc(50vh-2px)] overflow-hidden border-4 border-steam-naranja`;
-                    splitDiv.style.top = idx === 0 ? '0' : 'calc(50vh + 2px)';
-                } else if (playerCount === 3) {
-                    if (idx === 0) {
-                        splitDiv.className = 'absolute w-screen h-[calc(50vh-2px)] overflow-hidden border-4 border-steam-naranja';
-                        splitDiv.style.top = '0';
-                        splitDiv.style.left = '0';
-                    } else {
-                        splitDiv.className = 'absolute w-[calc(50vw-2px)] h-[calc(50vh-2px)] overflow-hidden border-4 border-steam-naranja';
-                        splitDiv.style.top = 'calc(50vh + 2px)';
-                        splitDiv.style.left = idx === 1 ? '0' : 'calc(50vw + 2px)';
-                    }
-                } else if (playerCount === 4) {
-                    splitDiv.className = 'absolute w-[calc(50vw-2px)] h-[calc(50vh-2px)] overflow-hidden border-4 border-steam-naranja';
-                    const positions = [
-                        { top: '0', left: '0' },
-                        { top: '0', left: 'calc(50vw + 2px)' },
-                        { top: 'calc(50vh + 2px)', left: '0' },
-                        { top: 'calc(50vh + 2px)', left: 'calc(50vw + 2px)' }
-                    ];
-                    splitDiv.style.top = positions[idx].top;
-                    splitDiv.style.left = positions[idx].left;
+                // Layout based on player count
+                if (count === 1) {
+                    div.style.cssText = 'inset:0;';
+                } else if (count === 2) {
+                    div.style.cssText = `left:0;right:0;height:calc(50% - 2px);${i === 0 ? 'top:0' : 'bottom:0'};`;
+                } else if (count === 3) {
+                    if (i === 0) div.style.cssText = 'top:0;left:0;right:0;height:calc(50% - 2px);';
+                    else div.style.cssText = `bottom:0;width:calc(50% - 2px);height:calc(50% - 2px);${i === 1 ? 'left:0' : 'right:0'};`;
+                } else {
+                    const pos = [['top:0;left:0'], ['top:0;right:0'], ['bottom:0;left:0'], ['bottom:0;right:0']][i];
+                    div.style.cssText = `${pos};width:calc(50% - 2px);height:calc(50% - 2px);`;
                 }
                 
-                splitDiv.innerHTML = `
-                    <div class="w-full h-full relative">
-                        <canvas id="canvas${playerNum}" class="absolute top-0 left-0 w-full h-full"></canvas>
-                        <div class="absolute top-4 left-4 bg-black/70 border-4 rounded-xl py-3 px-5 text-xl font-bold z-10 flex items-center gap-2 text-white" style="border-color: ${player.color};">
-                            <span>Monedas:</span>
-                            <span id="coinCount${playerNum}">0</span>/${LEVEL.coins.length}
+                div.innerHTML = `
+                    <canvas id="canvas${n}" class="absolute inset-0 w-full h-full"></canvas>
+                    <div class="absolute top-3 left-3 sm:top-4 sm:left-4 bg-black/70 rounded-xl py-2 px-4 flex items-center gap-2 text-white font-bold text-sm sm:text-lg z-10" style="border-left:4px solid ${p.color}">
+                        <iconify-icon icon="mdi:cash-multiple" class="text-steam-naranja text-lg"></iconify-icon>
+                        <span id="coins${n}">0</span>/<span>${LEVEL.coins.length}</span>
+                    </div>
+                    <div class="absolute top-3 right-3 sm:top-4 sm:right-4 bg-black/70 rounded-xl py-2 px-3 flex items-center gap-2 font-bold z-10" style="border-left:4px solid ${p.color}">
+                        <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg relative" style="background:${p.color}">
+                            <span class="absolute top-1 left-1 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full"></span>
+                            <span class="absolute top-1 right-1 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full"></span>
                         </div>
-                        <div class="absolute top-4 right-4 bg-black/70 border-4 rounded-xl py-2 px-4 font-bold z-10 flex items-center gap-2" style="border-color: ${player.color}; color: ${player.color};">
-                            <div class="player-avatar-visual-small" style="background-color: ${player.color};"></div>
-                            <span>${player.name}</span>
-                        </div>
-                        <div class="disconnect-overlay absolute top-0 left-0 w-full h-full bg-black/80 hidden items-center justify-center z-20">
-                            <div class="text-2xl text-steam-morado font-bold text-center">DESCONECTADO</div>
-                        </div>
+                        <span class="text-white text-sm sm:text-base">${p.name}</span>
+                    </div>
+                    <div class="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 h-2 bg-black/30 rounded-full overflow-hidden z-10">
+                        <div id="progress${n}" class="h-full rounded-full transition-all" style="width:0%;background:${p.color}"></div>
                     </div>
                 `;
                 
-                container.appendChild(splitDiv);
-                idx++;
+                if (count > 1) {
+                    div.style.border = `3px solid ${p.color}`;
+                }
+                
+                container.appendChild(div);
+                i++;
             }
         }
 
-        function restartGame() {
+        function restart() {
             document.getElementById('resultsScreen').style.display = 'none';
             document.getElementById('startScreen').style.display = 'flex';
             document.getElementById('gameContainer').style.display = 'none';
             
-            gameState.started = false;
-            gameState.games = {};
+            state.started = false;
+            state.games = {};
             
-            for (let playerNum in gameState.players) {
-                if (gameState.players[playerNum].disconnected) {
-                    delete gameState.players[playerNum];
-                }
+            for (let n in state.players) {
+                if (state.players[n].disconnected) delete state.players[n];
             }
             
-            updatePlayerSlots();
+            updateSlots();
             airconsole.broadcast({ type: 'gameRestart' });
         }
 
         function showResults() {
             const results = [];
             
-            for (let playerNum in gameState.games) {
-                const game = gameState.games[playerNum];
-                const player = gameState.players[playerNum];
-                
-                if (game.finishTime && !player.disconnected) {
-                    const timeScore = Math.max(0, 1000 - (game.finishTime - gameState.startTime) / 100);
-                    const coinScore = game.coins * 50;
-                    const totalScore = Math.round(timeScore + coinScore);
-                    
+            for (let n in state.games) {
+                const g = state.games[n];
+                const p = state.players[n];
+                if (g.finishTime && !p.disconnected) {
+                    const timeBonus = Math.max(0, 1000 - (g.finishTime - state.startTime) / 100);
+                    const coinBonus = g.coins * 100;
                     results.push({
-                        playerNum: playerNum,
-                        name: player.name,
-                        color: player.color,
-                        coins: game.coins,
-                        time: ((game.finishTime - gameState.startTime) / 1000).toFixed(1),
-                        score: totalScore
+                        num: n,
+                        name: p.name,
+                        color: p.color,
+                        coins: g.coins,
+                        time: ((g.finishTime - state.startTime) / 1000).toFixed(1),
+                        score: Math.round(timeBonus + coinBonus)
                     });
                 }
             }
             
             results.sort((a, b) => b.score - a.score);
             
-            const winnerSection = document.getElementById('winnerSection');
-            if (results.length > 0) {
-                const winner = results[0];
-                winnerSection.innerHTML = `
-                    <div class="text-6xl mb-4">1er Lugar</div>
-                    <div class="flex justify-center mb-4">
-                        <div class="player-avatar-visual-large" style="background-color: ${winner.color};"></div>
+            const winnerDiv = document.getElementById('winnerSection');
+            if (results.length) {
+                const w = results[0];
+                winnerDiv.innerHTML = `
+                    <iconify-icon icon="mdi:trophy" class="text-6xl text-steam-naranja mb-4"></iconify-icon>
+                    <div class="player-avatar mx-auto mb-4" style="background:${w.color};width:100px;height:100px;border-radius:20px;box-shadow:0 0 30px ${w.color}50"></div>
+                    <div class="text-2xl font-black" style="color:${w.color}">${w.name}</div>
+                    <div class="text-xl text-steam-verde font-bold mt-2 flex items-center justify-center gap-2">
+                        <iconify-icon icon="mdi:star"></iconify-icon>
+                        ${w.score} pts
                     </div>
-                    <div class="text-2xl font-bold text-steam-naranja">${winner.name}</div>
-                    <div class="text-xl text-steam-verde mt-2">${winner.score} puntos</div>
                 `;
-                playSound('win');
-                createConfetti();
+                sound('win');
+                confetti();
             }
             
-            const resultsBody = document.getElementById('resultsBody');
-            resultsBody.innerHTML = '';
+            const tbody = document.getElementById('resultsBody');
+            tbody.innerHTML = '';
+            const medals = ['mdi:medal-outline', 'mdi:medal-outline', 'mdi:medal-outline'];
+            const medalColors = ['#FFD700', '#C0C0C0', '#CD7F32'];
             
-            const medals = ['1ro', '2do', '3ro'];
-            results.forEach((result, index) => {
+            results.forEach((r, i) => {
                 const row = document.createElement('tr');
-                row.className = index === 0 ? 'bg-orange-50 font-bold' : '';
+                row.className = i === 0 ? 'bg-amber-50' : i % 2 ? 'bg-gray-50' : '';
                 row.innerHTML = `
-                    <td class="p-3 border-b border-gray-200">${medals[index] || `#${index + 1}`}</td>
-                    <td class="p-3 border-b border-gray-200">
+                    <td class="py-3 px-2 text-xl">
+                        ${i < 3 
+                            ? `<iconify-icon icon="${medals[i]}" style="color:${medalColors[i]}" class="text-2xl"></iconify-icon>` 
+                            : `#${i+1}`}
+                    </td>
+                    <td class="py-3 px-2">
                         <div class="flex items-center gap-2">
-                            <div class="w-5 h-5 rounded-full border-2 border-white shadow" style="background: ${result.color};"></div>
-                            ${result.name}
+                            <div class="w-6 h-6 rounded-md relative" style="background:${r.color}">
+                                <span class="absolute top-1 left-1 w-1.5 h-1.5 bg-white rounded-full"></span>
+                                <span class="absolute top-1 right-1 w-1.5 h-1.5 bg-white rounded-full"></span>
+                            </div>
+                            <span class="font-bold">${r.name}</span>
                         </div>
                     </td>
-                    <td class="p-3 border-b border-gray-200">${result.coins}</td>
-                    <td class="p-3 border-b border-gray-200">${result.time}s</td>
-                    <td class="p-3 border-b border-gray-200"><strong>${result.score}</strong></td>
+                    <td class="py-3 px-2 text-center text-steam-naranja font-bold">${r.coins}</td>
+                    <td class="py-3 px-2 text-center">${r.time}s</td>
+                    <td class="py-3 px-2 text-right font-black text-steam-verde">${r.score}</td>
                 `;
-                resultsBody.appendChild(row);
+                tbody.appendChild(row);
             });
             
             document.getElementById('resultsScreen').style.display = 'flex';
-            
-            airconsole.broadcast({
-                type: 'gameResults',
-                results: results,
-                winner: results[0]
-            });
+            airconsole.broadcast({ type: 'gameResults', results, winner: results[0] });
         }
 
         class Game {
-            constructor(playerNum, color) {
-                this.playerNum = playerNum;
+            constructor(num, color, name) {
+                this.num = num;
                 this.color = color;
+                this.name = name;
                 this.canvas = null;
                 this.ctx = null;
                 this.keys = { left: false, right: false, jump: false };
                 this.finishTime = null;
                 
-                this.player = {
-                    x: 50,
-                    y: 250,
-                    width: 35,
-                    height: 35,
-                    velX: 0,
-                    velY: 0,
-                    stunned: false,
-                    stunTimer: 0,
-                    color: color
-                };
-                
-                this.GRAVITY = 0.4;
-                this.JUMP_FORCE = -11;
-                this.MOVE_SPEED = 4.5;
-                this.MAX_FALL_SPEED = 12;
-                
+                this.player = { x: 80, y: 300, vx: 0, vy: 0, w: 44, h: 44, facing: 1, stunned: 0 };
                 this.coins = 0;
-                this.gameWon = false;
-                this.isGrounded = false;
-                this.cameraX = 0;
-                this.lastCameraX = -1;
+                this.won = false;
+                this.grounded = false;
+                this.camX = 0;
                 this.particles = [];
+                this.trail = [];
                 
-                this.floorSegments = JSON.parse(JSON.stringify(LEVEL.floorSegments));
-                this.platforms = JSON.parse(JSON.stringify(LEVEL.platforms));
-                this.coinList = LEVEL.coins.map(c => ({ ...c, collected: false }));
-                this.obstacles = JSON.parse(JSON.stringify(LEVEL.obstacles));
-                this.finishX = LEVEL.finishX;
-                this.finishY = LEVEL.finishY;
-                
-                this.lastTime = 0;
-                this.targetFPS = 60;
-                this.frameInterval = 1000 / this.targetFPS;
-                this.animationId = null;
-                
-                this.coinCountEl = null;
-                
-                this.bgCanvas = null;
-                this.bgCtx = null;
-                this.bgDrawn = false;
+                // Clone level data
+                this.floors = LEVEL.floorSegments.map(f => ({...f}));
+                this.platforms = LEVEL.platforms.map(p => ({...p, h: 16}));
+                this.coinList = LEVEL.coins.map(c => ({...c, got: false, bob: Math.random() * 6.28}));
+                this.obstacles = LEVEL.obstacles.map(o => ({...o, w: 38, h: 38, dir: 1, spd: 2 + Math.random(), range: 100 + Math.random() * 50}));
+                this.finishX = LEVEL.length - 200;
             }
 
             init() {
-                this.canvas = document.getElementById(`canvas${this.playerNum}`);
+                this.canvas = document.getElementById(`canvas${this.num}`);
                 this.ctx = this.canvas.getContext('2d', { alpha: false });
                 
-                const container = document.getElementById(`player${this.playerNum}Screen`);
+                const container = document.getElementById(`screen${this.num}`);
                 this.canvas.width = container.clientWidth;
                 this.canvas.height = container.clientHeight;
                 
-                this.coinCountEl = document.getElementById(`coinCount${this.playerNum}`);
+                const ratio = this.canvas.height / 700;
+                this.floorY = this.canvas.height - 70;
                 
-                this.bgCanvas = document.createElement('canvas');
-                this.bgCanvas.width = this.finishX + 200;
-                this.bgCanvas.height = this.canvas.height;
-                this.bgCtx = this.bgCanvas.getContext('2d');
+                this.floors.forEach(f => f.y = this.floorY);
+                this.platforms.forEach(p => p.y *= ratio);
+                this.coinList.forEach(c => c.y *= ratio);
+                this.obstacles.forEach(o => o.y *= ratio);
+                this.player.y = 300 * ratio;
                 
-                const heightRatio = this.canvas.height / 700;
+                this.coinsEl = document.getElementById(`coins${this.num}`);
+                this.progressEl = document.getElementById(`progress${this.num}`);
                 
-                this.floorSegments.forEach(segment => {
-                    segment.y = this.canvas.height - 50;
-                });
-                
-                this.platforms.forEach(platform => {
-                    platform.y = platform.y * heightRatio;
-                });
-                
-                this.coinList.forEach(coin => {
-                    coin.y = coin.y * heightRatio;
-                });
-                
-                this.obstacles.forEach(obs => {
-                    obs.y = obs.y * heightRatio;
-                });
-                
-                this.player.y = 250 * heightRatio;
-                this.finishY = this.canvas.height - 50;
-                
-                this.drawStaticBackground();
-                
-                this.lastTime = performance.now();
-                this.animate();
-            }
-            
-            drawStaticBackground() {
-                const ctx = this.bgCtx;
-                const width = this.bgCanvas.width;
-                const height = this.bgCanvas.height;
-                
-                const gradient = ctx.createLinearGradient(0, 0, 0, height);
-                gradient.addColorStop(0, '#1B4D3E');
-                gradient.addColorStop(1, '#0D2818');
-                ctx.fillStyle = gradient;
-                ctx.fillRect(0, 0, width, height);
-                
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
-                for (let x = 0; x < width; x += 50) {
-                    for (let y = 0; y < height; y += 50) {
-                        if ((x + y) % 100 === 0) {
-                            ctx.fillRect(x, y, 50, 50);
-                        }
-                    }
-                }
-                
-                const floorHeight = height - 50;
-                this.floorSegments.forEach(segment => {
-                    ctx.fillStyle = '#2D5A4A';
-                    ctx.fillRect(segment.x, floorHeight, segment.width, 50);
-                    ctx.fillStyle = '#73A03F';
-                    ctx.fillRect(segment.x, floorHeight, segment.width, 8);
-                    ctx.fillStyle = '#1B3D2F';
-                    ctx.fillRect(segment.x, floorHeight + 42, segment.width, 8);
-                });
-                
-                this.platforms.forEach(platform => {
-                    ctx.fillStyle = '#37474F';
-                    ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
-                    ctx.fillStyle = '#546E7A';
-                    ctx.fillRect(platform.x, platform.y, platform.width, 4);
-                });
-                
-                const flagX = this.finishX;
-                const flagY = this.finishY - 120;
-                ctx.fillStyle = '#37474F';
-                ctx.fillRect(flagX, flagY, 6, 120);
-                ctx.fillStyle = '#73A03F';
-                ctx.beginPath();
-                ctx.moveTo(flagX + 6, flagY);
-                ctx.lineTo(flagX + 50, flagY + 20);
-                ctx.lineTo(flagX + 6, flagY + 40);
-                ctx.fill();
-                ctx.fillStyle = '#fff';
-                ctx.font = 'bold 14px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText('META', flagX + 28, flagY + 25);
-                
-                ctx.fillStyle = '#EB8225';
-                ctx.font = 'bold 16px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText('!', 400, floorHeight + 80);
-                ctx.fillText('!', 825, floorHeight + 80);
-                ctx.fillText('!', 1325, floorHeight + 80);
-                
-                this.bgDrawn = true;
-            }
-
-            resizeCanvas() {
-                if (this.canvas) {
-                    const container = document.getElementById(`player${this.playerNum}Screen`);
-                    if (container) {
-                        this.canvas.width = container.clientWidth || window.innerWidth;
-                        this.canvas.height = container.clientHeight || window.innerHeight;
-                        if (this.bgCanvas) {
-                            this.bgCanvas.height = this.canvas.height;
-                            this.drawStaticBackground();
-                        }
-                    }
-                }
-            }
-            
-            destroy() {
-                if (this.animationId) {
-                    cancelAnimationFrame(this.animationId);
-                    this.animationId = null;
-                }
+                this.loop();
             }
 
             update() {
-                if (this.gameWon) return;
-
-                this.player.velX = 0;
-                if (!this.player.stunned) {
-                    if (this.keys.left) this.player.velX = -this.MOVE_SPEED;
-                    if (this.keys.right) this.player.velX = this.MOVE_SPEED;
-                }
-
-                if (this.player.stunned) {
-                    this.player.stunTimer--;
-                    if (this.player.stunTimer <= 0) {
-                        this.player.stunned = false;
-                    }
-                }
-
-                this.player.velY += this.GRAVITY;
-                if (this.player.velY > this.MAX_FALL_SPEED) {
-                    this.player.velY = this.MAX_FALL_SPEED;
-                }
-
-                if (this.keys.jump && this.isGrounded && !this.player.stunned) {
-                    this.player.velY = this.JUMP_FORCE;
-                    playSound('jump');
-                    this.keys.jump = false;
-                }
-
-                this.player.x += this.player.velX;
-                this.player.y += this.player.velY;
-
-                this.isGrounded = false;
-                this.platforms.forEach(platform => {
-                    if (this.player.x + this.player.width > platform.x &&
-                        this.player.x < platform.x + platform.width &&
-                        this.player.y + this.player.height > platform.y &&
-                        this.player.y + this.player.height < platform.y + 20 &&
-                        this.player.velY > 0) {
-                        this.player.y = platform.y - this.player.height;
-                        this.player.velY = 0;
-                        this.isGrounded = true;
-                    }
-                });
-
-                const floorHeight = this.canvas.height - 50;
-                let onFloorSegment = false;
+                if (this.won || !state.started) return;
                 
-                this.floorSegments.forEach(segment => {
-                    if (this.player.x + this.player.width > segment.x &&
-                        this.player.x < segment.x + segment.width &&
-                        this.player.y + this.player.height > floorHeight &&
-                        this.player.y + this.player.height < floorHeight + 20 &&
-                        this.player.velY > 0) {
-                        this.player.y = floorHeight - this.player.height;
-                        this.player.velY = 0;
-                        this.isGrounded = true;
-                        onFloorSegment = true;
-                    }
-                });
-
-                if (!onFloorSegment && this.player.y + this.player.height > floorHeight - 10) {
-                    if (this.player.y > this.canvas.height) {
-                        this.createParticles(this.player.x + this.player.width/2, this.player.y + this.player.height/2, ['#AB3D8B', '#8a3070']);
-                        this.player.x = 50;
-                        this.player.y = 250 * (this.canvas.height / 700);
-                        this.player.velX = 0;
-                        this.player.velY = 0;
-                        this.player.stunned = false;
-                        playSound('hit');
-                    }
+                const p = this.player;
+                const prevVy = p.vy;
+                
+                // Input
+                p.vx = 0;
+                if (!p.stunned) {
+                    if (this.keys.left) { p.vx = -5.5; p.facing = -1; }
+                    if (this.keys.right) { p.vx = 5.5; p.facing = 1; }
                 }
-
-                this.obstacles.forEach(obs => {
-                    obs.x += obs.direction * obs.speed;
-                    if (Math.abs(obs.x - obs.startX) > obs.range) {
-                        obs.direction *= -1;
-                    }
-                    
-                    if (!this.player.stunned &&
-                        this.player.x + this.player.width > obs.x &&
-                        this.player.x < obs.x + obs.width &&
-                        this.player.y + this.player.height > obs.y &&
-                        this.player.y < obs.y + obs.height) {
-                        this.player.stunned = true;
-                        this.player.stunTimer = 60;
-                        playSound('hit');
-                        this.createParticles(this.player.x + this.player.width/2, this.player.y + this.player.height/2, ['#AB3D8B', '#8a3070']);
+                
+                if (p.stunned > 0) p.stunned--;
+                
+                // Physics
+                p.vy += 0.5;
+                if (p.vy > 15) p.vy = 15;
+                
+                if (this.keys.jump && this.grounded && !p.stunned) {
+                    p.vy = -13;
+                    sound('jump');
+                    this.keys.jump = false;
+                    this.burst(p.x + p.w/2, p.y + p.h, '#8BC34A', 5);
+                }
+                
+                p.x += p.vx;
+                p.y += p.vy;
+                
+                // Trail
+                if (Math.abs(p.vx) > 0 || Math.abs(p.vy) > 3) {
+                    this.trail.push({ x: p.x, y: p.y, a: 0.4 });
+                    if (this.trail.length > 6) this.trail.shift();
+                }
+                this.trail = this.trail.filter(t => (t.a *= 0.85) > 0.05);
+                
+                // Collisions
+                this.grounded = false;
+                
+                // Floors
+                this.floors.forEach(f => {
+                    if (p.x + p.w > f.x && p.x < f.x + f.width && p.y + p.h > f.y && p.y + p.h < f.y + 25 && p.vy > 0) {
+                        p.y = f.y - p.h;
+                        p.vy = 0;
+                        this.grounded = true;
                     }
                 });
-
-                this.player.x = Math.max(0, this.player.x);
-                this.cameraX = Math.max(0, Math.min(this.player.x - this.canvas.width / 2, this.finishX - this.canvas.width + 100));
-
-                this.coinList.forEach(coin => {
-                    if (!coin.collected &&
-                        Math.abs(this.player.x + this.player.width/2 - coin.x) < 30 &&
-                        Math.abs(this.player.y + this.player.height/2 - coin.y) < 30) {
-                        coin.collected = true;
+                
+                // Platforms
+                this.platforms.forEach(pl => {
+                    if (p.x + p.w > pl.x && p.x < pl.x + pl.width && p.y + p.h > pl.y && p.y + p.h < pl.y + 20 && p.vy > 0) {
+                        p.y = pl.y - p.h;
+                        p.vy = 0;
+                        this.grounded = true;
+                    }
+                });
+                
+                // Fall death
+                if (p.y > this.canvas.height + 50) {
+                    this.burst(p.x + p.w/2, this.canvas.height - 50, '#AB3D8B', 12);
+                    p.x = 80;
+                    p.y = 300 * (this.canvas.height / 700);
+                    p.vx = p.vy = 0;
+                    sound('hit');
+                }
+                
+                // Obstacles
+                this.obstacles.forEach(o => {
+                    o.x += o.dir * o.spd;
+                    if (Math.abs(o.x - o.startX) > o.range) o.dir *= -1;
+                    
+                    if (!p.stunned && p.x + p.w > o.x && p.x < o.x + o.w && p.y + p.h > o.y && p.y < o.y + o.h) {
+                        p.stunned = 45;
+                        sound('hit');
+                        this.burst(p.x + p.w/2, p.y + p.h/2, '#AB3D8B', 10);
+                    }
+                });
+                
+                // Bounds
+                p.x = Math.max(0, p.x);
+                
+                // Camera
+                this.camX = Math.max(0, Math.min(p.x - this.canvas.width / 2, this.finishX - this.canvas.width + 150));
+                
+                // Progress
+                if (this.progressEl) this.progressEl.style.width = Math.min(100, p.x / this.finishX * 100) + '%';
+                
+                // Coins
+                this.coinList.forEach(c => {
+                    if (!c.got && Math.abs(p.x + p.w/2 - c.x) < 35 && Math.abs(p.y + p.h/2 - c.y) < 35) {
+                        c.got = true;
                         this.coins++;
-                        if (this.coinCountEl) this.coinCountEl.textContent = this.coins;
-                        this.createParticles(coin.x, coin.y, ['#EB8225', '#F4D03F', '#FFF']);
-                        playSound('coin');
+                        if (this.coinsEl) this.coinsEl.textContent = this.coins;
+                        this.burst(c.x, c.y, '#EB8225', 10);
+                        sound('coin');
                     }
                 });
-
-                if (this.player.x > this.finishX && 
-                    this.player.y + this.player.height > this.finishY - 100 &&
-                    this.player.y < this.finishY + 100) {
-                    this.gameWon = true;
+                
+                // Finish
+                if (p.x > this.finishX) {
+                    this.won = true;
                     this.finishTime = Date.now();
+                    this.burst(p.x + p.w/2, p.y, '#73A03F', 20);
                     
-                    let allFinished = true;
-                    for (let playerNum in gameState.games) {
-                        if (!gameState.games[playerNum].gameWon && !gameState.players[playerNum].disconnected) {
-                            allFinished = false;
-                            break;
-                        }
-                    }
-                    
-                    if (allFinished) {
-                        setTimeout(showResults, 1500);
-                    }
+                    const allDone = Object.values(state.games).every(g => g.won || state.players[g.num].disconnected);
+                    if (allDone) setTimeout(showResults, 1200);
                 }
-
-                this.particles = this.particles.filter(p => {
-                    p.x += p.vx;
-                    p.y += p.vy;
-                    p.vy += 0.1;
-                    p.life--;
-                    return p.life > 0;
+                
+                // Particles
+                this.particles = this.particles.filter(pt => {
+                    pt.x += pt.vx;
+                    pt.y += pt.vy;
+                    pt.vy += 0.15;
+                    pt.life--;
+                    return pt.life > 0;
                 });
             }
 
             draw() {
-                if (this.bgDrawn) {
-                    this.ctx.drawImage(
-                        this.bgCanvas, 
-                        this.cameraX, 0, this.canvas.width, this.canvas.height,
-                        0, 0, this.canvas.width, this.canvas.height
-                    );
-                }
+                const ctx = this.ctx;
+                const w = this.canvas.width;
+                const h = this.canvas.height;
                 
-                this.ctx.save();
-                this.ctx.translate(-this.cameraX, 0);
-
-                this.obstacles.forEach(obs => {
-                    this.ctx.fillStyle = '#AB3D8B';
-                    this.ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
-                    this.ctx.fillStyle = '#c44da0';
-                    this.ctx.fillRect(obs.x, obs.y, obs.width, 4);
+                // Sky - clean solid colors
+                ctx.fillStyle = '#87CEEB';
+                ctx.fillRect(0, 0, w, h * 0.4);
+                ctx.fillStyle = '#98D8C8';
+                ctx.fillRect(0, h * 0.4, w, h * 0.3);
+                ctx.fillStyle = '#2D5A4A';
+                ctx.fillRect(0, h * 0.7, w, h * 0.3);
+                
+                ctx.save();
+                ctx.translate(-this.camX, 0);
+                
+                // Simple clouds
+                ctx.fillStyle = 'rgba(255,255,255,0.9)';
+                [[100, 60], [400, 90], [800, 50], [1200, 80], [1700, 65], [2200, 75], [2700, 55]].forEach(([x, y]) => {
+                    ctx.beginPath();
+                    ctx.arc(x, y, 30, 0, Math.PI * 2);
+                    ctx.arc(x + 25, y - 5, 22, 0, Math.PI * 2);
+                    ctx.arc(x + 50, y, 28, 0, Math.PI * 2);
+                    ctx.fill();
                 });
-
-                const coinOffset = Math.sin(performance.now() / 200) * 3;
-                this.coinList.forEach(coin => {
-                    if (!coin.collected) {
-                        this.ctx.fillStyle = '#EB8225';
-                        this.ctx.beginPath();
-                        this.ctx.arc(coin.x, coin.y + coinOffset, 12, 0, Math.PI * 2);
-                        this.ctx.fill();
-                        this.ctx.fillStyle = '#FFF';
-                        this.ctx.beginPath();
-                        this.ctx.arc(coin.x - 3, coin.y - 3 + coinOffset, 4, 0, Math.PI * 2);
-                        this.ctx.fill();
+                
+                // Ground
+                this.floors.forEach(f => {
+                    // Dirt
+                    ctx.fillStyle = '#5D4037';
+                    ctx.fillRect(f.x, f.y, f.width, 70);
+                    // Grass
+                    ctx.fillStyle = '#8BC34A';
+                    ctx.fillRect(f.x, f.y, f.width, 12);
+                    // Grass detail
+                    ctx.fillStyle = '#9CCC65';
+                    for (let gx = f.x + 10; gx < f.x + f.width - 10; gx += 25) {
+                        ctx.fillRect(gx, f.y - 4, 3, 8);
                     }
                 });
-
-                if (this.particles.length > 0) {
-                    this.particles.forEach(p => {
-                        this.ctx.fillStyle = p.color;
-                        this.ctx.globalAlpha = p.life / 30;
-                        this.ctx.beginPath();
-                        this.ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
-                        this.ctx.fill();
-                    });
-                    this.ctx.globalAlpha = 1;
+                
+                // Platforms - clean flat design
+                this.platforms.forEach(pl => {
+                    ctx.fillStyle = '#546E7A';
+                    ctx.fillRect(pl.x, pl.y, pl.width, pl.h);
+                    ctx.fillStyle = '#78909C';
+                    ctx.fillRect(pl.x, pl.y, pl.width, 4);
+                });
+                
+                // Obstacles - enemy blocks
+                this.obstacles.forEach(o => {
+                    ctx.fillStyle = '#AB3D8B';
+                    ctx.beginPath();
+                    ctx.roundRect(o.x, o.y, o.w, o.h, 8);
+                    ctx.fill();
+                    // Eyes
+                    ctx.fillStyle = 'white';
+                    ctx.beginPath();
+                    ctx.arc(o.x + o.w * 0.3, o.y + o.h * 0.4, 6, 0, Math.PI * 2);
+                    ctx.arc(o.x + o.w * 0.7, o.y + o.h * 0.4, 6, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#333';
+                    ctx.beginPath();
+                    ctx.arc(o.x + o.w * 0.3 + o.dir * 2, o.y + o.h * 0.4, 3, 0, Math.PI * 2);
+                    ctx.arc(o.x + o.w * 0.7 + o.dir * 2, o.y + o.h * 0.4, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                
+                // Coins
+                const t = performance.now();
+                this.coinList.forEach(c => {
+                    if (!c.got) {
+                        const bobY = Math.sin(t / 200 + c.bob) * 4;
+                        ctx.fillStyle = '#EB8225';
+                        ctx.beginPath();
+                        ctx.arc(c.x, c.y + bobY, 14, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = '#FFD700';
+                        ctx.beginPath();
+                        ctx.arc(c.x - 4, c.y + bobY - 4, 5, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = 'white';
+                        ctx.font = 'bold 12px Arial';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText('$', c.x, c.y + bobY + 1);
+                    }
+                });
+                
+                // Finish flag
+                const fx = this.finishX;
+                ctx.fillStyle = '#455A64';
+                ctx.fillRect(fx, this.floorY - 130, 6, 130);
+                ctx.fillStyle = '#73A03F';
+                ctx.beginPath();
+                ctx.moveTo(fx + 6, this.floorY - 130);
+                ctx.lineTo(fx + 60, this.floorY - 105);
+                ctx.lineTo(fx + 6, this.floorY - 80);
+                ctx.fill();
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 14px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('META', fx + 33, this.floorY - 102);
+                
+                // Checkered finish
+                for (let i = 0; i < 8; i++) {
+                    for (let j = 0; j < 2; j++) {
+                        ctx.fillStyle = (i + j) % 2 ? '#333' : '#fff';
+                        ctx.fillRect(fx - 40 + i * 12, this.floorY - 20 + j * 10, 12, 10);
+                    }
                 }
-
-                if (this.player.stunned) {
-                    this.ctx.globalAlpha = 0.3 + Math.sin(performance.now() / 50) * 0.3;
-                }
                 
-                // Draw player as rounded rectangle (the game avatar)
-                this.ctx.fillStyle = this.player.color;
-                this.ctx.beginPath();
-                this.ctx.roundRect(this.player.x, this.player.y, this.player.width, this.player.height, 8);
-                this.ctx.fill();
+                // Particles
+                this.particles.forEach(pt => {
+                    ctx.globalAlpha = pt.life / 30;
+                    ctx.fillStyle = pt.color;
+                    ctx.beginPath();
+                    ctx.arc(pt.x, pt.y, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                ctx.globalAlpha = 1;
                 
-                // Highlight on player
-                this.ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-                this.ctx.beginPath();
-                this.ctx.roundRect(this.player.x + 3, this.player.y + 3, this.player.width - 6, 8, 4);
-                this.ctx.fill();
+                // Trail
+                this.trail.forEach(tr => {
+                    ctx.globalAlpha = tr.a * 0.5;
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.roundRect(tr.x + 5, tr.y + 5, this.player.w - 10, this.player.h - 10, 8);
+                    ctx.fill();
+                });
+                ctx.globalAlpha = 1;
                 
-                this.ctx.globalAlpha = 1;
-                this.ctx.restore();
+                // Player
+                const p = this.player;
+                if (p.stunned) ctx.globalAlpha = 0.4 + Math.sin(t / 40) * 0.3;
+                
+                // Shadow
+                ctx.fillStyle = 'rgba(0,0,0,0.2)';
+                ctx.beginPath();
+                ctx.ellipse(p.x + p.w/2, p.y + p.h + 4, p.w/2 * 0.7, 6, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Body
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.roundRect(p.x, p.y, p.w, p.h, 12);
+                ctx.fill();
+                
+                // Highlight
+                ctx.fillStyle = 'rgba(255,255,255,0.3)';
+                ctx.beginPath();
+                ctx.roundRect(p.x + 5, p.y + 4, p.w - 10, 12, 6);
+                ctx.fill();
+                
+                // Eyes
+                const eyeY = p.y + p.h * 0.38;
+                const eyeX1 = p.x + p.w * 0.3;
+                const eyeX2 = p.x + p.w * 0.7;
+                const lookX = p.facing * 3;
+                
+                ctx.fillStyle = 'white';
+                ctx.beginPath();
+                ctx.arc(eyeX1, eyeY, 7, 0, Math.PI * 2);
+                ctx.arc(eyeX2, eyeY, 7, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#222';
+                ctx.beginPath();
+                ctx.arc(eyeX1 + lookX, eyeY, 3, 0, Math.PI * 2);
+                ctx.arc(eyeX2 + lookX, eyeY, 3, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.globalAlpha = 1;
+                ctx.restore();
             }
 
-            createParticles(x, y, colors) {
-                const count = Math.min(8, 10);
+            burst(x, y, color, count) {
                 for (let i = 0; i < count; i++) {
                     this.particles.push({
-                        x: x,
-                        y: y,
-                        vx: (Math.random() - 0.5) * 6,
-                        vy: (Math.random() - 0.5) * 6 - 2,
-                        life: 25,
-                        color: colors[Math.floor(Math.random() * colors.length)]
+                        x, y,
+                        vx: (Math.random() - 0.5) * 8,
+                        vy: (Math.random() - 0.5) * 8 - 3,
+                        life: 25 + Math.random() * 10,
+                        color
                     });
                 }
             }
 
-            animate(currentTime) {
-                this.animationId = requestAnimationFrame((t) => this.animate(t));
-                
-                if (!currentTime) currentTime = performance.now();
-                const deltaTime = currentTime - this.lastTime;
-                
-                if (deltaTime >= this.frameInterval) {
-                    this.lastTime = currentTime - (deltaTime % this.frameInterval);
-                    this.update();
-                    this.draw();
-                }
+            loop() {
+                this.update();
+                this.draw();
+                requestAnimationFrame(() => this.loop());
             }
         }
 
         window.addEventListener('resize', () => {
-            if (gameState.started) {
-                for (let playerNum in gameState.games) {
-                    gameState.games[playerNum].resizeCanvas();
+            if (state.started) {
+                for (let n in state.games) {
+                    const g = state.games[n];
+                    const container = document.getElementById(`screen${n}`);
+                    if (container && g.canvas) {
+                        g.canvas.width = container.clientWidth;
+                        g.canvas.height = container.clientHeight;
+                    }
                 }
             }
         });

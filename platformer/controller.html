@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>STEAM Platformer - Control</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <script type="text/javascript" src="https://www.airconsole.com/api/airconsole-1.8.0.js"></script>
     <script>
         tailwind.config = {
@@ -15,9 +16,7 @@
                             turquesa: '#0595AE',
                             morado: '#AB3D8B',
                             naranja: '#EB8225',
-                            verde: '#73A03F',
-                            negro: '#010101',
-                            blanco: '#FFFFFF'
+                            verde: '#73A03F'
                         }
                     }
                 }
@@ -26,480 +25,504 @@
     </script>
     <style>
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-user-select: none;
-            user-select: none;
+            margin: 0; padding: 0; box-sizing: border-box;
+            -webkit-user-select: none; user-select: none;
             -webkit-tap-highlight-color: transparent;
         }
+        html, body { width: 100%; height: 100%; overflow: hidden; }
+        body { touch-action: none; font-family: 'Segoe UI', system-ui, sans-serif; }
 
-        body {
-            touch-action: none;
-        }
-
-        /* Player avatar visual representation */
-        .player-avatar-visual {
-            width: 60px;
-            height: 60px;
-            border-radius: 12px;
+        /* Clean avatar with simple centered eyes + idle blink */
+        .avatar {
+            width: clamp(70px, 22vw, 100px);
+            height: clamp(70px, 22vw, 100px);
+            border-radius: 18px;
             position: relative;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.25);
-            transition: all 0.2s ease;
+            box-shadow: 0 8px 0 rgba(0,0,0,0.15), 0 10px 30px rgba(0,0,0,0.1);
         }
-
-        .player-avatar-visual::before {
+        .avatar::before,
+        .avatar::after {
             content: '';
             position: absolute;
-            top: 4px;
-            left: 4px;
-            right: 4px;
-            height: 12px;
-            background: rgba(255,255,255,0.35);
-            border-radius: 8px 8px 0 0;
+            width: 24%;
+            height: 24%;
+            top: 32%;
+            background: radial-gradient(circle at 50% 50%, #222 35%, transparent 36%),
+                        white;
+            border-radius: 50%;
+            animation: idleBlink 4s ease-in-out infinite;
+        }
+        .avatar::before { left: 18%; }
+        .avatar::after { right: 18%; animation-delay: 0.05s; }
+        
+        .avatar-sm {
+            width: clamp(45px, 14vw, 60px);
+            height: clamp(45px, 14vw, 60px);
+            border-radius: 12px;
+            box-shadow: 0 5px 0 rgba(0,0,0,0.15);
+            position: relative;
+        }
+        .avatar-sm::before,
+        .avatar-sm::after {
+            content: '';
+            position: absolute;
+            width: 26%;
+            height: 26%;
+            top: 30%;
+            background: radial-gradient(circle at 50% 50%, #222 35%, transparent 36%),
+                        white;
+            border-radius: 50%;
+            animation: idleBlink 4s ease-in-out infinite;
+        }
+        .avatar-sm::before { left: 16%; }
+        .avatar-sm::after { right: 16%; animation-delay: 0.05s; }
+
+        /* Idle blink - natural blinking */
+        @keyframes idleBlink {
+            0%, 42%, 48%, 100% { transform: scaleY(1); }
+            45% { transform: scaleY(0.05); }
         }
 
-        .player-avatar-visual-large {
-            width: 80px;
-            height: 80px;
-            border-radius: 16px;
+        /* Happy jump when selecting color */
+        .avatar.jump {
+            animation: happyJump 0.5s ease-out;
+        }
+        @keyframes happyJump {
+            0% { transform: scale(1); }
+            40% { transform: scale(1.15) translateY(-12px); }
+            70% { transform: scale(0.95) translateY(0); }
+            100% { transform: scale(1) translateY(0); }
         }
 
-        .player-avatar-visual-large::before {
-            height: 16px;
-            top: 5px;
-            left: 5px;
-            right: 5px;
-            border-radius: 10px 10px 0 0;
+        /* Fast blink animation when selecting */
+        .avatar.blink::before,
+        .avatar.blink::after {
+            animation: blinkHappy 0.6s ease-out !important;
+        }
+        @keyframes blinkHappy {
+            0% { transform: scaleY(1); }
+            20% { transform: scaleY(0.05); }
+            40% { transform: scaleY(1); }
+            60% { transform: scaleY(0.05); }
+            80% { transform: scaleY(1); }
+            100% { transform: scaleY(1); }
         }
 
-        .player-avatar-visual-small {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-        }
+        /* Float animation */
+        @keyframes float { 50% { transform: translateY(-8px); } }
+        .float { animation: float 3s ease-in-out infinite; }
 
-        .player-avatar-visual-small::before {
-            height: 8px;
-            top: 3px;
-            left: 3px;
-            right: 3px;
-            border-radius: 5px 5px 0 0;
-        }
-
-        /* Color selector styling */
+        /* Color picker */
         .color-btn {
-            transition: all 0.15s ease;
+            width: clamp(52px, 15vw, 68px);
+            height: clamp(52px, 15vw, 68px);
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.2), 0 6px 15px rgba(0,0,0,0.15);
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
         }
-
+        .color-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,0.2); }
         .color-btn.selected {
-            transform: scale(1.15);
-            box-shadow: 0 0 0 4px #EB8225, 0 4px 15px rgba(0,0,0,0.3);
+            transform: scale(1.12);
+            border-color: #EB8225;
+            box-shadow: 0 0 0 4px #EB8225, 0 6px 20px rgba(235,130,37,0.4);
         }
 
-        /* Button 3D effect */
-        .btn-3d {
-            transition: all 0.08s ease;
+        /* Action buttons */
+        .btn {
+            border: none;
+            border-radius: 50px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
         }
+        .btn:active { transform: translateY(4px); }
+        .btn-verde { background: #73A03F; box-shadow: 0 6px 0 #5a8030; }
+        .btn-verde:active { box-shadow: 0 2px 0 #5a8030; }
+        .btn-turquesa { background: #0595AE; box-shadow: 0 6px 0 #047a91; }
+        .btn-turquesa:active { box-shadow: 0 2px 0 #047a91; }
+        .btn-morado { background: #AB3D8B; box-shadow: 0 6px 0 #8a3070; }
+        .btn-morado:active { box-shadow: 0 2px 0 #8a3070; }
 
-        .btn-3d:active, .btn-3d.pressed {
-            transform: translateY(4px);
+        /* Game controls */
+        .ctrl-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.08s, box-shadow 0.08s;
         }
+        .ctrl-btn:active, .ctrl-btn.pressed { transform: translateY(6px); }
 
-        .btn-verde {
-            box-shadow: 0 6px 0 #5a8030;
+        .jump-btn {
+            width: clamp(110px, 38vmin, 160px);
+            height: clamp(110px, 38vmin, 160px);
+            border-radius: 50%;
+            background: #73A03F;
+            box-shadow: 0 10px 0 #5a8030;
         }
-        .btn-verde:active, .btn-verde.pressed {
-            box-shadow: 0 2px 0 #5a8030;
-        }
+        .jump-btn:active, .jump-btn.pressed { box-shadow: 0 2px 0 #5a8030; }
 
-        .btn-turquesa {
-            box-shadow: 0 6px 0 #047a91;
+        .move-btn {
+            width: clamp(75px, 24vmin, 105px);
+            height: clamp(75px, 24vmin, 105px);
+            border-radius: 20px;
         }
-        .btn-turquesa:active, .btn-turquesa.pressed {
-            box-shadow: 0 2px 0 #047a91;
-        }
+        .left-btn { background: #AB3D8B; box-shadow: 0 8px 0 #8a3070; }
+        .left-btn:active, .left-btn.pressed { box-shadow: 0 2px 0 #8a3070; }
+        .right-btn { background: #0595AE; box-shadow: 0 8px 0 #047a91; }
+        .right-btn:active, .right-btn.pressed { box-shadow: 0 2px 0 #047a91; }
 
-        .btn-morado {
-            box-shadow: 0 6px 0 #8a3070;
-        }
-        .btn-morado:active, .btn-morado.pressed {
-            box-shadow: 0 2px 0 #8a3070;
-        }
+        .ctrl-icon { font-size: clamp(2.5rem, 12vmin, 4rem); color: white; line-height: 1; }
+        .ctrl-label { font-size: clamp(0.8rem, 3.5vmin, 1.1rem); font-weight: 700; color: white; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
 
-        .jump-button {
-            box-shadow: 0 8px 0 #5a8030;
-        }
-        .jump-button:active, .jump-button.pressed {
-            transform: translateY(6px);
-            box-shadow: 0 2px 0 #5a8030;
-        }
-
-        .left-button {
-            box-shadow: 0 6px 0 #8a3070;
-        }
-        .left-button:active, .left-button.pressed {
-            box-shadow: 0 2px 0 #8a3070;
-        }
-
-        .right-button {
-            box-shadow: 0 6px 0 #047a91;
-        }
-        .right-button:active, .right-button.pressed {
-            box-shadow: 0 2px 0 #047a91;
-        }
-
-        /* Shine effect on buttons */
-        .btn-shine::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 50%;
-            background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 100%);
-            border-radius: inherit;
-            pointer-events: none;
-        }
-
-        @keyframes rotate {
-            0%, 100% { transform: rotate(0deg); }
-            50% { transform: rotate(90deg); }
-        }
-
-        .rotate-anim {
-            animation: rotate 2s ease-in-out infinite;
-        }
-
-        @media (orientation: landscape) and (max-height: 450px) {
-            .control-layout {
+        /* Landscape game controls */
+        @media (orientation: landscape) {
+            .game-controls {
                 flex-direction: row !important;
                 justify-content: space-around !important;
+                gap: 4vw !important;
             }
-
-            .jump-button {
-                width: 120px !important;
-                height: 120px !important;
-            }
-
-            .control-button {
-                width: 80px !important;
-                height: 80px !important;
-            }
-
-            .movement-container {
-                gap: 25px !important;
-            }
-
-            .game-header {
-                display: none !important;
-            }
+            .jump-btn { width: clamp(90px, 22vmin, 140px); height: clamp(90px, 22vmin, 140px); }
+            .move-btn { width: clamp(70px, 18vmin, 95px); height: clamp(70px, 18vmin, 95px); }
+            .move-gap { gap: clamp(20px, 6vw, 50px) !important; }
+            .game-header { display: none !important; }
         }
+        @media (max-height: 480px) { .game-header { display: none !important; } }
+
+        /* Rotate warning */
+        @keyframes spin { 50% { transform: rotate(90deg); } }
+        .spin { animation: spin 2s ease-in-out infinite; }
+
+        /* Pulse */
+        @keyframes pulse { 50% { opacity: 0.6; } }
+        .pulse { animation: pulse 2s ease infinite; }
+
+        /* Pop in */
+        @keyframes pop { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .pop { animation: pop 0.4s ease-out; }
     </style>
 </head>
-<body class="w-screen h-screen overflow-hidden font-sans bg-white flex flex-col items-center justify-center text-steam-negro">
+<body class="bg-gray-50">
     <!-- JOIN SCREEN -->
-    <div class="screen flex flex-col items-center justify-center w-full h-full p-5 text-center gap-5" id="joinScreen">
-        <div class="flex justify-center mb-2">
-            <div class="player-avatar-visual-large bg-steam-verde"></div>
+    <div class="screen flex flex-col items-center justify-center w-full h-full p-6 text-center gap-5" id="joinScreen">
+        <div class="float">
+            <div class="avatar bg-steam-verde"></div>
         </div>
-        <h1 class="text-2xl font-bold text-steam-turquesa">STEAM Platformer</h1>
-        <p class="text-base text-steam-negro opacity-70">Fundacion STEAM RD</p>
-        <button class="bg-steam-verde text-white border-none py-4 px-10 text-xl font-bold rounded-full cursor-pointer uppercase btn-3d btn-verde" id="joinButton">Unirse!</button>
+        <div>
+            <h1 class="text-2xl sm:text-3xl font-black text-steam-turquesa">STEAM</h1>
+            <h2 class="text-xl sm:text-2xl font-bold text-steam-verde flex items-center justify-center gap-2">
+                <iconify-icon icon="mdi:gamepad-variant"></iconify-icon>
+                Platformer
+            </h2>
+        </div>
+        <p class="text-sm text-gray-500">Fundacion STEAM RD</p>
+        <button class="btn btn-verde py-4 px-10 text-lg flex items-center gap-2" id="joinBtn">
+            <iconify-icon icon="mdi:play-circle"></iconify-icon>
+            UNIRSE!
+        </button>
     </div>
 
-    <!-- AVATAR SELECT SCREEN -->
-    <div class="screen hidden flex-col items-center justify-center w-full h-full p-5 gap-4 overflow-y-auto" id="avatarSelectScreen">
-        <div class="bg-steam-naranja text-white py-2 px-4 rounded-full font-bold text-sm hidden" id="adminBadge">ADMIN</div>
-        
-        <h2 class="text-xl font-bold text-steam-turquesa text-center">Tu Personaje</h2>
-        
-        <!-- Current avatar display -->
-        <div class="flex justify-center">
-            <div class="player-avatar-visual-large" id="currentAvatarDisplay" style="background-color: #73A03F;"></div>
+    <!-- SELECT SCREEN -->
+    <div class="screen hidden flex-col items-center justify-center w-full h-full p-5 gap-4 overflow-y-auto" id="selectScreen">
+        <div class="bg-steam-naranja text-white py-2 px-5 rounded-full font-bold text-sm hidden flex items-center gap-2" id="adminBadge">
+            <iconify-icon icon="mdi:crown"></iconify-icon>
+            ADMIN
         </div>
         
-        <!-- Color selection -->
-        <div class="mt-4">
-            <h3 class="text-lg font-bold text-steam-turquesa mb-3 text-center">Elige tu Color</h3>
-            <div class="grid grid-cols-4 gap-3 max-w-xs mx-auto" id="colorGrid"></div>
+        <h2 class="text-xl font-bold text-steam-turquesa flex items-center gap-2">
+            <iconify-icon icon="mdi:account-edit"></iconify-icon>
+            Tu Personaje
+        </h2>
+        
+        <div class="float">
+            <div class="avatar" id="avatarDisplay" style="background:#73A03F"></div>
         </div>
         
-        <p class="text-steam-verde font-bold text-base mt-2">Listo para jugar</p>
-        
-        <!-- Admin start section -->
-        <div class="mt-4 hidden" id="adminStartSection">
-            <button class="bg-steam-turquesa text-white border-none py-4 px-8 text-lg font-bold rounded-full cursor-pointer uppercase btn-3d btn-turquesa" id="startGameBtn">INICIAR JUEGO!</button>
+        <div class="mt-2">
+            <p class="text-sm text-gray-500 mb-4 flex items-center justify-center gap-2">
+                <iconify-icon icon="mdi:palette"></iconify-icon>
+                Elige tu color
+            </p>
+            <div class="grid grid-cols-4 gap-4" id="colorGrid"></div>
         </div>
         
-        <!-- Waiting hint for non-admins -->
-        <div class="bg-gray-100 rounded-2xl py-4 px-5 text-center border-2 border-gray-200 mt-2" id="waitingHint">
-            <p class="text-sm text-gray-600">Esperando que el Jugador 1 inicie el juego...</p>
+        <div class="flex items-center gap-2 text-steam-verde font-bold mt-2">
+            <iconify-icon icon="mdi:check-circle" class="text-xl"></iconify-icon>
+            Listo para jugar
+        </div>
+        
+        <button class="btn btn-turquesa py-4 px-8 text-base hidden pulse mt-2 flex items-center gap-2" id="startBtn">
+            <iconify-icon icon="mdi:rocket-launch"></iconify-icon>
+            INICIAR JUEGO!
+        </button>
+        
+        <div class="bg-gray-100 rounded-2xl py-4 px-6 border-2 border-gray-200 mt-2 pulse" id="waitingHint">
+            <p class="text-sm text-gray-500 flex items-center gap-2">
+                <iconify-icon icon="mdi:timer-sand" class="animate-spin"></iconify-icon>
+                Esperando al Jugador 1...
+            </p>
         </div>
     </div>
 
     <!-- GAME CONTROLLER -->
-    <div class="screen hidden flex-col items-center justify-center w-full h-full p-4 bg-gradient-to-b from-[#1B4D3E] to-[#0D2818] gap-4" id="gameController">
-        <!-- Orientation warning -->
-        <div class="fixed top-0 left-0 w-full h-full bg-black/90 hidden flex-col items-center justify-center z-50 text-white text-center p-5" id="orientationWarning">
-            <div class="text-6xl mb-5 rotate-anim">📱</div>
-            <div class="text-2xl font-bold mb-3">Rota tu dispositivo!</div>
-            <div class="text-lg opacity-80">Coloca el telefono en posicion horizontal para jugar</div>
+    <div class="screen hidden flex-col items-center justify-center w-full h-full p-4 bg-[#1B4D3E] gap-4" id="gameScreen">
+        <!-- Rotate warning -->
+        <div class="fixed inset-0 bg-black/95 hidden flex-col items-center justify-center z-50 text-white text-center p-5" id="rotateWarning">
+            <iconify-icon icon="mdi:phone-rotate-landscape" class="text-7xl mb-5 text-steam-turquesa"></iconify-icon>
+            <div class="text-2xl font-bold mb-2">Rota tu dispositivo!</div>
+            <div class="text-lg opacity-70">Posicion horizontal para jugar</div>
         </div>
         
-        <!-- Game header -->
-        <div class="flex items-center justify-center gap-3 mb-2 game-header">
-            <div class="player-avatar-visual-small" id="gameAvatarBadge" style="background-color: #73A03F;"></div>
-            <span class="text-xl font-bold text-white" id="gamePlayerName">Verde</span>
+        <!-- Header -->
+        <div class="flex items-center gap-3 game-header">
+            <div class="avatar-sm" id="gameAvatar" style="background:#73A03F"></div>
+            <span class="text-xl font-bold text-white" id="gameName">Verde</span>
         </div>
         
         <!-- Controls -->
-        <div class="flex flex-col items-center gap-5 w-full max-w-md control-layout">
-            <div class="w-full flex justify-center">
-                <div class="jump-button w-40 h-40 rounded-full border-none bg-steam-verde flex flex-col items-center justify-center cursor-pointer relative btn-shine" id="jumpBtn">
-                    <span class="text-4xl mb-1">↑</span>
-                    <span class="text-lg text-white font-bold">SALTAR</span>
-                </div>
+        <div class="flex flex-col items-center gap-6 w-full max-w-lg game-controls">
+            <div class="ctrl-btn jump-btn" id="jumpBtn">
+                <iconify-icon icon="mdi:arrow-up-bold" class="ctrl-icon"></iconify-icon>
+                <span class="ctrl-label">SALTAR</span>
             </div>
             
-            <div class="flex gap-12 items-center justify-center w-full movement-container">
-                <div class="control-button left-button w-24 h-24 rounded-2xl border-none bg-steam-morado flex flex-col items-center justify-center cursor-pointer relative btn-shine" id="leftBtn">
-                    <span class="text-3xl text-white">◀</span>
-                    <span class="text-sm text-white font-bold mt-1">IZQ</span>
+            <div class="flex items-center justify-center gap-10 move-gap">
+                <div class="ctrl-btn move-btn left-btn" id="leftBtn">
+                    <iconify-icon icon="mdi:arrow-left-bold" class="ctrl-icon"></iconify-icon>
+                    <span class="ctrl-label">IZQ</span>
                 </div>
-                <div class="control-button right-button w-24 h-24 rounded-2xl border-none bg-steam-turquesa flex flex-col items-center justify-center cursor-pointer relative btn-shine" id="rightBtn">
-                    <span class="text-3xl text-white">▶</span>
-                    <span class="text-sm text-white font-bold mt-1">DER</span>
+                <div class="ctrl-btn move-btn right-btn" id="rightBtn">
+                    <iconify-icon icon="mdi:arrow-right-bold" class="ctrl-icon"></iconify-icon>
+                    <span class="ctrl-label">DER</span>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- RESULTS SCREEN -->
-    <div class="screen hidden flex-col items-center justify-center w-full h-full p-5 text-center gap-5" id="resultsScreen">
-        <h2 class="text-2xl font-bold text-steam-turquesa">Carrera Terminada!</h2>
-        <div class="text-5xl" id="finalRank">1ro</div>
-        <div class="flex justify-center">
-            <div class="player-avatar-visual-large" id="resultAvatarDisplay" style="background-color: #73A03F;"></div>
+    <div class="screen hidden flex-col items-center justify-center w-full h-full p-5 text-center gap-4 bg-gray-50" id="resultsScreen">
+        <h2 class="text-2xl font-bold text-steam-turquesa flex items-center gap-2">
+            <iconify-icon icon="mdi:flag-checkered"></iconify-icon>
+            Fin de Carrera!
+        </h2>
+        
+        <div class="text-5xl font-black pop" id="rankDisplay" style="color:#EB8225">1ro</div>
+        
+        <div class="avatar" id="resultAvatar" style="background:#73A03F"></div>
+        
+        <p class="text-xl font-bold text-steam-turquesa" id="resultMsg">Felicidades!</p>
+        
+        <div class="bg-steam-verde/10 border-2 border-steam-verde rounded-2xl py-3 px-6 flex items-center gap-2">
+            <iconify-icon icon="mdi:star" class="text-steam-verde text-xl"></iconify-icon>
+            <span class="text-2xl font-black text-steam-verde" id="resultScore">0 pts</span>
         </div>
-        <p class="text-xl font-bold text-steam-turquesa" id="finalMessage">Felicidades!</p>
-        <div class="text-2xl font-bold text-steam-verde" id="finalScore">0 puntos</div>
-        <button class="bg-steam-morado text-white border-none py-4 px-8 text-lg font-bold rounded-full cursor-pointer uppercase btn-3d btn-morado hidden" id="playAgainBtn">JUGAR DE NUEVO</button>
-        <p class="text-sm text-gray-600" id="waitingNext">Esperando al Jugador 1...</p>
+        
+        <button class="btn btn-morado py-4 px-8 text-base hidden flex items-center gap-2" id="againBtn">
+            <iconify-icon icon="mdi:replay"></iconify-icon>
+            JUGAR DE NUEVO
+        </button>
+        <p class="text-sm text-gray-500 pulse flex items-center gap-2" id="waitingResult">
+            <iconify-icon icon="mdi:timer-sand"></iconify-icon>
+            Esperando al Jugador 1...
+        </p>
     </div>
 
     <script>
         const airconsole = new AirConsole();
         
-        let playerInfo = {
-            playerNum: null,
-            color: '#73A03F',
-            colorName: 'Verde',
-            isAdmin: false
-        };
-        
-        const availableColors = [
-            { color: '#73A03F', name: 'Verde' },
-            { color: '#AB3D8B', name: 'Morado' },
-            { color: '#0595AE', name: 'Turquesa' },
-            { color: '#EB8225', name: 'Naranja' }
+        const COLORS = [
+            { hex: '#73A03F', name: 'Verde' },
+            { hex: '#AB3D8B', name: 'Morado' },
+            { hex: '#0595AE', name: 'Turquesa' },
+            { hex: '#EB8225', name: 'Naranja' }
         ];
         
-        let isLeftPressed = false;
-        let isRightPressed = false;
-        let isJumpPressed = false;
+        let player = { num: null, color: '#73A03F', name: 'Verde', isAdmin: false };
+        let keys = { left: false, right: false, jump: false };
         
-        let lastMoveTime = 0;
-        const MOVE_THROTTLE = 16;
-        
-        function sendMessage(msg) {
-            airconsole.message(AirConsole.SCREEN, msg);
-        }
-        
-        function sendThrottledMove(direction) {
-            const now = performance.now();
-            if (now - lastMoveTime >= MOVE_THROTTLE) {
-                lastMoveTime = now;
-                sendMessage({ action: 'move', direction: direction });
-            }
-        }
+        const $ = (id) => document.getElementById(id);
+        const send = (msg) => airconsole.message(AirConsole.SCREEN, msg);
 
         function init() {
-            airconsole.onReady = function() {
-                console.log('Controller ready');
-            };
-
-            airconsole.onMessage = function(from, data) {
-                console.log("Received:", data);
-                
-                if (data.action === 'joined') {
-                    handleJoined(data);
-                } else if (data.type === 'gameState') {
-                    // Update state
-                } else if (data.type === 'gameStart') {
-                    showScreen('gameController');
-                    setupControls();
-                    requestOrientationLock();
-                } else if (data.type === 'gameRestart') {
-                    unlockOrientation();
-                    showScreen('avatarSelect');
-                } else if (data.type === 'gameResults') {
-                    showResults(data.results, data.winner);
-                } else if (data.action === 'colorUpdated') {
-                    playerInfo.color = data.color;
-                    playerInfo.colorName = data.colorName;
-                    updateColorDisplays();
+            airconsole.onReady = () => console.log('Controller ready');
+            
+            airconsole.onMessage = (from, data) => {
+                switch(data.action || data.type) {
+                    case 'joined':
+                        player = { num: data.playerNum, color: data.color, name: data.colorName, isAdmin: data.isAdmin };
+                        setupSelect();
+                        showScreen('select');
+                        break;
+                    case 'colorUpdated':
+                        player.color = data.color;
+                        player.name = data.colorName;
+                        updateAvatars();
+                        break;
+                    case 'gameStart':
+                        showScreen('game');
+                        setupControls();
+                        lockLandscape();
+                        break;
+                    case 'gameRestart':
+                        unlock();
+                        showScreen('select');
+                        break;
+                    case 'gameResults':
+                        showResults(data.results, data.winner);
+                        break;
                 }
             };
 
-            document.getElementById('joinButton').addEventListener('click', joinGame);
-            document.getElementById('startGameBtn').addEventListener('click', startGame);
-            document.getElementById('playAgainBtn').addEventListener('click', playAgain);
+            $('joinBtn').onclick = () => {
+                send({ action: 'join' });
+                $('joinBtn').disabled = true;
+                $('joinBtn').textContent = 'Conectando...';
+            };
+            
+            $('startBtn').onclick = () => send({ action: 'startGame' });
+            $('againBtn').onclick = () => send({ action: 'playAgain' });
         }
 
-        function joinGame() {
-            airconsole.message(AirConsole.SCREEN, { 
-                action: 'join'
-            });
+        function setupSelect() {
+            updateAvatars();
             
-            document.getElementById('joinButton').disabled = true;
-            document.getElementById('joinButton').textContent = 'Conectando...';
-        }
-
-        function handleJoined(data) {
-            playerInfo.playerNum = data.playerNum;
-            playerInfo.color = data.color;
-            playerInfo.colorName = data.colorName;
-            playerInfo.isAdmin = data.isAdmin;
+            // Play join animation
+            const avatar = $('avatarDisplay');
+            avatar.classList.add('jump', 'blink');
+            setTimeout(() => avatar.classList.remove('blink'), 600);
+            setTimeout(() => avatar.classList.remove('jump'), 500);
             
-            setupAvatarScreen();
-            showScreen('avatarSelect');
-        }
-
-        function setupAvatarScreen() {
-            updateColorDisplays();
+            $('adminBadge').classList.toggle('hidden', !player.isAdmin);
+            $('startBtn').classList.toggle('hidden', !player.isAdmin);
+            $('waitingHint').classList.toggle('hidden', player.isAdmin);
             
-            document.getElementById('adminBadge').classList.toggle('hidden', !playerInfo.isAdmin);
-            document.getElementById('adminStartSection').classList.toggle('hidden', !playerInfo.isAdmin);
-            document.getElementById('waitingHint').classList.toggle('hidden', playerInfo.isAdmin);
+            const grid = $('colorGrid');
+            grid.innerHTML = '';
             
-            const colorGrid = document.getElementById('colorGrid');
-            colorGrid.innerHTML = '';
-            
-            availableColors.forEach((colorData) => {
-                const btn = document.createElement('div');
-                btn.className = `color-btn w-14 h-14 rounded-full border-4 border-white cursor-pointer shadow-lg ${colorData.color === playerInfo.color ? 'selected' : ''}`;
-                btn.style.backgroundColor = colorData.color;
-                btn.dataset.color = colorData.color;
-                btn.dataset.colorName = colorData.name;
-                
-                const nameSpan = document.createElement('span');
-                nameSpan.className = 'absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-steam-negro whitespace-nowrap font-bold';
-                nameSpan.textContent = colorData.name;
-                
+            COLORS.forEach(c => {
                 const wrapper = document.createElement('div');
-                wrapper.className = 'relative pb-6';
-                wrapper.appendChild(btn);
-                wrapper.appendChild(nameSpan);
+                wrapper.className = 'flex flex-col items-center gap-2';
                 
-                btn.addEventListener('click', () => selectColor(colorData.color, colorData.name));
-                colorGrid.appendChild(wrapper);
+                const btn = document.createElement('div');
+                btn.className = `color-btn ${c.hex === player.color ? 'selected' : ''}`;
+                btn.style.background = c.hex;
+                btn.onclick = () => selectColor(c.hex, c.name);
+                
+                const label = document.createElement('span');
+                label.className = 'text-xs font-bold text-gray-600';
+                label.textContent = c.name;
+                
+                wrapper.appendChild(btn);
+                wrapper.appendChild(label);
+                grid.appendChild(wrapper);
             });
         }
 
-        function updateColorDisplays() {
-            document.getElementById('currentAvatarDisplay').style.backgroundColor = playerInfo.color;
-            document.getElementById('gameAvatarBadge').style.backgroundColor = playerInfo.color;
-            document.getElementById('gamePlayerName').textContent = playerInfo.colorName;
-            document.getElementById('resultAvatarDisplay').style.backgroundColor = playerInfo.color;
+        function updateAvatars() {
+            $('avatarDisplay').style.background = player.color;
+            $('gameAvatar').style.background = player.color;
+            $('gameName').textContent = player.name;
+            $('resultAvatar').style.background = player.color;
         }
 
-        function selectColor(color, colorName) {
-            playerInfo.color = color;
-            playerInfo.colorName = colorName;
-            
-            updateColorDisplays();
+        function selectColor(hex, name) {
+            player.color = hex;
+            player.name = name;
+            updateAvatars();
             
             document.querySelectorAll('.color-btn').forEach(btn => {
-                btn.classList.toggle('selected', btn.dataset.color === color);
+                btn.classList.toggle('selected', btn.style.background === hex);
             });
             
-            airconsole.message(AirConsole.SCREEN, {
-                action: 'selectColor',
-                color: color,
-                colorName: colorName
-            });
+            // Trigger jump + blink animation
+            const avatar = $('avatarDisplay');
+            avatar.classList.remove('jump', 'blink');
+            void avatar.offsetWidth; // Force reflow
+            avatar.classList.add('jump', 'blink');
+            setTimeout(() => avatar.classList.remove('blink'), 600);
+            setTimeout(() => avatar.classList.remove('jump'), 500);
             
-            if (navigator.vibrate) navigator.vibrate(30);
-        }
-
-        function startGame() {
-            airconsole.message(AirConsole.SCREEN, { action: 'startGame' });
+            send({ action: 'selectColor', color: hex, colorName: name });
+            if (navigator.vibrate) navigator.vibrate(25);
         }
 
         function setupControls() {
-            const leftBtn = document.getElementById('leftBtn');
-            const rightBtn = document.getElementById('rightBtn');
-            const jumpBtn = document.getElementById('jumpBtn');
-
-            setupTouchControl(leftBtn, 'left');
-            setupTouchControl(rightBtn, 'right');
-            setupTouchControl(jumpBtn, 'jump');
-
-            setupMouseControl(leftBtn, 'left');
-            setupMouseControl(rightBtn, 'right');
-            setupMouseControl(jumpBtn, 'jump');
+            const btns = [
+                [$('leftBtn'), 'left'],
+                [$('rightBtn'), 'right'],
+                [$('jumpBtn'), 'jump']
+            ];
+            
+            btns.forEach(([el, action]) => {
+                ['touchstart', 'touchend', 'touchcancel'].forEach(evt => {
+                    el.addEventListener(evt, (e) => {
+                        e.preventDefault();
+                        handleInput(action, evt === 'touchstart', el);
+                    }, { passive: false });
+                });
+                
+                el.addEventListener('mousedown', () => handleInput(action, true, el));
+                el.addEventListener('mouseup', () => handleInput(action, false, el));
+                el.addEventListener('mouseleave', () => handleInput(action, false, el));
+            });
         }
 
-        function requestOrientationLock() {
-            if (screen.orientation && screen.orientation.lock) {
-                screen.orientation.lock('landscape').catch(err => {
-                    console.log('No se pudo bloquear la orientacion:', err);
-                    checkOrientation();
-                });
-            } else if (screen.lockOrientation) {
-                try {
-                    screen.lockOrientation('landscape');
-                } catch (err) {
-                    console.log('No se pudo bloquear la orientacion:', err);
-                    checkOrientation();
+        function handleInput(action, pressed, el) {
+            el.classList.toggle('pressed', pressed);
+            if (pressed && navigator.vibrate) navigator.vibrate(15);
+            
+            if (action === 'jump') {
+                if (pressed && !keys.jump) {
+                    keys.jump = true;
+                    send({ action: 'jump', pressed: true });
+                } else if (!pressed && keys.jump) {
+                    keys.jump = false;
+                    send({ action: 'jump', pressed: false });
                 }
-            } else if (screen.mozLockOrientation) {
-                try {
-                    screen.mozLockOrientation('landscape');
-                } catch (err) {
-                    console.log('No se pudo bloquear la orientacion:', err);
-                    checkOrientation();
+            } else {
+                if (pressed) {
+                    keys[action] = true;
+                    keys[action === 'left' ? 'right' : 'left'] = false;
+                    send({ action: 'move', direction: action });
+                } else if (keys[action]) {
+                    keys[action] = false;
+                    const other = action === 'left' ? 'right' : 'left';
+                    send(keys[other] ? { action: 'move', direction: other } : { action: 'stop' });
                 }
-            } else if (screen.msLockOrientation) {
-                try {
-                    screen.msLockOrientation('landscape');
-                } catch (err) {
-                    console.log('No se pudo bloquear la orientacion:', err);
-                    checkOrientation();
-                }
+            }
+        }
+
+        function lockLandscape() {
+            if (screen.orientation?.lock) {
+                screen.orientation.lock('landscape').catch(() => checkOrientation());
             } else {
                 checkOrientation();
             }
-
-            const orientationCheck = setInterval(() => {
-                if (!document.getElementById('gameController').classList.contains('hidden')) {
-                    checkOrientation();
+            
+            window.addEventListener('resize', checkOrientation);
+            window.addEventListener('orientationchange', checkOrientation);
+            
+            const check = setInterval(() => {
+                if ($('gameScreen').classList.contains('hidden')) {
+                    clearInterval(check);
+                    unlock();
                 } else {
-                    clearInterval(orientationCheck);
-                    unlockOrientation();
+                    checkOrientation();
                 }
             }, 500);
-
-            window.addEventListener('orientationchange', checkOrientation);
-            window.addEventListener('resize', checkOrientation);
         }
 
         function checkOrientation() {
-            const warning = document.getElementById('orientationWarning');
-            const isPortrait = window.innerHeight > window.innerWidth;
+            const warning = $('rotateWarning');
+            const portrait = window.innerHeight > window.innerWidth;
+            const inGame = !$('gameScreen').classList.contains('hidden');
             
-            if (isPortrait && !document.getElementById('gameController').classList.contains('hidden')) {
+            if (portrait && inGame) {
                 warning.classList.remove('hidden');
                 warning.classList.add('flex');
             } else {
@@ -508,148 +531,52 @@
             }
         }
 
-        function unlockOrientation() {
-            if (screen.orientation && screen.orientation.unlock) {
-                screen.orientation.unlock();
-            } else if (screen.unlockOrientation) {
-                screen.unlockOrientation();
-            } else if (screen.mozUnlockOrientation) {
-                screen.mozUnlockOrientation();
-            } else if (screen.msUnlockOrientation) {
-                screen.msUnlockOrientation();
-            }
-        }
-
-        function setupTouchControl(element, action) {
-            element.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                handleActionStart(action, element);
-            }, { passive: false });
-
-            element.addEventListener('touchend', (e) => {
-                e.preventDefault();
-                handleActionEnd(action, element);
-            }, { passive: false });
-
-            element.addEventListener('touchcancel', (e) => {
-                e.preventDefault();
-                handleActionEnd(action, element);
-            }, { passive: false });
-        }
-
-        function setupMouseControl(element, action) {
-            element.addEventListener('mousedown', () => handleActionStart(action, element));
-            element.addEventListener('mouseup', () => handleActionEnd(action, element));
-            element.addEventListener('mouseleave', () => handleActionEnd(action, element));
-        }
-
-        function handleActionStart(action, element) {
-            element.classList.add('pressed');
-            if (navigator.vibrate) navigator.vibrate(15);
-            
-            switch(action) {
-                case 'left':
-                    if (!isLeftPressed) {
-                        isLeftPressed = true;
-                        isRightPressed = false;
-                        sendMessage({ action: 'move', direction: 'left' });
-                    }
-                    break;
-                case 'right':
-                    if (!isRightPressed) {
-                        isRightPressed = true;
-                        isLeftPressed = false;
-                        sendMessage({ action: 'move', direction: 'right' });
-                    }
-                    break;
-                case 'jump':
-                    if (!isJumpPressed) {
-                        isJumpPressed = true;
-                        sendMessage({ action: 'jump', pressed: true });
-                    }
-                    break;
-            }
-        }
-
-        function handleActionEnd(action, element) {
-            element.classList.remove('pressed');
-            
-            switch(action) {
-                case 'left':
-                    if (isLeftPressed) {
-                        isLeftPressed = false;
-                        if (isRightPressed) {
-                            sendMessage({ action: 'move', direction: 'right' });
-                        } else {
-                            sendMessage({ action: 'stop' });
-                        }
-                    }
-                    break;
-                case 'right':
-                    if (isRightPressed) {
-                        isRightPressed = false;
-                        if (isLeftPressed) {
-                            sendMessage({ action: 'move', direction: 'left' });
-                        } else {
-                            sendMessage({ action: 'stop' });
-                        }
-                    }
-                    break;
-                case 'jump':
-                    if (isJumpPressed) {
-                        isJumpPressed = false;
-                        sendMessage({ action: 'jump', pressed: false });
-                    }
-                    break;
-            }
+        function unlock() {
+            screen.orientation?.unlock?.();
         }
 
         function showResults(results, winner) {
-            unlockOrientation();
+            unlock();
             showScreen('results');
             
-            const myResult = results.find(r => r.playerNum == playerInfo.playerNum);
-            const myRank = myResult ? results.indexOf(myResult) + 1 : results.length;
+            const me = results.find(r => r.num == player.num);
+            const rank = me ? results.indexOf(me) + 1 : results.length;
             
             const medals = ['1ro', '2do', '3ro'];
-            document.getElementById('finalRank').textContent = medals[myRank - 1] || `#${myRank}`;
+            const colors = ['#EB8225', '#0595AE', '#AB3D8B'];
             
-            if (winner && winner.playerNum == playerInfo.playerNum) {
-                document.getElementById('finalMessage').textContent = 'GANASTE!';
-                if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 100]);
-            } else if (winner) {
-                document.getElementById('finalMessage').textContent = `Gano ${winner.name}`;
+            $('rankDisplay').textContent = medals[rank - 1] || `#${rank}`;
+            $('rankDisplay').style.color = colors[rank - 1] || '#73A03F';
+            
+            if (winner?.num == player.num) {
+                $('resultMsg').textContent = 'GANASTE!';
+                $('resultMsg').style.color = '#EB8225';
+                if (navigator.vibrate) navigator.vibrate([80, 40, 80, 40, 80]);
+            } else {
+                $('resultMsg').textContent = winner ? `Gano ${winner.name}` : 'Buen juego!';
+                $('resultMsg').style.color = '#0595AE';
             }
             
-            document.getElementById('finalScore').textContent = `${myResult?.score || 0} puntos`;
-            
-            document.getElementById('playAgainBtn').classList.toggle('hidden', !playerInfo.isAdmin);
-            document.getElementById('waitingNext').classList.toggle('hidden', playerInfo.isAdmin);
+            $('resultScore').textContent = `${me?.score || 0} pts`;
+            $('againBtn').classList.toggle('hidden', !player.isAdmin);
+            $('waitingResult').classList.toggle('hidden', player.isAdmin);
         }
 
-        function playAgain() {
-            airconsole.message(AirConsole.SCREEN, { action: 'playAgain' });
-        }
-
-        function showScreen(screen) {
-            document.querySelectorAll('.screen').forEach(s => {
-                s.classList.add('hidden');
-                s.classList.remove('flex');
+        function showScreen(name) {
+            ['join', 'select', 'game', 'results'].forEach(s => {
+                const el = $(s + 'Screen');
+                el.classList.toggle('hidden', s !== name);
+                el.classList.toggle('flex', s === name);
             });
-            const targetScreen = document.getElementById(screen + 'Screen');
-            targetScreen.classList.remove('hidden');
-            targetScreen.classList.add('flex');
             
-            if (screen !== 'gameController') {
-                isLeftPressed = false;
-                isRightPressed = false;
-                isJumpPressed = false;
+            if (name !== 'game') {
+                keys = { left: false, right: false, jump: false };
             }
         }
 
-        document.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
-        document.addEventListener('gesturestart', (e) => e.preventDefault());
-
+        document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+        document.addEventListener('gesturestart', e => e.preventDefault());
+        
         window.onload = init;
     </script>
 </body>

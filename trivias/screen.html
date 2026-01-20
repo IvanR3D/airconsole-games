@@ -31,6 +31,12 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
         body {
             transition: background 0.5s ease;
         }
@@ -121,11 +127,11 @@
             animation: confettiFall 3s ease-out forwards;
         }
 
-        /* Player avatar visual */
+        /* Player avatar visual - responsive */
         .player-avatar-visual {
-            width: 45px;
-            height: 45px;
-            border-radius: 10px;
+            width: clamp(35px, 5vw, 50px);
+            height: clamp(35px, 5vw, 50px);
+            border-radius: clamp(7px, 1vw, 11px);
             position: relative;
             box-shadow: 0 3px 10px rgba(0,0,0,0.2);
         }
@@ -136,19 +142,19 @@
             top: 3px;
             left: 3px;
             right: 3px;
-            height: 9px;
+            height: clamp(7px, 1vw, 11px);
             background: rgba(255,255,255,0.35);
             border-radius: 6px 6px 0 0;
         }
 
         .player-avatar-visual-large {
-            width: 60px;
-            height: 60px;
-            border-radius: 12px;
+            width: clamp(45px, 7vw, 70px);
+            height: clamp(45px, 7vw, 70px);
+            border-radius: clamp(9px, 1.5vw, 14px);
         }
 
         .player-avatar-visual-large::before {
-            height: 12px;
+            height: clamp(9px, 1.5vw, 14px);
             top: 4px;
             left: 4px;
             right: 4px;
@@ -156,94 +162,103 @@
         }
 
         .player-avatar-visual-small {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
+            width: clamp(24px, 3vw, 36px);
+            height: clamp(24px, 3vw, 36px);
+            border-radius: clamp(5px, 0.8vw, 8px);
         }
 
         .player-avatar-visual-small::before {
-            height: 6px;
+            height: clamp(5px, 0.8vw, 8px);
             top: 2px;
             left: 2px;
             right: 2px;
             border-radius: 4px 4px 0 0;
+        }
+
+        /* Responsive text */
+        .responsive-title {
+            font-size: clamp(1.5rem, 5vw, 3.5rem);
+        }
+
+        .responsive-question {
+            font-size: clamp(1rem, 3vw, 2.2rem);
         }
     </style>
 </head>
 <body class="cat-default font-sans text-steam-negro overflow-hidden">
     <div class="w-screen h-screen flex flex-col relative">
         <!-- WAITING SCREEN -->
-        <div class="screen waiting-screen active flex-col items-center justify-center p-10" id="waitingScreen">
-            <div class="mb-8">
-                <h1 class="text-5xl font-black logo-gradient drop-shadow">STEAM TRIVIA</h1>
+        <div class="screen waiting-screen active flex-col items-center justify-center p-4 sm:p-6 lg:p-10" id="waitingScreen">
+            <div class="mb-4 sm:mb-8">
+                <h1 class="responsive-title font-black logo-gradient drop-shadow">STEAM TRIVIA</h1>
             </div>
-            <h2 class="text-2xl mb-4 text-steam-turquesa font-bold">Esperando Jugadores!</h2>
-            <p class="text-lg text-steam-negro/70 mb-8">Escanea el codigo QR con tu telefono para unirte</p>
-            <div class="flex flex-wrap gap-5 justify-center mb-8 max-w-3xl" id="playersGrid"></div>
-            <div class="bg-orange-50 border-2 border-steam-naranja rounded-2xl py-4 px-6 mt-5 text-center hidden" id="adminHint">
-                <p class="text-steam-naranja font-bold">El Jugador 1 controla el juego desde su telefono</p>
+            <h2 class="text-lg sm:text-xl lg:text-2xl mb-2 sm:mb-4 text-steam-turquesa font-bold">Esperando Jugadores!</h2>
+            <p class="text-sm sm:text-base lg:text-lg text-steam-negro/70 mb-4 sm:mb-8">Escanea el codigo QR con tu telefono para unirte</p>
+            <div class="flex flex-wrap gap-2 sm:gap-4 lg:gap-5 justify-center mb-4 sm:mb-8 max-w-xs sm:max-w-2xl lg:max-w-3xl" id="playersGrid"></div>
+            <div class="bg-orange-50 border-2 border-steam-naranja rounded-xl sm:rounded-2xl py-2 sm:py-4 px-4 sm:px-6 mt-2 sm:mt-5 text-center hidden" id="adminHint">
+                <p class="text-steam-naranja font-bold text-xs sm:text-sm lg:text-base">El Jugador 1 controla el juego desde su telefono</p>
             </div>
         </div>
 
         <!-- CATEGORY SCREEN -->
-        <div class="screen flex-col p-8 overflow-y-auto" id="categoryScreen">
-            <h2 class="text-2xl text-steam-turquesa mb-8 text-center font-bold">Jugador 1: Selecciona una Categoria</h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mb-8" id="categoryGrid"></div>
-            <div class="bg-orange-50 border-2 border-steam-naranja rounded-2xl py-4 px-6 text-center max-w-md mx-auto">
-                <p class="text-steam-naranja font-bold">Esperando que el Jugador 1 seleccione categoria e inicie...</p>
+        <div class="screen flex-col p-4 sm:p-6 lg:p-8 overflow-y-auto" id="categoryScreen">
+            <h2 class="text-lg sm:text-xl lg:text-2xl text-steam-turquesa mb-4 sm:mb-6 lg:mb-8 text-center font-bold">Jugador 1: Selecciona una Categoria</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4 max-w-xs sm:max-w-2xl lg:max-w-4xl mx-auto mb-4 sm:mb-6 lg:mb-8" id="categoryGrid"></div>
+            <div class="bg-orange-50 border-2 border-steam-naranja rounded-xl sm:rounded-2xl py-2 sm:py-4 px-4 sm:px-6 text-center max-w-xs sm:max-w-md mx-auto">
+                <p class="text-steam-naranja font-bold text-xs sm:text-sm lg:text-base">Esperando que el Jugador 1 seleccione categoria e inicie...</p>
             </div>
         </div>
 
         <!-- PLAYING SCREEN -->
         <div class="screen flex-col h-full" id="playingScreen">
             <!-- Header -->
-            <div class="flex justify-between items-center p-5">
+            <div class="flex justify-between items-center p-2 sm:p-4 lg:p-5">
                 <div class="flex-1 flex justify-center items-center">
-                    <div class="w-3/5 h-8 bg-black/10 rounded-full overflow-visible relative border-[3px] border-steam-turquesa">
+                    <div class="w-2/5 sm:w-1/2 lg:w-3/5 h-5 sm:h-6 lg:h-8 bg-black/10 rounded-full overflow-visible relative border-2 sm:border-[3px] border-steam-turquesa">
                         <div class="h-full bg-gradient-to-r from-steam-verde via-steam-naranja to-steam-morado rounded-full transition-all duration-100 relative" id="timerBarFill" style="width: 100%;">
-                            <div class="absolute -right-4 top-1/2 -translate-y-1/2 w-0 h-0 border-l-[20px] border-l-steam-morado border-y-[15px] border-y-transparent"></div>
+                            <div class="absolute -right-3 sm:-right-4 top-1/2 -translate-y-1/2 w-0 h-0 border-l-[12px] sm:border-l-[16px] lg:border-l-[20px] border-l-steam-morado border-y-[9px] sm:border-y-[12px] lg:border-y-[15px] border-y-transparent"></div>
                         </div>
                     </div>
                 </div>
-                <div class="w-20 h-20 bg-steam-turquesa rounded-full flex items-center justify-center text-4xl font-bold text-white shadow-lg border-4 border-white transition-all" id="timerCircle">20</div>
+                <div class="w-12 sm:w-16 lg:w-20 h-12 sm:h-16 lg:h-20 bg-steam-turquesa rounded-full flex items-center justify-center text-xl sm:text-3xl lg:text-4xl font-bold text-white shadow-lg border-2 sm:border-4 border-white transition-all ml-2 sm:ml-4" id="timerCircle">20</div>
             </div>
 
             <!-- Content -->
-            <div class="flex-1 flex flex-col px-10 pb-8">
+            <div class="flex-1 flex flex-col px-3 sm:px-6 lg:px-10 pb-2 sm:pb-4 lg:pb-8">
                 <div class="flex-1 flex flex-col items-center justify-center">
-                    <div class="text-lg text-steam-turquesa mb-4 font-bold" id="questionNumber">Pregunta 1 de 5</div>
-                    <h2 class="text-3xl text-center max-w-4xl leading-tight mb-10" id="questionText">Cual es la capital de Francia?</h2>
-                    <div class="grid grid-cols-2 gap-4 max-w-4xl w-full" id="optionsGrid"></div>
+                    <div class="text-sm sm:text-base lg:text-lg text-steam-turquesa mb-2 sm:mb-3 lg:mb-4 font-bold" id="questionNumber">Pregunta 1 de 5</div>
+                    <h2 class="responsive-question text-center max-w-xs sm:max-w-2xl lg:max-w-4xl leading-tight mb-4 sm:mb-6 lg:mb-10" id="questionText">Cual es la capital de Francia?</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 lg:gap-4 max-w-xs sm:max-w-2xl lg:max-w-4xl w-full" id="optionsGrid"></div>
                 </div>
             </div>
 
             <!-- Footer -->
-            <div class="flex items-center p-4 gap-5 bg-white/90 border-t-2 border-gray-200">
-                <div class="w-28 h-20 bg-gradient-to-br from-steam-turquesa to-steam-morado rounded-xl flex items-center justify-center">
-                    <span class="text-xl font-bold text-white">STEAM</span>
+            <div class="flex items-center p-2 sm:p-3 lg:p-4 gap-2 sm:gap-4 lg:gap-5 bg-white/90 border-t-2 border-gray-200">
+                <div class="w-16 sm:w-20 lg:w-28 h-10 sm:h-14 lg:h-20 bg-gradient-to-br from-steam-turquesa to-steam-morado rounded-lg sm:rounded-xl flex items-center justify-center">
+                    <span class="text-sm sm:text-lg lg:text-xl font-bold text-white">STEAM</span>
                 </div>
-                <div class="flex gap-3 flex-1 flex-wrap" id="playersStatus"></div>
+                <div class="flex gap-1 sm:gap-2 lg:gap-3 flex-1 flex-wrap" id="playersStatus"></div>
             </div>
 
             <!-- Scoreboard -->
-            <div class="absolute top-28 right-5 bg-white rounded-2xl p-4 min-w-[180px] border-2 border-gray-200 shadow-lg" id="scoreboard">
-                <div class="text-lg text-steam-turquesa mb-3 text-center font-bold">Puntuacion</div>
-                <div class="flex flex-col gap-2" id="scoreboardList"></div>
+            <div class="absolute top-16 sm:top-24 lg:top-28 right-2 sm:right-4 lg:right-5 bg-white rounded-lg sm:rounded-xl lg:rounded-2xl p-2 sm:p-3 lg:p-4 min-w-[120px] sm:min-w-[150px] lg:min-w-[180px] border-2 border-gray-200 shadow-lg hidden sm:block" id="scoreboard">
+                <div class="text-sm sm:text-base lg:text-lg text-steam-turquesa mb-2 sm:mb-3 text-center font-bold">Puntuacion</div>
+                <div class="flex flex-col gap-1 sm:gap-2" id="scoreboardList"></div>
             </div>
         </div>
 
         <!-- END SCREEN -->
-        <div class="screen flex-col items-center justify-center p-10" id="endScreen">
-            <h2 class="text-3xl text-steam-turquesa mb-8 font-bold">Juego Terminado!</h2>
-            <div class="winner-bounce text-center mb-8" id="winnerSection"></div>
-            <div class="flex flex-col gap-3 max-w-lg w-full mb-8" id="podium"></div>
-            <div class="bg-orange-50 border-2 border-steam-naranja rounded-2xl py-5 px-8 text-center animate-pulse">
-                <p class="text-steam-naranja text-lg font-bold">Esperando que el Jugador 1 decida...</p>
+        <div class="screen flex-col items-center justify-center p-4 sm:p-6 lg:p-10 overflow-y-auto" id="endScreen">
+            <h2 class="text-xl sm:text-2xl lg:text-3xl text-steam-turquesa mb-4 sm:mb-6 lg:mb-8 font-bold">Juego Terminado!</h2>
+            <div class="winner-bounce text-center mb-4 sm:mb-6 lg:mb-8" id="winnerSection"></div>
+            <div class="flex flex-col gap-2 sm:gap-3 max-w-xs sm:max-w-md lg:max-w-lg w-full mb-4 sm:mb-6 lg:mb-8" id="podium"></div>
+            <div class="bg-orange-50 border-2 border-steam-naranja rounded-xl sm:rounded-2xl py-3 sm:py-4 lg:py-5 px-4 sm:px-6 lg:px-8 text-center animate-pulse">
+                <p class="text-steam-naranja text-sm sm:text-base lg:text-lg font-bold">Esperando que el Jugador 1 decida...</p>
             </div>
         </div>
 
         <!-- Sound toggle -->
-        <div class="absolute bottom-5 right-5 text-3xl cursor-pointer opacity-70 hover:opacity-100 transition-opacity z-50" id="soundToggle">🔊</div>
+        <div class="absolute bottom-3 sm:bottom-5 right-3 sm:right-5 text-2xl sm:text-3xl cursor-pointer opacity-70 hover:opacity-100 transition-opacity z-50" id="soundToggle">🔊</div>
         
         <!-- Confetti container -->
         <div class="fixed top-0 left-0 w-full h-full pointer-events-none z-[1000] overflow-hidden" id="confettiContainer"></div>
@@ -279,12 +294,12 @@
             mathematics: [
                 { question: "Cuanto es 2 + 2 × 3?", options: ["12", "8", "10", "6"], correct: 1 },
                 { question: "Cual es la raiz cuadrada de 144?", options: ["10", "11", "12", "13"], correct: 2 },
-                { question: "Cuantos grados tiene un triangulo?", options: ["180°", "360°", "90°", "270°"], correct: 0 },
-                { question: "Cual es el numero π (pi) aproximadamente?", options: ["2.14", "3.14", "4.14", "5.14"], correct: 1 },
+                { question: "Cuantos grados tiene un triangulo?", options: ["180", "360", "90", "270"], correct: 0 },
+                { question: "Cual es el numero pi aproximadamente?", options: ["2.14", "3.14", "4.14", "5.14"], correct: 1 },
                 { question: "Cuantos lados tiene un hexagono?", options: ["4", "5", "6", "7"], correct: 2 }
             ],
             robotics: [
-                { question: "Que significa 'AI' en robotica?", options: ["Automated Intelligence", "Artificial Intelligence", "Advanced Integration", "Automatic Interface"], correct: 1 },
+                { question: "Que significa AI en robotica?", options: ["Automated Intelligence", "Artificial Intelligence", "Advanced Integration", "Automatic Interface"], correct: 1 },
                 { question: "Que sensor se usa para detectar obstaculos?", options: ["GPS", "Ultrasonido", "Bluetooth", "WiFi"], correct: 1 },
                 { question: "Que lenguaje se usa comunmente en Arduino?", options: ["Python", "Java", "C/C++", "JavaScript"], correct: 2 },
                 { question: "Que es un actuador en robotica?", options: ["Sensor", "Motor", "Bateria", "Procesador"], correct: 1 },
@@ -298,15 +313,15 @@
                 { question: "Cual es la formula quimica del agua?", options: ["H2", "O2", "H2O", "HO"], correct: 2 }
             ],
             technology: [
-                { question: "Que significa 'www' en una direccion web?", options: ["World Wide Web", "World Web Way", "Wide World Web", "Web World Wide"], correct: 0 },
+                { question: "Que significa www en una direccion web?", options: ["World Wide Web", "World Web Way", "Wide World Web", "Web World Wide"], correct: 0 },
                 { question: "Que compañia creo Android?", options: ["Apple", "Microsoft", "Google", "Samsung"], correct: 2 },
-                { question: "Que significa 'CPU'?", options: ["Central Processing Unit", "Computer Power Unit", "Control Processing Unit", "Central Power Unit"], correct: 0 },
-                { question: "Que significa 'HTML'?", options: ["HyperText Markup Language", "High Tech Machine Learning", "Home Tool Management List", "Hyper Transfer Media Link"], correct: 0 },
+                { question: "Que significa CPU?", options: ["Central Processing Unit", "Computer Power Unit", "Control Processing Unit", "Central Power Unit"], correct: 0 },
+                { question: "Que significa HTML?", options: ["HyperText Markup Language", "High Tech Machine Learning", "Home Tool Management List", "Hyper Transfer Media Link"], correct: 0 },
                 { question: "Que compañia creo Windows?", options: ["Apple", "Google", "Microsoft", "IBM"], correct: 2 }
             ],
             history: [
                 { question: "En que año cayo el Imperio Romano de Occidente?", options: ["410", "476", "500", "600"], correct: 1 },
-                { question: "Quien fue el primer presidente de EE.UU.?", options: ["Jefferson", "Lincoln", "Washington", "Adams"], correct: 2 },
+                { question: "Quien fue el primer presidente de EEUU?", options: ["Jefferson", "Lincoln", "Washington", "Adams"], correct: 2 },
                 { question: "Que civilizacion construyo las piramides de Giza?", options: ["Griega", "Egipcia", "Romana", "Maya"], correct: 1 },
                 { question: "En que año termino la Segunda Guerra Mundial?", options: ["1943", "1944", "1945", "1946"], correct: 2 },
                 { question: "En que año llego Colon a America?", options: ["1492", "1500", "1510", "1520"], correct: 0 }
@@ -547,11 +562,11 @@
             grid.innerHTML = '';
             Object.entries(categories).forEach(([key, category]) => {
                 const card = document.createElement('div');
-                card.className = 'category-card bg-white border-[3px] border-gray-200 rounded-2xl p-5 text-center cursor-pointer transition-all shadow-md hover:border-steam-turquesa hover:-translate-y-1 hover:shadow-lg';
+                card.className = 'category-card bg-white border-2 sm:border-[3px] border-gray-200 rounded-lg sm:rounded-xl lg:rounded-2xl p-2 sm:p-3 lg:p-5 text-center cursor-pointer transition-all shadow-md hover:border-steam-turquesa hover:-translate-y-1 hover:shadow-lg';
                 card.dataset.category = key;
                 card.innerHTML = `
-                    <div class="text-4xl mb-3">${category.emoji}</div>
-                    <div class="text-lg font-bold">${category.name}</div>
+                    <div class="text-2xl sm:text-3xl lg:text-4xl mb-1 sm:mb-2 lg:mb-3">${category.emoji}</div>
+                    <div class="text-xs sm:text-sm lg:text-lg font-bold">${category.name}</div>
                 `;
                 grid.appendChild(card);
             });
@@ -575,12 +590,12 @@
                     bgClass = 'bg-orange-50';
                 }
                 
-                card.className = `${bgClass} border-[3px] ${borderClass} rounded-2xl py-4 px-6 flex items-center gap-3 shadow-lg transition-all`;
+                card.className = `${bgClass} border-2 sm:border-[3px] ${borderClass} rounded-lg sm:rounded-xl lg:rounded-2xl py-2 sm:py-3 lg:py-4 px-3 sm:px-4 lg:px-6 flex items-center gap-2 sm:gap-3 shadow-lg transition-all`;
                 card.innerHTML = `
                     <div class="player-avatar-visual" style="background-color: ${player.color};"></div>
                     <div>
-                        <div class="text-lg font-bold">${player.name}</div>
-                        <div class="text-sm ${player.disconnected ? 'text-steam-morado' : 'text-steam-verde'}">
+                        <div class="text-sm sm:text-base lg:text-lg font-bold">${player.name}</div>
+                        <div class="text-xs sm:text-sm ${player.disconnected ? 'text-steam-morado' : 'text-steam-verde'}">
                             ${player.disconnected ? 'Desconectado' : (player.isAdmin ? 'Admin' : 'Conectado')}
                         </div>
                     </div>
@@ -618,11 +633,11 @@
                 }
                 
                 const card = document.createElement('div');
-                card.className = `flex items-center gap-2 ${bgClass} py-2 px-4 rounded-xl border-2 ${borderClass} transition-all`;
+                card.className = `flex items-center gap-1 sm:gap-2 ${bgClass} py-1 sm:py-2 px-2 sm:px-3 lg:px-4 rounded-lg sm:rounded-xl border-2 ${borderClass} transition-all`;
                 card.innerHTML = `
                     <div class="player-avatar-visual-small" style="background-color: ${player.color};"></div>
-                    <span class="font-bold text-sm">${player.name}</span>
-                    ${player.disconnected ? '<span class="text-steam-morado">X</span>' : (hasAnswered ? '<span class="text-steam-verde">✓</span>' : '<span class="text-gray-400">...</span>')}
+                    <span class="font-bold text-xs sm:text-sm">${player.name}</span>
+                    ${player.disconnected ? '<span class="text-steam-morado text-xs">X</span>' : (hasAnswered ? '<span class="text-steam-verde text-xs">✓</span>' : '<span class="text-gray-400 text-xs">...</span>')}
                 `;
                 fragment.appendChild(card);
             });
@@ -684,11 +699,11 @@
             const fragment = document.createDocumentFragment();
             question.options.forEach((option, index) => {
                 const card = document.createElement('div');
-                card.className = 'option-card flex items-center bg-white rounded-xl overflow-hidden border-[3px] border-gray-200 shadow-md transition-all';
+                card.className = 'option-card flex items-center bg-white rounded-lg sm:rounded-xl overflow-hidden border-2 sm:border-[3px] border-gray-200 shadow-md transition-all';
                 card.dataset.index = index;
                 card.innerHTML = `
-                    <div class="w-[70px] h-[70px] flex items-center justify-center text-3xl font-bold text-white flex-shrink-0 ${colors[index]}">${letters[index]}</div>
-                    <div class="flex-1 p-4 text-lg font-medium">${option}</div>
+                    <div class="w-10 sm:w-14 lg:w-[70px] h-10 sm:h-14 lg:h-[70px] flex items-center justify-center text-lg sm:text-2xl lg:text-3xl font-bold text-white flex-shrink-0 ${colors[index]}">${letters[index]}</div>
+                    <div class="flex-1 p-2 sm:p-3 lg:p-4 text-sm sm:text-base lg:text-lg font-medium">${option}</div>
                 `;
                 fragment.appendChild(card);
             });
@@ -823,11 +838,11 @@
             
             sortedPlayers.forEach((player, index) => {
                 const item = document.createElement('div');
-                item.className = `flex justify-between items-center p-2 rounded-lg text-sm ${index === 0 ? 'bg-orange-50 border-2 border-steam-naranja' : 'bg-gray-100'}`;
+                item.className = `flex justify-between items-center p-1 sm:p-2 rounded-lg text-xs sm:text-sm ${index === 0 ? 'bg-orange-50 border-2 border-steam-naranja' : 'bg-gray-100'}`;
                 item.innerHTML = `
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-1 sm:gap-2">
                         <div class="player-avatar-visual-small" style="background-color: ${player.color};"></div>
-                        <span>${player.name}</span>
+                        <span class="truncate max-w-[60px] sm:max-w-none">${player.name}</span>
                     </div>
                     <span class="font-bold">${player.score}</span>
                 `;
@@ -849,12 +864,12 @@
             if (sortedPlayers.length > 0) {
                 const winner = sortedPlayers[0];
                 winnerSection.innerHTML = `
-                    <div class="text-6xl mb-4">1er Lugar</div>
-                    <div class="flex justify-center mb-4">
+                    <div class="text-3xl sm:text-5xl lg:text-6xl mb-2 sm:mb-4">1er Lugar</div>
+                    <div class="flex justify-center mb-2 sm:mb-4">
                         <div class="player-avatar-visual-large" style="background-color: ${winner.color};"></div>
                     </div>
-                    <div class="text-3xl font-bold text-steam-naranja">${winner.name}</div>
-                    <div class="text-xl text-steam-verde mt-2">${winner.score} puntos</div>
+                    <div class="text-xl sm:text-2xl lg:text-3xl font-bold text-steam-naranja">${winner.name}</div>
+                    <div class="text-base sm:text-lg lg:text-xl text-steam-verde mt-1 sm:mt-2">${winner.score} puntos</div>
                 `;
                 
                 playSound('victory');
@@ -869,14 +884,14 @@
             
             sortedPlayers.forEach((player, index) => {
                 const item = document.createElement('div');
-                item.className = `flex items-center justify-between p-4 rounded-2xl border-[3px] shadow-md ${podiumBg[index] || 'bg-white border-gray-200'}`;
+                item.className = `flex items-center justify-between p-2 sm:p-3 lg:p-4 rounded-lg sm:rounded-xl lg:rounded-2xl border-2 sm:border-[3px] shadow-md ${podiumBg[index] || 'bg-white border-gray-200'}`;
                 item.innerHTML = `
-                    <div class="flex items-center gap-4">
-                        <span class="text-2xl font-bold">${medals[index] || `#${index + 1}`}</span>
+                    <div class="flex items-center gap-2 sm:gap-3 lg:gap-4">
+                        <span class="text-lg sm:text-xl lg:text-2xl font-bold">${medals[index] || `#${index + 1}`}</span>
                         <div class="player-avatar-visual" style="background-color: ${player.color};"></div>
-                        <span class="text-lg font-bold">${player.name}</span>
+                        <span class="text-sm sm:text-base lg:text-lg font-bold">${player.name}</span>
                     </div>
-                    <span class="text-xl font-bold text-steam-turquesa">${player.score} pts</span>
+                    <span class="text-base sm:text-lg lg:text-xl font-bold text-steam-turquesa">${player.score} pts</span>
                 `;
                 podium.appendChild(item);
             });

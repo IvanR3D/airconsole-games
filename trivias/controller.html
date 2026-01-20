@@ -32,6 +32,12 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
         body {
             touch-action: manipulation;
         }
@@ -47,11 +53,11 @@
             opacity: 1;
         }
 
-        /* Player avatar visual */
+        /* Player avatar visual - responsive */
         .player-avatar-visual {
-            width: 70px;
-            height: 70px;
-            border-radius: 14px;
+            width: clamp(50px, 15vw, 70px);
+            height: clamp(50px, 15vw, 70px);
+            border-radius: clamp(10px, 3vw, 14px);
             position: relative;
             box-shadow: 0 4px 15px rgba(0,0,0,0.25);
         }
@@ -62,19 +68,19 @@
             top: 5px;
             left: 5px;
             right: 5px;
-            height: 14px;
+            height: clamp(10px, 3vw, 14px);
             background: rgba(255,255,255,0.35);
             border-radius: 9px 9px 0 0;
         }
 
         .player-avatar-visual-small {
-            width: 38px;
-            height: 38px;
-            border-radius: 8px;
+            width: clamp(28px, 8vw, 40px);
+            height: clamp(28px, 8vw, 40px);
+            border-radius: clamp(6px, 1.5vw, 9px);
         }
 
         .player-avatar-visual-small::before {
-            height: 8px;
+            height: clamp(6px, 1.5vw, 9px);
             top: 3px;
             left: 3px;
             right: 3px;
@@ -151,89 +157,102 @@
         }
 
         .pop-in { animation: popIn 0.25s ease; }
+
+        /* Answer grid responsive */
+        .answer-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: clamp(8px, 2vw, 12px);
+            flex: 1;
+            max-height: clamp(200px, 50vh, 400px);
+        }
+
+        .answer-btn {
+            font-size: clamp(1.5rem, 8vw, 2.5rem);
+        }
     </style>
 </head>
 <body class="w-screen h-screen overflow-hidden font-sans bg-white text-steam-negro">
     <div class="w-full h-full flex flex-col">
         <!-- JOIN SCREEN -->
-        <div class="screen active flex-col items-center justify-center p-8 text-center gap-6" id="joinScreen">
+        <div class="screen active flex-col items-center justify-center p-4 sm:p-8 text-center gap-4 sm:gap-6" id="joinScreen">
             <div class="flex justify-center mb-2">
                 <div class="player-avatar-visual bg-steam-turquesa"></div>
             </div>
-            <h1 class="text-2xl font-bold text-steam-turquesa">STEAM Trivia</h1>
-            <p class="text-base text-steam-negro/70">Fundacion STEAM RD</p>
-            <button class="bg-steam-verde text-white border-none py-4 px-10 text-xl font-bold rounded-full cursor-pointer uppercase btn-3d btn-verde" id="joinButton">Unirse!</button>
+            <h1 class="text-xl sm:text-2xl font-bold text-steam-turquesa">STEAM Trivia</h1>
+            <p class="text-sm sm:text-base text-steam-negro/70">Fundacion STEAM RD</p>
+            <button class="bg-steam-verde text-white border-none py-3 sm:py-4 px-8 sm:px-10 text-lg sm:text-xl font-bold rounded-full cursor-pointer uppercase btn-3d btn-verde" id="joinButton">Unirse!</button>
         </div>
 
         <!-- WAITING SCREEN (Non-admin) -->
-        <div class="screen flex-col items-center justify-center p-6 text-center" id="waitingScreen">
-            <div class="mb-6">
-                <div class="player-avatar-visual mx-auto mb-4" id="playerAvatar"></div>
-                <div class="text-xl font-bold" id="playerNameDisplay"></div>
+        <div class="screen flex-col items-center justify-center p-4 sm:p-6 text-center" id="waitingScreen">
+            <div class="mb-4 sm:mb-6">
+                <div class="player-avatar-visual mx-auto mb-3 sm:mb-4" id="playerAvatar"></div>
+                <div class="text-lg sm:text-xl font-bold" id="playerNameDisplay"></div>
             </div>
-            <div class="text-4xl mb-4 bounce-anim">...</div>
-            <p class="text-lg text-steam-turquesa font-bold mb-4">Esperando que inicie el juego...</p>
+            <div class="text-3xl sm:text-4xl mb-3 sm:mb-4 bounce-anim">...</div>
+            <p class="text-base sm:text-lg text-steam-turquesa font-bold mb-3 sm:mb-4">Esperando que inicie el juego...</p>
             <div class="text-center" id="nonAdminWaiting">
-                <p class="text-sm text-gray-600 mb-4">El Jugador 1 esta seleccionando la categoria</p>
-                <div class="bg-gray-100 rounded-2xl p-5 border-2 border-gray-200 hidden" id="selectedCategoryDisplay">
-                    <div class="text-5xl mb-3" id="selectedCategoryEmoji">🌍</div>
-                    <div class="text-xl font-bold text-steam-turquesa" id="selectedCategoryName">General</div>
+                <p class="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">El Jugador 1 esta seleccionando la categoria</p>
+                <div class="bg-gray-100 rounded-xl sm:rounded-2xl p-4 sm:p-5 border-2 border-gray-200 hidden" id="selectedCategoryDisplay">
+                    <div class="text-4xl sm:text-5xl mb-2 sm:mb-3" id="selectedCategoryEmoji">🌍</div>
+                    <div class="text-lg sm:text-xl font-bold text-steam-turquesa" id="selectedCategoryName">General</div>
                 </div>
             </div>
         </div>
 
         <!-- ADMIN CATEGORY SELECT SCREEN -->
-        <div class="screen flex-col p-5 overflow-y-auto" id="categorySelectScreen">
-            <div class="text-center mb-4">
-                <div class="player-avatar-visual mx-auto mb-3" id="adminAvatar"></div>
-                <div class="text-lg font-bold" id="adminNameDisplay"></div>
-                <div class="bg-steam-naranja text-white py-1 px-4 rounded-full font-bold text-sm inline-block mt-2">ADMIN</div>
+        <div class="screen flex-col p-3 sm:p-5 overflow-y-auto" id="categorySelectScreen">
+            <div class="text-center mb-3 sm:mb-4">
+                <div class="player-avatar-visual mx-auto mb-2 sm:mb-3" id="adminAvatar"></div>
+                <div class="text-base sm:text-lg font-bold" id="adminNameDisplay"></div>
+                <div class="bg-steam-naranja text-white py-1 px-3 sm:px-4 rounded-full font-bold text-xs sm:text-sm inline-block mt-2">ADMIN</div>
             </div>
-            <h2 class="text-xl font-bold text-steam-turquesa mb-4 text-center">Selecciona una Categoria</h2>
-            <div class="grid grid-cols-2 gap-3 mb-5" id="categoryGrid"></div>
-            <button class="bg-steam-turquesa text-white border-none py-4 px-8 text-lg font-bold rounded-full cursor-pointer uppercase btn-3d btn-turquesa w-full" id="startGameBtn">INICIAR JUEGO!</button>
+            <h2 class="text-lg sm:text-xl font-bold text-steam-turquesa mb-3 sm:mb-4 text-center">Selecciona una Categoria</h2>
+            <div class="grid grid-cols-2 gap-2 sm:gap-3 mb-4 sm:mb-5" id="categoryGrid"></div>
+            <button class="bg-steam-turquesa text-white border-none py-3 sm:py-4 px-6 sm:px-8 text-base sm:text-lg font-bold rounded-full cursor-pointer uppercase btn-3d btn-turquesa w-full" id="startGameBtn">INICIAR JUEGO!</button>
         </div>
 
         <!-- PLAYING SCREEN -->
-        <div class="screen flex-col p-4 h-full" id="playingScreen">
-            <div class="text-center mb-4">
-                <div class="text-base text-steam-turquesa font-bold mb-2" id="questionIndicator">Pregunta 1 de 5</div>
-                <p class="text-lg">Selecciona tu respuesta:</p>
+        <div class="screen flex-col p-3 sm:p-4 h-full" id="playingScreen">
+            <div class="text-center mb-2 sm:mb-4">
+                <div class="text-sm sm:text-base text-steam-turquesa font-bold mb-1 sm:mb-2" id="questionIndicator">Pregunta 1 de 5</div>
+                <p class="text-base sm:text-lg">Selecciona tu respuesta:</p>
             </div>
 
-            <div class="grid grid-cols-2 gap-3 flex-1 max-h-[350px]" id="answerGrid">
-                <button class="answer-btn bg-steam-verde border-none rounded-2xl text-4xl font-bold text-white cursor-pointer relative btn-3d btn-verde" data-option="0">A</button>
-                <button class="answer-btn bg-steam-morado border-none rounded-2xl text-4xl font-bold text-white cursor-pointer relative btn-3d btn-morado" data-option="1">B</button>
-                <button class="answer-btn bg-steam-turquesa border-none rounded-2xl text-4xl font-bold text-white cursor-pointer relative btn-3d btn-turquesa" data-option="2">C</button>
-                <button class="answer-btn bg-steam-naranja border-none rounded-2xl text-4xl font-bold text-white cursor-pointer relative btn-3d btn-naranja" data-option="3">D</button>
+            <div class="answer-grid" id="answerGrid">
+                <button class="answer-btn bg-steam-verde border-none rounded-xl sm:rounded-2xl font-bold text-white cursor-pointer relative btn-3d btn-verde" data-option="0">A</button>
+                <button class="answer-btn bg-steam-morado border-none rounded-xl sm:rounded-2xl font-bold text-white cursor-pointer relative btn-3d btn-morado" data-option="1">B</button>
+                <button class="answer-btn bg-steam-turquesa border-none rounded-xl sm:rounded-2xl font-bold text-white cursor-pointer relative btn-3d btn-turquesa" data-option="2">C</button>
+                <button class="answer-btn bg-steam-naranja border-none rounded-xl sm:rounded-2xl font-bold text-white cursor-pointer relative btn-3d btn-naranja" data-option="3">D</button>
             </div>
 
-            <div class="flex items-center justify-between bg-gray-100 p-3 rounded-xl mt-4 border-2 border-gray-200">
+            <div class="flex items-center justify-between bg-gray-100 p-2 sm:p-3 rounded-lg sm:rounded-xl mt-3 sm:mt-4 border-2 border-gray-200">
                 <div class="player-avatar-visual-small" id="miniAvatar"></div>
-                <div class="flex-1 ml-3">
-                    <div class="font-bold text-sm" id="miniName"></div>
-                    <div class="text-xs text-gray-500" id="miniRank">Rank 1</div>
+                <div class="flex-1 ml-2 sm:ml-3">
+                    <div class="font-bold text-xs sm:text-sm" id="miniName"></div>
+                    <div class="text-[10px] sm:text-xs text-gray-500" id="miniRank">Rank 1</div>
                 </div>
-                <div class="bg-steam-naranja text-white py-2 px-3 rounded-xl font-bold text-lg" id="miniScore">0</div>
+                <div class="bg-steam-naranja text-white py-1 sm:py-2 px-2 sm:px-3 rounded-lg sm:rounded-xl font-bold text-sm sm:text-lg" id="miniScore">0</div>
             </div>
         </div>
 
         <!-- END SCREEN -->
-        <div class="screen flex-col items-center justify-center p-6 text-center gap-4" id="endScreen">
-            <div class="text-5xl" id="finalRank">1ro</div>
+        <div class="screen flex-col items-center justify-center p-4 sm:p-6 text-center gap-3 sm:gap-4" id="endScreen">
+            <div class="text-4xl sm:text-5xl" id="finalRank">1ro</div>
             <div class="player-avatar-visual mx-auto" id="resultAvatar"></div>
-            <p class="text-xl font-bold text-steam-turquesa" id="finalMessage">Felicidades!</p>
-            <div class="text-2xl font-bold text-steam-verde" id="finalScore">0 puntos</div>
-            <button class="bg-steam-morado text-white border-none py-4 px-8 text-lg font-bold rounded-full cursor-pointer uppercase btn-3d btn-morado hidden" id="playAgainBtn">JUGAR DE NUEVO</button>
-            <p class="text-sm text-gray-600" id="waitingNextText">Esperando al Jugador 1...</p>
+            <p class="text-lg sm:text-xl font-bold text-steam-turquesa" id="finalMessage">Felicidades!</p>
+            <div class="text-xl sm:text-2xl font-bold text-steam-verde" id="finalScore">0 puntos</div>
+            <button class="bg-steam-morado text-white border-none py-3 sm:py-4 px-6 sm:px-8 text-base sm:text-lg font-bold rounded-full cursor-pointer uppercase btn-3d btn-morado hidden" id="playAgainBtn">JUGAR DE NUEVO</button>
+            <p class="text-xs sm:text-sm text-gray-600" id="waitingNextText">Esperando al Jugador 1...</p>
         </div>
 
         <!-- RESULT OVERLAY -->
         <div class="fixed top-0 left-0 w-full h-full bg-white/95 hidden items-center justify-center z-50" id="resultOverlay">
             <div class="text-center pop-in" id="resultContent">
-                <div class="text-6xl mb-4 result-icon">✓</div>
-                <div class="text-2xl font-bold mb-2 result-text">Correcto!</div>
-                <div class="text-xl result-points">+500 pts</div>
+                <div class="text-5xl sm:text-6xl mb-3 sm:mb-4 result-icon">✓</div>
+                <div class="text-xl sm:text-2xl font-bold mb-2 result-text">Correcto!</div>
+                <div class="text-lg sm:text-xl result-points">+500 pts</div>
             </div>
         </div>
     </div>
@@ -343,11 +362,11 @@
             
             Object.entries(categories).forEach(([key, cat]) => {
                 const btn = document.createElement('div');
-                btn.className = `category-btn bg-white border-[3px] ${key === selectedCategory ? 'border-steam-verde bg-green-50' : 'border-gray-200'} rounded-xl p-4 text-center cursor-pointer transition-all shadow-md active:scale-95`;
+                btn.className = `category-btn bg-white border-[3px] ${key === selectedCategory ? 'border-steam-verde bg-green-50' : 'border-gray-200'} rounded-lg sm:rounded-xl p-3 sm:p-4 text-center cursor-pointer transition-all shadow-md active:scale-95`;
                 btn.dataset.category = key;
                 btn.innerHTML = `
-                    <div class="text-3xl mb-2">${cat.emoji}</div>
-                    <div class="text-sm font-bold">${cat.name}</div>
+                    <div class="text-2xl sm:text-3xl mb-1 sm:mb-2">${cat.emoji}</div>
+                    <div class="text-xs sm:text-sm font-bold">${cat.name}</div>
                 `;
                 btn.addEventListener('click', () => selectCategory(key));
                 grid.appendChild(btn);
@@ -525,18 +544,18 @@
             
             if (correct) {
                 content.innerHTML = `
-                    <div class="text-6xl mb-4 text-steam-verde">✓</div>
-                    <div class="text-2xl font-bold mb-2 text-steam-verde">Correcto!</div>
-                    <div class="text-xl text-steam-naranja">+${points} pts</div>
+                    <div class="text-5xl sm:text-6xl mb-3 sm:mb-4 text-steam-verde">✓</div>
+                    <div class="text-xl sm:text-2xl font-bold mb-2 text-steam-verde">Correcto!</div>
+                    <div class="text-lg sm:text-xl text-steam-naranja">+${points} pts</div>
                 `;
                 myScore += points;
                 if (domCache.miniScore) domCache.miniScore.textContent = myScore;
                 if (navigator.vibrate) navigator.vibrate([40, 20, 40]);
             } else {
                 content.innerHTML = `
-                    <div class="text-6xl mb-4 text-steam-morado">✗</div>
-                    <div class="text-2xl font-bold mb-2 text-steam-morado">Incorrecto</div>
-                    <div class="text-xl text-gray-500">0 pts</div>
+                    <div class="text-5xl sm:text-6xl mb-3 sm:mb-4 text-steam-morado">✗</div>
+                    <div class="text-xl sm:text-2xl font-bold mb-2 text-steam-morado">Incorrecto</div>
+                    <div class="text-lg sm:text-xl text-gray-500">0 pts</div>
                 `;
                 if (navigator.vibrate) navigator.vibrate(150);
             }
