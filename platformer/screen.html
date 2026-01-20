@@ -691,6 +691,7 @@
 
         airconsole.onReady = () => {
             console.log("Screen ready");
+            airconsole.setActivePlayers(4);
             setupLevelSelector();
             setupResultsButtons();
         };
@@ -705,7 +706,50 @@
                 returnToLevelSelect();
             });
         }
-        airconsole.onConnect = (id) => console.log("Connected:", id);
+        airconsole.onConnect = (id) => {
+            console.log("🔌 Device connected:", id);
+            
+            // Check if this device is an active player
+            const playerNumber = airconsole.convertDeviceIdToPlayerNumber(id);
+            
+            if (playerNumber !== undefined && playerNumber >= 0 && playerNumber < 4) {
+                const playerSlot = playerNumber + 1;
+                console.log(`✅ Device ${id} is active player ${playerSlot} (player number: ${playerNumber})`);
+                
+                // Check if this player was previously connected but disconnected
+                if (state.players[playerSlot]) {
+                    const existingPlayer = state.players[playerSlot];
+                    
+                    // Player is reconnecting
+                    if (existingPlayer.disconnected) {
+                        console.log(`🔄 Player ${playerSlot} (${existingPlayer.name}) is reconnecting!`);
+                        
+                        // Reactivate the player
+                        existingPlayer.disconnected = false;
+                        existingPlayer.deviceId = id; // Update device ID in case it changed
+                        
+                        // Notify the controller of their restored state
+                        airconsole.message(id, {
+                            action: 'reconnected',
+                            playerNum: playerSlot,
+                            color: existingPlayer.color,
+                            colorName: existingPlayer.name,
+                            isAdmin: existingPlayer.isAdmin
+                        });
+                        
+                        console.log(`✨ Player ${playerSlot} reactivated successfully`);
+                        updateSlots();
+                        airconsole.broadcast({ type: 'gameState', players: state.players });
+                    } else {
+                        console.log(`ℹ️ Player ${playerSlot} already connected (deviceId: ${existingPlayer.deviceId})`);
+                    }
+                } else {
+                    console.log(`📝 New player slot ${playerSlot} available for device ${id}`);
+                }
+            } else {
+                console.log(`⚠️ Device ${id} is not an active player (playerNumber: ${playerNumber})`);
+            }
+        };
         
         function setupLevelSelector() {
             updateLevelButtons();
@@ -757,42 +801,65 @@
         }
         
         airconsole.onDisconnect = (id) => {
-            for (let n in state.players) {
-                if (state.players[n].deviceId === id) {
-                    state.players[n].disconnected = true;
+            console.log("🔌 Device disconnected:", id);
+            
+            // Use player number instead of searching by deviceId
+            const playerNumber = airconsole.convertDeviceIdToPlayerNumber(id);
+            
+            if (playerNumber !== undefined && playerNumber >= 0 && playerNumber < 4) {
+                const playerSlot = playerNumber + 1;
+                
+                if (state.players[playerSlot]) {
+                    const player = state.players[playerSlot];
+                    console.log(`⚠️ Player ${playerSlot} (${player.name}) disconnected - marking as disconnected`);
+                    
+                    player.disconnected = true;
                     updateSlots();
-                    break;
+                    
+                    // Broadcast the disconnection to other players
+                    airconsole.broadcast({ 
+                        type: 'playerDisconnected', 
+                        playerNum: playerSlot,
+                        playerName: player.name
+                    });
+                    
+                    console.log(`📊 Active players: ${Object.values(state.players).filter(p => !p.disconnected).length}/${Object.keys(state.players).length}`);
+                } else {
+                    console.log(`ℹ️ Disconnected device ${id} (player ${playerSlot}) was not in active players`);
                 }
+            } else {
+                console.log(`ℹ️ Disconnected device ${id} was not an active player (playerNumber: ${playerNumber})`);
             }
         };
 
         airconsole.onMessage = (id, data) => {
             if (data.action === 'join') {
-                for (let i = 0; i < 4; i++) {
-                    if (!state.players[i+1]) {
-                        const isAdmin = !state.admin;
-                        if (isAdmin) state.admin = id;
-                        
-                        state.players[i+1] = {
-                            deviceId: id,
-                            name: NAMES[i],
-                            color: COLORS[i],
-                            isAdmin,
-                            disconnected: false
-                        };
-                        
-                        airconsole.message(id, {
-                            action: 'joined',
-                            playerNum: i + 1,
-                            color: COLORS[i],
-                            colorName: NAMES[i],
-                            isAdmin
-                        });
-                        
-                        updateSlots();
-                        airconsole.broadcast({ type: 'gameState', players: state.players });
-                        break;
-                    }
+                const playerNumber = airconsole.convertDeviceIdToPlayerNumber(id);
+                
+                if (playerNumber !== undefined && playerNumber >= 0 && playerNumber < 4) {
+                    const playerSlot = playerNumber + 1;
+                    const isAdmin = !state.admin;
+                    if (isAdmin) state.admin = playerSlot;
+                    
+                    state.players[playerSlot] = {
+                        deviceId: id,
+                        playerNumber: playerNumber,
+                        name: NAMES[playerNumber],
+                        color: COLORS[playerNumber],
+                        isAdmin,
+                        disconnected: false
+                    };
+                    
+                    airconsole.message(id, {
+                        action: 'joined',
+                        playerNum: playerSlot,
+                        color: COLORS[playerNumber],
+                        colorName: NAMES[playerNumber],
+                        isAdmin
+                    });
+                    
+                    updateSlots();
+                    airconsole.broadcast({ type: 'gameState', players: state.players });
                 }
             } else if (data.action === 'selectColor') {
                 for (let n in state.players) {
@@ -804,17 +871,37 @@
                         break;
                     }
                 }
-            } else if (data.action === 'startGame' && id === state.admin) {
-                startGame();
-            } else if (data.action === 'playAgain' && id === state.admin) {
-                restart();
-            } else if (data.action === 'nextLevel' && id === state.admin) {
-                goToNextLevel();
-            } else if (data.action === 'goToLevelSelect' && id === state.admin) {
-                returnToLevelSelect();
+            } else if (data.action === 'startGame') {
+                const playerNumber = airconsole.convertDeviceIdToPlayerNumber(id);
+                const playerSlot = playerNumber !== undefined ? playerNumber + 1 : null;
+                if (playerSlot === state.admin) {
+                    startGame();
+                }
+            } else if (data.action === 'playAgain') {
+                const playerNumber = airconsole.convertDeviceIdToPlayerNumber(id);
+                const playerSlot = playerNumber !== undefined ? playerNumber + 1 : null;
+                if (playerSlot === state.admin) {
+                    restart();
+                }
+            } else if (data.action === 'nextLevel') {
+                const playerNumber = airconsole.convertDeviceIdToPlayerNumber(id);
+                const playerSlot = playerNumber !== undefined ? playerNumber + 1 : null;
+                if (playerSlot === state.admin) {
+                    goToNextLevel();
+                }
+            } else if (data.action === 'goToLevelSelect') {
+                const playerNumber = airconsole.convertDeviceIdToPlayerNumber(id);
+                const playerSlot = playerNumber !== undefined ? playerNumber + 1 : null;
+                if (playerSlot === state.admin) {
+                    returnToLevelSelect();
+                }
             } else {
-                for (let n in state.players) {
-                    if (state.players[n].deviceId === id && state.games[n] && state.started) {
+                const playerNumber = airconsole.convertDeviceIdToPlayerNumber(id);
+                
+                if (playerNumber !== undefined && playerNumber >= 0) {
+                    const n = playerNumber + 1;
+                    
+                    if (state.games[n] && state.started) {
                         const g = state.games[n];
                         if (data.action === 'move') {
                             g.keys.left = data.direction === 'left';
@@ -824,7 +911,6 @@
                         } else if (data.action === 'jump') {
                             g.keys.jump = data.pressed;
                         }
-                        break;
                     }
                 }
             }
