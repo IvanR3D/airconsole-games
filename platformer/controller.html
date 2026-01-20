@@ -4,7 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>STEAM Platformer - Control</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script type="text/javascript" src="https://www.airconsole.com/api/airconsole-1.8.0.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        steam: {
+                            turquesa: '#0595AE',
+                            morado: '#AB3D8B',
+                            naranja: '#EB8225',
+                            verde: '#73A03F',
+                            negro: '#010101',
+                            blanco: '#FFFFFF'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         * {
             margin: 0;
@@ -15,290 +34,132 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        :root {
-            --steam-turquesa: #0595AE;
-            --steam-morado: #AB3D8B;
-            --steam-naranja: #EB8225;
-            --steam-verde: #73A03F;
-            --steam-negro: #010101;
-            --steam-blanco: #FFFFFF;
-        }
-
         body {
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
-            font-family: 'Segoe UI', 'Arial', sans-serif;
-            background: var(--steam-blanco);
             touch-action: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: var(--steam-negro);
         }
 
-        .screen {
-            display: none;
-            width: 100%;
-            height: 100%;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .screen.active {
-            display: flex;
-        }
-
-        /* JOIN SCREEN */
-        .join-screen {
-            text-align: center;
-            gap: 20px;
-        }
-
-        .join-logo {
-            font-size: 3em;
-            margin-bottom: 10px;
-        }
-
-        .join-title {
-            font-size: 1.6em;
-            color: var(--steam-turquesa);
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        .join-subtitle {
-            font-size: 1em;
-            color: var(--steam-negro);
-            opacity: 0.7;
-            margin-bottom: 15px;
-        }
-
-        .join-button {
-            background: var(--steam-verde);
-            color: white;
-            border: none;
-            padding: 16px 40px;
-            font-size: 1.3em;
-            font-weight: bold;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 6px 0 #5a8030;
-            transition: all 0.1s ease;
-            text-transform: uppercase;
-        }
-
-        .join-button:active {
-            transform: translateY(4px);
-            box-shadow: 0 2px 0 #5a8030;
-        }
-
-        .join-button:disabled {
-            background: #ccc;
-            box-shadow: 0 4px 0 #999;
-        }
-
-        /* AVATAR SELECT SCREEN */
-        .avatar-select-screen {
-            gap: 15px;
-        }
-
-        .avatar-title {
-            font-size: 1.4em;
-            color: var(--steam-turquesa);
-            margin-bottom: 10px;
-            text-align: center;
-            font-weight: bold;
-        }
-
-        .current-avatar {
-            font-size: 4em;
-            margin-bottom: 10px;
-        }
-
-        .player-color-display {
+        /* Player avatar visual representation */
+        .player-avatar-visual {
             width: 60px;
             height: 60px;
-            border-radius: 50%;
-            border: 4px solid white;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-        }
-
-        .avatar-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            max-width: 300px;
-            margin-bottom: 15px;
-        }
-
-        .avatar-btn {
-            width: 60px;
-            height: 60px;
-            font-size: 2em;
-            background: white;
-            border: 3px solid #E0E0E0;
             border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.15s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-        }
-
-        .avatar-btn.selected {
-            border-color: var(--steam-verde);
-            background: #F5FAF0;
-        }
-
-        .avatar-btn:active {
-            transform: scale(0.95);
-        }
-
-        .color-section {
-            margin-top: 15px;
-            margin-bottom: 15px;
-        }
-
-        .color-title {
-            font-size: 1.2em;
-            color: var(--steam-turquesa);
-            margin-bottom: 10px;
-            text-align: center;
-            font-weight: bold;
-        }
-
-        .color-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            max-width: 300px;
-            margin: 0 auto;
-        }
-
-        .color-btn {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            border: 4px solid white;
-            cursor: pointer;
-            transition: all 0.15s ease;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
             position: relative;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+            transition: all 0.2s ease;
+        }
+
+        .player-avatar-visual::before {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            right: 4px;
+            height: 12px;
+            background: rgba(255,255,255,0.35);
+            border-radius: 8px 8px 0 0;
+        }
+
+        .player-avatar-visual-large {
+            width: 80px;
+            height: 80px;
+            border-radius: 16px;
+        }
+
+        .player-avatar-visual-large::before {
+            height: 16px;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .player-avatar-visual-small {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+        }
+
+        .player-avatar-visual-small::before {
+            height: 8px;
+            top: 3px;
+            left: 3px;
+            right: 3px;
+            border-radius: 5px 5px 0 0;
+        }
+
+        /* Color selector styling */
+        .color-btn {
+            transition: all 0.15s ease;
         }
 
         .color-btn.selected {
-            border-color: var(--steam-naranja);
             transform: scale(1.15);
-            box-shadow: 0 0 0 4px var(--steam-naranja), 0 4px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 0 0 4px #EB8225, 0 4px 15px rgba(0,0,0,0.3);
         }
 
-        .color-btn:active {
-            transform: scale(1.1);
+        /* Button 3D effect */
+        .btn-3d {
+            transition: all 0.08s ease;
         }
 
-        .color-name {
-            position: absolute;
-            bottom: -25px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 0.7em;
-            color: var(--steam-negro);
-            white-space: nowrap;
-            font-weight: bold;
-        }
-
-        .ready-status {
-            font-size: 1.1em;
-            color: var(--steam-verde);
-            margin-bottom: 15px;
-            font-weight: bold;
-        }
-
-        .admin-start-section {
-            margin-top: 15px;
-        }
-
-        .start-game-btn {
-            background: var(--steam-turquesa);
-            color: white;
-            border: none;
-            padding: 16px 40px;
-            font-size: 1.2em;
-            font-weight: bold;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 6px 0 #047a91;
-            transition: all 0.1s ease;
-            text-transform: uppercase;
-        }
-
-        .start-game-btn:active {
+        .btn-3d:active, .btn-3d.pressed {
             transform: translateY(4px);
+        }
+
+        .btn-verde {
+            box-shadow: 0 6px 0 #5a8030;
+        }
+        .btn-verde:active, .btn-verde.pressed {
+            box-shadow: 0 2px 0 #5a8030;
+        }
+
+        .btn-turquesa {
+            box-shadow: 0 6px 0 #047a91;
+        }
+        .btn-turquesa:active, .btn-turquesa.pressed {
             box-shadow: 0 2px 0 #047a91;
         }
 
-        .admin-badge {
-            background: var(--steam-naranja);
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 0.9em;
-            margin-bottom: 10px;
+        .btn-morado {
+            box-shadow: 0 6px 0 #8a3070;
+        }
+        .btn-morado:active, .btn-morado.pressed {
+            box-shadow: 0 2px 0 #8a3070;
         }
 
-        .waiting-hint {
-            background: #F5F5F5;
-            border-radius: 15px;
-            padding: 15px;
-            text-align: center;
-            margin-top: 15px;
-            border: 2px solid #E0E0E0;
+        .jump-button {
+            box-shadow: 0 8px 0 #5a8030;
+        }
+        .jump-button:active, .jump-button.pressed {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 #5a8030;
         }
 
-        .waiting-hint p {
-            font-size: 0.95em;
-            color: #666;
+        .left-button {
+            box-shadow: 0 6px 0 #8a3070;
+        }
+        .left-button:active, .left-button.pressed {
+            box-shadow: 0 2px 0 #8a3070;
         }
 
-        /* GAME CONTROLLER */
-        .game-controller {
-            gap: 15px;
-            padding: 15px;
-            background: linear-gradient(180deg, #1B4D3E 0%, #0D2818 100%);
+        .right-button {
+            box-shadow: 0 6px 0 #047a91;
+        }
+        .right-button:active, .right-button.pressed {
+            box-shadow: 0 2px 0 #047a91;
         }
 
-        .orientation-warning {
-            position: fixed;
+        /* Shine effect on buttons */
+        .btn-shine::before {
+            content: '';
+            position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            color: white;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .orientation-warning.active {
-            display: flex;
-        }
-
-        .orientation-warning-icon {
-            font-size: 5em;
-            margin-bottom: 20px;
-            animation: rotate 2s ease-in-out infinite;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 100%);
+            border-radius: inherit;
+            pointer-events: none;
         }
 
         @keyframes rotate {
@@ -306,342 +167,125 @@
             50% { transform: rotate(90deg); }
         }
 
-        .orientation-warning-text {
-            font-size: 1.5em;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .orientation-warning-subtext {
-            font-size: 1.1em;
-            opacity: 0.8;
-        }
-
-        .game-header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 10px;
-        }
-
-        .player-avatar-badge {
-            font-size: 2em;
-        }
-
-        .player-color-badge {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            border: 3px solid white;
-        }
-
-        .player-name-text {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: white;
-        }
-
-        /* CONTROL BUTTONS */
-        .control-layout {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .jump-container {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-        }
-
-        .jump-button {
-            width: 160px;
-            height: 160px;
-            border-radius: 50%;
-            border: none;
-            background: var(--steam-verde);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.08s ease;
-            box-shadow: 0 8px 0 #5a8030;
-            position: relative;
-        }
-
-        .jump-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 50%;
-            background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 100%);
-            border-radius: 50% 50% 0 0;
-        }
-
-        .jump-button:active,
-        .jump-button.pressed {
-            transform: translateY(6px);
-            box-shadow: 0 2px 0 #5a8030;
-        }
-
-        .jump-icon {
-            font-size: 2.5em;
-            margin-bottom: 5px;
-        }
-
-        .jump-text {
-            font-size: 1.3em;
-            color: white;
-            font-weight: bold;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-        }
-
-        .movement-container {
-            display: flex;
-            gap: 50px;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-        }
-
-        .control-button {
-            width: 100px;
-            height: 100px;
-            border-radius: 20px;
-            border: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.08s ease;
-            position: relative;
-        }
-
-        .control-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 50%;
-            background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 100%);
-            border-radius: 20px 20px 0 0;
-        }
-
-        .left-button {
-            background: var(--steam-morado);
-            box-shadow: 0 6px 0 #8a3070;
-        }
-
-        .right-button {
-            background: var(--steam-turquesa);
-            box-shadow: 0 6px 0 #047a91;
-        }
-
-        .control-button:active,
-        .control-button.pressed {
-            transform: translateY(4px);
-        }
-
-        .left-button:active, .left-button.pressed { box-shadow: 0 2px 0 #8a3070; }
-        .right-button:active, .right-button.pressed { box-shadow: 0 2px 0 #047a91; }
-
-        .button-icon {
-            font-size: 2em;
-            color: white;
-        }
-
-        .button-text {
-            font-size: 0.9em;
-            color: white;
-            font-weight: bold;
-            margin-top: 5px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-        }
-
-        /* RESULTS SCREEN */
-        .results-screen {
-            text-align: center;
-            gap: 20px;
-        }
-
-        .results-title {
-            font-size: 1.8em;
-            color: var(--steam-turquesa);
-            font-weight: bold;
-        }
-
-        .final-rank {
-            font-size: 4em;
-            margin-bottom: 10px;
-        }
-
-        .final-message {
-            font-size: 1.4em;
-            margin-bottom: 5px;
-            color: var(--steam-turquesa);
-            font-weight: bold;
-        }
-
-        .final-score {
-            font-size: 1.6em;
-            font-weight: bold;
-            color: var(--steam-verde);
-            margin-bottom: 20px;
-        }
-
-        .play-again-btn {
-            background: var(--steam-morado);
-            color: white;
-            border: none;
-            padding: 16px 40px;
-            font-size: 1.2em;
-            font-weight: bold;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 6px 0 #8a3070;
-            transition: all 0.1s ease;
-            text-transform: uppercase;
-        }
-
-        .play-again-btn:active {
-            transform: translateY(4px);
-            box-shadow: 0 2px 0 #8a3070;
-        }
-
-        .waiting-next {
-            font-size: 0.95em;
-            color: #666;
-            margin-top: 10px;
-        }
-
-        /* Responsive */
-        @media (max-width: 380px) {
-            .jump-button {
-                width: 140px;
-                height: 140px;
-            }
-
-            .control-button {
-                width: 85px;
-                height: 85px;
-            }
-
-            .movement-container {
-                gap: 35px;
-            }
+        .rotate-anim {
+            animation: rotate 2s ease-in-out infinite;
         }
 
         @media (orientation: landscape) and (max-height: 450px) {
             .control-layout {
-                flex-direction: row;
-                justify-content: space-around;
+                flex-direction: row !important;
+                justify-content: space-around !important;
             }
 
             .jump-button {
-                width: 120px;
-                height: 120px;
+                width: 120px !important;
+                height: 120px !important;
             }
 
             .control-button {
-                width: 80px;
-                height: 80px;
+                width: 80px !important;
+                height: 80px !important;
             }
 
             .movement-container {
-                gap: 25px;
+                gap: 25px !important;
             }
 
             .game-header {
-                display: none;
+                display: none !important;
             }
         }
     </style>
 </head>
-<body>
+<body class="w-screen h-screen overflow-hidden font-sans bg-white flex flex-col items-center justify-center text-steam-negro">
     <!-- JOIN SCREEN -->
-    <div class="screen join-screen active" id="joinScreen">
-        <div class="join-logo">🎮</div>
-        <h1 class="join-title">STEAM Platformer</h1>
-        <p class="join-subtitle">Fundación STEAM RD</p>
-        <button class="join-button" id="joinButton">¡UNIRSE!</button>
+    <div class="screen flex flex-col items-center justify-center w-full h-full p-5 text-center gap-5" id="joinScreen">
+        <div class="flex justify-center mb-2">
+            <div class="player-avatar-visual-large bg-steam-verde"></div>
+        </div>
+        <h1 class="text-2xl font-bold text-steam-turquesa">STEAM Platformer</h1>
+        <p class="text-base text-steam-negro opacity-70">Fundacion STEAM RD</p>
+        <button class="bg-steam-verde text-white border-none py-4 px-10 text-xl font-bold rounded-full cursor-pointer uppercase btn-3d btn-verde" id="joinButton">Unirse!</button>
     </div>
 
     <!-- AVATAR SELECT SCREEN -->
-    <div class="screen avatar-select-screen" id="avatarSelectScreen">
-        <div class="admin-badge" id="adminBadge" style="display: none;">👑 ADMIN</div>
-        <h2 class="avatar-title">Elige tu Avatar</h2>
-        <div class="current-avatar" id="currentAvatar">🦊</div>
-        <div class="player-color-display" id="playerColorDisplay"></div>
-        <div class="avatar-grid" id="avatarGrid"></div>
+    <div class="screen hidden flex-col items-center justify-center w-full h-full p-5 gap-4 overflow-y-auto" id="avatarSelectScreen">
+        <div class="bg-steam-naranja text-white py-2 px-4 rounded-full font-bold text-sm hidden" id="adminBadge">ADMIN</div>
         
-        <div class="color-section">
-            <h3 class="color-title">Elige tu Color</h3>
-            <div class="color-grid" id="colorGrid"></div>
+        <h2 class="text-xl font-bold text-steam-turquesa text-center">Tu Personaje</h2>
+        
+        <!-- Current avatar display -->
+        <div class="flex justify-center">
+            <div class="player-avatar-visual-large" id="currentAvatarDisplay" style="background-color: #73A03F;"></div>
         </div>
         
-        <p class="ready-status">✓ Listo para jugar</p>
-        
-        <div class="admin-start-section" id="adminStartSection" style="display: none;">
-            <button class="start-game-btn" id="startGameBtn">🚀 ¡INICIAR JUEGO!</button>
+        <!-- Color selection -->
+        <div class="mt-4">
+            <h3 class="text-lg font-bold text-steam-turquesa mb-3 text-center">Elige tu Color</h3>
+            <div class="grid grid-cols-4 gap-3 max-w-xs mx-auto" id="colorGrid"></div>
         </div>
         
-        <div class="waiting-hint" id="waitingHint">
-            <p>⏳ Esperando que el Jugador 1 inicie el juego...</p>
+        <p class="text-steam-verde font-bold text-base mt-2">Listo para jugar</p>
+        
+        <!-- Admin start section -->
+        <div class="mt-4 hidden" id="adminStartSection">
+            <button class="bg-steam-turquesa text-white border-none py-4 px-8 text-lg font-bold rounded-full cursor-pointer uppercase btn-3d btn-turquesa" id="startGameBtn">INICIAR JUEGO!</button>
+        </div>
+        
+        <!-- Waiting hint for non-admins -->
+        <div class="bg-gray-100 rounded-2xl py-4 px-5 text-center border-2 border-gray-200 mt-2" id="waitingHint">
+            <p class="text-sm text-gray-600">Esperando que el Jugador 1 inicie el juego...</p>
         </div>
     </div>
 
     <!-- GAME CONTROLLER -->
-    <div class="screen game-controller" id="gameController">
-        <div class="orientation-warning" id="orientationWarning">
-            <div class="orientation-warning-icon">📱</div>
-            <div class="orientation-warning-text">¡Rota tu dispositivo!</div>
-            <div class="orientation-warning-subtext">Coloca el teléfono en posición horizontal para jugar</div>
+    <div class="screen hidden flex-col items-center justify-center w-full h-full p-4 bg-gradient-to-b from-[#1B4D3E] to-[#0D2818] gap-4" id="gameController">
+        <!-- Orientation warning -->
+        <div class="fixed top-0 left-0 w-full h-full bg-black/90 hidden flex-col items-center justify-center z-50 text-white text-center p-5" id="orientationWarning">
+            <div class="text-6xl mb-5 rotate-anim">📱</div>
+            <div class="text-2xl font-bold mb-3">Rota tu dispositivo!</div>
+            <div class="text-lg opacity-80">Coloca el telefono en posicion horizontal para jugar</div>
         </div>
         
-        <div class="game-header">
-            <span class="player-avatar-badge" id="gameAvatar">🦊</span>
-            <div class="player-color-badge" id="gameColorBadge"></div>
-            <span class="player-name-text" id="gamePlayerName">Verde</span>
+        <!-- Game header -->
+        <div class="flex items-center justify-center gap-3 mb-2 game-header">
+            <div class="player-avatar-visual-small" id="gameAvatarBadge" style="background-color: #73A03F;"></div>
+            <span class="text-xl font-bold text-white" id="gamePlayerName">Verde</span>
         </div>
         
-        <div class="control-layout">
-            <div class="jump-container">
-                <div class="jump-button" id="jumpBtn">
-                    <div class="jump-icon">⬆️</div>
-                    <div class="jump-text">SALTAR</div>
+        <!-- Controls -->
+        <div class="flex flex-col items-center gap-5 w-full max-w-md control-layout">
+            <div class="w-full flex justify-center">
+                <div class="jump-button w-40 h-40 rounded-full border-none bg-steam-verde flex flex-col items-center justify-center cursor-pointer relative btn-shine" id="jumpBtn">
+                    <span class="text-4xl mb-1">↑</span>
+                    <span class="text-lg text-white font-bold">SALTAR</span>
                 </div>
             </div>
             
-            <div class="movement-container">
-                <div class="control-button left-button" id="leftBtn">
-                    <span class="button-icon">◀️</span>
-                    <span class="button-text">IZQ</span>
+            <div class="flex gap-12 items-center justify-center w-full movement-container">
+                <div class="control-button left-button w-24 h-24 rounded-2xl border-none bg-steam-morado flex flex-col items-center justify-center cursor-pointer relative btn-shine" id="leftBtn">
+                    <span class="text-3xl text-white">◀</span>
+                    <span class="text-sm text-white font-bold mt-1">IZQ</span>
                 </div>
-                <div class="control-button right-button" id="rightBtn">
-                    <span class="button-icon">▶️</span>
-                    <span class="button-text">DER</span>
+                <div class="control-button right-button w-24 h-24 rounded-2xl border-none bg-steam-turquesa flex flex-col items-center justify-center cursor-pointer relative btn-shine" id="rightBtn">
+                    <span class="text-3xl text-white">▶</span>
+                    <span class="text-sm text-white font-bold mt-1">DER</span>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- RESULTS SCREEN -->
-    <div class="screen results-screen" id="resultsScreen">
-        <h2 class="results-title">🏆 ¡Carrera Terminada!</h2>
-        <div class="final-rank" id="finalRank">🥇</div>
-        <p class="final-message" id="finalMessage">¡Felicidades!</p>
-        <div class="final-score" id="finalScore">0 puntos</div>
-        <button class="play-again-btn" id="playAgainBtn" style="display: none;">🔄 JUGAR DE NUEVO</button>
-        <p class="waiting-next" id="waitingNext">Esperando al Jugador 1...</p>
+    <div class="screen hidden flex-col items-center justify-center w-full h-full p-5 text-center gap-5" id="resultsScreen">
+        <h2 class="text-2xl font-bold text-steam-turquesa">Carrera Terminada!</h2>
+        <div class="text-5xl" id="finalRank">1ro</div>
+        <div class="flex justify-center">
+            <div class="player-avatar-visual-large" id="resultAvatarDisplay" style="background-color: #73A03F;"></div>
+        </div>
+        <p class="text-xl font-bold text-steam-turquesa" id="finalMessage">Felicidades!</p>
+        <div class="text-2xl font-bold text-steam-verde" id="finalScore">0 puntos</div>
+        <button class="bg-steam-morado text-white border-none py-4 px-8 text-lg font-bold rounded-full cursor-pointer uppercase btn-3d btn-morado hidden" id="playAgainBtn">JUGAR DE NUEVO</button>
+        <p class="text-sm text-gray-600" id="waitingNext">Esperando al Jugador 1...</p>
     </div>
 
     <script>
@@ -649,29 +293,25 @@
         
         let playerInfo = {
             playerNum: null,
-            color: null,
-            colorName: null,
-            avatar: '🦊',
+            color: '#73A03F',
+            colorName: 'Verde',
             isAdmin: false
         };
         
-        let availableAvatars = ['🦊', '🐼', '🐸', '🦁', '🐯', '🐻', '🐨', '🐵', '🦄', '🐙', '🐲', '🦅'];
         const availableColors = [
             { color: '#73A03F', name: 'Verde' },
             { color: '#AB3D8B', name: 'Morado' },
             { color: '#0595AE', name: 'Turquesa' },
             { color: '#EB8225', name: 'Naranja' }
         ];
+        
         let isLeftPressed = false;
         let isRightPressed = false;
         let isJumpPressed = false;
         
-        // Performance: throttling y estado de mensajes
         let lastMoveTime = 0;
-        const MOVE_THROTTLE = 16; // ~60fps
-        let pendingMessage = null;
+        const MOVE_THROTTLE = 16;
         
-        // Envío optimizado de mensajes
         function sendMessage(msg) {
             airconsole.message(AirConsole.SCREEN, msg);
         }
@@ -718,11 +358,8 @@
         }
 
         function joinGame() {
-            const randomAvatar = availableAvatars[Math.floor(Math.random() * availableAvatars.length)];
-            
             airconsole.message(AirConsole.SCREEN, { 
-                action: 'join',
-                avatar: randomAvatar
+                action: 'join'
             });
             
             document.getElementById('joinButton').disabled = true;
@@ -733,78 +370,48 @@
             playerInfo.playerNum = data.playerNum;
             playerInfo.color = data.color;
             playerInfo.colorName = data.colorName;
-            playerInfo.avatar = data.avatar;
             playerInfo.isAdmin = data.isAdmin;
-            
-            if (data.availableAvatars) {
-                availableAvatars = data.availableAvatars;
-            }
             
             setupAvatarScreen();
             showScreen('avatarSelect');
         }
 
         function setupAvatarScreen() {
-            document.getElementById('currentAvatar').textContent = playerInfo.avatar;
             updateColorDisplays();
             
-            document.getElementById('adminBadge').style.display = playerInfo.isAdmin ? 'block' : 'none';
-            document.getElementById('adminStartSection').style.display = playerInfo.isAdmin ? 'block' : 'none';
-            document.getElementById('waitingHint').style.display = playerInfo.isAdmin ? 'none' : 'block';
-            
-            const avatarGrid = document.getElementById('avatarGrid');
-            avatarGrid.innerHTML = '';
-            
-            availableAvatars.forEach(avatar => {
-                const btn = document.createElement('div');
-                btn.className = 'avatar-btn' + (avatar === playerInfo.avatar ? ' selected' : '');
-                btn.textContent = avatar;
-                btn.addEventListener('click', () => selectAvatar(avatar));
-                avatarGrid.appendChild(btn);
-            });
+            document.getElementById('adminBadge').classList.toggle('hidden', !playerInfo.isAdmin);
+            document.getElementById('adminStartSection').classList.toggle('hidden', !playerInfo.isAdmin);
+            document.getElementById('waitingHint').classList.toggle('hidden', playerInfo.isAdmin);
             
             const colorGrid = document.getElementById('colorGrid');
             colorGrid.innerHTML = '';
             
-            availableColors.forEach((colorData, index) => {
+            availableColors.forEach((colorData) => {
                 const btn = document.createElement('div');
-                btn.className = 'color-btn' + (colorData.color === playerInfo.color ? ' selected' : '');
+                btn.className = `color-btn w-14 h-14 rounded-full border-4 border-white cursor-pointer shadow-lg ${colorData.color === playerInfo.color ? 'selected' : ''}`;
                 btn.style.backgroundColor = colorData.color;
                 btn.dataset.color = colorData.color;
                 btn.dataset.colorName = colorData.name;
                 
                 const nameSpan = document.createElement('span');
-                nameSpan.className = 'color-name';
+                nameSpan.className = 'absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-steam-negro whitespace-nowrap font-bold';
                 nameSpan.textContent = colorData.name;
-                btn.appendChild(nameSpan);
+                
+                const wrapper = document.createElement('div');
+                wrapper.className = 'relative pb-6';
+                wrapper.appendChild(btn);
+                wrapper.appendChild(nameSpan);
                 
                 btn.addEventListener('click', () => selectColor(colorData.color, colorData.name));
-                colorGrid.appendChild(btn);
+                colorGrid.appendChild(wrapper);
             });
         }
 
         function updateColorDisplays() {
-            document.getElementById('playerColorDisplay').style.backgroundColor = playerInfo.color;
-            document.getElementById('gameColorBadge').style.backgroundColor = playerInfo.color;
+            document.getElementById('currentAvatarDisplay').style.backgroundColor = playerInfo.color;
+            document.getElementById('gameAvatarBadge').style.backgroundColor = playerInfo.color;
             document.getElementById('gamePlayerName').textContent = playerInfo.colorName;
-        }
-
-        function selectAvatar(avatar) {
-            playerInfo.avatar = avatar;
-            
-            document.getElementById('currentAvatar').textContent = avatar;
-            document.getElementById('gameAvatar').textContent = avatar;
-            
-            document.querySelectorAll('.avatar-btn').forEach(btn => {
-                btn.classList.toggle('selected', btn.textContent === avatar);
-            });
-            
-            airconsole.message(AirConsole.SCREEN, {
-                action: 'selectAvatar',
-                avatar: avatar
-            });
-            
-            if (navigator.vibrate) navigator.vibrate(30);
+            document.getElementById('resultAvatarDisplay').style.backgroundColor = playerInfo.color;
         }
 
         function selectColor(color, colorName) {
@@ -845,40 +452,38 @@
         }
 
         function requestOrientationLock() {
-            // Intentar bloquear la orientación en horizontal (landscape)
             if (screen.orientation && screen.orientation.lock) {
                 screen.orientation.lock('landscape').catch(err => {
-                    console.log('No se pudo bloquear la orientación:', err);
+                    console.log('No se pudo bloquear la orientacion:', err);
                     checkOrientation();
                 });
             } else if (screen.lockOrientation) {
                 try {
                     screen.lockOrientation('landscape');
                 } catch (err) {
-                    console.log('No se pudo bloquear la orientación:', err);
+                    console.log('No se pudo bloquear la orientacion:', err);
                     checkOrientation();
                 }
             } else if (screen.mozLockOrientation) {
                 try {
                     screen.mozLockOrientation('landscape');
                 } catch (err) {
-                    console.log('No se pudo bloquear la orientación:', err);
+                    console.log('No se pudo bloquear la orientacion:', err);
                     checkOrientation();
                 }
             } else if (screen.msLockOrientation) {
                 try {
                     screen.msLockOrientation('landscape');
                 } catch (err) {
-                    console.log('No se pudo bloquear la orientación:', err);
+                    console.log('No se pudo bloquear la orientacion:', err);
                     checkOrientation();
                 }
             } else {
                 checkOrientation();
             }
 
-            // Verificar orientación periódicamente
             const orientationCheck = setInterval(() => {
-                if (document.getElementById('gameController').classList.contains('active')) {
+                if (!document.getElementById('gameController').classList.contains('hidden')) {
                     checkOrientation();
                 } else {
                     clearInterval(orientationCheck);
@@ -886,7 +491,6 @@
                 }
             }, 500);
 
-            // Escuchar cambios de orientación
             window.addEventListener('orientationchange', checkOrientation);
             window.addEventListener('resize', checkOrientation);
         }
@@ -895,15 +499,16 @@
             const warning = document.getElementById('orientationWarning');
             const isPortrait = window.innerHeight > window.innerWidth;
             
-            if (isPortrait && document.getElementById('gameController').classList.contains('active')) {
-                warning.classList.add('active');
+            if (isPortrait && !document.getElementById('gameController').classList.contains('hidden')) {
+                warning.classList.remove('hidden');
+                warning.classList.add('flex');
             } else {
-                warning.classList.remove('active');
+                warning.classList.add('hidden');
+                warning.classList.remove('flex');
             }
         }
 
         function unlockOrientation() {
-            // Desbloquear la orientación cuando se sale del juego
             if (screen.orientation && screen.orientation.unlock) {
                 screen.orientation.unlock();
             } else if (screen.unlockOrientation) {
@@ -946,14 +551,14 @@
                 case 'left':
                     if (!isLeftPressed) {
                         isLeftPressed = true;
-                        isRightPressed = false; // Prevenir conflictos
+                        isRightPressed = false;
                         sendMessage({ action: 'move', direction: 'left' });
                     }
                     break;
                 case 'right':
                     if (!isRightPressed) {
                         isRightPressed = true;
-                        isLeftPressed = false; // Prevenir conflictos
+                        isLeftPressed = false;
                         sendMessage({ action: 'move', direction: 'right' });
                     }
                     break;
@@ -973,7 +578,6 @@
                 case 'left':
                     if (isLeftPressed) {
                         isLeftPressed = false;
-                        // Si el otro botón está presionado, enviar ese movimiento
                         if (isRightPressed) {
                             sendMessage({ action: 'move', direction: 'right' });
                         } else {
@@ -1007,20 +611,20 @@
             const myResult = results.find(r => r.playerNum == playerInfo.playerNum);
             const myRank = myResult ? results.indexOf(myResult) + 1 : results.length;
             
-            const medals = ['🥇', '🥈', '🥉'];
+            const medals = ['1ro', '2do', '3ro'];
             document.getElementById('finalRank').textContent = medals[myRank - 1] || `#${myRank}`;
             
             if (winner && winner.playerNum == playerInfo.playerNum) {
-                document.getElementById('finalMessage').textContent = '¡GANASTE!';
+                document.getElementById('finalMessage').textContent = 'GANASTE!';
                 if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 100]);
             } else if (winner) {
-                document.getElementById('finalMessage').textContent = `Ganó ${winner.avatar} ${winner.name}`;
+                document.getElementById('finalMessage').textContent = `Gano ${winner.name}`;
             }
             
             document.getElementById('finalScore').textContent = `${myResult?.score || 0} puntos`;
             
-            document.getElementById('playAgainBtn').style.display = playerInfo.isAdmin ? 'block' : 'none';
-            document.getElementById('waitingNext').style.display = playerInfo.isAdmin ? 'none' : 'block';
+            document.getElementById('playAgainBtn').classList.toggle('hidden', !playerInfo.isAdmin);
+            document.getElementById('waitingNext').classList.toggle('hidden', playerInfo.isAdmin);
         }
 
         function playAgain() {
@@ -1028,8 +632,13 @@
         }
 
         function showScreen(screen) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screen + 'Screen').classList.add('active');
+            document.querySelectorAll('.screen').forEach(s => {
+                s.classList.add('hidden');
+                s.classList.remove('flex');
+            });
+            const targetScreen = document.getElementById(screen + 'Screen');
+            targetScreen.classList.remove('hidden');
+            targetScreen.classList.add('flex');
             
             if (screen !== 'gameController') {
                 isLeftPressed = false;

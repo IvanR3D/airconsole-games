@@ -3,8 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STEAM Trivia - Fundación STEAM RD</title>
+    <title>STEAM Trivia - Fundacion STEAM RD</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.airconsole.com/api/airconsole-1.8.0.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        steam: {
+                            turquesa: '#0595AE',
+                            morado: '#AB3D8B',
+                            naranja: '#EB8225',
+                            verde: '#73A03F',
+                            negro: '#010101',
+                            blanco: '#FFFFFF'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         * {
             margin: 0;
@@ -12,26 +31,11 @@
             box-sizing: border-box;
         }
 
-        /* Colores STEAM RD */
-        :root {
-            --steam-turquesa: #0595AE;
-            --steam-morado: #AB3D8B;
-            --steam-naranja: #EB8225;
-            --steam-verde: #73A03F;
-            --steam-negro: #010101;
-            --steam-blanco: #FFFFFF;
-        }
-
         body {
-            font-family: 'Segoe UI', 'Arial', sans-serif;
-            min-height: 100vh;
-            color: var(--steam-negro);
-            overflow: hidden;
-            background: var(--steam-blanco);
             transition: background 0.5s ease;
         }
 
-        /* Fondos por categoría - tonos claros */
+        /* Category backgrounds */
         body.cat-general { background: linear-gradient(135deg, #E8F4F8 0%, #F0F8FF 100%); }
         body.cat-science { background: linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 100%); }
         body.cat-mathematics { background: linear-gradient(135deg, #E3F2FD 0%, #E8F4F8 100%); }
@@ -40,21 +44,10 @@
         body.cat-technology { background: linear-gradient(135deg, #F3E5F5 0%, #EDE7F6 100%); }
         body.cat-history { background: linear-gradient(135deg, #FFF3E0 0%, #FBE9E7 100%); }
         body.cat-geography { background: linear-gradient(135deg, #E0F7FA 0%, #E3F2FD 100%); }
-        body.cat-default { background: var(--steam-blanco); }
-
-        .container {
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
+        body.cat-default { background: #FFFFFF; }
 
         .screen {
             display: none;
-            width: 100%;
-            height: 100%;
-            flex-direction: column;
             opacity: 0;
             transition: opacity 0.3s ease;
         }
@@ -64,78 +57,19 @@
             opacity: 1;
         }
 
-        /* HEADER */
-        .game-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 40px;
-            position: relative;
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-        .timer-bar-container {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .timer-bar {
-            width: 60%;
-            height: 30px;
-            background: rgba(0, 0, 0, 0.1);
-            border-radius: 20px;
-            overflow: visible;
-            position: relative;
-            border: 3px solid var(--steam-turquesa);
-        }
-
-        .timer-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--steam-verde) 0%, var(--steam-naranja) 50%, var(--steam-morado) 100%);
-            border-radius: 17px;
-            transition: width 0.1s linear;
-            position: relative;
-            width: 100%;
-        }
-
-        .timer-bar-fill::after {
-            content: '';
-            position: absolute;
-            right: -15px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 0;
-            height: 0;
-            border-left: 20px solid var(--steam-morado);
-            border-top: 15px solid transparent;
-            border-bottom: 15px solid transparent;
-        }
-
-        .timer-circle {
-            width: 80px;
-            height: 80px;
-            background: var(--steam-turquesa);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5em;
-            font-weight: bold;
-            color: white;
-            box-shadow: 0 4px 15px rgba(5, 149, 174, 0.4);
-            border: 4px solid white;
-            transition: background 0.3s, transform 0.1s;
-        }
-
-        .timer-circle.warning {
-            background: var(--steam-naranja);
-            animation: pulse 0.5s ease infinite;
-        }
-
-        .timer-circle.danger {
-            background: var(--steam-morado);
-            animation: shake 0.3s ease infinite;
+        .logo-gradient {
+            background: linear-gradient(45deg, #0595AE, #AB3D8B, #EB8225, #73A03F);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientMove 3s ease infinite;
         }
 
         @keyframes pulse {
@@ -149,271 +83,8 @@
             75% { transform: translateX(3px); }
         }
 
-        /* WAITING SCREEN */
-        .waiting-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
-        }
-
-        .logo-container {
-            margin-bottom: 30px;
-        }
-
-        .logo {
-            font-size: 3.5em;
-            font-weight: 900;
-            background: linear-gradient(45deg, var(--steam-turquesa), var(--steam-morado), var(--steam-naranja), var(--steam-verde));
-            background-size: 300% 300%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: gradientMove 3s ease infinite;
-            filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.1));
-        }
-
-        @keyframes gradientMove {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .waiting-title {
-            font-size: 2em;
-            margin-bottom: 15px;
-            color: var(--steam-turquesa);
-        }
-
-        .waiting-subtitle {
-            font-size: 1.3em;
-            color: var(--steam-negro);
-            opacity: 0.7;
-            margin-bottom: 30px;
-        }
-
-        .players-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
-            margin-bottom: 30px;
-            max-width: 800px;
-        }
-
-        .player-card {
-            background: white;
-            border: 3px solid #E0E0E0;
-            border-radius: 15px;
-            padding: 15px 25px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .player-card.admin {
-            border-color: var(--steam-naranja);
-            background: #FFF8F0;
-        }
-
-        .player-card.disconnected {
-            border-color: var(--steam-morado);
-            background: #FDF0F5;
-            opacity: 0.6;
-        }
-
-        .player-avatar {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5em;
-            border: 3px solid white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-        }
-
-        .player-name {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: var(--steam-negro);
-        }
-
-        .player-status {
-            font-size: 0.85em;
-            color: var(--steam-verde);
-        }
-
-        .admin-controls-hint {
-            background: #FFF8F0;
-            border: 2px solid var(--steam-naranja);
-            border-radius: 15px;
-            padding: 15px 25px;
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        .admin-controls-hint p {
-            color: var(--steam-naranja);
-            font-weight: bold;
-        }
-
-        /* CATEGORY SELECTION */
-        .category-screen {
-            padding: 30px;
-            overflow-y: auto;
-        }
-
-        .category-title {
-            text-align: center;
-            font-size: 2em;
-            color: var(--steam-turquesa);
-            margin-bottom: 30px;
-        }
-
-        .category-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 15px;
-            max-width: 1000px;
-            margin: 0 auto 30px;
-        }
-
-        .category-card {
-            background: white;
-            border: 3px solid #E0E0E0;
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-        }
-
-        .category-card:hover {
-            border-color: var(--steam-turquesa);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(5, 149, 174, 0.2);
-        }
-
-        .category-card.selected {
-            border-color: var(--steam-verde);
-            background: #F5FAF0;
-            box-shadow: 0 0 20px rgba(115, 160, 63, 0.3);
-        }
-
-        .category-emoji {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-
-        .category-name {
-            font-size: 1.1em;
-            font-weight: bold;
-            color: var(--steam-negro);
-        }
-
-        /* PLAYING SCREEN */
-        .playing-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 0 40px 30px;
-        }
-
-        .question-section {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .question-number {
-            font-size: 1.1em;
-            color: var(--steam-turquesa);
-            margin-bottom: 15px;
-            font-weight: bold;
-        }
-
-        .question-text {
-            font-size: 2.2em;
-            text-align: center;
-            max-width: 900px;
-            line-height: 1.3;
-            margin-bottom: 40px;
-            color: var(--steam-negro);
-        }
-
-        /* OPTIONS GRID */
-        .options-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            max-width: 900px;
-            width: 100%;
-        }
-
-        .option-card {
-            display: flex;
-            align-items: center;
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            transition: all 0.2s ease;
-            border: 3px solid #E0E0E0;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-        }
-
-        .option-letter {
-            width: 70px;
-            height: 70px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.2em;
-            font-weight: bold;
-            color: white;
-            flex-shrink: 0;
-        }
-
-        .option-card.option-a .option-letter { background: var(--steam-verde); }
-        .option-card.option-b .option-letter { background: var(--steam-morado); }
-        .option-card.option-c .option-letter { background: var(--steam-turquesa); }
-        .option-card.option-d .option-letter { background: var(--steam-naranja); }
-
-        .option-text {
-            flex: 1;
-            padding: 15px 20px;
-            font-size: 1.2em;
-            font-weight: 500;
-            color: var(--steam-negro);
-        }
-
-        .option-card.correct {
-            background: var(--steam-verde);
-            border-color: var(--steam-verde);
-            animation: correctPop 0.3s ease;
-        }
-
-        .option-card.correct .option-text {
-            color: white;
-        }
-
-        .option-card.incorrect {
-            background: var(--steam-morado);
-            border-color: var(--steam-morado);
-            animation: incorrectShake 0.3s ease;
-        }
-
-        .option-card.incorrect .option-text {
-            color: white;
-        }
+        .timer-warning { animation: pulse 0.5s ease infinite; }
+        .timer-danger { animation: shake 0.3s ease infinite; }
 
         @keyframes correctPop {
             0% { transform: scale(1); }
@@ -427,134 +98,8 @@
             75% { transform: translateX(5px); }
         }
 
-        /* FOOTER */
-        .game-footer {
-            display: flex;
-            align-items: center;
-            padding: 15px 40px;
-            gap: 20px;
-            background: rgba(255,255,255,0.9);
-            border-top: 2px solid #E0E0E0;
-        }
-
-        .trivia-logo {
-            width: 120px;
-            height: 80px;
-            background: linear-gradient(135deg, var(--steam-turquesa), var(--steam-morado));
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .trivia-logo-text {
-            font-size: 1.3em;
-            font-weight: bold;
-            color: white;
-        }
-
-        .players-status {
-            display: flex;
-            gap: 12px;
-            flex: 1;
-            flex-wrap: wrap;
-        }
-
-        .player-status-card {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: white;
-            padding: 8px 15px;
-            border-radius: 10px;
-            border: 2px solid #E0E0E0;
-            transition: all 0.2s ease;
-        }
-
-        .player-status-card.answered {
-            background: #F5FAF0;
-            border-color: var(--steam-verde);
-        }
-
-        .player-status-card.disconnected {
-            background: #FDF0F5;
-            border-color: var(--steam-morado);
-        }
-
-        .player-status-icon {
-            font-size: 1.3em;
-        }
-
-        .player-status-name {
-            font-weight: bold;
-            font-size: 0.9em;
-            color: var(--steam-negro);
-        }
-
-        /* SCOREBOARD */
-        .scoreboard {
-            position: absolute;
-            top: 110px;
-            right: 20px;
-            background: white;
-            border-radius: 15px;
-            padding: 15px;
-            min-width: 180px;
-            border: 2px solid #E0E0E0;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-
-        .scoreboard-title {
-            font-size: 1.1em;
-            color: var(--steam-turquesa);
-            margin-bottom: 12px;
-            text-align: center;
-            font-weight: bold;
-        }
-
-        .scoreboard-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .scoreboard-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 10px;
-            background: #F5F5F5;
-            border-radius: 8px;
-            font-size: 0.9em;
-            color: var(--steam-negro);
-        }
-
-        .scoreboard-item.first {
-            background: #FFF8F0;
-            border: 2px solid var(--steam-naranja);
-        }
-
-        /* END SCREEN */
-        .end-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
-        }
-
-        .end-title {
-            font-size: 2.5em;
-            color: var(--steam-turquesa);
-            margin-bottom: 30px;
-        }
-
-        .winner-section {
-            text-align: center;
-            margin-bottom: 30px;
-            animation: winnerBounce 0.5s ease;
-        }
+        .option-correct { animation: correctPop 0.3s ease; }
+        .option-incorrect { animation: incorrectShake 0.3s ease; }
 
         @keyframes winnerBounce {
             0% { transform: scale(0); opacity: 0; }
@@ -562,106 +107,11 @@
             100% { transform: scale(1); opacity: 1; }
         }
 
-        .winner-crown {
-            font-size: 4em;
-            margin-bottom: 10px;
-        }
+        .winner-bounce { animation: winnerBounce 0.5s ease; }
 
-        .winner-name {
-            font-size: 2.5em;
-            font-weight: bold;
-            color: var(--steam-naranja);
-        }
-
-        .winner-score {
-            font-size: 1.5em;
-            color: var(--steam-verde);
-            margin-top: 10px;
-        }
-
-        .podium {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            max-width: 500px;
-            width: 100%;
-            margin-bottom: 30px;
-        }
-
-        .podium-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 15px 20px;
-            border-radius: 15px;
-            background: white;
-            border: 3px solid #E0E0E0;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-        }
-
-        .podium-item.first {
-            background: linear-gradient(135deg, #FFF8E1, #FFECB3);
-            border-color: var(--steam-naranja);
-        }
-
-        .podium-item.second {
-            background: linear-gradient(135deg, #F5F5F5, #E0E0E0);
-            border-color: #9E9E9E;
-        }
-
-        .podium-item.third {
-            background: linear-gradient(135deg, #FFF3E0, #FFE0B2);
-            border-color: #FF9800;
-        }
-
-        .podium-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .podium-rank {
-            font-size: 1.5em;
-            font-weight: bold;
-        }
-
-        .podium-name {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: var(--steam-negro);
-        }
-
-        .podium-score {
-            font-size: 1.3em;
-            font-weight: bold;
-            color: var(--steam-turquesa);
-        }
-
-        .waiting-admin {
-            background: #FFF8F0;
-            border: 2px solid var(--steam-naranja);
-            border-radius: 15px;
-            padding: 20px 30px;
-            text-align: center;
-            animation: pulse 2s ease infinite;
-        }
-
-        .waiting-admin p {
-            color: var(--steam-naranja);
-            font-size: 1.2em;
-            font-weight: bold;
-        }
-
-        /* CONFETTI */
-        .confetti-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1000;
-            overflow: hidden;
+        @keyframes confettiFall {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
         }
 
         .confetti {
@@ -671,171 +121,202 @@
             animation: confettiFall 3s ease-out forwards;
         }
 
-        @keyframes confettiFall {
-            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        /* Player avatar visual */
+        .player-avatar-visual {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
         }
 
-        .sound-toggle {
+        .player-avatar-visual::before {
+            content: '';
             position: absolute;
-            bottom: 20px;
-            right: 20px;
-            font-size: 2em;
-            cursor: pointer;
-            opacity: 0.7;
-            transition: opacity 0.3s;
-            z-index: 100;
+            top: 3px;
+            left: 3px;
+            right: 3px;
+            height: 9px;
+            background: rgba(255,255,255,0.35);
+            border-radius: 6px 6px 0 0;
         }
 
-        .sound-toggle:hover {
-            opacity: 1;
+        .player-avatar-visual-large {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+        }
+
+        .player-avatar-visual-large::before {
+            height: 12px;
+            top: 4px;
+            left: 4px;
+            right: 4px;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .player-avatar-visual-small {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+        }
+
+        .player-avatar-visual-small::before {
+            height: 6px;
+            top: 2px;
+            left: 2px;
+            right: 2px;
+            border-radius: 4px 4px 0 0;
         }
     </style>
 </head>
-<body class="cat-default">
-    <div class="container">
+<body class="cat-default font-sans text-steam-negro overflow-hidden">
+    <div class="w-screen h-screen flex flex-col relative">
         <!-- WAITING SCREEN -->
-        <div class="screen waiting-screen active" id="waitingScreen">
-            <div class="waiting-content">
-                <div class="logo-container">
-                    <div class="logo">🎯 STEAM TRIVIA 🎯</div>
-                </div>
-                <h2 class="waiting-title">¡Esperando Jugadores!</h2>
-                <p class="waiting-subtitle">Escanea el código QR con tu teléfono para unirte</p>
-                <div class="players-grid" id="playersGrid"></div>
-                <div class="admin-controls-hint" id="adminHint" style="display: none;">
-                    <p>👑 El Jugador 1 controla el juego desde su teléfono</p>
-                </div>
+        <div class="screen waiting-screen active flex-col items-center justify-center p-10" id="waitingScreen">
+            <div class="mb-8">
+                <h1 class="text-5xl font-black logo-gradient drop-shadow">STEAM TRIVIA</h1>
+            </div>
+            <h2 class="text-2xl mb-4 text-steam-turquesa font-bold">Esperando Jugadores!</h2>
+            <p class="text-lg text-steam-negro/70 mb-8">Escanea el codigo QR con tu telefono para unirte</p>
+            <div class="flex flex-wrap gap-5 justify-center mb-8 max-w-3xl" id="playersGrid"></div>
+            <div class="bg-orange-50 border-2 border-steam-naranja rounded-2xl py-4 px-6 mt-5 text-center hidden" id="adminHint">
+                <p class="text-steam-naranja font-bold">El Jugador 1 controla el juego desde su telefono</p>
             </div>
         </div>
 
         <!-- CATEGORY SCREEN -->
-        <div class="screen category-screen" id="categoryScreen">
-            <h2 class="category-title">🎮 Jugador 1: Selecciona una Categoría</h2>
-            <div class="category-grid" id="categoryGrid"></div>
-            <div class="admin-controls-hint">
-                <p>⏳ Esperando que el Jugador 1 seleccione categoría e inicie...</p>
+        <div class="screen flex-col p-8 overflow-y-auto" id="categoryScreen">
+            <h2 class="text-2xl text-steam-turquesa mb-8 text-center font-bold">Jugador 1: Selecciona una Categoria</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mb-8" id="categoryGrid"></div>
+            <div class="bg-orange-50 border-2 border-steam-naranja rounded-2xl py-4 px-6 text-center max-w-md mx-auto">
+                <p class="text-steam-naranja font-bold">Esperando que el Jugador 1 seleccione categoria e inicie...</p>
             </div>
         </div>
 
         <!-- PLAYING SCREEN -->
-        <div class="screen playing-screen" id="playingScreen">
-            <div class="game-header">
-                <div class="timer-bar-container">
-                    <div class="timer-bar">
-                        <div class="timer-bar-fill" id="timerBarFill"></div>
+        <div class="screen flex-col h-full" id="playingScreen">
+            <!-- Header -->
+            <div class="flex justify-between items-center p-5">
+                <div class="flex-1 flex justify-center items-center">
+                    <div class="w-3/5 h-8 bg-black/10 rounded-full overflow-visible relative border-[3px] border-steam-turquesa">
+                        <div class="h-full bg-gradient-to-r from-steam-verde via-steam-naranja to-steam-morado rounded-full transition-all duration-100 relative" id="timerBarFill" style="width: 100%;">
+                            <div class="absolute -right-4 top-1/2 -translate-y-1/2 w-0 h-0 border-l-[20px] border-l-steam-morado border-y-[15px] border-y-transparent"></div>
+                        </div>
                     </div>
                 </div>
-                <div class="timer-circle" id="timerCircle">20</div>
+                <div class="w-20 h-20 bg-steam-turquesa rounded-full flex items-center justify-center text-4xl font-bold text-white shadow-lg border-4 border-white transition-all" id="timerCircle">20</div>
             </div>
 
-            <div class="playing-content">
-                <div class="question-section">
-                    <div class="question-number" id="questionNumber">Pregunta 1 de 5</div>
-                    <h2 class="question-text" id="questionText">¿Cuál es la capital de Francia?</h2>
-                    <div class="options-grid" id="optionsGrid"></div>
+            <!-- Content -->
+            <div class="flex-1 flex flex-col px-10 pb-8">
+                <div class="flex-1 flex flex-col items-center justify-center">
+                    <div class="text-lg text-steam-turquesa mb-4 font-bold" id="questionNumber">Pregunta 1 de 5</div>
+                    <h2 class="text-3xl text-center max-w-4xl leading-tight mb-10" id="questionText">Cual es la capital de Francia?</h2>
+                    <div class="grid grid-cols-2 gap-4 max-w-4xl w-full" id="optionsGrid"></div>
                 </div>
             </div>
 
-            <div class="game-footer">
-                <div class="trivia-logo">
-                    <span class="trivia-logo-text">STEAM</span>
+            <!-- Footer -->
+            <div class="flex items-center p-4 gap-5 bg-white/90 border-t-2 border-gray-200">
+                <div class="w-28 h-20 bg-gradient-to-br from-steam-turquesa to-steam-morado rounded-xl flex items-center justify-center">
+                    <span class="text-xl font-bold text-white">STEAM</span>
                 </div>
-                <div class="players-status" id="playersStatus"></div>
+                <div class="flex gap-3 flex-1 flex-wrap" id="playersStatus"></div>
             </div>
 
-            <div class="scoreboard" id="scoreboard">
-                <div class="scoreboard-title">🏆 Puntuación</div>
-                <div class="scoreboard-list" id="scoreboardList"></div>
+            <!-- Scoreboard -->
+            <div class="absolute top-28 right-5 bg-white rounded-2xl p-4 min-w-[180px] border-2 border-gray-200 shadow-lg" id="scoreboard">
+                <div class="text-lg text-steam-turquesa mb-3 text-center font-bold">Puntuacion</div>
+                <div class="flex flex-col gap-2" id="scoreboardList"></div>
             </div>
         </div>
 
         <!-- END SCREEN -->
-        <div class="screen end-screen" id="endScreen">
-            <div class="end-content">
-                <h2 class="end-title">🏆 ¡Juego Terminado! 🏆</h2>
-                <div class="winner-section" id="winnerSection"></div>
-                <div class="podium" id="podium"></div>
-                <div class="waiting-admin">
-                    <p>⏳ Esperando que el Jugador 1 decida...</p>
-                </div>
+        <div class="screen flex-col items-center justify-center p-10" id="endScreen">
+            <h2 class="text-3xl text-steam-turquesa mb-8 font-bold">Juego Terminado!</h2>
+            <div class="winner-bounce text-center mb-8" id="winnerSection"></div>
+            <div class="flex flex-col gap-3 max-w-lg w-full mb-8" id="podium"></div>
+            <div class="bg-orange-50 border-2 border-steam-naranja rounded-2xl py-5 px-8 text-center animate-pulse">
+                <p class="text-steam-naranja text-lg font-bold">Esperando que el Jugador 1 decida...</p>
             </div>
         </div>
 
-        <div class="sound-toggle" id="soundToggle">🔊</div>
-        <div class="confetti-container" id="confettiContainer"></div>
+        <!-- Sound toggle -->
+        <div class="absolute bottom-5 right-5 text-3xl cursor-pointer opacity-70 hover:opacity-100 transition-opacity z-50" id="soundToggle">🔊</div>
+        
+        <!-- Confetti container -->
+        <div class="fixed top-0 left-0 w-full h-full pointer-events-none z-[1000] overflow-hidden" id="confettiContainer"></div>
     </div>
 
     <script>
-        // Categories
         const categories = {
             general: { name: "General", emoji: "🌍", color: "general" },
             science: { name: "Ciencia", emoji: "🔬", color: "science" },
-            mathematics: { name: "Matemáticas", emoji: "📐", color: "mathematics" },
-            robotics: { name: "Robótica", emoji: "🤖", color: "robotics" },
-            chemistry: { name: "Química", emoji: "⚗️", color: "chemistry" },
-            technology: { name: "Tecnología", emoji: "💻", color: "technology" },
+            mathematics: { name: "Matematicas", emoji: "📐", color: "mathematics" },
+            robotics: { name: "Robotica", emoji: "🤖", color: "robotics" },
+            chemistry: { name: "Quimica", emoji: "⚗️", color: "chemistry" },
+            technology: { name: "Tecnologia", emoji: "💻", color: "technology" },
             history: { name: "Historia", emoji: "📜", color: "history" },
-            geography: { name: "Geografía", emoji: "🗺️", color: "geography" }
+            geography: { name: "Geografia", emoji: "🗺️", color: "geography" }
         };
 
-        // Questions database
         const questions = {
             general: [
-                { question: "¿Cuál es la capital de Francia?", options: ["Londres", "París", "Berlín", "Madrid"], correct: 1 },
-                { question: "¿En qué año llegó el hombre a la Luna?", options: ["1965", "1969", "1972", "1975"], correct: 1 },
-                { question: "¿Quién pintó la Mona Lisa?", options: ["Picasso", "Van Gogh", "Leonardo da Vinci", "Miguel Ángel"], correct: 2 },
-                { question: "¿Cuál es el océano más grande del mundo?", options: ["Atlántico", "Índico", "Ártico", "Pacífico"], correct: 3 },
-                { question: "¿Cuántos continentes hay en la Tierra?", options: ["5", "6", "7", "8"], correct: 2 }
+                { question: "Cual es la capital de Francia?", options: ["Londres", "Paris", "Berlin", "Madrid"], correct: 1 },
+                { question: "En que año llego el hombre a la Luna?", options: ["1965", "1969", "1972", "1975"], correct: 1 },
+                { question: "Quien pinto la Mona Lisa?", options: ["Picasso", "Van Gogh", "Leonardo da Vinci", "Miguel Angel"], correct: 2 },
+                { question: "Cual es el oceano mas grande del mundo?", options: ["Atlantico", "Indico", "Artico", "Pacifico"], correct: 3 },
+                { question: "Cuantos continentes hay en la Tierra?", options: ["5", "6", "7", "8"], correct: 2 }
             ],
             science: [
-                { question: "¿Cuál es el elemento químico del oro?", options: ["Go", "Gd", "Au", "Ag"], correct: 2 },
-                { question: "¿Qué planeta es el más cercano al Sol?", options: ["Venus", "Mercurio", "Marte", "Tierra"], correct: 1 },
-                { question: "¿Cuántos huesos tiene el cuerpo humano adulto?", options: ["196", "206", "216", "226"], correct: 1 },
-                { question: "¿Cuál es el animal más grande del mundo?", options: ["Elefante", "Tiburón blanco", "Ballena azul", "Jirafa"], correct: 2 },
-                { question: "¿Cuál es la galaxia en la que vivimos?", options: ["Andrómeda", "Vía Láctea", "Sombrero", "Triángulo"], correct: 1 }
+                { question: "Cual es el elemento quimico del oro?", options: ["Go", "Gd", "Au", "Ag"], correct: 2 },
+                { question: "Que planeta es el mas cercano al Sol?", options: ["Venus", "Mercurio", "Marte", "Tierra"], correct: 1 },
+                { question: "Cuantos huesos tiene el cuerpo humano adulto?", options: ["196", "206", "216", "226"], correct: 1 },
+                { question: "Cual es el animal mas grande del mundo?", options: ["Elefante", "Tiburon blanco", "Ballena azul", "Jirafa"], correct: 2 },
+                { question: "Cual es la galaxia en la que vivimos?", options: ["Andromeda", "Via Lactea", "Sombrero", "Triangulo"], correct: 1 }
             ],
             mathematics: [
-                { question: "¿Cuánto es 2 + 2 × 3?", options: ["12", "8", "10", "6"], correct: 1 },
-                { question: "¿Cuál es la raíz cuadrada de 144?", options: ["10", "11", "12", "13"], correct: 2 },
-                { question: "¿Cuántos grados tiene un triángulo?", options: ["180°", "360°", "90°", "270°"], correct: 0 },
-                { question: "¿Cuál es el número π (pi) aproximadamente?", options: ["2.14", "3.14", "4.14", "5.14"], correct: 1 },
-                { question: "¿Cuántos lados tiene un hexágono?", options: ["4", "5", "6", "7"], correct: 2 }
+                { question: "Cuanto es 2 + 2 × 3?", options: ["12", "8", "10", "6"], correct: 1 },
+                { question: "Cual es la raiz cuadrada de 144?", options: ["10", "11", "12", "13"], correct: 2 },
+                { question: "Cuantos grados tiene un triangulo?", options: ["180°", "360°", "90°", "270°"], correct: 0 },
+                { question: "Cual es el numero π (pi) aproximadamente?", options: ["2.14", "3.14", "4.14", "5.14"], correct: 1 },
+                { question: "Cuantos lados tiene un hexagono?", options: ["4", "5", "6", "7"], correct: 2 }
             ],
             robotics: [
-                { question: "¿Qué significa 'AI' en robótica?", options: ["Automated Intelligence", "Artificial Intelligence", "Advanced Integration", "Automatic Interface"], correct: 1 },
-                { question: "¿Qué sensor se usa para detectar obstáculos?", options: ["GPS", "Ultrasonido", "Bluetooth", "WiFi"], correct: 1 },
-                { question: "¿Qué lenguaje se usa comúnmente en Arduino?", options: ["Python", "Java", "C/C++", "JavaScript"], correct: 2 },
-                { question: "¿Qué es un actuador en robótica?", options: ["Sensor", "Motor", "Batería", "Procesador"], correct: 1 },
-                { question: "¿Qué es ROS en robótica?", options: ["Robot Operating System", "Robotic Output System", "Remote Operation Software", "Robot Optimization Suite"], correct: 0 }
+                { question: "Que significa 'AI' en robotica?", options: ["Automated Intelligence", "Artificial Intelligence", "Advanced Integration", "Automatic Interface"], correct: 1 },
+                { question: "Que sensor se usa para detectar obstaculos?", options: ["GPS", "Ultrasonido", "Bluetooth", "WiFi"], correct: 1 },
+                { question: "Que lenguaje se usa comunmente en Arduino?", options: ["Python", "Java", "C/C++", "JavaScript"], correct: 2 },
+                { question: "Que es un actuador en robotica?", options: ["Sensor", "Motor", "Bateria", "Procesador"], correct: 1 },
+                { question: "Que es ROS en robotica?", options: ["Robot Operating System", "Robotic Output System", "Remote Operation Software", "Robot Optimization Suite"], correct: 0 }
             ],
             chemistry: [
-                { question: "¿Cuál es el símbolo del elemento oxígeno?", options: ["Ox", "O2", "O", "Ox2"], correct: 2 },
-                { question: "¿Cuántos elementos hay en la tabla periódica?", options: ["108", "118", "128", "138"], correct: 1 },
-                { question: "¿Cuál es la fórmula del dióxido de carbono?", options: ["CO", "CO2", "C2O", "C2O2"], correct: 1 },
-                { question: "¿Qué pH tiene una sustancia neutra?", options: ["0", "7", "14", "10"], correct: 1 },
-                { question: "¿Cuál es la fórmula química del agua?", options: ["H2", "O2", "H2O", "HO"], correct: 2 }
+                { question: "Cual es el simbolo del elemento oxigeno?", options: ["Ox", "O2", "O", "Ox2"], correct: 2 },
+                { question: "Cuantos elementos hay en la tabla periodica?", options: ["108", "118", "128", "138"], correct: 1 },
+                { question: "Cual es la formula del dioxido de carbono?", options: ["CO", "CO2", "C2O", "C2O2"], correct: 1 },
+                { question: "Que pH tiene una sustancia neutra?", options: ["0", "7", "14", "10"], correct: 1 },
+                { question: "Cual es la formula quimica del agua?", options: ["H2", "O2", "H2O", "HO"], correct: 2 }
             ],
             technology: [
-                { question: "¿Qué significa 'www' en una dirección web?", options: ["World Wide Web", "World Web Way", "Wide World Web", "Web World Wide"], correct: 0 },
-                { question: "¿Qué compañía creó Android?", options: ["Apple", "Microsoft", "Google", "Samsung"], correct: 2 },
-                { question: "¿Qué significa 'CPU'?", options: ["Central Processing Unit", "Computer Power Unit", "Control Processing Unit", "Central Power Unit"], correct: 0 },
-                { question: "¿Qué significa 'HTML'?", options: ["HyperText Markup Language", "High Tech Machine Learning", "Home Tool Management List", "Hyper Transfer Media Link"], correct: 0 },
-                { question: "¿Qué compañía creó Windows?", options: ["Apple", "Google", "Microsoft", "IBM"], correct: 2 }
+                { question: "Que significa 'www' en una direccion web?", options: ["World Wide Web", "World Web Way", "Wide World Web", "Web World Wide"], correct: 0 },
+                { question: "Que compañia creo Android?", options: ["Apple", "Microsoft", "Google", "Samsung"], correct: 2 },
+                { question: "Que significa 'CPU'?", options: ["Central Processing Unit", "Computer Power Unit", "Control Processing Unit", "Central Power Unit"], correct: 0 },
+                { question: "Que significa 'HTML'?", options: ["HyperText Markup Language", "High Tech Machine Learning", "Home Tool Management List", "Hyper Transfer Media Link"], correct: 0 },
+                { question: "Que compañia creo Windows?", options: ["Apple", "Google", "Microsoft", "IBM"], correct: 2 }
             ],
             history: [
-                { question: "¿En qué año cayó el Imperio Romano de Occidente?", options: ["410", "476", "500", "600"], correct: 1 },
-                { question: "¿Quién fue el primer presidente de EE.UU.?", options: ["Jefferson", "Lincoln", "Washington", "Adams"], correct: 2 },
-                { question: "¿Qué civilización construyó las pirámides de Giza?", options: ["Griega", "Egipcia", "Romana", "Maya"], correct: 1 },
-                { question: "¿En qué año terminó la Segunda Guerra Mundial?", options: ["1943", "1944", "1945", "1946"], correct: 2 },
-                { question: "¿En qué año llegó Colón a América?", options: ["1492", "1500", "1510", "1520"], correct: 0 }
+                { question: "En que año cayo el Imperio Romano de Occidente?", options: ["410", "476", "500", "600"], correct: 1 },
+                { question: "Quien fue el primer presidente de EE.UU.?", options: ["Jefferson", "Lincoln", "Washington", "Adams"], correct: 2 },
+                { question: "Que civilizacion construyo las piramides de Giza?", options: ["Griega", "Egipcia", "Romana", "Maya"], correct: 1 },
+                { question: "En que año termino la Segunda Guerra Mundial?", options: ["1943", "1944", "1945", "1946"], correct: 2 },
+                { question: "En que año llego Colon a America?", options: ["1492", "1500", "1510", "1520"], correct: 0 }
             ],
             geography: [
-                { question: "¿Cuál es el río más largo del mundo?", options: ["Amazonas", "Nilo", "Yangtsé", "Misisipi"], correct: 1 },
-                { question: "¿Cuál es la montaña más alta del mundo?", options: ["K2", "Kangchenjunga", "Everest", "Makalu"], correct: 2 },
-                { question: "¿Cuál es la capital de Australia?", options: ["Sídney", "Melbourne", "Canberra", "Brisbane"], correct: 2 },
-                { question: "¿Cuál es el desierto más grande del mundo?", options: ["Sahara", "Gobi", "Antártico", "Arabia"], correct: 0 },
-                { question: "¿Cuál es la capital de Canadá?", options: ["Toronto", "Vancouver", "Montreal", "Ottawa"], correct: 3 }
+                { question: "Cual es el rio mas largo del mundo?", options: ["Amazonas", "Nilo", "Yangtse", "Misisipi"], correct: 1 },
+                { question: "Cual es la montaña mas alta del mundo?", options: ["K2", "Kangchenjunga", "Everest", "Makalu"], correct: 2 },
+                { question: "Cual es la capital de Australia?", options: ["Sidney", "Melbourne", "Canberra", "Brisbane"], correct: 2 },
+                { question: "Cual es el desierto mas grande del mundo?", options: ["Sahara", "Gobi", "Antartico", "Arabia"], correct: 0 },
+                { question: "Cual es la capital de Canada?", options: ["Toronto", "Vancouver", "Montreal", "Ottawa"], correct: 3 }
             ]
         };
 
@@ -854,18 +335,7 @@
         let soundEnabled = true;
         let adminDeviceId = null;
 
-        // Performance: cachear elementos DOM
-        const domCache = {
-            timerCircle: null,
-            timerBarFill: null,
-            questionNumber: null,
-            questionText: null,
-            optionsGrid: null,
-            playersStatus: null,
-            scoreboardList: null,
-            playersGrid: null,
-            adminHint: null
-        };
+        const domCache = {};
 
         function cacheDomElements() {
             domCache.timerCircle = document.getElementById('timerCircle');
@@ -878,11 +348,6 @@
             domCache.playersGrid = document.getElementById('playersGrid');
             domCache.adminHint = document.getElementById('adminHint');
         }
-
-        // Performance: usar requestAnimationFrame para timer
-        let timerAnimationId = null;
-        let timerStartTime = 0;
-        const TIMER_DURATION = 20000; // 20 segundos
 
         let audioContext;
 
@@ -974,7 +439,7 @@
         }
 
         function setCategoryBackground(category) {
-            document.body.className = 'cat-' + (categories[category]?.color || 'default');
+            document.body.className = 'cat-' + (categories[category]?.color || 'default') + ' font-sans text-steam-negro overflow-hidden';
         }
 
         function init() {
@@ -1008,7 +473,6 @@
                     players[deviceId] = {
                         id: deviceId,
                         name: data.name,
-                        emoji: data.emoji,
                         score: 0,
                         color: playerColors[Object.keys(players).length % playerColors.length],
                         isAdmin: isAdmin,
@@ -1021,7 +485,6 @@
                     airconsole.message(deviceId, { 
                         action: 'joined', 
                         color: players[deviceId].color,
-                        emoji: data.emoji,
                         isAdmin: isAdmin,
                         gameState: gameState,
                         selectedCategory: selectedCategory
@@ -1039,9 +502,14 @@
                     setCategoryBackground(selectedCategory);
                     
                     document.querySelectorAll('.category-card').forEach(card => {
-                        card.classList.remove('selected');
+                        card.classList.remove('border-steam-verde', 'bg-green-50');
+                        card.classList.add('border-gray-200');
                     });
-                    document.querySelector(`[data-category="${data.category}"]`)?.classList.add('selected');
+                    const selected = document.querySelector(`[data-category="${data.category}"]`);
+                    if (selected) {
+                        selected.classList.remove('border-gray-200');
+                        selected.classList.add('border-steam-verde', 'bg-green-50');
+                    }
                     
                     airconsole.broadcast({ action: 'categorySelected', category: data.category });
                     
@@ -1079,15 +547,15 @@
             grid.innerHTML = '';
             Object.entries(categories).forEach(([key, category]) => {
                 const card = document.createElement('div');
-                card.className = 'category-card';
+                card.className = 'category-card bg-white border-[3px] border-gray-200 rounded-2xl p-5 text-center cursor-pointer transition-all shadow-md hover:border-steam-turquesa hover:-translate-y-1 hover:shadow-lg';
                 card.dataset.category = key;
                 card.innerHTML = `
-                    <div class="category-emoji">${category.emoji}</div>
-                    <div class="category-name">${category.name}</div>
+                    <div class="text-4xl mb-3">${category.emoji}</div>
+                    <div class="text-lg font-bold">${category.name}</div>
                 `;
                 grid.appendChild(card);
             });
-            document.querySelector('.category-card')?.classList.add('selected');
+            document.querySelector('.category-card')?.classList.add('border-steam-verde', 'bg-green-50');
         }
 
         function updatePlayersDisplay() {
@@ -1096,13 +564,24 @@
             
             Object.values(players).forEach(player => {
                 const card = document.createElement('div');
-                card.className = `player-card ${player.isAdmin ? 'admin' : ''} ${player.disconnected ? 'disconnected' : ''}`;
+                let borderClass = 'border-gray-200';
+                let bgClass = 'bg-white';
+                
+                if (player.disconnected) {
+                    borderClass = 'border-steam-morado';
+                    bgClass = 'bg-pink-50 opacity-60';
+                } else if (player.isAdmin) {
+                    borderClass = 'border-steam-naranja';
+                    bgClass = 'bg-orange-50';
+                }
+                
+                card.className = `${bgClass} border-[3px] ${borderClass} rounded-2xl py-4 px-6 flex items-center gap-3 shadow-lg transition-all`;
                 card.innerHTML = `
-                    <div class="player-avatar" style="background-color: ${player.color}">${player.emoji}</div>
+                    <div class="player-avatar-visual" style="background-color: ${player.color};"></div>
                     <div>
-                        <div class="player-name">${player.name}</div>
-                        <div class="player-status">
-                            ${player.disconnected ? '❌ Desconectado' : (player.isAdmin ? '👑 Admin' : '✓ Conectado')}
+                        <div class="text-lg font-bold">${player.name}</div>
+                        <div class="text-sm ${player.disconnected ? 'text-steam-morado' : 'text-steam-verde'}">
+                            ${player.disconnected ? 'Desconectado' : (player.isAdmin ? 'Admin' : 'Conectado')}
                         </div>
                     </div>
                 `;
@@ -1114,7 +593,7 @@
 
             const adminHint = domCache.adminHint || document.getElementById('adminHint');
             if (adminHint && Object.keys(players).length >= 1) {
-                adminHint.style.display = 'block';
+                adminHint.classList.remove('hidden');
             }
 
             updatePlayersStatus();
@@ -1127,12 +606,23 @@
             const fragment = document.createDocumentFragment();
             Object.values(players).forEach(player => {
                 const hasAnswered = answers[player.id] !== undefined;
+                let borderClass = 'border-gray-200';
+                let bgClass = 'bg-white';
+                
+                if (player.disconnected) {
+                    borderClass = 'border-steam-morado';
+                    bgClass = 'bg-pink-50';
+                } else if (hasAnswered) {
+                    borderClass = 'border-steam-verde';
+                    bgClass = 'bg-green-50';
+                }
+                
                 const card = document.createElement('div');
-                card.className = `player-status-card ${hasAnswered ? 'answered' : ''} ${player.disconnected ? 'disconnected' : ''}`;
+                card.className = `flex items-center gap-2 ${bgClass} py-2 px-4 rounded-xl border-2 ${borderClass} transition-all`;
                 card.innerHTML = `
-                    <span class="player-status-icon">${player.emoji}</span>
-                    <span class="player-status-name">${player.name}</span>
-                    ${player.disconnected ? '<span style="color: #AB3D8B;">❌</span>' : (hasAnswered ? '<span style="color: #73A03F;">✓</span>' : '<span style="color: #999;">⏳</span>')}
+                    <div class="player-avatar-visual-small" style="background-color: ${player.color};"></div>
+                    <span class="font-bold text-sm">${player.name}</span>
+                    ${player.disconnected ? '<span class="text-steam-morado">X</span>' : (hasAnswered ? '<span class="text-steam-verde">✓</span>' : '<span class="text-gray-400">...</span>')}
                 `;
                 fragment.appendChild(card);
             });
@@ -1189,17 +679,16 @@
             container.innerHTML = '';
             
             const letters = ['A', 'B', 'C', 'D'];
-            const classes = ['option-a', 'option-b', 'option-c', 'option-d'];
+            const colors = ['bg-steam-verde', 'bg-steam-morado', 'bg-steam-turquesa', 'bg-steam-naranja'];
             
-            // Usar fragment para mejor rendimiento
             const fragment = document.createDocumentFragment();
             question.options.forEach((option, index) => {
                 const card = document.createElement('div');
-                card.className = `option-card ${classes[index]}`;
+                card.className = 'option-card flex items-center bg-white rounded-xl overflow-hidden border-[3px] border-gray-200 shadow-md transition-all';
                 card.dataset.index = index;
                 card.innerHTML = `
-                    <div class="option-letter">${letters[index]}</div>
-                    <div class="option-text">${option}</div>
+                    <div class="w-[70px] h-[70px] flex items-center justify-center text-3xl font-bold text-white flex-shrink-0 ${colors[index]}">${letters[index]}</div>
+                    <div class="flex-1 p-4 text-lg font-medium">${option}</div>
                 `;
                 fragment.appendChild(card);
             });
@@ -1234,20 +723,14 @@
             const percentage = (timeLeft / 20) * 100;
             barFill.style.width = `${percentage}%`;
             
-            // Optimizar cambio de clases
-            const classList = circle.classList;
+            circle.classList.remove('timer-warning', 'timer-danger', 'bg-steam-turquesa', 'bg-steam-naranja', 'bg-steam-morado');
+            
             if (timeLeft <= 5) {
-                if (!classList.contains('danger')) {
-                    classList.remove('warning');
-                    classList.add('danger');
-                }
+                circle.classList.add('bg-steam-morado', 'timer-danger');
             } else if (timeLeft <= 10) {
-                if (!classList.contains('warning')) {
-                    classList.remove('danger');
-                    classList.add('warning');
-                }
+                circle.classList.add('bg-steam-naranja', 'timer-warning');
             } else {
-                classList.remove('warning', 'danger');
+                circle.classList.add('bg-steam-turquesa');
             }
         }
 
@@ -1298,11 +781,13 @@
             const options = document.querySelectorAll('.option-card');
             options.forEach((opt, index) => {
                 if (index === question.correct) {
-                    opt.classList.add('correct');
+                    opt.classList.add('bg-steam-verde', 'border-steam-verde', 'option-correct');
+                    opt.querySelector('.flex-1').classList.add('text-white');
                 } else {
                     const wasSelected = Object.values(answers).some(a => a.option === index);
                     if (wasSelected) {
-                        opt.classList.add('incorrect');
+                        opt.classList.add('bg-steam-morado', 'border-steam-morado', 'option-incorrect');
+                        opt.querySelector('.flex-1').classList.add('text-white');
                     }
                 }
             });
@@ -1338,10 +823,13 @@
             
             sortedPlayers.forEach((player, index) => {
                 const item = document.createElement('div');
-                item.className = `scoreboard-item ${index === 0 ? 'first' : ''}`;
+                item.className = `flex justify-between items-center p-2 rounded-lg text-sm ${index === 0 ? 'bg-orange-50 border-2 border-steam-naranja' : 'bg-gray-100'}`;
                 item.innerHTML = `
-                    <span>${player.emoji} ${player.name}</span>
-                    <span>${player.score}</span>
+                    <div class="flex items-center gap-2">
+                        <div class="player-avatar-visual-small" style="background-color: ${player.color};"></div>
+                        <span>${player.name}</span>
+                    </div>
+                    <span class="font-bold">${player.score}</span>
                 `;
                 list.appendChild(item);
             });
@@ -1361,9 +849,12 @@
             if (sortedPlayers.length > 0) {
                 const winner = sortedPlayers[0];
                 winnerSection.innerHTML = `
-                    <div class="winner-crown">👑</div>
-                    <div class="winner-name">${winner.emoji} ${winner.name}</div>
-                    <div class="winner-score">${winner.score} puntos</div>
+                    <div class="text-6xl mb-4">1er Lugar</div>
+                    <div class="flex justify-center mb-4">
+                        <div class="player-avatar-visual-large" style="background-color: ${winner.color};"></div>
+                    </div>
+                    <div class="text-3xl font-bold text-steam-naranja">${winner.name}</div>
+                    <div class="text-xl text-steam-verde mt-2">${winner.score} puntos</div>
                 `;
                 
                 playSound('victory');
@@ -1373,19 +864,19 @@
             const podium = document.getElementById('podium');
             podium.innerHTML = '';
             
-            const medals = ['🥇', '🥈', '🥉'];
-            const classes = ['first', 'second', 'third'];
+            const medals = ['1ro', '2do', '3ro'];
+            const podiumBg = ['bg-gradient-to-r from-yellow-100 to-amber-100 border-steam-naranja', 'bg-gradient-to-r from-gray-100 to-gray-200 border-gray-400', 'bg-gradient-to-r from-orange-100 to-amber-100 border-orange-400'];
             
             sortedPlayers.forEach((player, index) => {
                 const item = document.createElement('div');
-                item.className = `podium-item ${classes[index] || 'other'}`;
+                item.className = `flex items-center justify-between p-4 rounded-2xl border-[3px] shadow-md ${podiumBg[index] || 'bg-white border-gray-200'}`;
                 item.innerHTML = `
-                    <div class="podium-left">
-                        <span class="podium-rank">${medals[index] || `#${index + 1}`}</span>
-                        <span style="font-size: 1.5em;">${player.emoji}</span>
-                        <span class="podium-name">${player.name}</span>
+                    <div class="flex items-center gap-4">
+                        <span class="text-2xl font-bold">${medals[index] || `#${index + 1}`}</span>
+                        <div class="player-avatar-visual" style="background-color: ${player.color};"></div>
+                        <span class="text-lg font-bold">${player.name}</span>
                     </div>
-                    <span class="podium-score">${player.score} pts</span>
+                    <span class="text-xl font-bold text-steam-turquesa">${player.score} pts</span>
                 `;
                 podium.appendChild(item);
             });

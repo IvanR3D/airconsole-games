@@ -4,21 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>STEAM Platformer - Fundación STEAM RD</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script type="text/javascript" src="https://www.airconsole.com/api/airconsole-1.8.0.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        steam: {
+                            turquesa: '#0595AE',
+                            morado: '#AB3D8B',
+                            naranja: '#EB8225',
+                            verde: '#73A03F',
+                            negro: '#010101',
+                            blanco: '#FFFFFF'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
-
-        :root {
-            --steam-turquesa: #0595AE;
-            --steam-morado: #AB3D8B;
-            --steam-naranja: #EB8225;
-            --steam-verde: #73A03F;
-            --steam-negro: #010101;
-            --steam-blanco: #FFFFFF;
         }
 
         html, body {
@@ -30,38 +40,9 @@
         }
 
         body {
-            font-family: 'Segoe UI', 'Arial', sans-serif;
-            background: var(--steam-blanco);
             position: fixed;
             top: 0;
             left: 0;
-            color: var(--steam-negro);
-        }
-
-        /* START SCREEN - Fondo blanco */
-        #startScreen {
-            width: 100vw;
-            height: 100vh;
-            background: var(--steam-blanco);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .logo {
-            font-size: 3em;
-            font-weight: 900;
-            background: linear-gradient(45deg, var(--steam-turquesa), var(--steam-morado), var(--steam-naranja), var(--steam-verde));
-            background-size: 300% 300%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: gradientMove 3s ease infinite;
-            filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.1));
-            margin-bottom: 15px;
         }
 
         @keyframes gradientMove {
@@ -70,265 +51,13 @@
             100% { background-position: 0% 50%; }
         }
 
-        .subtitle {
-            font-size: 1.3em;
-            color: var(--steam-turquesa);
-            margin-bottom: 30px;
-        }
-
-        .player-slots {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 30px;
-            width: 100%;
-            max-width: 700px;
-        }
-
-        .player-slot {
-            background: white;
-            border: 3px solid #E0E0E0;
-            border-radius: 15px;
-            padding: 20px;
-            transition: all 0.3s ease;
-            position: relative;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-        }
-
-        .player-slot.filled {
-            border-color: var(--steam-verde);
-            background: #F5FAF0;
-        }
-
-        .player-slot.admin {
-            border-color: var(--steam-naranja);
-            background: #FFF8F0;
-        }
-
-        .player-slot.disconnected {
-            border-color: var(--steam-morado);
-            background: #FDF0F5;
-        }
-
-        .player-slot.disconnected::after {
-            content: 'DESCONECTADO';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: var(--steam-morado);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 0.9em;
-        }
-
-        .player-slot h3 {
-            font-size: 1.3em;
-            color: var(--steam-turquesa);
-            margin-bottom: 8px;
-        }
-
-        .player-slot-avatar {
-            font-size: 2.5em;
-            margin-bottom: 8px;
-        }
-
-        .player-slot-color {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            margin: 8px auto;
-            border: 3px solid white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-        }
-
-        .player-slot p {
-            font-size: 1em;
-            color: var(--steam-negro);
-            opacity: 0.7;
-        }
-
-        .admin-hint {
-            background: #FFF8F0;
-            border: 2px solid var(--steam-naranja);
-            border-radius: 15px;
-            padding: 15px 25px;
-            margin-top: 20px;
-            text-align: center;
-            max-width: 500px;
-        }
-
-        .admin-hint p {
-            color: var(--steam-naranja);
-            font-weight: bold;
-        }
-
-        /* GAME CONTAINER - Mantiene colores del juego */
-        #gameContainer {
-            display: none;
-            width: 100vw;
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            overflow: hidden;
-            background: #0D2818;
-        }
-
-        .screen-split {
-            position: absolute;
-            overflow: hidden;
-            border: 4px solid var(--steam-naranja);
-        }
-
-        .screen-split.one-player {
-            width: 100vw;
-            height: 100vh;
-            border: none;
-        }
-
-        .screen-split.two-players {
-            width: 100vw;
-            height: calc(50vh - 2px);
-        }
-
-        .screen-split.two-players:nth-child(1) { top: 0; }
-        .screen-split.two-players:nth-child(2) { top: calc(50vh + 2px); }
-
-        .screen-split.three-players:nth-child(1) { 
-            top: 0; left: 0; 
-            width: 100vw; 
-            height: calc(50vh - 2px);
-        }
-        .screen-split.three-players:nth-child(2) { 
-            top: calc(50vh + 2px); left: 0; 
-            width: calc(50vw - 2px); 
-            height: calc(50vh - 2px);
-        }
-        .screen-split.three-players:nth-child(3) { 
-            top: calc(50vh + 2px); left: calc(50vw + 2px); 
-            width: calc(50vw - 2px); 
-            height: calc(50vh - 2px);
-        }
-
-        .screen-split.four-players {
-            width: calc(50vw - 2px);
-            height: calc(50vh - 2px);
-        }
-
-        .screen-split.four-players:nth-child(1) { top: 0; left: 0; }
-        .screen-split.four-players:nth-child(2) { top: 0; left: calc(50vw + 2px); }
-        .screen-split.four-players:nth-child(3) { top: calc(50vh + 2px); left: 0; }
-        .screen-split.four-players:nth-child(4) { top: calc(50vh + 2px); left: calc(50vw + 2px); }
-
-        .game-canvas {
-            width: 100%;
-            height: 100%;
-            position: relative;
-        }
-
-        canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .player-hud {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background: rgba(0, 0, 0, 0.7);
-            border: 3px solid;
-            padding: 12px 20px;
-            border-radius: 12px;
-            font-size: 1.3em;
-            font-weight: bold;
-            z-index: 10;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: white;
-        }
-
-        .player-name-badge {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(0, 0, 0, 0.7);
-            border: 3px solid;
-            padding: 10px 18px;
-            border-radius: 12px;
-            font-size: 1.1em;
-            font-weight: bold;
-            z-index: 10;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: white;
-        }
-
-        .disconnect-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 20;
-        }
-
-        .disconnect-overlay.active {
-            display: flex;
-        }
-
-        .disconnect-text {
-            font-size: 2em;
-            color: var(--steam-morado);
-            font-weight: bold;
-            text-align: center;
-        }
-
-        /* RESULTS SCREEN - Fondo blanco */
-        #resultsScreen {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: var(--steam-blanco);
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-        }
-
-        .results-container {
-            background: white;
-            border: 3px solid #E0E0E0;
-            border-radius: 25px;
-            padding: 40px;
-            text-align: center;
-            width: 90%;
-            max-width: 700px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
-        }
-
-        .results-title {
-            font-size: 2.5em;
-            color: var(--steam-turquesa);
-            margin-bottom: 25px;
-        }
-
-        .winner-section {
-            margin-bottom: 30px;
-            animation: winnerBounce 0.5s ease;
+        .logo-gradient {
+            background: linear-gradient(45deg, #0595AE, #AB3D8B, #EB8225, #73A03F);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientMove 3s ease infinite;
         }
 
         @keyframes winnerBounce {
@@ -337,67 +66,8 @@
             100% { transform: scale(1); opacity: 1; }
         }
 
-        .winner-crown {
-            font-size: 4em;
-            margin-bottom: 10px;
-        }
-
-        .winner-name {
-            font-size: 2em;
-            font-weight: bold;
-            color: var(--steam-naranja);
-        }
-
-        .winner-score {
-            font-size: 1.3em;
-            color: var(--steam-verde);
-            margin-top: 5px;
-        }
-
-        .results-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
-        }
-
-        .results-table th {
-            background: #F5F5F5;
-            padding: 12px;
-            text-align: left;
-            font-size: 1.1em;
-            color: var(--steam-turquesa);
-            border-bottom: 2px solid #E0E0E0;
-        }
-
-        .results-table td {
-            padding: 12px;
-            font-size: 1em;
-            border-bottom: 1px solid #E0E0E0;
-            color: var(--steam-negro);
-        }
-
-        .results-table tr:first-child td {
-            background: #FFF8F0;
-            font-weight: bold;
-        }
-
-        .player-color-dot {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            margin-right: 8px;
-            vertical-align: middle;
-            border: 2px solid white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-        }
-
-        .waiting-admin-result {
-            background: #FFF8F0;
-            border: 2px solid var(--steam-naranja);
-            border-radius: 15px;
-            padding: 15px 25px;
-            animation: pulse 2s ease infinite;
+        .winner-bounce {
+            animation: winnerBounce 0.5s ease;
         }
 
         @keyframes pulse {
@@ -405,22 +75,13 @@
             50% { opacity: 0.7; }
         }
 
-        .waiting-admin-result p {
-            color: var(--steam-naranja);
-            font-size: 1.1em;
-            font-weight: bold;
+        .pulse-anim {
+            animation: pulse 2s ease infinite;
         }
 
-        /* CONFETTI */
-        .confetti-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1000;
-            overflow: hidden;
+        @keyframes confettiFall {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
         }
 
         .confetti {
@@ -430,76 +91,122 @@
             animation: confettiFall 3s ease-out forwards;
         }
 
-        @keyframes confettiFall {
-            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        /* Player avatar visual representation */
+        .player-avatar-visual {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
-        .hidden {
-            display: none !important;
+        .player-avatar-visual::before {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            right: 3px;
+            height: 10px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 6px 6px 0 0;
+        }
+
+        .player-avatar-visual-small {
+            width: 35px;
+            height: 35px;
+            border-radius: 8px;
+        }
+
+        .player-avatar-visual-small::before {
+            height: 7px;
+            border-radius: 4px 4px 0 0;
+        }
+
+        .player-avatar-visual-large {
+            width: 70px;
+            height: 70px;
+            border-radius: 14px;
+        }
+
+        .player-avatar-visual-large::before {
+            height: 14px;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            border-radius: 8px 8px 0 0;
         }
     </style>
 </head>
-<body>
-    <div id="startScreen">
-        <div class="logo">🎮 STEAM PLATFORMER 🎮</div>
-        <p class="subtitle">1-4 Jugadores • Carrera a la Meta • Colecta Monedas</p>
-        <div class="player-slots">
-            <div class="player-slot" id="playerSlot1">
-                <h3>Jugador 1</h3>
-                <div class="player-slot-avatar">❓</div>
-                <div class="player-slot-color" style="background: var(--steam-verde);"></div>
-                <p>Esperando...</p>
+<body class="font-sans bg-white text-steam-negro">
+    <!-- START SCREEN -->
+    <div id="startScreen" class="w-screen h-screen bg-white flex flex-col items-center justify-center p-8 text-center">
+        <h1 class="text-4xl md:text-5xl font-black logo-gradient drop-shadow mb-4">STEAM PLATFORMER</h1>
+        <p class="text-lg text-steam-turquesa mb-8">1-4 Jugadores - Carrera a la Meta - Colecta Monedas</p>
+        
+        <div class="grid grid-cols-2 gap-4 mb-8 w-full max-w-2xl">
+            <div class="player-slot bg-white border-4 border-gray-200 rounded-2xl p-5 shadow-lg transition-all" id="playerSlot1">
+                <h3 class="text-xl font-bold text-steam-turquesa mb-2">Jugador 1</h3>
+                <div class="flex justify-center mb-2">
+                    <div class="player-avatar-visual bg-gray-300"></div>
+                </div>
+                <p class="text-sm opacity-70">Esperando...</p>
             </div>
-            <div class="player-slot" id="playerSlot2">
-                <h3>Jugador 2</h3>
-                <div class="player-slot-avatar">❓</div>
-                <div class="player-slot-color" style="background: var(--steam-morado);"></div>
-                <p>Esperando...</p>
+            <div class="player-slot bg-white border-4 border-gray-200 rounded-2xl p-5 shadow-lg transition-all" id="playerSlot2">
+                <h3 class="text-xl font-bold text-steam-turquesa mb-2">Jugador 2</h3>
+                <div class="flex justify-center mb-2">
+                    <div class="player-avatar-visual bg-gray-300"></div>
+                </div>
+                <p class="text-sm opacity-70">Esperando...</p>
             </div>
-            <div class="player-slot" id="playerSlot3">
-                <h3>Jugador 3</h3>
-                <div class="player-slot-avatar">❓</div>
-                <div class="player-slot-color" style="background: var(--steam-turquesa);"></div>
-                <p>Esperando...</p>
+            <div class="player-slot bg-white border-4 border-gray-200 rounded-2xl p-5 shadow-lg transition-all" id="playerSlot3">
+                <h3 class="text-xl font-bold text-steam-turquesa mb-2">Jugador 3</h3>
+                <div class="flex justify-center mb-2">
+                    <div class="player-avatar-visual bg-gray-300"></div>
+                </div>
+                <p class="text-sm opacity-70">Esperando...</p>
             </div>
-            <div class="player-slot" id="playerSlot4">
-                <h3>Jugador 4</h3>
-                <div class="player-slot-avatar">❓</div>
-                <div class="player-slot-color" style="background: var(--steam-naranja);"></div>
-                <p>Esperando...</p>
+            <div class="player-slot bg-white border-4 border-gray-200 rounded-2xl p-5 shadow-lg transition-all" id="playerSlot4">
+                <h3 class="text-xl font-bold text-steam-turquesa mb-2">Jugador 4</h3>
+                <div class="flex justify-center mb-2">
+                    <div class="player-avatar-visual bg-gray-300"></div>
+                </div>
+                <p class="text-sm opacity-70">Esperando...</p>
             </div>
         </div>
-        <div class="admin-hint" id="adminHint" style="display: none;">
-            <p>👑 El Jugador 1 controla el juego desde su teléfono</p>
+        
+        <div class="bg-orange-50 border-2 border-steam-naranja rounded-2xl py-4 px-6 max-w-lg hidden" id="adminHint">
+            <p class="text-steam-naranja font-bold">El Jugador 1 controla el juego desde su telefono</p>
         </div>
     </div>
 
-    <div id="gameContainer"></div>
+    <!-- GAME CONTAINER -->
+    <div id="gameContainer" class="hidden w-screen h-screen fixed top-0 left-0 overflow-hidden bg-[#0D2818]"></div>
 
-    <div id="resultsScreen">
-        <div class="results-container">
-            <h2 class="results-title">🏆 ¡Carrera Terminada! 🏆</h2>
-            <div class="winner-section" id="winnerSection"></div>
-            <table class="results-table">
+    <!-- RESULTS SCREEN -->
+    <div id="resultsScreen" class="hidden fixed top-0 left-0 w-screen h-screen bg-white items-center justify-center z-50">
+        <div class="bg-white border-4 border-gray-200 rounded-3xl p-10 text-center w-11/12 max-w-2xl shadow-xl">
+            <h2 class="text-3xl font-bold text-steam-turquesa mb-6">Carrera Terminada!</h2>
+            <div class="winner-bounce mb-8" id="winnerSection"></div>
+            <table class="w-full mb-8 border-collapse">
                 <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Jugador</th>
-                        <th>Monedas</th>
-                        <th>Tiempo</th>
-                        <th>Puntos</th>
+                    <tr class="bg-gray-100">
+                        <th class="p-3 text-left text-steam-turquesa border-b-2 border-gray-200">Rank</th>
+                        <th class="p-3 text-left text-steam-turquesa border-b-2 border-gray-200">Jugador</th>
+                        <th class="p-3 text-left text-steam-turquesa border-b-2 border-gray-200">Monedas</th>
+                        <th class="p-3 text-left text-steam-turquesa border-b-2 border-gray-200">Tiempo</th>
+                        <th class="p-3 text-left text-steam-turquesa border-b-2 border-gray-200">Puntos</th>
                     </tr>
                 </thead>
                 <tbody id="resultsBody"></tbody>
             </table>
-            <div class="waiting-admin-result">
-                <p>⏳ Esperando que el Jugador 1 decida...</p>
+            <div class="bg-orange-50 border-2 border-steam-naranja rounded-2xl py-4 px-6 pulse-anim">
+                <p class="text-steam-naranja font-bold">Esperando que el Jugador 1 decida...</p>
             </div>
         </div>
     </div>
 
-    <div class="confetti-container" id="confettiContainer"></div>
+    <!-- CONFETTI -->
+    <div class="fixed top-0 left-0 w-full h-full pointer-events-none z-[1000] overflow-hidden" id="confettiContainer"></div>
 
     <script>
         const airconsole = new AirConsole();
@@ -541,7 +248,6 @@
 
         const playerColors = ['#73A03F', '#AB3D8B', '#0595AE', '#EB8225'];
         const playerColorNames = ['Verde', 'Morado', 'Turquesa', 'Naranja'];
-        const availableAvatars = ['🦊', '🐼', '🐸', '🦁', '🐯', '🐻', '🐨', '🐵', '🦄', '🐙', '🐲', '🦅'];
 
         const gameState = {
             players: {},
@@ -669,7 +375,6 @@
                             deviceId: device_id,
                             name: playerColorNames[i],
                             color: playerColors[i],
-                            avatar: data.avatar || availableAvatars[Math.floor(Math.random() * availableAvatars.length)],
                             isAdmin: isAdmin,
                             connected: true,
                             disconnected: false
@@ -681,9 +386,8 @@
                             playerNum: i + 1,
                             color: playerColors[i],
                             colorName: playerColorNames[i],
-                            avatar: gameState.players[i+1].avatar,
                             isAdmin: isAdmin,
-                            availableAvatars: availableAvatars
+                            availableColors: playerColors.map((c, idx) => ({ color: c, name: playerColorNames[idx] }))
                         });
                         break;
                     }
@@ -692,26 +396,6 @@
                 if (assigned) {
                     updatePlayerSlots();
                     broadcastGameState();
-                }
-                
-            } else if (data.action === 'selectAvatar') {
-                for (let playerNum in gameState.players) {
-                    if (gameState.players[playerNum].deviceId === device_id) {
-                        gameState.players[playerNum].avatar = data.avatar;
-                        if (gameState.games[playerNum]) {
-                            gameState.games[playerNum].avatar = data.avatar;
-                            
-                            // Actualizar badge en el juego si está activo
-                            const badge = document.querySelector(`#player${playerNum}Screen .player-name-badge`);
-                            if (badge) {
-                                const avatarSpan = badge.querySelector('span:first-child');
-                                if (avatarSpan) avatarSpan.textContent = data.avatar;
-                            }
-                        }
-                        updatePlayerSlots();
-                        broadcastGameState();
-                        break;
-                    }
                 }
                 
             } else if (data.action === 'selectColor') {
@@ -723,7 +407,6 @@
                             gameState.games[playerNum].player.color = data.color;
                             gameState.games[playerNum].color = data.color;
                             
-                            // Actualizar badge en el juego si está activo
                             const badge = document.querySelector(`#player${playerNum}Screen .player-name-badge`);
                             if (badge) {
                                 badge.style.borderColor = data.color;
@@ -778,30 +461,39 @@
                 const slot = document.getElementById(`playerSlot${i}`);
                 const player = gameState.players[i];
                 
-                slot.classList.remove('filled', 'admin', 'disconnected');
+                slot.className = 'bg-white border-4 rounded-2xl p-5 shadow-lg transition-all';
                 
                 if (player) {
-                    slot.classList.add('filled');
-                    if (player.isAdmin) slot.classList.add('admin');
-                    if (player.disconnected) slot.classList.add('disconnected');
+                    if (player.disconnected) {
+                        slot.classList.add('border-steam-morado', 'bg-pink-50');
+                    } else if (player.isAdmin) {
+                        slot.classList.add('border-steam-naranja', 'bg-orange-50');
+                    } else {
+                        slot.classList.add('border-steam-verde', 'bg-green-50');
+                    }
                     
                     slot.innerHTML = `
-                        <h3>${player.name}${player.isAdmin ? ' 👑' : ''}</h3>
-                        <div class="player-slot-avatar">${player.avatar}</div>
-                        <div class="player-slot-color" style="background: ${player.color};"></div>
-                        <p>${player.disconnected ? '❌ Desconectado' : '✓ Listo'}</p>
+                        <h3 class="text-xl font-bold text-steam-turquesa mb-2">${player.name}${player.isAdmin ? ' (Admin)' : ''}</h3>
+                        <div class="flex justify-center mb-2">
+                            <div class="player-avatar-visual" style="background-color: ${player.color};"></div>
+                        </div>
+                        <p class="text-sm ${player.disconnected ? 'text-steam-morado' : 'text-steam-verde'} font-semibold">
+                            ${player.disconnected ? 'Desconectado' : 'Listo'}
+                        </p>
                     `;
                 } else {
+                    slot.classList.add('border-gray-200');
                     slot.innerHTML = `
-                        <h3>Jugador ${i}</h3>
-                        <div class="player-slot-avatar">❓</div>
-                        <div class="player-slot-color" style="background: ${playerColors[i-1]};"></div>
-                        <p>Esperando...</p>
+                        <h3 class="text-xl font-bold text-steam-turquesa mb-2">Jugador ${i}</h3>
+                        <div class="flex justify-center mb-2">
+                            <div class="player-avatar-visual bg-gray-300"></div>
+                        </div>
+                        <p class="text-sm opacity-70">Esperando...</p>
                     `;
                 }
             }
             
-            document.getElementById('adminHint').style.display = connectedPlayers > 0 ? 'block' : 'none';
+            document.getElementById('adminHint').classList.toggle('hidden', connectedPlayers === 0);
         }
 
         function broadcastGameState() {
@@ -827,7 +519,7 @@
             for (let playerNum in gameState.players) {
                 if (!gameState.players[playerNum].disconnected) {
                     const player = gameState.players[playerNum];
-                    gameState.games[playerNum] = new Game(playerNum, player.color, player.avatar);
+                    gameState.games[playerNum] = new Game(playerNum, player.color);
                     gameState.games[playerNum].init();
                     idx++;
                 }
@@ -840,44 +532,69 @@
             const container = document.getElementById('gameContainer');
             container.innerHTML = '';
             
+            const splitClasses = {
+                1: 'w-screen h-screen border-0',
+                2: 'w-screen h-[calc(50vh-2px)]',
+                3: 'screen-split-3',
+                4: 'w-[calc(50vw-2px)] h-[calc(50vh-2px)]'
+            };
+            
             let idx = 0;
             for (let playerNum in gameState.players) {
                 if (gameState.players[playerNum].disconnected) continue;
                 
                 const player = gameState.players[playerNum];
                 const splitDiv = document.createElement('div');
-                splitDiv.className = `screen-split ${getSplitClass(playerCount)}`;
+                splitDiv.className = `absolute overflow-hidden border-4 border-steam-naranja`;
                 splitDiv.id = `player${playerNum}Screen`;
                 
+                // Position based on player count and index
+                if (playerCount === 1) {
+                    splitDiv.className = 'absolute w-screen h-screen overflow-hidden';
+                } else if (playerCount === 2) {
+                    splitDiv.className = `absolute w-screen h-[calc(50vh-2px)] overflow-hidden border-4 border-steam-naranja`;
+                    splitDiv.style.top = idx === 0 ? '0' : 'calc(50vh + 2px)';
+                } else if (playerCount === 3) {
+                    if (idx === 0) {
+                        splitDiv.className = 'absolute w-screen h-[calc(50vh-2px)] overflow-hidden border-4 border-steam-naranja';
+                        splitDiv.style.top = '0';
+                        splitDiv.style.left = '0';
+                    } else {
+                        splitDiv.className = 'absolute w-[calc(50vw-2px)] h-[calc(50vh-2px)] overflow-hidden border-4 border-steam-naranja';
+                        splitDiv.style.top = 'calc(50vh + 2px)';
+                        splitDiv.style.left = idx === 1 ? '0' : 'calc(50vw + 2px)';
+                    }
+                } else if (playerCount === 4) {
+                    splitDiv.className = 'absolute w-[calc(50vw-2px)] h-[calc(50vh-2px)] overflow-hidden border-4 border-steam-naranja';
+                    const positions = [
+                        { top: '0', left: '0' },
+                        { top: '0', left: 'calc(50vw + 2px)' },
+                        { top: 'calc(50vh + 2px)', left: '0' },
+                        { top: 'calc(50vh + 2px)', left: 'calc(50vw + 2px)' }
+                    ];
+                    splitDiv.style.top = positions[idx].top;
+                    splitDiv.style.left = positions[idx].left;
+                }
+                
                 splitDiv.innerHTML = `
-                    <div class="game-canvas">
-                        <canvas id="canvas${playerNum}"></canvas>
-                        <div class="player-hud" style="border-color: ${player.color};">
-                            <span>🪙</span>
+                    <div class="w-full h-full relative">
+                        <canvas id="canvas${playerNum}" class="absolute top-0 left-0 w-full h-full"></canvas>
+                        <div class="absolute top-4 left-4 bg-black/70 border-4 rounded-xl py-3 px-5 text-xl font-bold z-10 flex items-center gap-2 text-white" style="border-color: ${player.color};">
+                            <span>Monedas:</span>
                             <span id="coinCount${playerNum}">0</span>/${LEVEL.coins.length}
                         </div>
-                        <div class="player-name-badge" style="border-color: ${player.color}; color: ${player.color};">
-                            <span>${player.avatar}</span>
+                        <div class="absolute top-4 right-4 bg-black/70 border-4 rounded-xl py-2 px-4 font-bold z-10 flex items-center gap-2" style="border-color: ${player.color}; color: ${player.color};">
+                            <div class="player-avatar-visual-small" style="background-color: ${player.color};"></div>
                             <span>${player.name}</span>
                         </div>
-                        <div class="disconnect-overlay">
-                            <div class="disconnect-text">❌ DESCONECTADO</div>
+                        <div class="disconnect-overlay absolute top-0 left-0 w-full h-full bg-black/80 hidden items-center justify-center z-20">
+                            <div class="text-2xl text-steam-morado font-bold text-center">DESCONECTADO</div>
                         </div>
                     </div>
                 `;
                 
                 container.appendChild(splitDiv);
                 idx++;
-            }
-        }
-
-        function getSplitClass(playerCount) {
-            switch(playerCount) {
-                case 1: return 'one-player';
-                case 2: return 'two-players';
-                case 3: return 'three-players';
-                case 4: return 'four-players';
-                default: return 'one-player';
             }
         }
 
@@ -915,7 +632,6 @@
                         playerNum: playerNum,
                         name: player.name,
                         color: player.color,
-                        avatar: player.avatar,
                         coins: game.coins,
                         time: ((game.finishTime - gameState.startTime) / 1000).toFixed(1),
                         score: totalScore
@@ -929,9 +645,12 @@
             if (results.length > 0) {
                 const winner = results[0];
                 winnerSection.innerHTML = `
-                    <div class="winner-crown">👑</div>
-                    <div class="winner-name">${winner.avatar} ${winner.name}</div>
-                    <div class="winner-score">${winner.score} puntos</div>
+                    <div class="text-6xl mb-4">1er Lugar</div>
+                    <div class="flex justify-center mb-4">
+                        <div class="player-avatar-visual-large" style="background-color: ${winner.color};"></div>
+                    </div>
+                    <div class="text-2xl font-bold text-steam-naranja">${winner.name}</div>
+                    <div class="text-xl text-steam-verde mt-2">${winner.score} puntos</div>
                 `;
                 playSound('win');
                 createConfetti();
@@ -940,15 +659,21 @@
             const resultsBody = document.getElementById('resultsBody');
             resultsBody.innerHTML = '';
             
-            const medals = ['🥇', '🥈', '🥉'];
+            const medals = ['1ro', '2do', '3ro'];
             results.forEach((result, index) => {
                 const row = document.createElement('tr');
+                row.className = index === 0 ? 'bg-orange-50 font-bold' : '';
                 row.innerHTML = `
-                    <td>${medals[index] || `#${index + 1}`}</td>
-                    <td><span class="player-color-dot" style="background: ${result.color};"></span>${result.avatar} ${result.name}</td>
-                    <td>${result.coins}</td>
-                    <td>${result.time}s</td>
-                    <td><strong>${result.score}</strong></td>
+                    <td class="p-3 border-b border-gray-200">${medals[index] || `#${index + 1}`}</td>
+                    <td class="p-3 border-b border-gray-200">
+                        <div class="flex items-center gap-2">
+                            <div class="w-5 h-5 rounded-full border-2 border-white shadow" style="background: ${result.color};"></div>
+                            ${result.name}
+                        </div>
+                    </td>
+                    <td class="p-3 border-b border-gray-200">${result.coins}</td>
+                    <td class="p-3 border-b border-gray-200">${result.time}s</td>
+                    <td class="p-3 border-b border-gray-200"><strong>${result.score}</strong></td>
                 `;
                 resultsBody.appendChild(row);
             });
@@ -963,10 +688,9 @@
         }
 
         class Game {
-            constructor(playerNum, color, avatar) {
+            constructor(playerNum, color) {
                 this.playerNum = playerNum;
                 this.color = color;
-                this.avatar = avatar;
                 this.canvas = null;
                 this.ctx = null;
                 this.keys = { left: false, right: false, jump: false };
@@ -1003,16 +727,13 @@
                 this.finishX = LEVEL.finishX;
                 this.finishY = LEVEL.finishY;
                 
-                // Performance: timing y frame rate
                 this.lastTime = 0;
                 this.targetFPS = 60;
                 this.frameInterval = 1000 / this.targetFPS;
                 this.animationId = null;
                 
-                // Performance: cachear elementos DOM
                 this.coinCountEl = null;
                 
-                // Performance: offscreen canvas para fondo estático
                 this.bgCanvas = null;
                 this.bgCtx = null;
                 this.bgDrawn = false;
@@ -1026,10 +747,8 @@
                 this.canvas.width = container.clientWidth;
                 this.canvas.height = container.clientHeight;
                 
-                // Cachear elemento DOM
                 this.coinCountEl = document.getElementById(`coinCount${this.playerNum}`);
                 
-                // Crear offscreen canvas para fondo
                 this.bgCanvas = document.createElement('canvas');
                 this.bgCanvas.width = this.finishX + 200;
                 this.bgCanvas.height = this.canvas.height;
@@ -1056,7 +775,6 @@
                 this.player.y = 250 * heightRatio;
                 this.finishY = this.canvas.height - 50;
                 
-                // Dibujar fondo estático una vez
                 this.drawStaticBackground();
                 
                 this.lastTime = performance.now();
@@ -1068,14 +786,12 @@
                 const width = this.bgCanvas.width;
                 const height = this.bgCanvas.height;
                 
-                // Background gradient
                 const gradient = ctx.createLinearGradient(0, 0, 0, height);
                 gradient.addColorStop(0, '#1B4D3E');
                 gradient.addColorStop(1, '#0D2818');
                 ctx.fillStyle = gradient;
                 ctx.fillRect(0, 0, width, height);
                 
-                // Grid
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
                 for (let x = 0; x < width; x += 50) {
                     for (let y = 0; y < height; y += 50) {
@@ -1085,7 +801,6 @@
                     }
                 }
                 
-                // Floor segments
                 const floorHeight = height - 50;
                 this.floorSegments.forEach(segment => {
                     ctx.fillStyle = '#2D5A4A';
@@ -1096,7 +811,6 @@
                     ctx.fillRect(segment.x, floorHeight + 42, segment.width, 8);
                 });
                 
-                // Platforms
                 this.platforms.forEach(platform => {
                     ctx.fillStyle = '#37474F';
                     ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
@@ -1104,7 +818,6 @@
                     ctx.fillRect(platform.x, platform.y, platform.width, 4);
                 });
                 
-                // Finish flag
                 const flagX = this.finishX;
                 const flagY = this.finishY - 120;
                 ctx.fillStyle = '#37474F';
@@ -1120,13 +833,12 @@
                 ctx.textAlign = 'center';
                 ctx.fillText('META', flagX + 28, flagY + 25);
                 
-                // Pit warnings
                 ctx.fillStyle = '#EB8225';
                 ctx.font = 'bold 16px Arial';
                 ctx.textAlign = 'center';
-                ctx.fillText('⚠️', 400, floorHeight + 80);
-                ctx.fillText('⚠️', 825, floorHeight + 80);
-                ctx.fillText('⚠️', 1325, floorHeight + 80);
+                ctx.fillText('!', 400, floorHeight + 80);
+                ctx.fillText('!', 825, floorHeight + 80);
+                ctx.fillText('!', 1325, floorHeight + 80);
                 
                 this.bgDrawn = true;
             }
@@ -1137,7 +849,6 @@
                     if (container) {
                         this.canvas.width = container.clientWidth || window.innerWidth;
                         this.canvas.height = container.clientHeight || window.innerHeight;
-                        // Redibujar fondo si cambia el tamaño
                         if (this.bgCanvas) {
                             this.bgCanvas.height = this.canvas.height;
                             this.drawStaticBackground();
@@ -1286,7 +997,6 @@
             }
 
             draw() {
-                // Dibujar fondo desde offscreen canvas (muy rápido)
                 if (this.bgDrawn) {
                     this.ctx.drawImage(
                         this.bgCanvas, 
@@ -1298,7 +1008,6 @@
                 this.ctx.save();
                 this.ctx.translate(-this.cameraX, 0);
 
-                // Obstacles (dinámicos - se mueven)
                 this.obstacles.forEach(obs => {
                     this.ctx.fillStyle = '#AB3D8B';
                     this.ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
@@ -1306,7 +1015,6 @@
                     this.ctx.fillRect(obs.x, obs.y, obs.width, 4);
                 });
 
-                // Coins (animados)
                 const coinOffset = Math.sin(performance.now() / 200) * 3;
                 this.coinList.forEach(coin => {
                     if (!coin.collected) {
@@ -1321,7 +1029,6 @@
                     }
                 });
 
-                // Particles
                 if (this.particles.length > 0) {
                     this.particles.forEach(p => {
                         this.ctx.fillStyle = p.color;
@@ -1333,36 +1040,28 @@
                     this.ctx.globalAlpha = 1;
                 }
 
-                // Player
                 if (this.player.stunned) {
                     this.ctx.globalAlpha = 0.3 + Math.sin(performance.now() / 50) * 0.3;
                 }
                 
+                // Draw player as rounded rectangle (the game avatar)
                 this.ctx.fillStyle = this.player.color;
                 this.ctx.beginPath();
                 this.ctx.roundRect(this.player.x, this.player.y, this.player.width, this.player.height, 8);
                 this.ctx.fill();
                 
+                // Highlight on player
                 this.ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
                 this.ctx.beginPath();
                 this.ctx.roundRect(this.player.x + 3, this.player.y + 3, this.player.width - 6, 8, 4);
                 this.ctx.fill();
-                
-                // Avatar
-                this.ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-                this.ctx.shadowBlur = 3;
-                this.ctx.font = 'bold 22px Arial';
-                this.ctx.textAlign = 'center';
-                this.ctx.textBaseline = 'middle';
-                this.ctx.fillText(this.avatar, this.player.x + this.player.width/2, this.player.y + this.player.height/2);
-                this.ctx.shadowBlur = 0;
                 
                 this.ctx.globalAlpha = 1;
                 this.ctx.restore();
             }
 
             createParticles(x, y, colors) {
-                const count = Math.min(8, 10); // Limitar partículas
+                const count = Math.min(8, 10);
                 for (let i = 0; i < count; i++) {
                     this.particles.push({
                         x: x,
@@ -1378,7 +1077,6 @@
             animate(currentTime) {
                 this.animationId = requestAnimationFrame((t) => this.animate(t));
                 
-                // Control de frame rate para consistencia
                 if (!currentTime) currentTime = performance.now();
                 const deltaTime = currentTime - this.lastTime;
                 
