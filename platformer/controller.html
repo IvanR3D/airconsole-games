@@ -147,7 +147,7 @@
         .btn-morado { background: #AB3D8B; box-shadow: 0 6px 0 #8a3070; }
         .btn-morado:active { box-shadow: 0 2px 0 #8a3070; }
 
-        /* Game controls */
+        /* Game controls - responsive for both orientations */
         .ctrl-btn {
             display: flex;
             flex-direction: column;
@@ -159,8 +159,8 @@
         .ctrl-btn:active, .ctrl-btn.pressed { transform: translateY(6px); }
 
         .jump-btn {
-            width: clamp(110px, 38vmin, 160px);
-            height: clamp(110px, 38vmin, 160px);
+            width: clamp(100px, 30vmin, 150px);
+            height: clamp(100px, 30vmin, 150px);
             border-radius: 50%;
             background: #73A03F;
             box-shadow: 0 10px 0 #5a8030;
@@ -168,8 +168,8 @@
         .jump-btn:active, .jump-btn.pressed { box-shadow: 0 2px 0 #5a8030; }
 
         .move-btn {
-            width: clamp(75px, 24vmin, 105px);
-            height: clamp(75px, 24vmin, 105px);
+            width: clamp(70px, 22vmin, 100px);
+            height: clamp(70px, 22vmin, 100px);
             border-radius: 20px;
         }
         .left-btn { background: #AB3D8B; box-shadow: 0 8px 0 #8a3070; }
@@ -177,22 +177,42 @@
         .right-btn { background: #0595AE; box-shadow: 0 8px 0 #047a91; }
         .right-btn:active, .right-btn.pressed { box-shadow: 0 2px 0 #047a91; }
 
-        .ctrl-icon { font-size: clamp(2.5rem, 12vmin, 4rem); color: white; line-height: 1; }
-        .ctrl-label { font-size: clamp(0.8rem, 3.5vmin, 1.1rem); font-weight: 700; color: white; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .ctrl-icon { font-size: clamp(2rem, 10vmin, 3.5rem); color: white; line-height: 1; }
+        .ctrl-label { font-size: clamp(0.7rem, 3vmin, 1rem); font-weight: 700; color: white; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
 
-        /* Landscape game controls */
+        /* Portrait - vertical layout */
+        @media (orientation: portrait) {
+            .game-controls {
+                flex-direction: column !important;
+                gap: clamp(15px, 4vh, 30px) !important;
+            }
+            .move-gap { gap: clamp(30px, 15vw, 80px) !important; }
+            .game-header { display: flex !important; }
+        }
+
+        /* Landscape - horizontal layout */
         @media (orientation: landscape) {
             .game-controls {
                 flex-direction: row !important;
                 justify-content: space-around !important;
+                align-items: center !important;
                 gap: 4vw !important;
+                width: 100% !important;
             }
-            .jump-btn { width: clamp(90px, 22vmin, 140px); height: clamp(90px, 22vmin, 140px); }
-            .move-btn { width: clamp(70px, 18vmin, 95px); height: clamp(70px, 18vmin, 95px); }
-            .move-gap { gap: clamp(20px, 6vw, 50px) !important; }
+            .jump-btn { width: clamp(80px, 20vmin, 130px); height: clamp(80px, 20vmin, 130px); }
+            .move-btn { width: clamp(65px, 16vmin, 90px); height: clamp(65px, 16vmin, 90px); }
+            .move-gap { gap: clamp(15px, 5vw, 40px) !important; }
             .game-header { display: none !important; }
+            .ctrl-icon { font-size: clamp(1.8rem, 8vmin, 3rem); }
+            .ctrl-label { font-size: clamp(0.6rem, 2.5vmin, 0.9rem); }
         }
-        @media (max-height: 480px) { .game-header { display: none !important; } }
+
+        /* Small height screens */
+        @media (max-height: 400px) {
+            .game-header { display: none !important; }
+            .jump-btn { width: 70px; height: 70px; }
+            .move-btn { width: 60px; height: 60px; }
+        }
 
         /* Rotate warning */
         @keyframes spin { 50% { transform: rotate(90deg); } }
@@ -270,28 +290,21 @@
     </div>
 
     <!-- GAME CONTROLLER -->
-    <div class="screen hidden flex-col items-center justify-center w-full h-full p-4 bg-[#1B4D3E] gap-4" id="gameScreen">
-        <!-- Rotate warning -->
-        <div class="fixed inset-0 bg-black/95 hidden flex-col items-center justify-center z-50 text-white text-center p-5" id="rotateWarning">
-            <iconify-icon icon="mdi:phone-rotate-landscape" class="text-7xl mb-5 text-steam-turquesa"></iconify-icon>
-            <div class="text-2xl font-bold mb-2">Rota tu dispositivo!</div>
-            <div class="text-lg opacity-70">Posicion horizontal para jugar</div>
-        </div>
-        
-        <!-- Header -->
+    <div class="screen hidden flex-col items-center justify-evenly w-full h-full p-4 bg-[#1B4D3E]" id="gameScreen">
+        <!-- Header - shown in portrait -->
         <div class="flex items-center gap-3 game-header">
             <div class="avatar-sm" id="gameAvatar" style="background:#73A03F"></div>
             <span class="text-xl font-bold text-white" id="gameName">Verde</span>
         </div>
         
         <!-- Controls -->
-        <div class="flex flex-col items-center gap-6 w-full max-w-lg game-controls">
+        <div class="flex flex-col items-center w-full game-controls">
             <div class="ctrl-btn jump-btn" id="jumpBtn">
                 <iconify-icon icon="mdi:arrow-up-bold" class="ctrl-icon"></iconify-icon>
                 <span class="ctrl-label">SALTAR</span>
             </div>
             
-            <div class="flex items-center justify-center gap-10 move-gap">
+            <div class="flex items-center justify-center move-gap mt-6">
                 <div class="ctrl-btn move-btn left-btn" id="leftBtn">
                     <iconify-icon icon="mdi:arrow-left-bold" class="ctrl-icon"></iconify-icon>
                     <span class="ctrl-label">IZQ</span>
@@ -302,6 +315,9 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Spacer for portrait mode -->
+        <div class="game-header"></div>
     </div>
 
     <!-- RESULTS SCREEN -->
@@ -498,41 +514,15 @@
         }
 
         function lockLandscape() {
-            if (screen.orientation?.lock) {
-                screen.orientation.lock('landscape').catch(() => checkOrientation());
-            } else {
-                checkOrientation();
-            }
-            
-            window.addEventListener('resize', checkOrientation);
-            window.addEventListener('orientationchange', checkOrientation);
-            
-            const check = setInterval(() => {
-                if ($('gameScreen').classList.contains('hidden')) {
-                    clearInterval(check);
-                    unlock();
-                } else {
-                    checkOrientation();
-                }
-            }, 500);
+            // Rotation warning disabled temporarily
         }
 
         function checkOrientation() {
-            const warning = $('rotateWarning');
-            const portrait = window.innerHeight > window.innerWidth;
-            const inGame = !$('gameScreen').classList.contains('hidden');
-            
-            if (portrait && inGame) {
-                warning.classList.remove('hidden');
-                warning.classList.add('flex');
-            } else {
-                warning.classList.add('hidden');
-                warning.classList.remove('flex');
-            }
+            // Rotation warning disabled temporarily
         }
 
         function unlock() {
-            screen.orientation?.unlock?.();
+            // Rotation warning disabled temporarily
         }
 
         function showResults(results, winner) {
