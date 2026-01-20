@@ -338,10 +338,16 @@
             <span class="text-2xl font-black text-steam-verde" id="resultScore">0 pts</span>
         </div>
         
-        <button class="btn btn-morado py-4 px-8 text-base hidden flex items-center gap-2" id="againBtn">
-            <iconify-icon icon="mdi:replay"></iconify-icon>
-            JUGAR DE NUEVO
-        </button>
+        <div class="flex flex-col gap-3" id="resultsButtonContainer">
+            <button class="btn btn-turquesa py-4 px-8 text-base hidden flex items-center gap-2 justify-center" id="nextLevelBtn">
+                <iconify-icon icon="mdi:arrow-right-bold"></iconify-icon>
+                SIGUIENTE NIVEL
+            </button>
+            <button class="btn btn-morado py-4 px-8 text-base hidden flex items-center gap-2 justify-center" id="levelSelectBtn">
+                <iconify-icon icon="mdi:map-marker-path"></iconify-icon>
+                SELECCIONAR NIVEL
+            </button>
+        </div>
         <p class="text-sm text-gray-500 pulse flex items-center gap-2" id="waitingResult">
             <iconify-icon icon="mdi:timer-sand"></iconify-icon>
             Esperando al Jugador 1...
@@ -360,6 +366,7 @@
         
         let player = { num: null, color: '#73A03F', name: 'Verde', isAdmin: false };
         let keys = { left: false, right: false, jump: false };
+        let controlsBound = false;
         
         const $ = (id) => document.getElementById(id);
         const send = (msg) => airconsole.message(AirConsole.SCREEN, msg);
@@ -389,7 +396,7 @@
                         showScreen('select');
                         break;
                     case 'gameResults':
-                        showResults(data.results, data.winner);
+                        showResults(data.results, data.winner, data.levelCompleted, data.hasNextLevel);
                         break;
                 }
             };
@@ -401,7 +408,8 @@
             };
             
             $('startBtn').onclick = () => send({ action: 'startGame' });
-            $('againBtn').onclick = () => send({ action: 'playAgain' });
+            $('nextLevelBtn').onclick = () => send({ action: 'nextLevel' });
+            $('levelSelectBtn').onclick = () => send({ action: 'goToLevelSelect' });
         }
 
         function setupSelect() {
@@ -468,6 +476,10 @@
         }
 
         function setupControls() {
+            // Guard to prevent duplicate listener registration
+            if (controlsBound) return;
+            controlsBound = true;
+            
             const btns = [
                 [$('leftBtn'), 'left'],
                 [$('rightBtn'), 'right'],
@@ -513,19 +525,87 @@
             }
         }
 
+        let orientationLocked = false;
+        let orientationWarning = null;
+
         function lockLandscape() {
-            // Rotation warning disabled temporarily
+            orientationLocked = true;
+            
+            // Try to lock screen orientation using Screen Orientation API
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('landscape').catch(err => {
+                    console.log('Orientation lock not supported:', err);
+                    // Fallback to visual warning if API not supported - check orientation and add listener
+                    checkOrientation();
+                    window.addEventListener('resize', checkOrientation);
+                    window.addEventListener('orientationchange', checkOrientation);
+                });
+            } else {
+                // Show warning for devices that don't support orientation API
+                checkOrientation();
+                window.addEventListener('resize', checkOrientation);
+                window.addEventListener('orientationchange', checkOrientation);
+            }
         }
 
         function checkOrientation() {
-            // Rotation warning disabled temporarily
+            if (!orientationLocked) return;
+            
+            const isPortrait = window.innerHeight > window.innerWidth;
+            
+            if (isPortrait && !orientationWarning) {
+                showOrientationWarning();
+            } else if (!isPortrait && orientationWarning) {
+                hideOrientationWarning();
+            }
+        }
+
+        function showOrientationWarning() {
+            if (orientationWarning) return;
+            
+            orientationWarning = document.createElement('div');
+            orientationWarning.id = 'orientationWarning';
+            orientationWarning.style.cssText = `
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.95);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+                color: white;
+                text-align: center;
+                padding: 20px;
+            `;
+            orientationWarning.innerHTML = `
+                <iconify-icon icon="mdi:phone-rotate-landscape" class="text-6xl mb-4 spin"></iconify-icon>
+                <h2 class="text-2xl font-bold mb-2">Gira tu dispositivo</h2>
+                <p class="text-lg">Para mejor experiencia, usa modo horizontal</p>
+            `;
+            document.body.appendChild(orientationWarning);
+        }
+
+        function hideOrientationWarning() {
+            if (orientationWarning) {
+                orientationWarning.remove();
+                orientationWarning = null;
+            }
         }
 
         function unlock() {
-            // Rotation warning disabled temporarily
+            orientationLocked = false;
+            hideOrientationWarning();
+            window.removeEventListener('resize', checkOrientation);
+            window.removeEventListener('orientationchange', checkOrientation);
+            
+            // Unlock screen orientation if supported
+            if (screen.orientation && screen.orientation.unlock) {
+                screen.orientation.unlock();
+            }
         }
 
-        function showResults(results, winner) {
+        function showResults(results, winner, levelCompleted, hasNextLevel) {
             unlock();
             showScreen('results');
             
@@ -548,8 +628,18 @@
             }
             
             $('resultScore').textContent = `${me?.score || 0} pts`;
-            $('againBtn').classList.toggle('hidden', !player.isAdmin);
-            $('waitingResult').classList.toggle('hidden', player.isAdmin);
+            
+            // Show appropriate buttons for admin
+            if (player.isAdmin) {
+                const showNextLevel = levelCompleted && hasNextLevel;
+                $('nextLevelBtn').classList.toggle('hidden', !showNextLevel);
+                $('levelSelectBtn').classList.remove('hidden');
+                $('waitingResult').classList.add('hidden');
+            } else {
+                $('nextLevelBtn').classList.add('hidden');
+                $('levelSelectBtn').classList.add('hidden');
+                $('waitingResult').classList.remove('hidden');
+            }
         }
 
         function showScreen(name) {
