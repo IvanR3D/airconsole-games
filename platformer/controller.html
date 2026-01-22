@@ -705,25 +705,8 @@
         keys: { left: false, right: false, jump: false },
         controlsBound: false,
         
-        init() {
-            DOM.init();
-            this.airconsole = new AirConsole();
-            this._setupAirConsole();
-            this._setupEventListeners();
-        },
-        
         send(msg) {
             this.airconsole.message(AirConsole.SCREEN, msg);
-        },
-        
-        _setupAirConsole() {
-            this.airconsole.onReady = () => {
-                console.log('Controller ready');
-            };
-            
-            this.airconsole.onMessage = (from, data) => {
-                this._handleMessage(data);
-            };
         },
         
         _handleMessage(data) {
@@ -958,7 +941,26 @@
     // INITIALIZATION
     // ==========================================================================
     
-    window.onload = () => Controller.init();
+    // Initialize AirConsole immediately (not on window.onload) to catch early events
+    const airconsole = new AirConsole();
+    
+    // DOM must wait for load, but AirConsole handlers are set immediately
+    airconsole.onReady = () => {
+        console.log('Controller ready');
+    };
+    
+    airconsole.onMessage = (from, data) => {
+        Controller._handleMessage(data);
+    };
+    
+    // Store reference in Controller
+    Controller.airconsole = airconsole;
+    
+    // Initialize DOM elements when page loads
+    window.onload = () => {
+        DOM.init();
+        Controller._setupEventListeners();
+    };
     </script>
 </body>
 </html>

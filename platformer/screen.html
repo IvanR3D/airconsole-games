@@ -1536,25 +1536,6 @@
             resultsDisplayed: false
         },
         
-        init() {
-            DOM.init();
-            this.airconsole = new AirConsole();
-            this._setupAirConsole();
-            this._setupEventListeners();
-            LevelManager.init();
-        },
-        
-        _setupAirConsole() {
-            this.airconsole.onReady = () => {
-                console.log("Screen ready");
-                this.airconsole.setActivePlayers(CONFIG.MAX_PLAYERS);
-            };
-            
-            this.airconsole.onConnect = (id) => this._handleConnect(id);
-            this.airconsole.onDisconnect = (id) => this._handleDisconnect(id);
-            this.airconsole.onMessage = (id, data) => this._handleMessage(id, data);
-        },
-        
         _setupEventListeners() {
             DOM.elements.nextLevelBtn.addEventListener('click', () => this.goToNextLevel());
             DOM.elements.levelSelectBtn.addEventListener('click', () => this.restart());
@@ -1902,7 +1883,27 @@
     // INITIALIZATION
     // ==========================================================================
     
-    window.onload = () => GameManager.init();
+    // Initialize AirConsole immediately (not on window.onload) to catch early connection events
+    const airconsole = new AirConsole();
+    
+    airconsole.onReady = () => {
+        console.log("Screen ready");
+        airconsole.setActivePlayers(CONFIG.MAX_PLAYERS);
+    };
+    
+    airconsole.onConnect = (id) => GameManager._handleConnect(id);
+    airconsole.onDisconnect = (id) => GameManager._handleDisconnect(id);
+    airconsole.onMessage = (id, data) => GameManager._handleMessage(id, data);
+    
+    // Store reference in GameManager
+    GameManager.airconsole = airconsole;
+    
+    // Initialize DOM elements and UI when page loads
+    window.onload = () => {
+        DOM.init();
+        GameManager._setupEventListeners();
+        LevelManager.init();
+    };
     </script>
 </body>
 </html>
