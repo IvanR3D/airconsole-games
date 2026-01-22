@@ -390,16 +390,16 @@
     };
 
     const PHYSICS = {
-        GRAVITY: 0.55,
-        MAX_FALL_SPEED: 16,
-        MOVE_SPEED: 6.5,
-        JUMP_POWER: -18,
-        AIR_ACCELERATION: 0.6,
-        GROUND_ACCELERATION: 0.8,
+        GRAVITY: 0.5,
+        MAX_FALL_SPEED: 15,
+        MOVE_SPEED: 7,
+        JUMP_POWER: -40,
+        AIR_ACCELERATION: 0.7,
+        GROUND_ACCELERATION: 0.85,
         FRICTION: 0.7,
         AIR_RESISTANCE: 0.95,
         JUMP_CUT_MULTIPLIER: 0.5,
-        JUMP_CUT_THRESHOLD: -4
+        JUMP_CUT_THRESHOLD: -5
     };
 
     // ==========================================================================
@@ -1333,128 +1333,115 @@
                 
                 const centerX = o.x + o.w / 2;
                 const centerY = o.y + o.h / 2;
-                const radius = o.w / 2 + 4; // Un poco más grande
+                const radius = o.w / 2 + 6;
                 
-                // Animación de mordedura (ángulo de apertura de boca)
+                // Animación de mordedura
                 const biteAnim = (Math.sin(o.bitePhase) + 1) / 2;
-                const mouthAngle = 0.15 + biteAnim * 0.35; // Entre 0.15 y 0.5 radianes
+                const mouthAngle = 0.25 + biteAnim * 0.4; // Ángulo de apertura
                 
-                // Pequeño rebote
-                const bounceY = Math.abs(Math.sin(o.bitePhase * 0.5)) * 3;
+                // Rebote
+                const bounceY = Math.abs(Math.sin(o.bitePhase * 0.6)) * 4;
                 
                 ctx.save();
                 ctx.translate(centerX, centerY - bounceY);
                 
-                // Rotar según dirección
-                if (o.dir < 0) {
-                    ctx.scale(-1, 1);
-                }
+                // Voltear según dirección
+                if (o.dir < 0) ctx.scale(-1, 1);
                 
-                // === CUERPO NEGRO (estilo Pac-Man con boca cortada) ===
-                const bodyGradient = ctx.createRadialGradient(-radius * 0.3, -radius * 0.3, 0, 0, 0, radius);
-                bodyGradient.addColorStop(0, '#4A4A4A');
-                bodyGradient.addColorStop(0.3, '#2A2A2A');
-                bodyGradient.addColorStop(1, '#0A0A0A');
-                
-                ctx.fillStyle = bodyGradient;
+                // === CUERPO NEGRO ===
+                ctx.fillStyle = '#1a1a1a';
                 ctx.beginPath();
-                // Círculo con corte para la boca (como Pac-Man)
                 ctx.arc(0, 0, radius, mouthAngle, Math.PI * 2 - mouthAngle);
                 ctx.lineTo(0, 0);
                 ctx.closePath();
                 ctx.fill();
                 
-                // Borde
-                ctx.strokeStyle = '#000';
-                ctx.lineWidth = 2;
-                ctx.stroke();
-                
-                // Brillo metálico
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+                // Brillo superior
+                ctx.fillStyle = '#3a3a3a';
                 ctx.beginPath();
-                ctx.ellipse(-radius * 0.3, -radius * 0.4, radius * 0.25, radius * 0.12, -0.5, 0, Math.PI * 2);
+                ctx.ellipse(-radius * 0.25, -radius * 0.35, radius * 0.4, radius * 0.2, -0.4, 0, Math.PI * 2);
                 ctx.fill();
                 
-                // === INTERIOR DE LA BOCA (rojo) ===
-                ctx.fillStyle = '#8B0000';
+                // === LABIOS ROJOS ===
+                ctx.fillStyle = '#CC0000';
+                ctx.lineWidth = 6;
+                ctx.strokeStyle = '#CC0000';
+                
+                // Labio superior
                 ctx.beginPath();
-                ctx.arc(0, 0, radius * 0.6, mouthAngle * 0.8, Math.PI * 2 - mouthAngle * 0.8);
-                ctx.lineTo(0, 0);
+                ctx.arc(0, 0, radius - 2, mouthAngle - 0.05, mouthAngle + 0.5);
+                ctx.stroke();
+                
+                // Labio inferior  
+                ctx.beginPath();
+                ctx.arc(0, 0, radius - 2, -mouthAngle - 0.5, -mouthAngle + 0.05);
+                ctx.stroke();
+                
+                // Interior boca oscuro
+                ctx.fillStyle = '#330000';
+                ctx.beginPath();
+                ctx.moveTo(radius * 0.3, 0);
+                ctx.arc(0, 0, radius * 0.5, mouthAngle * 0.5, -mouthAngle * 0.5, true);
                 ctx.closePath();
                 ctx.fill();
                 
-                // === DIENTES SUPERIORES ===
+                // === DIENTES BLANCOS ===
                 ctx.fillStyle = '#FFFFFF';
-                const teethCount = 4;
-                const startAngle = mouthAngle;
-                const toothSpacing = 0.12;
                 
-                for (let i = 0; i < teethCount; i++) {
-                    const angle = startAngle - 0.05 + i * toothSpacing;
-                    const x1 = Math.cos(angle) * radius;
-                    const y1 = Math.sin(angle) * radius;
-                    const x2 = Math.cos(angle) * radius * 0.65;
-                    const y2 = Math.sin(angle) * radius * 0.65;
+                // Dientes superiores (3 grandes)
+                for (let i = 0; i < 3; i++) {
+                    const angle = mouthAngle - 0.1 + i * 0.18;
+                    const baseX = Math.cos(angle) * radius * 0.95;
+                    const baseY = Math.sin(angle) * radius * 0.95;
+                    const tipX = Math.cos(angle + 0.08) * radius * 0.5;
+                    const tipY = Math.sin(angle + 0.08) * radius * 0.5;
                     
                     ctx.beginPath();
-                    ctx.moveTo(x1 - 4, y1);
-                    ctx.lineTo(x2, y2 + 3);
-                    ctx.lineTo(x1 + 4, y1);
+                    ctx.moveTo(baseX - 5, baseY - 2);
+                    ctx.lineTo(tipX, tipY + 4);
+                    ctx.lineTo(baseX + 5, baseY + 2);
                     ctx.closePath();
                     ctx.fill();
                 }
                 
-                // === DIENTES INFERIORES ===
-                for (let i = 0; i < teethCount; i++) {
-                    const angle = -startAngle + 0.05 - i * toothSpacing;
-                    const x1 = Math.cos(angle) * radius;
-                    const y1 = Math.sin(angle) * radius;
-                    const x2 = Math.cos(angle) * radius * 0.65;
-                    const y2 = Math.sin(angle) * radius * 0.65;
+                // Dientes inferiores (3 grandes)
+                for (let i = 0; i < 3; i++) {
+                    const angle = -mouthAngle + 0.1 - i * 0.18;
+                    const baseX = Math.cos(angle) * radius * 0.95;
+                    const baseY = Math.sin(angle) * radius * 0.95;
+                    const tipX = Math.cos(angle - 0.08) * radius * 0.5;
+                    const tipY = Math.sin(angle - 0.08) * radius * 0.5;
                     
                     ctx.beginPath();
-                    ctx.moveTo(x1 - 4, y1);
-                    ctx.lineTo(x2, y2 - 3);
-                    ctx.lineTo(x1 + 4, y1);
+                    ctx.moveTo(baseX - 5, baseY + 2);
+                    ctx.lineTo(tipX, tipY - 4);
+                    ctx.lineTo(baseX + 5, baseY - 2);
                     ctx.closePath();
                     ctx.fill();
                 }
                 
-                // === OJO GRANDE ===
-                const eyeX = -radius * 0.25;
-                const eyeY = -radius * 0.35;
-                const eyeRadius = radius * 0.35;
+                // === OJO ===
+                const eyeX = -radius * 0.3;
+                const eyeY = -radius * 0.25;
+                const eyeR = radius * 0.32;
                 
                 // Ojo blanco
                 ctx.fillStyle = '#FFFFFF';
                 ctx.beginPath();
-                ctx.arc(eyeX, eyeY, eyeRadius, 0, Math.PI * 2);
+                ctx.arc(eyeX, eyeY, eyeR, 0, Math.PI * 2);
                 ctx.fill();
-                ctx.strokeStyle = '#000';
-                ctx.lineWidth = 2;
-                ctx.stroke();
                 
-                // Pupila negra
-                const pupilRadius = eyeRadius * 0.5;
-                ctx.fillStyle = '#000';
+                // Pupila
+                ctx.fillStyle = '#000000';
                 ctx.beginPath();
-                ctx.arc(eyeX + pupilRadius * 0.3, eyeY + biteAnim * 2, pupilRadius, 0, Math.PI * 2);
+                ctx.arc(eyeX + eyeR * 0.25, eyeY, eyeR * 0.5, 0, Math.PI * 2);
                 ctx.fill();
                 
-                // Brillo del ojo
+                // Brillo ojo
                 ctx.fillStyle = '#FFFFFF';
                 ctx.beginPath();
-                ctx.arc(eyeX + pupilRadius * 0.1, eyeY - pupilRadius * 0.3, pupilRadius * 0.3, 0, Math.PI * 2);
+                ctx.arc(eyeX, eyeY - eyeR * 0.3, eyeR * 0.2, 0, Math.PI * 2);
                 ctx.fill();
-                
-                // === CEJA ENOJADA ===
-                ctx.strokeStyle = '#1A1A1A';
-                ctx.lineWidth = 5;
-                ctx.lineCap = 'round';
-                ctx.beginPath();
-                ctx.moveTo(eyeX - eyeRadius, eyeY - eyeRadius * 0.8);
-                ctx.lineTo(eyeX + eyeRadius * 0.7, eyeY - eyeRadius * 0.3);
-                ctx.stroke();
                 
                 ctx.restore();
             });
