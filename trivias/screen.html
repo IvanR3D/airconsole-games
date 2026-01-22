@@ -467,14 +467,137 @@
             };
 
             airconsole.onConnect = function(deviceId) {
-                console.log('Device connected:', deviceId);
+                console.log("🔌 Device connected:", deviceId);
+                console.log("📊 DEBUG: Getting active player device IDs...");
+                
+                // Get list of active player devices
+                const activeDeviceIds = airconsole.getActivePlayerDeviceIds();
+                console.log("📊 DEBUG: Active device IDs:", activeDeviceIds);
+                
+                // Check if this device is an active player
+                const playerNumber = airconsole.convertDeviceIdToPlayerNumber(deviceId);
+                console.log(`📊 DEBUG: Device ${deviceId} converted to player number:`, playerNumber);
+                
+                // Count current connected players (excluding disconnected ones)
+                const connectedPlayersCount = Object.keys(players).filter(
+                    id => !players[id].disconnected
+                ).length;
+                console.log(`📊 DEBUG: Current connected players: ${connectedPlayersCount}/4`);
+                
+                if (playerNumber !== undefined && playerNumber >= 0) {
+                    console.log(`✅ Device ${deviceId} is active player (player number: ${playerNumber})`);
+                    
+                    // Check if this player was previously connected but disconnected
+                    if (players[deviceId]) {
+                        const existingPlayer = players[deviceId];
+                        
+                        // Player is reconnecting
+                        if (existingPlayer.disconnected) {
+                            console.log(`🔄 Player ${existingPlayer.name} is reconnecting!`);
+                            
+                            // Reactivate the player
+                            existingPlayer.disconnected = false;
+                            
+                            // Notify the controller of their restored state
+                            airconsole.message(deviceId, {
+                                action: 'reconnected',
+                                color: existingPlayer.color,
+                                isAdmin: existingPlayer.isAdmin,
+                                gameState: gameState,
+                                selectedCategory: selectedCategory,
+                                score: existingPlayer.score
+                            });
+                            
+                            console.log(`✨ Player ${existingPlayer.name} reactivated successfully`);
+                            updatePlayersDisplay();
+                            broadcastGameState();
+                        } else {
+                            console.log(`ℹ️ Player already connected (deviceId: ${deviceId})`);
+                        }
+                    } else {
+                        // New player - auto-assign if there's space
+                        if (connectedPlayersCount < 4) {
+                            console.log(`🎮 Auto-assigning player to device ${deviceId}...`);
+                            
+                            const isAdmin = adminDeviceId === null;
+                            if (isAdmin) {
+                                adminDeviceId = deviceId;
+                                console.log(`👑 Device ${deviceId} assigned as admin`);
+                            }
+                            
+                            const playerColor = playerColors[Object.keys(players).length % playerColors.length];
+                            const playerName = airconsole.getNickname(deviceId) || `Jugador ${Object.keys(players).length + 1}`;
+                            
+                            players[deviceId] = {
+                                id: deviceId,
+                                playerNumber: playerNumber,
+                                name: playerName,
+                                score: 0,
+                                color: playerColor,
+                                isAdmin: isAdmin,
+                                disconnected: false
+                            };
+                            
+                            console.log(`📊 DEBUG: Player ${deviceId} data:`, players[deviceId]);
+                            
+                            playSound('join');
+                            
+                            // Send joined confirmation to controller
+                            airconsole.message(deviceId, {
+                                action: 'joined',
+                                color: playerColor,
+                                isAdmin: isAdmin,
+                                gameState: gameState,
+                                selectedCategory: selectedCategory
+                            });
+                            
+                            console.log(`✅ Player auto-assigned and joined successfully!`);
+                            updatePlayersDisplay();
+                            
+                            if (isAdmin && gameState === 'waiting') {
+                                showScreen('category');
+                                gameState = 'categorySelect';
+                            }
+                            
+                            broadcastGameState();
+                        } else {
+                            console.log(`⚠️ Cannot auto-assign player: Game is full (4/4 players)`);
+                            
+                            // Send game full error to controller
+                            airconsole.message(deviceId, {
+                                action: 'gameFull'
+                            });
+                        }
+                    }
+                } else {
+                    console.log(`⚠️ Device ${deviceId} is not an active player (playerNumber: ${playerNumber})`);
+                    console.log("💡 Device needs to be added as active player via AirConsole dashboard");
+                }
             };
 
             airconsole.onDisconnect = function(deviceId) {
+                console.log("🔌 Device disconnected:", deviceId);
+                
+                // Use player number to identify the player
+                const playerNumber = airconsole.convertDeviceIdToPlayerNumber(deviceId);
+                
                 if (players[deviceId]) {
-                    players[deviceId].disconnected = true;
+                    const player = players[deviceId];
+                    console.log(`⚠️ Player ${player.name} disconnected - marking as disconnected`);
+                    
+                    player.disconnected = true;
                     updatePlayersDisplay();
-                    airconsole.broadcast({ action: 'playerDisconnected', playerId: deviceId, playerName: players[deviceId].name });
+                    
+                    // Broadcast the disconnection to other players
+                    airconsole.broadcast({
+                        action: 'playerDisconnected',
+                        playerId: deviceId,
+                        playerName: player.name
+                    });
+                    
+                    console.log(`📊 Active players: ${Object.values(players).filter(p => !p.disconnected).length}/${Object.keys(players).length}`);
+                } else {
+                    console.log(`ℹ️ Disconnected device ${deviceId} was not in active players`);
                 }
             };
 
@@ -482,34 +605,25 @@
                 console.log("Received:", data.action, "from", deviceId);
                 
                 if (data.action === 'join') {
-                    const isAdmin = adminDeviceId === null;
-                    if (isAdmin) adminDeviceId = deviceId;
+                    // Simplified join handler - only needed as fallback since onConnect handles auto-join
+                    const playerNumber = airconsole.convertDeviceIdToPlayerNumber(deviceId);
                     
-                    players[deviceId] = {
-                        id: deviceId,
-                        name: data.name,
-                        score: 0,
-                        color: playerColors[Object.keys(players).length % playerColors.length],
-                        isAdmin: isAdmin,
-                        disconnected: false
-                    };
-                    
-                    playSound('join');
-                    updatePlayersDisplay();
-                    
-                    airconsole.message(deviceId, { 
-                        action: 'joined', 
-                        color: players[deviceId].color,
-                        isAdmin: isAdmin,
-                        gameState: gameState,
-                        selectedCategory: selectedCategory
-                    });
-                    
-                    if (isAdmin && gameState === 'waiting') {
-                        showScreen('category');
-                        gameState = 'categorySelect';
+                    if (playerNumber !== undefined && playerNumber >= 0) {
+                        // Check if player already exists
+                        if (players[deviceId]) {
+                            // Player already joined, just send confirmation
+                            const p = players[deviceId];
+                            airconsole.message(deviceId, {
+                                action: 'joined',
+                                color: p.color,
+                                isAdmin: p.isAdmin,
+                                gameState: gameState,
+                                selectedCategory: selectedCategory
+                            });
+                        }
                     }
                     
+                    updatePlayersDisplay();
                     broadcastGameState();
                     
                 } else if (data.action === 'selectCategory' && deviceId === adminDeviceId) {

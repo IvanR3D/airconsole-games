@@ -241,10 +241,17 @@
             </h2>
         </div>
         <p class="text-sm text-gray-500">Fundacion STEAM RD</p>
-        <button class="btn btn-verde py-4 px-10 text-lg flex items-center gap-2" id="joinBtn">
-            <iconify-icon icon="mdi:play-circle"></iconify-icon>
-            UNIRSE!
-        </button>
+        <div class="bg-steam-verde/10 border-2 border-steam-verde rounded-2xl py-4 px-6 pulse flex items-center gap-2" id="connectingMsg">
+            <iconify-icon icon="mdi:loading" class="text-steam-verde text-2xl animate-spin"></iconify-icon>
+            <span class="text-steam-verde font-bold">Conectando...</span>
+        </div>
+        <div class="bg-red-500/10 border-2 border-red-500 rounded-2xl py-4 px-6 hidden flex items-center gap-2" id="errorMsg">
+            <iconify-icon icon="mdi:alert-circle" class="text-red-500 text-2xl"></iconify-icon>
+            <div>
+                <p class="text-red-500 font-bold">Juego Lleno</p>
+                <p class="text-red-500 text-sm">Ya hay 4 jugadores conectados</p>
+            </div>
+        </div>
     </div>
 
     <!-- SELECT SCREEN -->
@@ -381,6 +388,16 @@
                         setupSelect();
                         showScreen('select');
                         break;
+                    case 'reconnected':
+                        player = { num: data.playerNum, color: data.color, name: data.colorName, isAdmin: data.isAdmin };
+                        setupSelect();
+                        showScreen('select');
+                        break;
+                    case 'gameFull':
+                        $('connectingMsg').classList.add('hidden');
+                        $('errorMsg').classList.remove('hidden');
+                        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+                        break;
                     case 'colorUpdated':
                         player.color = data.color;
                         player.name = data.colorName;
@@ -394,17 +411,14 @@
                     case 'gameRestart':
                         unlock();
                         showScreen('select');
+                        // Reset error messages
+                        $('connectingMsg').classList.remove('hidden');
+                        $('errorMsg').classList.add('hidden');
                         break;
                     case 'gameResults':
                         showResults(data.results, data.winner, data.levelCompleted, data.hasNextLevel);
                         break;
                 }
-            };
-
-            $('joinBtn').onclick = () => {
-                send({ action: 'join' });
-                $('joinBtn').disabled = true;
-                $('joinBtn').textContent = 'Conectando...';
             };
             
             $('startBtn').onclick = () => send({ action: 'startGame' });

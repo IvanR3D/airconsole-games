@@ -170,6 +170,16 @@
         .answer-btn {
             font-size: clamp(1.5rem, 8vw, 2.5rem);
         }
+
+        /* Pulse animation */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .pulse {
+            animation: pulse 2s ease infinite;
+        }
     </style>
 </head>
 <body class="w-screen h-screen overflow-hidden font-sans bg-white text-steam-negro">
@@ -181,7 +191,17 @@
             </div>
             <h1 class="text-xl sm:text-2xl font-bold text-steam-turquesa">STEAM Trivia</h1>
             <p class="text-sm sm:text-base text-steam-negro/70">Fundacion STEAM RD</p>
-            <button class="bg-steam-verde text-white border-none py-3 sm:py-4 px-8 sm:px-10 text-lg sm:text-xl font-bold rounded-full cursor-pointer uppercase btn-3d btn-verde" id="joinButton">Unirse!</button>
+            <div class="bg-steam-verde/10 border-2 border-steam-verde rounded-2xl py-4 px-6 pulse flex items-center gap-2" id="connectingMsg">
+                <div class="w-5 h-5 border-3 border-steam-verde border-t-transparent rounded-full animate-spin"></div>
+                <span class="text-steam-verde font-bold">Conectando...</span>
+            </div>
+            <div class="bg-red-500/10 border-2 border-red-500 rounded-2xl py-4 px-6 hidden flex items-center gap-2" id="errorMsg">
+                <div class="text-red-500 text-2xl">⚠</div>
+                <div>
+                    <p class="text-red-500 font-bold">Juego Lleno</p>
+                    <p class="text-red-500 text-sm">Ya hay 4 jugadores conectados</p>
+                </div>
+            </div>
         </div>
 
         <!-- WAITING SCREEN (Non-admin) -->
@@ -281,7 +301,6 @@
         const domCache = {};
         
         function cacheDom() {
-            domCache.joinButton = document.getElementById('joinButton');
             domCache.playerAvatar = document.getElementById('playerAvatar');
             domCache.playerNameDisplay = document.getElementById('playerNameDisplay');
             domCache.adminAvatar = document.getElementById('adminAvatar');
@@ -309,6 +328,10 @@
                 console.log('Controller ready');
                 setupCategoryGrid();
                 setupAnswerButtons();
+                
+                // Auto-connection handled by screen's onConnect
+                // Just show connecting state
+                playerName = airconsole.getNickname() || `Jugador ${airconsole.device_id}`;
             };
 
             airconsole.onMessage = function(from, data) {
@@ -317,6 +340,12 @@
                 switch(data.action) {
                     case 'joined':
                         handleJoined(data);
+                        break;
+                    case 'reconnected':
+                        handleReconnected(data);
+                        break;
+                    case 'gameFull':
+                        handleGameFull();
                         break;
                     case 'gameStateUpdate':
                         handleGameStateUpdate(data);
@@ -351,7 +380,6 @@
                 }
             };
 
-            document.getElementById('joinButton').addEventListener('click', joinGame);
             document.getElementById('startGameBtn').addEventListener('click', startGame);
             document.getElementById('playAgainBtn').addEventListener('click', playAgain);
         }
@@ -383,20 +411,13 @@
             });
         }
 
-        function joinGame() {
-            playerName = airconsole.getNickname() || `Jugador ${airconsole.device_id}`;
-            
-            sendMessage({ action: 'join', name: playerName });
-            
-            if (domCache.joinButton) {
-                domCache.joinButton.disabled = true;
-                domCache.joinButton.textContent = 'Conectando...';
-            }
-        }
-
         function handleJoined(data) {
             playerColor = data.color;
             isAdmin = data.isAdmin;
+            
+            if (data.score !== undefined) {
+                myScore = data.score;
+            }
             
             updateAvatarDisplays();
             
@@ -409,6 +430,49 @@
             } else {
                 showScreen('waiting');
             }
+        }
+
+        function handleReconnected(data) {
+            playerColor = data.color;
+            isAdmin = data.isAdmin;
+            
+            if (data.score !== undefined) {
+                myScore = data.score;
+                if (domCache.miniScore) domCache.miniScore.textContent = myScore;
+            }
+            
+            updateAvatarDisplays();
+            
+            if (data.selectedCategory) {
+                updateSelectedCategory(data.selectedCategory);
+            }
+            
+            // Resume appropriate screen based on game state
+            if (data.gameState === 'playing') {
+                showScreen('playing');
+                resetAnswer();
+            } else if (data.gameState === 'gameEnd') {
+                // Will receive gameEnd message separately
+                showScreen('waiting');
+            } else if (data.gameState === 'categorySelect') {
+                if (isAdmin) {
+                    showScreen('categorySelect');
+                } else {
+                    showScreen('waiting');
+                }
+            } else {
+                if (isAdmin) {
+                    showScreen('categorySelect');
+                } else {
+                    showScreen('waiting');
+                }
+            }
+        }
+
+        function handleGameFull() {
+            document.getElementById('connectingMsg').classList.add('hidden');
+            document.getElementById('errorMsg').classList.remove('hidden');
+            if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
         }
 
         function updateAvatarDisplays() {
@@ -624,6 +688,10 @@
             myRank = 1;
             if (domCache.miniScore) domCache.miniScore.textContent = '0';
             if (domCache.miniRank) domCache.miniRank.textContent = 'Rank 1';
+            
+            // Reset error messages
+            document.getElementById('connectingMsg').classList.remove('hidden');
+            document.getElementById('errorMsg').classList.add('hidden');
             
             if (isAdmin) {
                 showScreen('categorySelect');
