@@ -1335,118 +1335,148 @@
                 const centerY = o.y + o.h / 2;
                 const radius = o.w / 2;
                 
-                // Calcular apertura de boca (0 = cerrada, 1 = abierta)
-                const mouthOpen = (Math.sin(o.bitePhase) + 1) / 2;
-                const mouthAngle = mouthOpen * 0.6; // Máximo 0.6 radianes (~34 grados)
+                // Animación de mordedura (0 = cerrada, 1 = abierta)
+                const biteAnim = (Math.sin(o.bitePhase) + 1) / 2;
+                const mouthOpenY = biteAnim * radius * 0.4;
+                
+                // Rebote vertical
+                const bounceY = Math.abs(Math.sin(o.bitePhase * 0.7)) * 4;
                 
                 ctx.save();
-                ctx.translate(centerX, centerY);
+                ctx.translate(centerX, centerY - bounceY);
                 
-                // Cuerpo - esfera metálica oscura
-                const gradient = ctx.createRadialGradient(-8, -8, 2, 0, 0, radius);
-                gradient.addColorStop(0, '#5A5A5A');
-                gradient.addColorStop(0.5, '#2D2D2D');
-                gradient.addColorStop(1, '#1A1A1A');
+                // Dirección (voltear si va a la izquierda)
+                if (o.dir < 0) {
+                    ctx.scale(-1, 1);
+                }
                 
-                ctx.fillStyle = gradient;
+                // === CADENA (detrás del cuerpo) ===
+                ctx.fillStyle = '#4A4A4A';
+                for (let i = 0; i < 4; i++) {
+                    const chainX = -radius - 8 - i * 10;
+                    const chainY = Math.sin(i * 0.8 + o.bitePhase) * 3;
+                    ctx.beginPath();
+                    ctx.ellipse(chainX, chainY, 6, 4, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = '#333';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+                
+                // === CUERPO PRINCIPAL (esfera negra-azul) ===
+                const bodyGradient = ctx.createRadialGradient(-radius * 0.3, -radius * 0.3, 0, 0, 0, radius);
+                bodyGradient.addColorStop(0, '#3D4F6F');  // Azul oscuro highlight
+                bodyGradient.addColorStop(0.4, '#1A1A2E');
+                bodyGradient.addColorStop(1, '#0F0F1A');
+                
+                ctx.fillStyle = bodyGradient;
                 ctx.beginPath();
                 ctx.arc(0, 0, radius, 0, Math.PI * 2);
                 ctx.fill();
                 
-                // Sombra/borde
+                // Borde
                 ctx.strokeStyle = '#000';
                 ctx.lineWidth = 2;
                 ctx.stroke();
                 
                 // Brillo metálico
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
                 ctx.beginPath();
-                ctx.ellipse(-radius * 0.3, -radius * 0.3, radius * 0.35, radius * 0.25, -0.3, 0, Math.PI * 2);
+                ctx.ellipse(-radius * 0.35, -radius * 0.35, radius * 0.3, radius * 0.15, -0.5, 0, Math.PI * 2);
                 ctx.fill();
                 
-                // BOCA - parte superior
-                ctx.fillStyle = '#1A1A1A';
-                ctx.beginPath();
-                ctx.arc(0, 0, radius * 0.85, Math.PI * 0.5 + mouthAngle, Math.PI * 1.5 - mouthAngle);
-                ctx.lineTo(0, 0);
-                ctx.closePath();
-                ctx.fill();
-                
-                // BOCA - parte inferior
-                ctx.beginPath();
-                ctx.arc(0, 0, radius * 0.85, -Math.PI * 0.5 + mouthAngle, Math.PI * 0.5 - mouthAngle);
-                ctx.lineTo(0, 0);
-                ctx.closePath();
-                ctx.fill();
+                // === BOCA (horizontal, estilo Chain Chomp) ===
+                const mouthWidth = radius * 1.4;
+                const mouthHeight = radius * 0.5 + mouthOpenY;
+                const mouthX = radius * 0.3;
+                const mouthY = radius * 0.15;
                 
                 // Interior de la boca (rojo oscuro)
-                if (mouthOpen > 0.1) {
-                    ctx.fillStyle = '#660000';
-                    ctx.beginPath();
-                    ctx.arc(0, 0, radius * 0.6 * mouthOpen, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-                
-                // DIENTES - superiores
-                const teethCount = 6;
-                ctx.fillStyle = '#FFFFFF';
-                for (let i = 0; i < teethCount; i++) {
-                    const angle = (Math.PI * 0.5 + mouthAngle) + (i / teethCount) * (Math.PI - mouthAngle * 2);
-                    const x1 = Math.cos(angle) * radius * 0.85;
-                    const y1 = Math.sin(angle) * radius * 0.85;
-                    const toothLength = radius * 0.25 * (1 + mouthOpen * 0.3);
-                    
-                    ctx.beginPath();
-                    ctx.moveTo(x1, y1);
-                    ctx.lineTo(x1 - Math.sin(angle) * 6, y1 + Math.cos(angle) * 6);
-                    ctx.lineTo(x1 - Math.cos(angle) * toothLength, y1 - Math.sin(angle) * toothLength);
-                    ctx.lineTo(x1 + Math.sin(angle) * 6, y1 - Math.cos(angle) * 6);
-                    ctx.closePath();
-                    ctx.fill();
-                }
-                
-                // DIENTES - inferiores
-                for (let i = 0; i < teethCount; i++) {
-                    const angle = (-Math.PI * 0.5 + mouthAngle) + (i / teethCount) * (Math.PI - mouthAngle * 2);
-                    const x1 = Math.cos(angle) * radius * 0.85;
-                    const y1 = Math.sin(angle) * radius * 0.85;
-                    const toothLength = radius * 0.25 * (1 + mouthOpen * 0.3);
-                    
-                    ctx.beginPath();
-                    ctx.moveTo(x1, y1);
-                    ctx.lineTo(x1 + Math.sin(angle) * 6, y1 - Math.cos(angle) * 6);
-                    ctx.lineTo(x1 - Math.cos(angle) * toothLength, y1 - Math.sin(angle) * toothLength);
-                    ctx.lineTo(x1 - Math.sin(angle) * 6, y1 + Math.cos(angle) * 6);
-                    ctx.closePath();
-                    ctx.fill();
-                }
-                
-                // OJOS - blancos
-                const eyeOffsetX = radius * 0.35;
-                const eyeOffsetY = -radius * 0.2;
-                const eyeRadius = radius * 0.22;
-                
-                ctx.fillStyle = 'white';
+                ctx.fillStyle = '#8B0000';
                 ctx.beginPath();
-                ctx.arc(-eyeOffsetX, eyeOffsetY, eyeRadius, 0, Math.PI * 2);
-                ctx.arc(eyeOffsetX, eyeOffsetY, eyeRadius, 0, Math.PI * 2);
+                ctx.ellipse(mouthX, mouthY, mouthWidth * 0.45, mouthHeight * 0.7, 0, 0, Math.PI * 2);
                 ctx.fill();
                 
-                // OJOS - pupilas (miran en dirección de movimiento)
-                const pupilOffset = o.dir * 3;
-                const pupilRadius = eyeRadius * 0.5;
+                // Labio superior (arco negro)
+                ctx.fillStyle = '#0F0F1A';
+                ctx.beginPath();
+                ctx.ellipse(mouthX, mouthY - mouthOpenY * 0.3, mouthWidth * 0.5, mouthHeight * 0.35, 0, Math.PI, Math.PI * 2);
+                ctx.fill();
+                
+                // Labio inferior (arco negro)
+                ctx.beginPath();
+                ctx.ellipse(mouthX, mouthY + mouthOpenY * 0.3, mouthWidth * 0.5, mouthHeight * 0.35, 0, 0, Math.PI);
+                ctx.fill();
+                
+                // === DIENTES (estilo Chain Chomp - triangulares blancos) ===
+                ctx.fillStyle = '#FFFFFF';
+                const teethCount = 5;
+                const teethWidth = mouthWidth * 0.8 / teethCount;
+                
+                // Dientes superiores
+                for (let i = 0; i < teethCount; i++) {
+                    const tx = mouthX - mouthWidth * 0.35 + i * teethWidth + teethWidth * 0.5;
+                    const toothH = radius * 0.25 * (0.8 + biteAnim * 0.4);
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(tx - teethWidth * 0.35, mouthY - mouthOpenY * 0.2);
+                    ctx.lineTo(tx, mouthY - mouthOpenY * 0.2 + toothH);
+                    ctx.lineTo(tx + teethWidth * 0.35, mouthY - mouthOpenY * 0.2);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+                
+                // Dientes inferiores
+                for (let i = 0; i < teethCount; i++) {
+                    const tx = mouthX - mouthWidth * 0.35 + i * teethWidth + teethWidth * 0.5;
+                    const toothH = radius * 0.25 * (0.8 + biteAnim * 0.4);
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(tx - teethWidth * 0.35, mouthY + mouthOpenY * 0.2);
+                    ctx.lineTo(tx, mouthY + mouthOpenY * 0.2 - toothH);
+                    ctx.lineTo(tx + teethWidth * 0.35, mouthY + mouthOpenY * 0.2);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+                
+                // === OJOS (grandes, estilo Chain Chomp) ===
+                const eyeRadius = radius * 0.32;
+                const eyeY = -radius * 0.25;
+                const eyeX = -radius * 0.15;
+                
+                // Ojo blanco
+                ctx.fillStyle = '#FFFFFF';
+                ctx.beginPath();
+                ctx.arc(eyeX, eyeY, eyeRadius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                // Pupila (mira hacia adelante/jugador)
+                const pupilRadius = eyeRadius * 0.55;
+                const pupilOffsetX = eyeRadius * 0.2;
+                const pupilOffsetY = biteAnim * 2;
+                
                 ctx.fillStyle = '#000';
                 ctx.beginPath();
-                ctx.arc(-eyeOffsetX + pupilOffset, eyeOffsetY + mouthOpen * 2, pupilRadius, 0, Math.PI * 2);
-                ctx.arc(eyeOffsetX + pupilOffset, eyeOffsetY + mouthOpen * 2, pupilRadius, 0, Math.PI * 2);
+                ctx.arc(eyeX + pupilOffsetX, eyeY + pupilOffsetY, pupilRadius, 0, Math.PI * 2);
                 ctx.fill();
                 
-                // Brillo en los ojos
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+                // Brillo en el ojo
+                ctx.fillStyle = '#FFFFFF';
                 ctx.beginPath();
-                ctx.arc(-eyeOffsetX - 2, eyeOffsetY - 2, pupilRadius * 0.4, 0, Math.PI * 2);
-                ctx.arc(eyeOffsetX - 2, eyeOffsetY - 2, pupilRadius * 0.4, 0, Math.PI * 2);
+                ctx.arc(eyeX + pupilOffsetX - pupilRadius * 0.4, eyeY + pupilOffsetY - pupilRadius * 0.4, pupilRadius * 0.35, 0, Math.PI * 2);
                 ctx.fill();
+                
+                // Cejas enojadas (línea diagonal)
+                ctx.strokeStyle = '#0F0F1A';
+                ctx.lineWidth = 4;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(eyeX - eyeRadius * 0.8, eyeY - eyeRadius * 0.9);
+                ctx.lineTo(eyeX + eyeRadius * 0.5, eyeY - eyeRadius * 0.5);
+                ctx.stroke();
                 
                 ctx.restore();
             });
@@ -2118,6 +2148,73 @@
     // Setup UI and level selector
     GameManager._setupEventListeners();
     LevelManager.init();
+    
+    // ==========================================================================
+    // KEYBOARD CONTROLS FOR PC TESTING
+    // ==========================================================================
+    
+    const KeyboardControls = {
+        enabled: true,
+        activePlayer: null,
+        
+        init() {
+            window.addEventListener('keydown', (e) => this._handleKey(e, true));
+            window.addEventListener('keyup', (e) => this._handleKey(e, false));
+        },
+        
+        _getActivePlayer() {
+            // Find first connected player
+            for (let slot = 1; slot <= CONFIG.MAX_PLAYERS; slot++) {
+                if (GameManager.state.players[slot] && !GameManager.state.players[slot].disconnected) {
+                    return slot;
+                }
+            }
+            return null;
+        },
+        
+        _handleKey(e, pressed) {
+            if (!this.enabled || !GameManager.state.started) return;
+            
+            const playerSlot = this._getActivePlayer();
+            if (!playerSlot || !GameManager.state.games[playerSlot]) return;
+            
+            const game = GameManager.state.games[playerSlot];
+            
+            // Arrow keys or WASD
+            switch (e.code) {
+                case 'ArrowLeft':
+                case 'KeyA':
+                    e.preventDefault();
+                    if (pressed) {
+                        game.keys.left = true;
+                        game.keys.right = false;
+                    } else {
+                        game.keys.left = false;
+                    }
+                    break;
+                    
+                case 'ArrowRight':
+                case 'KeyD':
+                    e.preventDefault();
+                    if (pressed) {
+                        game.keys.right = true;
+                        game.keys.left = false;
+                    } else {
+                        game.keys.right = false;
+                    }
+                    break;
+                    
+                case 'ArrowUp':
+                case 'KeyW':
+                case 'Space':
+                    e.preventDefault();
+                    game.keys.jump = pressed;
+                    break;
+            }
+        }
+    };
+    
+    KeyboardControls.init();
     </script>
 </body>
 </html>
