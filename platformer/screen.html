@@ -4,9 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>STEAM Platformer - Fundacion STEAM RD</title>
+    
+    <!-- External Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <script type="text/javascript" src="https://www.airconsole.com/api/airconsole-1.8.0.js"></script>
+    
+    <!-- Tailwind Configuration -->
     <script>
         tailwind.config = {
             theme: {
@@ -25,16 +29,40 @@
             }
         }
     </script>
+    
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { width: 100%; height: 100%; overflow: hidden; }
-        body { position: fixed; top: 0; left: 0; font-family: 'Segoe UI', system-ui, sans-serif; background: #f8f9fa; }
+        /* ==========================================================================
+           BASE STYLES
+           ========================================================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        body {
+            position: fixed;
+            top: 0;
+            left: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #f8f9fa;
+        }
 
-        /* Clean title with colored letters */
+        /* ==========================================================================
+           TITLE STYLES
+           ========================================================================== */
         .title-steam { color: #0595AE; }
         .title-platformer { color: #73A03F; }
 
-        /* Player avatar - clean flat design */
+        /* ==========================================================================
+           PLAYER AVATAR
+           ========================================================================== */
         .player-avatar {
             width: clamp(50px, 8vw, 80px);
             height: clamp(50px, 8vw, 80px);
@@ -43,7 +71,6 @@
             box-shadow: 0 6px 0 rgba(0,0,0,0.15), 0 8px 25px rgba(0,0,0,0.1);
         }
 
-        /* Eyes for avatar - simple centered with idle blink */
         .player-avatar::before,
         .player-avatar::after {
             content: '';
@@ -51,47 +78,13 @@
             width: 24%;
             height: 24%;
             top: 32%;
-            background: radial-gradient(circle at 50% 50%, #222 35%, transparent 36%),
-                        white;
+            background: radial-gradient(circle at 50% 50%, #222 35%, transparent 36%), white;
             border-radius: 50%;
             animation: idleBlink 4s ease-in-out infinite;
         }
+        
         .player-avatar::before { left: 18%; }
         .player-avatar::after { right: 18%; animation-delay: 0.05s; }
-
-        /* Idle blink - natural blinking */
-        @keyframes idleBlink {
-            0%, 42%, 48%, 100% { transform: scaleY(1); }
-            45% { transform: scaleY(0.05); }
-        }
-
-        /* Happy blink when player connects */
-        .player-card.ready .player-avatar::before,
-        .player-card.ready .player-avatar::after,
-        .player-card.admin .player-avatar::before,
-        .player-card.admin .player-avatar::after {
-            animation: blinkHappy 0.6s ease-out, idleBlink 4s ease-in-out 0.6s infinite;
-        }
-        @keyframes blinkHappy {
-            0% { transform: scaleY(1); }
-            20% { transform: scaleY(0.05); }
-            40% { transform: scaleY(1); }
-            60% { transform: scaleY(0.05); }
-            80% { transform: scaleY(1); }
-            100% { transform: scaleY(1); }
-        }
-
-        /* Jump when connected */
-        .player-card.ready .player-avatar,
-        .player-card.admin .player-avatar {
-            animation: happyJump 0.5s ease-out;
-        }
-        @keyframes happyJump {
-            0% { transform: scale(1); }
-            40% { transform: scale(1.15) translateY(-12px); }
-            70% { transform: scale(0.95) translateY(0); }
-            100% { transform: scale(1) translateY(0); }
-        }
 
         .player-avatar-small {
             width: clamp(35px, 5vw, 50px);
@@ -100,14 +93,9 @@
             box-shadow: 0 4px 0 rgba(0,0,0,0.15);
         }
 
-        /* Float animation */
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
-        }
-        .float { animation: float 3s ease-in-out infinite; }
-
-        /* Player card */
+        /* ==========================================================================
+           PLAYER CARD
+           ========================================================================== */
         .player-card {
             background: white;
             border-radius: 20px;
@@ -126,7 +114,22 @@
             background: #fff7ed;
         }
 
-        /* Countdown */
+        /* Player card ready/admin animations */
+        .player-card.ready .player-avatar::before,
+        .player-card.ready .player-avatar::after,
+        .player-card.admin .player-avatar::before,
+        .player-card.admin .player-avatar::after {
+            animation: blinkHappy 0.6s ease-out, idleBlink 4s ease-in-out 0.6s infinite;
+        }
+
+        .player-card.ready .player-avatar,
+        .player-card.admin .player-avatar {
+            animation: happyJump 0.5s ease-out;
+        }
+
+        /* ==========================================================================
+           COUNTDOWN
+           ========================================================================== */
         .countdown-overlay {
             position: fixed;
             inset: 0;
@@ -145,28 +148,53 @@
             animation: countPop 0.6s ease-out;
         }
 
+        /* ==========================================================================
+           ANIMATIONS
+           ========================================================================== */
+        @keyframes idleBlink {
+            0%, 42%, 48%, 100% { transform: scaleY(1); }
+            45% { transform: scaleY(0.05); }
+        }
+
+        @keyframes blinkHappy {
+            0% { transform: scaleY(1); }
+            20% { transform: scaleY(0.05); }
+            40% { transform: scaleY(1); }
+            60% { transform: scaleY(0.05); }
+            80%, 100% { transform: scaleY(1); }
+        }
+
+        @keyframes happyJump {
+            0% { transform: scale(1); }
+            40% { transform: scale(1.15) translateY(-12px); }
+            70% { transform: scale(0.95) translateY(0); }
+            100% { transform: scale(1) translateY(0); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        .float { animation: float 3s ease-in-out infinite; }
+
         @keyframes countPop {
             0% { transform: scale(2.5); opacity: 0; }
             60% { transform: scale(0.9); }
             100% { transform: scale(1); opacity: 1; }
         }
 
-        /* Confetti */
         @keyframes fall {
             to { transform: translateY(100vh) rotate(720deg); opacity: 0; }
         }
+        
         .confetti {
             position: absolute;
             animation: fall 3s ease-out forwards;
         }
 
-        /* Pulse */
-        @keyframes pulse {
-            50% { opacity: 0.6; }
-        }
+        @keyframes pulse { 50% { opacity: 0.6; } }
         .pulse { animation: pulse 2s ease infinite; }
 
-        /* Winner animation */
         @keyframes winner {
             0% { transform: scale(0) rotate(-10deg); }
             70% { transform: scale(1.1) rotate(5deg); }
@@ -339,860 +367,509 @@
     <div class="fixed inset-0 pointer-events-none z-[1000] overflow-hidden" id="confettiContainer"></div>
 
     <script>
-        const airconsole = new AirConsole();
-        
-        // Physics configuration - centralized for easy tuning
-        const PHYSICS_CONFIG = {
-            gravity: 0.6,              // Gravity acceleration per frame
-            maxFallSpeed: 16,          // Terminal velocity when falling
-            moveSpeed: 6.0,            // Base horizontal movement speed
-            jumpPower: -14,            // Initial jump velocity (negative = up)
-            airAcceleration: 0.5,      // Acceleration multiplier in air
-            groundAcceleration: 0.8,   // Acceleration multiplier on ground
-            friction: 0.7,             // Ground friction (lower = more slide)
-            airResistance: 0.95,       // Air resistance when stunned
-            jumpCutMultiplier: 0.5,    // Jump height reduction when button released
-            jumpCutThreshold: -4       // Minimum upward velocity for jump cutting
-        };
-        
-        // Multi-level system with progressive difficulty
-        const LEVELS = {
-            1: {
-                name: "Inicio Facil",
-                length: 2500,
-                floorSegments: [
-                    { x: 0, width: 500 },
-                    { x: 700, width: 400 },
-                    { x: 1300, width: 500 },
-                    { x: 2000, width: 500 },
-                ],
-                platforms: [
-                    { x: 350, y: 550, width: 180 },       // Platform 1
-                    { x: 700, y: 500, width: 150 },       // Platform 2 - moved right for spacing
-                    { x: 1050, y: 540, width: 160 },      // Platform 3 - adjusted spacing
-                    { x: 1550, y: 520, width: 180 },      // Platform 4
-                    { x: 1900, y: 490, width: 160 },      // Platform 5
-                ],
-                coins: [
-                    { x: 440, y: 510 }, { x: 775, y: 460 }, { x: 1130, y: 500 },
-                    { x: 1630, y: 480 }, { x: 1980, y: 450 }, { x: 2250, y: 550 },
-                ],
-                obstacles: [
-                    { x: 590, y: 340, startX: 590 },      // Obstacle 1 - moved for safe zone
-                    { x: 1350, y: 330, startX: 1350 },    // Obstacle 2 - moved for safe zone
-                ],
-            },
-            2: {
-                name: "Saltos Medianos",
-                length: 3000,
-                floorSegments: [
-                    { x: 0, width: 400 },
-                    { x: 650, width: 300 },             // Increased gap to 250px
-                    { x: 1150, width: 450 },            // Adjusted for 200px gap
-                    { x: 1800, width: 350 },            // Adjusted for 200px gap
-                    { x: 2350, width: 650 },            // Adjusted for 200px gap
-                ],
-                platforms: [
-                    { x: 300, y: 550, width: 150 },
-                    { x: 550, y: 480, width: 120 },     // Adjusted spacing
-                    { x: 850, y: 530, width: 180 },     // Better spacing from obstacle
-                    { x: 1100, y: 460, width: 140 },
-                    { x: 1400, y: 510, width: 160 },
-                    { x: 1650, y: 440, width: 130 },
-                    { x: 1950, y: 490, width: 200 },
-                    { x: 2250, y: 530, width: 150 },
-                    { x: 2550, y: 470, width: 180 },
-                ],
-                coins: [
-                    { x: 375, y: 510 }, { x: 610, y: 440 }, { x: 930, y: 490 },
-                    { x: 1170, y: 420 }, { x: 1480, y: 470 }, { x: 1715, y: 400 },
-                    { x: 2050, y: 450 }, { x: 2325, y: 490 }, { x: 2630, y: 430 },
-                    { x: 2850, y: 550 },
-                ],
-                obstacles: [
-                    { x: 470, y: 320, startX: 470 },    // Better safe zone
-                    { x: 1000, y: 300, startX: 1000 },  // Better safe zone
-                    { x: 1550, y: 280, startX: 1550 },  // Better safe zone
-                    { x: 2150, y: 310, startX: 2150 },  // Better safe zone
-                ],
-            },
-            3: {
-                name: "Torre Alta",
-                length: 3500,
-                floorSegments: [
-                    { x: 0, width: 350 },
-                    { x: 600, width: 250 },             // 250px gap (hard level)
-                    { x: 1100, width: 200 },            // 250px gap
-                    { x: 1550, width: 300 },            // 250px gap
-                    { x: 2100, width: 250 },            // 250px gap
-                    { x: 2600, width: 400 },            // 250px gap
-                    { x: 3250, width: 250 },            // 250px gap
-                ],
-                platforms: [
-                    { x: 250, y: 570, width: 130 },
-                    { x: 480, y: 510, width: 120 },     // Better spacing
-                    { x: 710, y: 450, width: 110 },
-                    { x: 950, y: 500, width: 130 },     // Better spacing from obstacle
-                    { x: 1200, y: 440, width: 140 },
-                    { x: 1450, y: 380, width: 120 },
-                    { x: 1750, y: 520, width: 150 },
-                    { x: 2000, y: 460, width: 130 },
-                    { x: 2300, y: 400, width: 140 },
-                    { x: 2550, y: 480, width: 150 },
-                    { x: 2850, y: 520, width: 160 },
-                    { x: 3150, y: 470, width: 140 },
-                ],
-                coins: [
-                    { x: 315, y: 530 }, { x: 540, y: 470 }, { x: 770, y: 410 },
-                    { x: 1010, y: 460 }, { x: 1270, y: 400 }, { x: 1510, y: 340 },
-                    { x: 1820, y: 480 }, { x: 2060, y: 420 }, { x: 2370, y: 360 },
-                    { x: 2610, y: 440 }, { x: 2920, y: 480 }, { x: 3210, y: 430 },
-                ],
-                obstacles: [
-                    { x: 390, y: 300, startX: 390 },    // Better safe zone
-                    { x: 850, y: 280, startX: 850 },    // Better safe zone
-                    { x: 1350, y: 260, startX: 1350 },  // Better safe zone
-                    { x: 1900, y: 270, startX: 1900 },  // Better safe zone
-                    { x: 2450, y: 250, startX: 2450 },  // Better safe zone
-                    { x: 3000, y: 280, startX: 3000 },  // Better safe zone
-                ],
-            },
-            4: {
-                name: "Abismo Peligroso",
-                length: 4000,
-                floorSegments: [
-                    { x: 0, width: 300 },
-                    { x: 550, width: 200 },             // 250px gap (expert level)
-                    { x: 1000, width: 250 },            // 250px gap
-                    { x: 1500, width: 200 },            // 250px gap
-                    { x: 1950, width: 300 },            // 250px gap
-                    { x: 2500, width: 200 },            // 250px gap
-                    { x: 2950, width: 250 },            // 250px gap
-                    { x: 3450, width: 300 },            // 250px gap
-                    { x: 4000, width: 0 },              // Finish line
-                ],
-                platforms: [
-                    { x: 200, y: 560, width: 120 },
-                    { x: 420, y: 500, width: 100 },
-                    { x: 630, y: 440, width: 110 },
-                    { x: 850, y: 490, width: 120 },
-                    { x: 1070, y: 530, width: 130 },
-                    { x: 1300, y: 470, width: 110 },
-                    { x: 1550, y: 410, width: 120 },
-                    { x: 1800, y: 500, width: 130 },
-                    { x: 2050, y: 450, width: 120 },
-                    { x: 2300, y: 490, width: 110 },
-                    { x: 2600, y: 430, width: 120 },
-                    { x: 2850, y: 510, width: 130 },
-                    { x: 3100, y: 460, width: 110 },
-                    { x: 3350, y: 500, width: 120 },
-                    { x: 3600, y: 450, width: 130 },
-                ],
-                coins: [
-                    { x: 260, y: 520 }, { x: 480, y: 460 }, { x: 690, y: 400 },
-                    { x: 910, y: 450 }, { x: 1130, y: 490 }, { x: 1360, y: 430 },
-                    { x: 1610, y: 370 }, { x: 1860, y: 460 }, { x: 2110, y: 410 },
-                    { x: 2360, y: 450 }, { x: 2660, y: 390 }, { x: 2910, y: 470 },
-                    { x: 3160, y: 420 }, { x: 3410, y: 460 }, { x: 3660, y: 410 },
-                ],
-                obstacles: [
-                    { x: 340, y: 310, startX: 340 },
-                    { x: 750, y: 290, startX: 750 },
-                    { x: 1200, y: 280, startX: 1200 },
-                    { x: 1680, y: 270, startX: 1680 },
-                    { x: 2180, y: 280, startX: 2180 },
-                    { x: 2730, y: 270, startX: 2730 },
-                    { x: 3230, y: 280, startX: 3230 },
-                    { x: 3750, y: 270, startX: 3750 },
-                ],
-            },
-            5: {
-                name: "Maestro Supremo",
-                length: 4500,
-                floorSegments: [
-                    { x: 0, width: 250 },
-                    { x: 550, width: 180 },             // 300px gap (master level - extreme)
-                    { x: 1030, width: 200 },            // 300px gap
-                    { x: 1530, width: 180 },            // 300px gap
-                    { x: 2010, width: 220 },            // 300px gap
-                    { x: 2530, width: 180 },            // 300px gap
-                    { x: 3010, width: 200 },            // 300px gap
-                    { x: 3510, width: 180 },            // 300px gap
-                    { x: 3990, width: 510 },            // Final stretch
-                ],
-                platforms: [
-                    { x: 170, y: 570, width: 100 },
-                    { x: 350, y: 520, width: 90 },
-                    { x: 580, y: 460, width: 100 },
-                    { x: 750, y: 510, width: 90 },
-                    { x: 930, y: 450, width: 100 },
-                    { x: 1130, y: 390, width: 90 },
-                    { x: 1330, y: 530, width: 100 },
-                    { x: 1580, y: 470, width: 90 },
-                    { x: 1780, y: 410, width: 100 },
-                    { x: 2030, y: 350, width: 90 },
-                    { x: 2280, y: 500, width: 100 },
-                    { x: 2480, y: 440, width: 90 },
-                    { x: 2680, y: 490, width: 100 },
-                    { x: 2880, y: 430, width: 90 },
-                    { x: 3080, y: 380, width: 100 },
-                    { x: 3330, y: 520, width: 90 },
-                    { x: 3580, y: 460, width: 100 },
-                    { x: 3830, y: 400, width: 90 },
-                    { x: 4080, y: 510, width: 100 },
-                    { x: 4330, y: 450, width: 90 },
-                ],
-                coins: [
-                    { x: 220, y: 530 }, { x: 400, y: 480 }, { x: 630, y: 420 },
-                    { x: 800, y: 470 }, { x: 980, y: 410 }, { x: 1180, y: 350 },
-                    { x: 1380, y: 490 }, { x: 1630, y: 430 }, { x: 1830, y: 370 },
-                    { x: 2080, y: 310 }, { x: 2330, y: 460 }, { x: 2530, y: 400 },
-                    { x: 2730, y: 450 }, { x: 2930, y: 390 }, { x: 3130, y: 340 },
-                    { x: 3380, y: 480 }, { x: 3630, y: 420 }, { x: 3880, y: 360 },
-                    { x: 4130, y: 470 }, { x: 4380, y: 410 },
-                ],
-                obstacles: [
-                    { x: 280, y: 320, startX: 280 },
-                    { x: 670, y: 300, startX: 670 },
-                    { x: 1030, y: 280, startX: 1030 },
-                    { x: 1460, y: 290, startX: 1460 },
-                    { x: 1880, y: 270, startX: 1880 },
-                    { x: 2180, y: 260, startX: 2180 },
-                    { x: 2580, y: 280, startX: 2580 },
-                    { x: 2980, y: 270, startX: 2980 },
-                    { x: 3230, y: 260, startX: 3230 },
-                    { x: 3480, y: 280, startX: 3480 },
-                    { x: 3730, y: 270, startX: 3730 },
-                    { x: 4230, y: 260, startX: 4230 },
-                ],
-            },
-        };
-        
-        // Default to level 1
-        let currentLevel = 1;
+    /**
+     * STEAM Platformer - Screen Controller
+     * 
+     * Manages game state, player connections, physics, and game rendering.
+     * Broadcasts game events to controllers via AirConsole.
+     * 
+     * @fileoverview Main game screen module for the STEAM Platformer
+     * @version 2.0.0
+     */
 
-        const COLORS = ['#73A03F', '#AB3D8B', '#0595AE', '#EB8225'];
-        const NAMES = ['Verde', 'Morado', 'Turquesa', 'Naranja'];
+    // ==========================================================================
+    // CONFIGURATION
+    // ==========================================================================
+    
+    const CONFIG = {
+        MAX_PLAYERS: 4,
+        COLORS: ['#73A03F', '#AB3D8B', '#0595AE', '#EB8225'],
+        NAMES: ['Verde', 'Morado', 'Turquesa', 'Naranja'],
+        CONFETTI_COLORS: ['#0595AE', '#AB3D8B', '#EB8225', '#73A03F', '#FFD700'],
+        CONFETTI_COUNT: 150
+    };
 
-        const state = {
-            players: {},
-            games: {},
-            started: false,
-            starting: false,
-            startTime: null,
-            admin: null,
-            resultsDisplayed: false,
-            levelProgress: {
-                currentLevel: 1,           // Currently selected level (1-5)
-                unlockedLevels: [1],       // Array of unlocked level numbers
-                completedLevels: []        // Array of completed level numbers
-            }
-        };
+    const PHYSICS = {
+        GRAVITY: 0.6,
+        MAX_FALL_SPEED: 16,
+        MOVE_SPEED: 6.0,
+        JUMP_POWER: -14,
+        AIR_ACCELERATION: 0.5,
+        GROUND_ACCELERATION: 0.8,
+        FRICTION: 0.7,
+        AIR_RESISTANCE: 0.95,
+        JUMP_CUT_MULTIPLIER: 0.5,
+        JUMP_CUT_THRESHOLD: -4
+    };
 
-        let audioCtx;
-        const initAudio = () => { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); };
-        
-        function sound(type) {
-            initAudio();
-            const o = audioCtx.createOscillator();
-            const g = audioCtx.createGain();
-            o.connect(g);
-            g.connect(audioCtx.destination);
-            
-            const t = audioCtx.currentTime;
-            switch(type) {
-                case 'jump':
-                    o.frequency.setValueAtTime(400, t);
-                    o.frequency.exponentialRampToValueAtTime(800, t + 0.1);
-                    g.gain.setValueAtTime(0.1, t);
-                    g.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
-                    o.start(t); o.stop(t + 0.1);
-                    break;
-                case 'coin':
-                    [1000, 1250, 1500].forEach((f, i) => {
-                        const osc = audioCtx.createOscillator();
-                        const gain = audioCtx.createGain();
-                        osc.connect(gain); gain.connect(audioCtx.destination);
-                        osc.frequency.value = f;
-                        gain.gain.setValueAtTime(0.08, t + i * 0.05);
-                        gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.05 + 0.1);
-                        osc.start(t + i * 0.05); osc.stop(t + i * 0.05 + 0.1);
-                    });
-                    break;
-                case 'hit':
-                    o.type = 'sawtooth';
-                    o.frequency.setValueAtTime(200, t);
-                    o.frequency.exponentialRampToValueAtTime(80, t + 0.15);
-                    g.gain.setValueAtTime(0.12, t);
-                    g.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
-                    o.start(t); o.stop(t + 0.15);
-                    break;
-                case 'win':
-                    [523, 659, 784, 1047].forEach((f, i) => {
-                        const osc = audioCtx.createOscillator();
-                        const gain = audioCtx.createGain();
-                        osc.connect(gain); gain.connect(audioCtx.destination);
-                        osc.frequency.value = f;
-                        gain.gain.setValueAtTime(0.1, t + i * 0.12);
-                        gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.12 + 0.25);
-                        osc.start(t + i * 0.12); osc.stop(t + i * 0.12 + 0.25);
-                    });
-                    break;
-                case 'count':
-                    o.frequency.value = 500;
-                    g.gain.setValueAtTime(0.1, t);
-                    g.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
-                    o.start(t); o.stop(t + 0.12);
-                    break;
-                case 'go':
-                    [600, 900, 1200].forEach((f, i) => {
-                        const osc = audioCtx.createOscillator();
-                        const gain = audioCtx.createGain();
-                        osc.connect(gain); gain.connect(audioCtx.destination);
-                        osc.frequency.value = f;
-                        gain.gain.setValueAtTime(0.12, t + i * 0.04);
-                        gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.04 + 0.15);
-                        osc.start(t + i * 0.04); osc.stop(t + i * 0.04 + 0.15);
-                    });
-                    break;
-            }
+    // ==========================================================================
+    // LEVEL DATA
+    // ==========================================================================
+    
+    const LEVELS = {
+        1: {
+            name: "Inicio Facil",
+            length: 2500,
+            floorSegments: [
+                { x: 0, width: 500 },
+                { x: 700, width: 400 },
+                { x: 1300, width: 500 },
+                { x: 2000, width: 500 }
+            ],
+            platforms: [
+                { x: 350, y: 550, width: 180 },
+                { x: 700, y: 500, width: 150 },
+                { x: 1050, y: 540, width: 160 },
+                { x: 1550, y: 520, width: 180 },
+                { x: 1900, y: 490, width: 160 }
+            ],
+            coins: [
+                { x: 440, y: 510 }, { x: 775, y: 460 }, { x: 1130, y: 500 },
+                { x: 1630, y: 480 }, { x: 1980, y: 450 }, { x: 2250, y: 550 }
+            ],
+            obstacles: [
+                { x: 590, y: 340, startX: 590 },
+                { x: 1350, y: 330, startX: 1350 }
+            ]
+        },
+        2: {
+            name: "Saltos Medianos",
+            length: 3000,
+            floorSegments: [
+                { x: 0, width: 400 },
+                { x: 650, width: 300 },
+                { x: 1150, width: 450 },
+                { x: 1800, width: 350 },
+                { x: 2350, width: 650 }
+            ],
+            platforms: [
+                { x: 300, y: 550, width: 150 },
+                { x: 550, y: 480, width: 120 },
+                { x: 850, y: 530, width: 180 },
+                { x: 1100, y: 460, width: 140 },
+                { x: 1400, y: 510, width: 160 },
+                { x: 1650, y: 440, width: 130 },
+                { x: 1950, y: 490, width: 200 },
+                { x: 2250, y: 530, width: 150 },
+                { x: 2550, y: 470, width: 180 }
+            ],
+            coins: [
+                { x: 375, y: 510 }, { x: 610, y: 440 }, { x: 930, y: 490 },
+                { x: 1170, y: 420 }, { x: 1480, y: 470 }, { x: 1715, y: 400 },
+                { x: 2050, y: 450 }, { x: 2325, y: 490 }, { x: 2630, y: 430 },
+                { x: 2850, y: 550 }
+            ],
+            obstacles: [
+                { x: 470, y: 320, startX: 470 },
+                { x: 1000, y: 300, startX: 1000 },
+                { x: 1550, y: 280, startX: 1550 },
+                { x: 2150, y: 310, startX: 2150 }
+            ]
+        },
+        3: {
+            name: "Torre Alta",
+            length: 3500,
+            floorSegments: [
+                { x: 0, width: 350 },
+                { x: 600, width: 250 },
+                { x: 1100, width: 200 },
+                { x: 1550, width: 300 },
+                { x: 2100, width: 250 },
+                { x: 2600, width: 400 },
+                { x: 3250, width: 250 }
+            ],
+            platforms: [
+                { x: 250, y: 570, width: 130 },
+                { x: 480, y: 510, width: 120 },
+                { x: 710, y: 450, width: 110 },
+                { x: 950, y: 500, width: 130 },
+                { x: 1200, y: 440, width: 140 },
+                { x: 1450, y: 380, width: 120 },
+                { x: 1750, y: 520, width: 150 },
+                { x: 2000, y: 460, width: 130 },
+                { x: 2300, y: 400, width: 140 },
+                { x: 2550, y: 480, width: 150 },
+                { x: 2850, y: 520, width: 160 },
+                { x: 3150, y: 470, width: 140 }
+            ],
+            coins: [
+                { x: 315, y: 530 }, { x: 540, y: 470 }, { x: 770, y: 410 },
+                { x: 1010, y: 460 }, { x: 1270, y: 400 }, { x: 1510, y: 340 },
+                { x: 1820, y: 480 }, { x: 2060, y: 420 }, { x: 2370, y: 360 },
+                { x: 2610, y: 440 }, { x: 2920, y: 480 }, { x: 3210, y: 430 }
+            ],
+            obstacles: [
+                { x: 390, y: 300, startX: 390 },
+                { x: 850, y: 280, startX: 850 },
+                { x: 1350, y: 260, startX: 1350 },
+                { x: 1900, y: 270, startX: 1900 },
+                { x: 2450, y: 250, startX: 2450 },
+                { x: 3000, y: 280, startX: 3000 }
+            ]
+        },
+        4: {
+            name: "Abismo Peligroso",
+            length: 4000,
+            floorSegments: [
+                { x: 0, width: 300 },
+                { x: 550, width: 200 },
+                { x: 1000, width: 250 },
+                { x: 1500, width: 200 },
+                { x: 1950, width: 300 },
+                { x: 2500, width: 200 },
+                { x: 2950, width: 250 },
+                { x: 3450, width: 300 },
+                { x: 4000, width: 0 }
+            ],
+            platforms: [
+                { x: 200, y: 560, width: 120 },
+                { x: 420, y: 500, width: 100 },
+                { x: 630, y: 440, width: 110 },
+                { x: 850, y: 490, width: 120 },
+                { x: 1070, y: 530, width: 130 },
+                { x: 1300, y: 470, width: 110 },
+                { x: 1550, y: 410, width: 120 },
+                { x: 1800, y: 500, width: 130 },
+                { x: 2050, y: 450, width: 120 },
+                { x: 2300, y: 490, width: 110 },
+                { x: 2600, y: 430, width: 120 },
+                { x: 2850, y: 510, width: 130 },
+                { x: 3100, y: 460, width: 110 },
+                { x: 3350, y: 500, width: 120 },
+                { x: 3600, y: 450, width: 130 }
+            ],
+            coins: [
+                { x: 260, y: 520 }, { x: 480, y: 460 }, { x: 690, y: 400 },
+                { x: 910, y: 450 }, { x: 1130, y: 490 }, { x: 1360, y: 430 },
+                { x: 1610, y: 370 }, { x: 1860, y: 460 }, { x: 2110, y: 410 },
+                { x: 2360, y: 450 }, { x: 2660, y: 390 }, { x: 2910, y: 470 },
+                { x: 3160, y: 420 }, { x: 3410, y: 460 }, { x: 3660, y: 410 }
+            ],
+            obstacles: [
+                { x: 340, y: 310, startX: 340 },
+                { x: 750, y: 290, startX: 750 },
+                { x: 1200, y: 280, startX: 1200 },
+                { x: 1680, y: 270, startX: 1680 },
+                { x: 2180, y: 280, startX: 2180 },
+                { x: 2730, y: 270, startX: 2730 },
+                { x: 3230, y: 280, startX: 3230 },
+                { x: 3750, y: 270, startX: 3750 }
+            ]
+        },
+        5: {
+            name: "Maestro Supremo",
+            length: 4500,
+            floorSegments: [
+                { x: 0, width: 250 },
+                { x: 550, width: 180 },
+                { x: 1030, width: 200 },
+                { x: 1530, width: 180 },
+                { x: 2010, width: 220 },
+                { x: 2530, width: 180 },
+                { x: 3010, width: 200 },
+                { x: 3510, width: 180 },
+                { x: 3990, width: 510 }
+            ],
+            platforms: [
+                { x: 170, y: 570, width: 100 },
+                { x: 350, y: 520, width: 90 },
+                { x: 580, y: 460, width: 100 },
+                { x: 750, y: 510, width: 90 },
+                { x: 930, y: 450, width: 100 },
+                { x: 1130, y: 390, width: 90 },
+                { x: 1330, y: 530, width: 100 },
+                { x: 1580, y: 470, width: 90 },
+                { x: 1780, y: 410, width: 100 },
+                { x: 2030, y: 350, width: 90 },
+                { x: 2280, y: 500, width: 100 },
+                { x: 2480, y: 440, width: 90 },
+                { x: 2680, y: 490, width: 100 },
+                { x: 2880, y: 430, width: 90 },
+                { x: 3080, y: 380, width: 100 },
+                { x: 3330, y: 520, width: 90 },
+                { x: 3580, y: 460, width: 100 },
+                { x: 3830, y: 400, width: 90 },
+                { x: 4080, y: 510, width: 100 },
+                { x: 4330, y: 450, width: 90 }
+            ],
+            coins: [
+                { x: 220, y: 530 }, { x: 400, y: 480 }, { x: 630, y: 420 },
+                { x: 800, y: 470 }, { x: 980, y: 410 }, { x: 1180, y: 350 },
+                { x: 1380, y: 490 }, { x: 1630, y: 430 }, { x: 1830, y: 370 },
+                { x: 2080, y: 310 }, { x: 2330, y: 460 }, { x: 2530, y: 400 },
+                { x: 2730, y: 450 }, { x: 2930, y: 390 }, { x: 3130, y: 340 },
+                { x: 3380, y: 480 }, { x: 3630, y: 420 }, { x: 3880, y: 360 },
+                { x: 4130, y: 470 }, { x: 4380, y: 410 }
+            ],
+            obstacles: [
+                { x: 280, y: 320, startX: 280 },
+                { x: 670, y: 300, startX: 670 },
+                { x: 1030, y: 280, startX: 1030 },
+                { x: 1460, y: 290, startX: 1460 },
+                { x: 1880, y: 270, startX: 1880 },
+                { x: 2180, y: 260, startX: 2180 },
+                { x: 2580, y: 280, startX: 2580 },
+                { x: 2980, y: 270, startX: 2980 },
+                { x: 3230, y: 260, startX: 3230 },
+                { x: 3480, y: 280, startX: 3480 },
+                { x: 3730, y: 270, startX: 3730 },
+                { x: 4230, y: 260, startX: 4230 }
+            ]
         }
+    };
 
-        function confetti() {
-            const c = document.getElementById('confettiContainer');
-            c.innerHTML = '';
-            const colors = ['#0595AE', '#AB3D8B', '#EB8225', '#73A03F', '#FFD700'];
-            for (let i = 0; i < 150; i++) {
+    // ==========================================================================
+    // DOM UTILITIES
+    // ==========================================================================
+    
+    const DOM = {
+        get: (id) => document.getElementById(id),
+        
+        elements: {},
+        
+        init() {
+            this.elements = {
+                startScreen: this.get('startScreen'),
+                gameContainer: this.get('gameContainer'),
+                countdownOverlay: this.get('countdownOverlay'),
+                countdownNumber: this.get('countdownNumber'),
+                resultsScreen: this.get('resultsScreen'),
+                winnerSection: this.get('winnerSection'),
+                resultsBody: this.get('resultsBody'),
+                adminHint: this.get('adminHint'),
+                levelSelector: this.get('levelSelector'),
+                levelName: this.get('levelName'),
+                nextLevelBtn: this.get('nextLevelBtn'),
+                levelSelectBtn: this.get('levelSelectBtn'),
+                waitingAdmin: this.get('waitingAdmin'),
+                confettiContainer: this.get('confettiContainer')
+            };
+        }
+    };
+
+    // ==========================================================================
+    // AUDIO MANAGER
+    // ==========================================================================
+    
+    const AudioManager = {
+        context: null,
+        
+        init() {
+            if (!this.context) {
+                this.context = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        },
+        
+        play(type) {
+            this.init();
+            const ctx = this.context;
+            const t = ctx.currentTime;
+            
+            const sounds = {
+                jump: () => this._playTone(400, 800, 0.1, 0.1),
+                coin: () => this._playArpeggio([1000, 1250, 1500], 0.08, 0.05),
+                hit: () => this._playSawtooth(200, 80, 0.15, 0.12),
+                win: () => this._playArpeggio([523, 659, 784, 1047], 0.1, 0.12),
+                count: () => this._playTone(500, 500, 0.12, 0.1),
+                go: () => this._playArpeggio([600, 900, 1200], 0.12, 0.04)
+            };
+            
+            if (sounds[type]) sounds[type]();
+        },
+        
+        _playTone(startFreq, endFreq, duration, gain) {
+            const ctx = this.context;
+            const t = ctx.currentTime;
+            const o = ctx.createOscillator();
+            const g = ctx.createGain();
+            
+            o.connect(g);
+            g.connect(ctx.destination);
+            o.frequency.setValueAtTime(startFreq, t);
+            o.frequency.exponentialRampToValueAtTime(endFreq, t + duration);
+            g.gain.setValueAtTime(gain, t);
+            g.gain.exponentialRampToValueAtTime(0.001, t + duration);
+            o.start(t);
+            o.stop(t + duration);
+        },
+        
+        _playArpeggio(frequencies, gain, delay) {
+            const ctx = this.context;
+            const t = ctx.currentTime;
+            
+            frequencies.forEach((f, i) => {
+                const osc = ctx.createOscillator();
+                const gainNode = ctx.createGain();
+                osc.connect(gainNode);
+                gainNode.connect(ctx.destination);
+                osc.frequency.value = f;
+                gainNode.gain.setValueAtTime(gain, t + i * delay);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, t + i * delay + 0.15);
+                osc.start(t + i * delay);
+                osc.stop(t + i * delay + 0.15);
+            });
+        },
+        
+        _playSawtooth(startFreq, endFreq, duration, gain) {
+            const ctx = this.context;
+            const t = ctx.currentTime;
+            const o = ctx.createOscillator();
+            const g = ctx.createGain();
+            
+            o.type = 'sawtooth';
+            o.connect(g);
+            g.connect(ctx.destination);
+            o.frequency.setValueAtTime(startFreq, t);
+            o.frequency.exponentialRampToValueAtTime(endFreq, t + duration);
+            g.gain.setValueAtTime(gain, t);
+            g.gain.exponentialRampToValueAtTime(0.001, t + duration);
+            o.start(t);
+            o.stop(t + duration);
+        }
+    };
+
+    // ==========================================================================
+    // EFFECTS MANAGER
+    // ==========================================================================
+    
+    const EffectsManager = {
+        spawnConfetti() {
+            const container = DOM.elements.confettiContainer;
+            container.innerHTML = '';
+            
+            for (let i = 0; i < CONFIG.CONFETTI_COUNT; i++) {
                 const el = document.createElement('div');
                 el.className = 'confetti';
-                el.style.cssText = `left:${Math.random()*100}%;top:-20px;width:${8+Math.random()*8}px;height:${8+Math.random()*8}px;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:${Math.random()>0.5?'50%':'2px'};animation-delay:${Math.random()*2}s;animation-duration:${2+Math.random()*2}s;`;
-                c.appendChild(el);
+                const color = CONFIG.CONFETTI_COLORS[Math.floor(Math.random() * CONFIG.CONFETTI_COLORS.length)];
+                el.style.cssText = `
+                    left: ${Math.random() * 100}%;
+                    top: -20px;
+                    width: ${8 + Math.random() * 8}px;
+                    height: ${8 + Math.random() * 8}px;
+                    background: ${color};
+                    border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+                    animation-delay: ${Math.random() * 2}s;
+                    animation-duration: ${2 + Math.random() * 2}s;
+                `;
+                container.appendChild(el);
             }
-            setTimeout(() => c.innerHTML = '', 5000);
+            
+            setTimeout(() => container.innerHTML = '', 5000);
         }
+    };
 
-        async function countdown() {
-            const overlay = document.getElementById('countdownOverlay');
-            const num = document.getElementById('countdownNumber');
+    // ==========================================================================
+    // UI MANAGER
+    // ==========================================================================
+    
+    const UIManager = {
+        async countdown() {
+            const overlay = DOM.elements.countdownOverlay;
+            const num = DOM.elements.countdownNumber;
             overlay.classList.remove('hidden');
             
-            for (const [val, color] of [['3', '#EB8225'], ['2', '#AB3D8B'], ['1', '#0595AE'], ['GO!', '#73A03F']]) {
+            const steps = [
+                ['3', '#EB8225'],
+                ['2', '#AB3D8B'],
+                ['1', '#0595AE'],
+                ['GO!', '#73A03F']
+            ];
+            
+            for (const [val, color] of steps) {
                 num.textContent = val;
                 num.style.color = color;
                 num.style.animation = 'none';
-                num.offsetHeight;
+                num.offsetHeight; // Force reflow
                 num.style.animation = 'countPop 0.6s ease-out';
-                sound(val === 'GO!' ? 'go' : 'count');
+                AudioManager.play(val === 'GO!' ? 'go' : 'count');
                 await new Promise(r => setTimeout(r, 750));
             }
             
             overlay.classList.add('hidden');
-        }
-
-        airconsole.onReady = () => {
-            console.log("Screen ready");
-            airconsole.setActivePlayers(4);
-            setupLevelSelector();
-            setupResultsButtons();
-        };
+        },
         
-        function setupResultsButtons() {
-            // These buttons are only visible to admin, so they trigger directly
-            document.getElementById('nextLevelBtn').addEventListener('click', () => {
-                goToNextLevel();
-            });
+        updatePlayerSlots(players, admin) {
+            const count = Object.keys(players).length;
             
-            document.getElementById('levelSelectBtn').addEventListener('click', () => {
-                returnToLevelSelect();
-            });
-        }
-        airconsole.onConnect = (id) => {
-            console.log("🔌 Device connected:", id);
-            console.log("📊 DEBUG: Getting active player device IDs...");
-            
-            // Get list of active player devices
-            const activeDeviceIds = airconsole.getActivePlayerDeviceIds();
-            console.log("📊 DEBUG: Active device IDs:", activeDeviceIds);
-            
-            // Check if this device is an active player
-            const playerNumber = airconsole.convertDeviceIdToPlayerNumber(id);
-            console.log(`📊 DEBUG: Device ${id} converted to player number:`, playerNumber);
-            
-            // Count current connected players (excluding disconnected ones)
-            const connectedPlayersCount = Object.keys(state.players).filter(
-                slot => !state.players[slot].disconnected
-            ).length;
-            console.log(`📊 DEBUG: Current connected players: ${connectedPlayersCount}/4`);
-            
-            if (playerNumber !== undefined && playerNumber >= 0 && playerNumber < 4) {
-                const playerSlot = playerNumber + 1;
-                console.log(`✅ Device ${id} is active player ${playerSlot} (player number: ${playerNumber})`);
-                
-                // Check if this player was previously connected but disconnected
-                if (state.players[playerSlot]) {
-                    const existingPlayer = state.players[playerSlot];
-                    
-                    // Player is reconnecting
-                    if (existingPlayer.disconnected) {
-                        console.log(`🔄 Player ${playerSlot} (${existingPlayer.name}) is reconnecting!`);
-                        
-                        // Reactivate the player
-                        existingPlayer.disconnected = false;
-                        existingPlayer.deviceId = id; // Update device ID in case it changed
-                        
-                        // Notify the controller of their restored state
-                        airconsole.message(id, {
-                            action: 'reconnected',
-                            playerNum: playerSlot,
-                            color: existingPlayer.color,
-                            colorName: existingPlayer.name,
-                            isAdmin: existingPlayer.isAdmin
-                        });
-                        
-                        console.log(`✨ Player ${playerSlot} reactivated successfully`);
-                        updateSlots();
-                        airconsole.broadcast({ type: 'gameState', players: state.players });
-                    } else {
-                        console.log(`ℹ️ Player ${playerSlot} already connected (deviceId: ${existingPlayer.deviceId})`);
-                    }
-                } else {
-                    // New player - auto-assign if there's space
-                    if (connectedPlayersCount < 4) {
-                        console.log(`🎮 Auto-assigning player ${playerSlot} to device ${id}...`);
-                        
-                        const isAdmin = !state.admin;
-                        if (isAdmin) {
-                            state.admin = playerSlot;
-                            console.log(`👑 Player ${playerSlot} assigned as admin`);
-                        }
-                        
-                        state.players[playerSlot] = {
-                            deviceId: id,
-                            playerNumber: playerNumber,
-                            name: NAMES[playerNumber],
-                            color: COLORS[playerNumber],
-                            isAdmin,
-                            disconnected: false
-                        };
-                        
-                        console.log(`📊 DEBUG: Player ${playerSlot} data:`, state.players[playerSlot]);
-                        
-                        // Send joined confirmation to controller
-                        airconsole.message(id, {
-                            action: 'joined',
-                            playerNum: playerSlot,
-                            color: COLORS[playerNumber],
-                            colorName: NAMES[playerNumber],
-                            isAdmin
-                        });
-                        
-                        console.log(`✅ Player ${playerSlot} auto-assigned and joined successfully!`);
-                        updateSlots();
-                        airconsole.broadcast({ type: 'gameState', players: state.players });
-                    } else {
-                        console.log(`⚠️ Cannot auto-assign player ${playerSlot}: Game is full (4/4 players)`);
-                        
-                        // Send game full error to controller
-                        airconsole.message(id, {
-                            action: 'gameFull'
-                        });
-                    }
-                }
-            } else {
-                console.log(`⚠️ Device ${id} is not an active player (playerNumber: ${playerNumber})`);
-                console.log("💡 Device needs to be added as active player via AirConsole dashboard");
-            }
-        };
-        
-        function setupLevelSelector() {
-            updateLevelButtons();
-            
-            const levelBtns = document.querySelectorAll('.level-btn');
-            levelBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const level = parseInt(btn.dataset.level);
-                    // Only allow selecting unlocked levels
-                    if (state.levelProgress.unlockedLevels.includes(level)) {
-                        selectLevel(level);
-                    }
-                });
-            });
-        }
-        
-        function updateLevelButtons() {
-            document.querySelectorAll('.level-btn').forEach(btn => {
-                const btnLevel = parseInt(btn.dataset.level);
-                const isUnlocked = state.levelProgress.unlockedLevels.includes(btnLevel);
-                const isSelected = btnLevel === state.levelProgress.currentLevel;
-                const isCompleted = state.levelProgress.completedLevels.includes(btnLevel);
-                
-                if (isSelected) {
-                    btn.className = 'level-btn bg-steam-verde text-white font-bold py-2 px-4 rounded-xl border-2 border-steam-verde';
-                    btn.disabled = false;
-                } else if (isCompleted) {
-                    btn.className = 'level-btn bg-steam-turquesa text-white font-bold py-2 px-4 rounded-xl border-2 border-steam-turquesa';
-                    btn.disabled = false;
-                } else if (isUnlocked) {
-                    btn.className = 'level-btn bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded-xl border-2 border-gray-300';
-                    btn.disabled = false;
-                } else {
-                    btn.className = 'level-btn bg-gray-100 text-gray-400 font-bold py-2 px-4 rounded-xl border-2 border-gray-200 opacity-50 cursor-not-allowed';
-                    btn.disabled = true;
-                }
-            });
-        }
-        
-        function selectLevel(level) {
-            state.levelProgress.currentLevel = level;
-            updateLevelButtons();
-            
-            // Update level name
-            document.getElementById('levelName').textContent = LEVELS[level].name;
-            
-            // Broadcast to controllers
-            airconsole.broadcast({ type: 'levelChanged', level, name: LEVELS[level].name });
-        }
-        
-        airconsole.onDisconnect = (id) => {
-            console.log("🔌 Device disconnected:", id);
-            
-            // Use player number instead of searching by deviceId
-            const playerNumber = airconsole.convertDeviceIdToPlayerNumber(id);
-            
-            if (playerNumber !== undefined && playerNumber >= 0 && playerNumber < 4) {
-                const playerSlot = playerNumber + 1;
-                
-                if (state.players[playerSlot]) {
-                    const player = state.players[playerSlot];
-                    console.log(`⚠️ Player ${playerSlot} (${player.name}) disconnected - marking as disconnected`);
-                    
-                    player.disconnected = true;
-                    updateSlots();
-                    
-                    // Broadcast the disconnection to other players
-                    airconsole.broadcast({ 
-                        type: 'playerDisconnected', 
-                        playerNum: playerSlot,
-                        playerName: player.name
-                    });
-                    
-                    console.log(`📊 Active players: ${Object.values(state.players).filter(p => !p.disconnected).length}/${Object.keys(state.players).length}`);
-                } else {
-                    console.log(`ℹ️ Disconnected device ${id} (player ${playerSlot}) was not in active players`);
-                }
-            } else {
-                console.log(`ℹ️ Disconnected device ${id} was not an active player (playerNumber: ${playerNumber})`);
-            }
-        };
-
-        airconsole.onMessage = (id, data) => {
-            if (data.action === 'join') {
-                // Simplified join handler - only needed as fallback since onConnect handles auto-join
-                const playerNumber = airconsole.convertDeviceIdToPlayerNumber(id);
-                
-                if (playerNumber !== undefined && playerNumber >= 0 && playerNumber < 4) {
-                    const playerSlot = playerNumber + 1;
-                    
-                    // Check if player already exists
-                    if (state.players[playerSlot]) {
-                        // Player already joined, just send confirmation
-                        const p = state.players[playerSlot];
-                        airconsole.message(id, {
-                            action: 'joined',
-                            playerNum: playerSlot,
-                            color: p.color,
-                            colorName: p.name,
-                            isAdmin: p.isAdmin
-                        });
-                    }
-                }
-            } else if (data.action === 'selectColor') {
-                for (let n in state.players) {
-                    if (state.players[n].deviceId === id) {
-                        state.players[n].color = data.color;
-                        state.players[n].name = data.colorName;
-                        updateSlots();
-                        airconsole.message(id, { action: 'colorUpdated', color: data.color, colorName: data.colorName });
-                        break;
-                    }
-                }
-            } else if (data.action === 'startGame') {
-                const playerNumber = airconsole.convertDeviceIdToPlayerNumber(id);
-                const playerSlot = playerNumber !== undefined ? playerNumber + 1 : null;
-                if (playerSlot === state.admin) {
-                    startGame();
-                }
-            } else if (data.action === 'playAgain') {
-                const playerNumber = airconsole.convertDeviceIdToPlayerNumber(id);
-                const playerSlot = playerNumber !== undefined ? playerNumber + 1 : null;
-                if (playerSlot === state.admin) {
-                    restart();
-                }
-            } else if (data.action === 'nextLevel') {
-                const playerNumber = airconsole.convertDeviceIdToPlayerNumber(id);
-                const playerSlot = playerNumber !== undefined ? playerNumber + 1 : null;
-                if (playerSlot === state.admin) {
-                    goToNextLevel();
-                }
-            } else if (data.action === 'goToLevelSelect') {
-                const playerNumber = airconsole.convertDeviceIdToPlayerNumber(id);
-                const playerSlot = playerNumber !== undefined ? playerNumber + 1 : null;
-                if (playerSlot === state.admin) {
-                    returnToLevelSelect();
-                }
-            } else {
-                const playerNumber = airconsole.convertDeviceIdToPlayerNumber(id);
-                
-                if (playerNumber !== undefined && playerNumber >= 0) {
-                    const n = playerNumber + 1;
-                    
-                    if (state.games[n] && state.started) {
-                        const g = state.games[n];
-                        if (data.action === 'move') {
-                            g.keys.left = data.direction === 'left';
-                            g.keys.right = data.direction === 'right';
-                        } else if (data.action === 'stop') {
-                            g.keys.left = g.keys.right = false;
-                        } else if (data.action === 'jump') {
-                            g.keys.jump = data.pressed;
-                        }
-                    }
-                }
-            }
-        };
-
-        function updateSlots() {
-            const count = Object.keys(state.players).length;
-            for (let i = 1; i <= 4; i++) {
-                const slot = document.getElementById(`playerSlot${i}`);
-                const p = state.players[i];
+            for (let i = 1; i <= CONFIG.MAX_PLAYERS; i++) {
+                const slot = DOM.get(`playerSlot${i}`);
+                const player = players[i];
                 
                 slot.className = 'player-card';
                 
-                if (p) {
-                    slot.classList.add(p.isAdmin ? 'admin' : 'ready');
-                    slot.innerHTML = `
-                        <div class="text-lg sm:text-xl font-bold flex items-center justify-center gap-2" style="color:${p.color}">
-                            ${p.isAdmin ? '<iconify-icon icon="mdi:crown" class="text-steam-naranja text-2xl"></iconify-icon>' : '<iconify-icon icon="mdi:account-check" class="text-xl"></iconify-icon>'}
-                            ${p.name}
-                        </div>
-                        <div class="flex justify-center my-3 float">
-                            <div class="player-avatar" style="background:${p.color}"></div>
-                        </div>
-                        <div class="text-sm font-bold flex items-center justify-center gap-1 ${p.disconnected ? 'text-steam-morado' : 'text-steam-verde'}">
-                            ${p.disconnected 
-                                ? '<iconify-icon icon="mdi:wifi-off"></iconify-icon> Desconectado' 
-                                : '<iconify-icon icon="mdi:check-circle"></iconify-icon> Listo!'}
-                        </div>
-                    `;
+                if (player) {
+                    slot.classList.add(player.isAdmin ? 'admin' : 'ready');
+                    slot.innerHTML = this._renderPlayerSlot(player);
                 } else {
-                    slot.innerHTML = `
-                        <div class="text-lg sm:text-xl font-bold text-gray-400 flex items-center justify-center gap-2">
-                            <iconify-icon icon="mdi:controller" class="text-xl"></iconify-icon>
-                            Jugador ${i}
-                        </div>
-                        <div class="flex justify-center my-3 float">
-                            <div class="player-avatar bg-gray-200"></div>
-                        </div>
-                        <div class="text-sm text-gray-400 flex items-center justify-center gap-1">
-                            <iconify-icon icon="mdi:timer-sand" class="animate-pulse"></iconify-icon>
-                            Esperando...
-                        </div>
-                    `;
+                    slot.innerHTML = this._renderEmptySlot(i);
                 }
             }
             
-            document.getElementById('adminHint').classList.toggle('hidden', count === 0);
-            document.getElementById('levelSelector').classList.toggle('hidden', count === 0);
-        }
-
-        async function startGame() {
-            // Prevent multiple simultaneous start calls
-            if (state.started || state.starting) return;
-            state.starting = true;
-            
-            document.getElementById('startScreen').style.display = 'none';
-            document.getElementById('gameContainer').style.display = 'block';
-            
-            const players = Object.values(state.players).filter(p => !p.disconnected);
-            setupScreens(players.length);
-            
-            let i = 0;
-            for (let n in state.players) {
-                if (!state.players[n].disconnected) {
-                    state.games[n] = new Game(n, state.players[n].color, state.players[n].name);
-                    state.games[n].init();
-                    i++;
-                }
-            }
-            
-            await countdown();
-            
-            state.started = true;
-            state.starting = false;
-            state.startTime = Date.now();
-            airconsole.broadcast({ type: 'gameStart' });
-        }
-
-        function setupScreens(count) {
-            const container = document.getElementById('gameContainer');
-            container.innerHTML = '';
-            
-            let i = 0;
-            for (let n in state.players) {
-                if (state.players[n].disconnected) continue;
-                const p = state.players[n];
-                
-                const div = document.createElement('div');
-                div.id = `screen${n}`;
-                div.className = 'absolute overflow-hidden';
-                
-                // Layout based on player count
-                if (count === 1) {
-                    div.style.cssText = 'inset:0;';
-                } else if (count === 2) {
-                    div.style.cssText = `left:0;right:0;height:calc(50% - 2px);${i === 0 ? 'top:0' : 'bottom:0'};`;
-                } else if (count === 3) {
-                    if (i === 0) div.style.cssText = 'top:0;left:0;right:0;height:calc(50% - 2px);';
-                    else div.style.cssText = `bottom:0;width:calc(50% - 2px);height:calc(50% - 2px);${i === 1 ? 'left:0' : 'right:0'};`;
-                } else {
-                    const pos = [['top:0;left:0'], ['top:0;right:0'], ['bottom:0;left:0'], ['bottom:0;right:0']][i];
-                    div.style.cssText = `${pos};width:calc(50% - 2px);height:calc(50% - 2px);`;
-                }
-                
-                const levelData = LEVELS[state.levelProgress.currentLevel];
-                div.innerHTML = `
-                    <canvas id="canvas${n}" class="absolute inset-0 w-full h-full"></canvas>
-                    <div class="absolute top-3 left-3 sm:top-4 sm:left-4 bg-black/70 rounded-xl py-2 px-4 flex items-center gap-2 text-white font-bold text-sm sm:text-lg z-10" style="border-left:4px solid ${p.color}">
-                        <iconify-icon icon="mdi:cash-multiple" class="text-steam-naranja text-lg"></iconify-icon>
-                        <span id="coins${n}">0</span>/<span>${levelData.coins.length}</span>
-                    </div>
-                    <div class="absolute top-3 right-3 sm:top-4 sm:right-4 bg-black/70 rounded-xl py-2 px-3 flex items-center gap-2 font-bold z-10" style="border-left:4px solid ${p.color}">
-                        <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg relative" style="background:${p.color}">
-                            <span class="absolute top-1 left-1 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full"></span>
-                            <span class="absolute top-1 right-1 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full"></span>
-                        </div>
-                        <span class="text-white text-sm sm:text-base">${p.name}</span>
-                    </div>
-                    <div class="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 flex items-center gap-2 z-10">
-                        <div class="flex-1 h-2 bg-black/30 rounded-full overflow-hidden">
-                            <div id="progress${n}" class="h-full rounded-full transition-all" style="width:0%;background:${p.color}"></div>
-                        </div>
-                        <div class="bg-black/70 rounded-lg px-2 py-1 text-white text-xs font-bold">
-                            Nivel ${state.levelProgress.currentLevel}
-                        </div>
-                    </div>
-                `;
-                
-                if (count > 1) {
-                    div.style.border = `3px solid ${p.color}`;
-                }
-                
-                container.appendChild(div);
-                i++;
-            }
-        }
-
-        function restart() {
-            // Prevent multiple restart calls
-            if (!state.resultsDisplayed) return;
-            
-            document.getElementById('resultsScreen').style.display = 'none';
-            document.getElementById('startScreen').style.display = 'flex';
-            document.getElementById('gameContainer').style.display = 'none';
-            
-            // Stop all running game loops before resetting
-            for (let n in state.games) {
-                if (state.games[n] && state.games[n].stop) {
-                    state.games[n].stop();
-                }
-            }
-            
-            state.started = false;
-            state.starting = false;
-            state.games = {};
-            state.resultsDisplayed = false;
-            
-            for (let n in state.players) {
-                if (state.players[n].disconnected) delete state.players[n];
-            }
-            
-            updateSlots();
-            updateLevelButtons();
-            airconsole.broadcast({ type: 'gameRestart' });
-        }
+            DOM.elements.adminHint.classList.toggle('hidden', count === 0);
+            DOM.elements.levelSelector.classList.toggle('hidden', count === 0);
+        },
         
-        function goToNextLevel() {
-            if (!state.resultsDisplayed) return;
-            
-            const nextLevel = state.levelProgress.currentLevel + 1;
-            if (nextLevel <= 5) {
-                selectLevel(nextLevel);
-                restart();
-            }
-        }
+        _renderPlayerSlot(player) {
+            return `
+                <div class="text-lg sm:text-xl font-bold flex items-center justify-center gap-2" style="color:${player.color}">
+                    ${player.isAdmin ? '<iconify-icon icon="mdi:crown" class="text-steam-naranja text-2xl"></iconify-icon>' : '<iconify-icon icon="mdi:account-check" class="text-xl"></iconify-icon>'}
+                    ${player.name}
+                </div>
+                <div class="flex justify-center my-3 float">
+                    <div class="player-avatar" style="background:${player.color}"></div>
+                </div>
+                <div class="text-sm font-bold flex items-center justify-center gap-1 ${player.disconnected ? 'text-steam-morado' : 'text-steam-verde'}">
+                    ${player.disconnected 
+                        ? '<iconify-icon icon="mdi:wifi-off"></iconify-icon> Desconectado' 
+                        : '<iconify-icon icon="mdi:check-circle"></iconify-icon> Listo!'}
+                </div>
+            `;
+        },
         
-        function returnToLevelSelect() {
-            restart();
-        }
-
-        function showResults() {
-            const results = [];
+        _renderEmptySlot(slotNum) {
+            return `
+                <div class="text-lg sm:text-xl font-bold text-gray-400 flex items-center justify-center gap-2">
+                    <iconify-icon icon="mdi:controller" class="text-xl"></iconify-icon>
+                    Jugador ${slotNum}
+                </div>
+                <div class="flex justify-center my-3 float">
+                    <div class="player-avatar bg-gray-200"></div>
+                </div>
+                <div class="text-sm text-gray-400 flex items-center justify-center gap-1">
+                    <iconify-icon icon="mdi:timer-sand" class="animate-pulse"></iconify-icon>
+                    Esperando...
+                </div>
+            `;
+        },
+        
+        showResults(results, levelCompleted, hasNextLevel) {
+            const winnerDiv = DOM.elements.winnerSection;
             
-            for (let n in state.games) {
-                const g = state.games[n];
-                const p = state.players[n];
-                if (g.finishTime && !p.disconnected) {
-                    const timeBonus = Math.max(0, 1000 - (g.finishTime - state.startTime) / 100);
-                    const coinBonus = g.coins * 100;
-                    results.push({
-                        num: n,
-                        name: p.name,
-                        color: p.color,
-                        coins: g.coins,
-                        time: ((g.finishTime - state.startTime) / 1000).toFixed(1),
-                        score: Math.round(timeBonus + coinBonus)
-                    });
-                }
-            }
-            
-            results.sort((a, b) => b.score - a.score);
-            
-            // Check if level was completed (at least one player finished)
-            const levelCompleted = results.length > 0;
-            const currentLevel = state.levelProgress.currentLevel;
-            
-            if (levelCompleted) {
-                // Mark level as completed
-                if (!state.levelProgress.completedLevels.includes(currentLevel)) {
-                    state.levelProgress.completedLevels.push(currentLevel);
-                }
-                
-                // Unlock next level if exists
-                const nextLevel = currentLevel + 1;
-                if (nextLevel <= 5 && !state.levelProgress.unlockedLevels.includes(nextLevel)) {
-                    state.levelProgress.unlockedLevels.push(nextLevel);
-                }
-            }
-            
-            const winnerDiv = document.getElementById('winnerSection');
             if (results.length) {
-                const w = results[0];
+                const winner = results[0];
                 winnerDiv.innerHTML = `
                     <iconify-icon icon="mdi:trophy" class="text-6xl text-steam-naranja mb-4"></iconify-icon>
-                    <div class="player-avatar mx-auto mb-4" style="background:${w.color};width:100px;height:100px;border-radius:20px;box-shadow:0 0 30px ${w.color}50"></div>
-                    <div class="text-2xl font-black" style="color:${w.color}">${w.name}</div>
+                    <div class="player-avatar mx-auto mb-4" style="background:${winner.color};width:100px;height:100px;border-radius:20px;box-shadow:0 0 30px ${winner.color}50"></div>
+                    <div class="text-2xl font-black" style="color:${winner.color}">${winner.name}</div>
                     <div class="text-xl text-steam-verde font-bold mt-2 flex items-center justify-center gap-2">
                         <iconify-icon icon="mdi:star"></iconify-icon>
-                        ${w.score} pts
+                        ${winner.score} pts
                     </div>
                 `;
-                sound('win');
-                confetti();
+                AudioManager.play('win');
+                EffectsManager.spawnConfetti();
             }
             
-            const tbody = document.getElementById('resultsBody');
+            this._renderResultsTable(results);
+            this._updateResultButtons(levelCompleted, hasNextLevel);
+            
+            DOM.elements.resultsScreen.style.display = 'flex';
+        },
+        
+        _renderResultsTable(results) {
+            const tbody = DOM.elements.resultsBody;
             tbody.innerHTML = '';
+            
             const medals = ['mdi:medal-outline', 'mdi:medal-outline', 'mdi:medal-outline'];
             const medalColors = ['#FFD700', '#C0C0C0', '#CD7F32'];
             
@@ -1220,565 +897,1012 @@
                 `;
                 tbody.appendChild(row);
             });
-            
-            // Show appropriate buttons
-            const hasNextLevel = currentLevel < 5;
-            const nextLevelBtn = document.getElementById('nextLevelBtn');
-            const levelSelectBtn = document.getElementById('levelSelectBtn');
-            const waitingAdmin = document.getElementById('waitingAdmin');
-            
+        },
+        
+        _updateResultButtons(levelCompleted, hasNextLevel) {
             if (levelCompleted && hasNextLevel) {
-                nextLevelBtn.classList.remove('hidden');
+                DOM.elements.nextLevelBtn.classList.remove('hidden');
             } else {
-                nextLevelBtn.classList.add('hidden');
+                DOM.elements.nextLevelBtn.classList.add('hidden');
             }
             
-            levelSelectBtn.classList.remove('hidden');
-            waitingAdmin.classList.add('hidden');
+            DOM.elements.levelSelectBtn.classList.remove('hidden');
+            DOM.elements.waitingAdmin.classList.add('hidden');
+        }
+    };
+
+    // ==========================================================================
+    // LEVEL MANAGER
+    // ==========================================================================
+    
+    const LevelManager = {
+        progress: {
+            currentLevel: 1,
+            unlockedLevels: [1],
+            completedLevels: []
+        },
+        
+        init() {
+            this.setupButtons();
+        },
+        
+        setupButtons() {
+            document.querySelectorAll('.level-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const level = parseInt(btn.dataset.level);
+                    if (this.progress.unlockedLevels.includes(level)) {
+                        this.selectLevel(level);
+                    }
+                });
+            });
+        },
+        
+        selectLevel(level) {
+            this.progress.currentLevel = level;
+            this.updateButtons();
+            DOM.elements.levelName.textContent = LEVELS[level].name;
+            GameManager.airconsole.broadcast({ action: 'levelChanged', level, name: LEVELS[level].name });
+        },
+        
+        updateButtons() {
+            document.querySelectorAll('.level-btn').forEach(btn => {
+                const btnLevel = parseInt(btn.dataset.level);
+                const isUnlocked = this.progress.unlockedLevels.includes(btnLevel);
+                const isSelected = btnLevel === this.progress.currentLevel;
+                const isCompleted = this.progress.completedLevels.includes(btnLevel);
+                
+                if (isSelected) {
+                    btn.className = 'level-btn bg-steam-verde text-white font-bold py-2 px-4 rounded-xl border-2 border-steam-verde';
+                    btn.disabled = false;
+                } else if (isCompleted) {
+                    btn.className = 'level-btn bg-steam-turquesa text-white font-bold py-2 px-4 rounded-xl border-2 border-steam-turquesa';
+                    btn.disabled = false;
+                } else if (isUnlocked) {
+                    btn.className = 'level-btn bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded-xl border-2 border-gray-300';
+                    btn.disabled = false;
+                } else {
+                    btn.className = 'level-btn bg-gray-100 text-gray-400 font-bold py-2 px-4 rounded-xl border-2 border-gray-200 opacity-50 cursor-not-allowed';
+                    btn.disabled = true;
+                }
+            });
+        },
+        
+        completeLevel(level) {
+            if (!this.progress.completedLevels.includes(level)) {
+                this.progress.completedLevels.push(level);
+            }
             
-            document.getElementById('resultsScreen').style.display = 'flex';
-            airconsole.broadcast({ type: 'gameResults', results, winner: results[0], levelCompleted, hasNextLevel });
+            const nextLevel = level + 1;
+            if (nextLevel <= 5 && !this.progress.unlockedLevels.includes(nextLevel)) {
+                this.progress.unlockedLevels.push(nextLevel);
+            }
+        },
+        
+        getLevelData() {
+            return LEVELS[this.progress.currentLevel];
+        },
+        
+        hasNextLevel() {
+            return this.progress.currentLevel < 5;
+        }
+    };
+
+    // ==========================================================================
+    // GAME CLASS
+    // ==========================================================================
+    
+    class Game {
+        constructor(playerNum, color, name) {
+            this.num = playerNum;
+            this.color = color;
+            this.name = name;
+            
+            // Canvas
+            this.canvas = null;
+            this.ctx = null;
+            
+            // Input
+            this.keys = { left: false, right: false, jump: false };
+            
+            // State
+            this.finishTime = null;
+            this.resultsShown = false;
+            this.running = false;
+            this.animationFrameId = null;
+            this.lastFrameTime = 0;
+            
+            // Player physics
+            this.player = { x: 80, y: 300, vx: 0, vy: 0, w: 44, h: 44, facing: 1, stunned: 0 };
+            this.coins = 0;
+            this.won = false;
+            this.grounded = false;
+            this.camX = 0;
+            
+            // Visual effects
+            this.particles = [];
+            this.trail = [];
+            
+            // Level data (cloned from level manager)
+            const levelData = LevelManager.getLevelData();
+            this.floors = levelData.floorSegments.map(f => ({...f}));
+            this.platforms = levelData.platforms.map(p => ({...p, h: 16}));
+            this.coinList = levelData.coins.map(c => ({...c, got: false, bob: Math.random() * 6.28}));
+            this.obstacles = levelData.obstacles.map(o => ({
+                ...o, w: 38, h: 38, dir: 1, spd: 2 + Math.random(), range: 100 + Math.random() * 50
+            }));
+            this.finishX = levelData.length - 200;
         }
 
-        class Game {
-            constructor(num, color, name) {
-                this.num = num;
-                this.color = color;
-                this.name = name;
-                this.canvas = null;
-                this.ctx = null;
-                this.keys = { left: false, right: false, jump: false };
-                this.finishTime = null;
-                this.resultsShown = false;
-                this.running = false;
-                this.animationFrameId = null;
-                
-                this.player = { x: 80, y: 300, vx: 0, vy: 0, w: 44, h: 44, facing: 1, stunned: 0 };
-                this.coins = 0;
-                this.won = false;
-                this.grounded = false;
-                this.camX = 0;
-                this.particles = [];
-                this.trail = [];
-                
-                // Clone level data from selected level
-                const levelData = LEVELS[state.levelProgress.currentLevel];
-                this.floors = levelData.floorSegments.map(f => ({...f}));
-                this.platforms = levelData.platforms.map(p => ({...p, h: 16}));
-                this.coinList = levelData.coins.map(c => ({...c, got: false, bob: Math.random() * 6.28}));
-                this.obstacles = levelData.obstacles.map(o => ({...o, w: 38, h: 38, dir: 1, spd: 2 + Math.random(), range: 100 + Math.random() * 50}));
-                this.finishX = levelData.length - 200;
-            }
+        init() {
+            this.canvas = DOM.get(`canvas${this.num}`);
+            this.ctx = this.canvas.getContext('2d', { alpha: false });
+            
+            const container = DOM.get(`screen${this.num}`);
+            this.canvas.width = container.clientWidth;
+            this.canvas.height = container.clientHeight;
+            
+            const ratio = this.canvas.height / 700;
+            this.floorY = this.canvas.height - 70;
+            
+            // Scale level elements
+            this.floors.forEach(f => f.y = this.floorY);
+            this.platforms.forEach(p => p.y *= ratio);
+            this.coinList.forEach(c => c.y *= ratio);
+            this.obstacles.forEach(o => o.y *= ratio);
+            this.player.y = 300 * ratio;
+            
+            // Cache DOM elements
+            this.coinsEl = DOM.get(`coins${this.num}`);
+            this.progressEl = DOM.get(`progress${this.num}`);
+            
+            this.running = true;
+            this.loop();
+        }
 
-            init() {
-                this.canvas = document.getElementById(`canvas${this.num}`);
-                this.ctx = this.canvas.getContext('2d', { alpha: false });
-                
-                const container = document.getElementById(`screen${this.num}`);
-                this.canvas.width = container.clientWidth;
-                this.canvas.height = container.clientHeight;
-                
-                const ratio = this.canvas.height / 700;
-                this.floorY = this.canvas.height - 70;
-                
-                this.floors.forEach(f => f.y = this.floorY);
-                this.platforms.forEach(p => p.y *= ratio);
-                this.coinList.forEach(c => c.y *= ratio);
-                this.obstacles.forEach(o => o.y *= ratio);
-                this.player.y = 300 * ratio;
-                
-                this.coinsEl = document.getElementById(`coins${this.num}`);
-                this.progressEl = document.getElementById(`progress${this.num}`);
-                
-                this.running = true;
-                this.loop();
-            }
+        update() {
+            if (this.won || !GameManager.state.started) return;
+            
+            const p = this.player;
+            const prevY = p.y;
+            
+            this._updateMovement(p);
+            this._updatePhysics(p, prevY);
+            this._updateObstacles(p);
+            this._updateCoins(p);
+            this._updateParticles();
+            this._checkFinish(p);
+        }
 
-            update() {
-                if (this.won || !state.started) return;
+        _updateMovement(p) {
+            if (!p.stunned) {
+                const targetVx = this.keys.left ? -PHYSICS.MOVE_SPEED : 
+                                 this.keys.right ? PHYSICS.MOVE_SPEED : 0;
+                const acceleration = this.grounded ? PHYSICS.GROUND_ACCELERATION : PHYSICS.AIR_ACCELERATION;
                 
-                const p = this.player;
-                const prevY = p.y;
-                
-                // Input - improved movement physics
-                if (!p.stunned) {
-                    // Apply acceleration for smoother movement
-                    const targetVx = this.keys.left ? -PHYSICS_CONFIG.moveSpeed : (this.keys.right ? PHYSICS_CONFIG.moveSpeed : 0);
-                    const acceleration = this.grounded ? PHYSICS_CONFIG.groundAcceleration : PHYSICS_CONFIG.airAcceleration;
-                    
-                    if (targetVx !== 0) {
-                        p.vx += (targetVx - p.vx) * acceleration;
-                        p.facing = targetVx > 0 ? 1 : -1;
-                    } else if (this.grounded) {
-                        // Apply friction when not moving
-                        p.vx *= PHYSICS_CONFIG.friction;
-                        if (Math.abs(p.vx) < 0.1) p.vx = 0;
-                    }
-                } else {
-                    // Still apply some air resistance when stunned
-                    p.vx *= PHYSICS_CONFIG.airResistance;
+                if (targetVx !== 0) {
+                    p.vx += (targetVx - p.vx) * acceleration;
+                    p.facing = targetVx > 0 ? 1 : -1;
+                } else if (this.grounded) {
+                    p.vx *= PHYSICS.FRICTION;
+                    if (Math.abs(p.vx) < 0.1) p.vx = 0;
                 }
-                
-                if (p.stunned > 0) p.stunned--;
-                
-                // Physics - improved gravity and terminal velocity
-                p.vy += PHYSICS_CONFIG.gravity;
-                
-                // Terminal velocity
-                if (p.vy > PHYSICS_CONFIG.maxFallSpeed) p.vy = PHYSICS_CONFIG.maxFallSpeed;
-                
-                // Jump - improved jump feel with variable height
-                if (this.keys.jump && this.grounded && !p.stunned) {
-                    p.vy = PHYSICS_CONFIG.jumpPower;
-                    sound('jump');
-                    this.keys.jump = false;
-                    this.burst(p.x + p.w/2, p.y + p.h, '#8BC34A', 5);
-                }
-                
-                // Cut jump short if button released (variable jump height)
-                if (!this.keys.jump && p.vy < PHYSICS_CONFIG.jumpCutThreshold) {
-                    p.vy *= PHYSICS_CONFIG.jumpCutMultiplier;
-                }
-                
-                // Apply horizontal movement with collision check
-                const newX = p.x + p.vx;
-                p.x = newX;
-                
-                // Trail - optimized for performance
-                if (Math.abs(p.vx) > 1 || Math.abs(p.vy) > 3) {
-                    this.trail.push({ x: p.x, y: p.y, a: 0.4 });
-                    if (this.trail.length > 4) this.trail.shift(); // Reduced from 6 to 4
-                }
-                // Optimize trail updates
-                for (let i = this.trail.length - 1; i >= 0; i--) {
-                    this.trail[i].a *= 0.85;
-                    if (this.trail[i].a <= 0.05) {
-                        this.trail.splice(i, 1);
-                    }
-                }
-                
-                // Apply vertical movement with improved collision detection
-                const newY = p.y + p.vy;
-                p.y = newY;
-                
-                // Collisions - improved with better precision
-                this.grounded = false;
-                let landedThisFrame = false;
-                
-                // Floors - improved collision with better threshold
-                this.floors.forEach(f => {
-                    if (p.x + p.w > f.x + 2 && p.x < f.x + f.width - 2) {
-                        // Check if player is landing on floor (coming from above)
-                        if (p.vy >= 0 && prevY + p.h <= f.y + 5 && p.y + p.h >= f.y) {
-                            p.y = f.y - p.h;
-                            p.vy = 0;
-                            this.grounded = true;
-                            landedThisFrame = true;
-                        }
-                    }
-                });
-                
-                // Platforms - improved collision detection
-                this.platforms.forEach(pl => {
-                    if (p.x + p.w > pl.x + 2 && p.x < pl.x + pl.width - 2) {
-                        // Only collide when coming from above
-                        if (p.vy >= 0 && prevY + p.h <= pl.y + 5 && p.y + p.h >= pl.y && p.y < pl.y + pl.h) {
-                            p.y = pl.y - p.h;
-                            p.vy = 0;
-                            this.grounded = true;
-                            landedThisFrame = true;
-                        }
-                    }
-                });
-                
-                // Fall death
-                if (p.y > this.canvas.height + 50) {
-                    this.burst(p.x + p.w/2, this.canvas.height - 50, '#AB3D8B', 12);
-                    p.x = 80;
-                    p.y = 300 * (this.canvas.height / 700);
-                    p.vx = p.vy = 0;
-                    sound('hit');
-                }
-                
-                // Obstacles - optimized with culling
-                this.obstacles.forEach(o => {
-                    o.x += o.dir * o.spd;
-                    if (Math.abs(o.x - o.startX) > o.range) o.dir *= -1;
-                    
-                    // Only check collision if obstacle is near player (culling)
-                    const cullDistance = 200;
-                    if (Math.abs(o.x - p.x) > cullDistance) return;
-                    
-                    // Better AABB collision with small margin to prevent tunneling
-                    const margin = 2;
-                    if (!p.stunned && 
-                        p.x + p.w - margin > o.x && 
-                        p.x + margin < o.x + o.w && 
-                        p.y + p.h - margin > o.y && 
-                        p.y + margin < o.y + o.h) {
-                        p.stunned = 45;
-                        sound('hit');
-                        this.burst(p.x + p.w/2, p.y + p.h/2, '#AB3D8B', 8); // Reduced particles
-                        // Knockback effect
-                        p.vy = -8;
-                        p.vx = o.dir * -4;
-                    }
-                });
-                
-                // Bounds
-                p.x = Math.max(0, p.x);
-                
-                // Camera
-                this.camX = Math.max(0, Math.min(p.x - this.canvas.width / 2, this.finishX - this.canvas.width + 150));
-                
-                // Progress
-                if (this.progressEl) this.progressEl.style.width = Math.min(100, p.x / this.finishX * 100) + '%';
-                
-                // Coins - optimized with culling and distance check
-                this.coinList.forEach(c => {
-                    if (c.got) return;
-                    
-                    // Quick cull check before expensive distance calculation
-                    const cullDistance = 100;
-                    if (Math.abs(c.x - p.x) > cullDistance) return;
-                    
-                    const dx = (p.x + p.w/2) - c.x;
-                    const dy = (p.y + p.h/2) - c.y;
-                    
-                    // Use squared distance to avoid sqrt
-                    const distSq = dx * dx + dy * dy;
-                    if (distSq < 900) { // 30 * 30 = 900
-                        c.got = true;
-                        this.coins++;
-                        if (this.coinsEl) this.coinsEl.textContent = this.coins;
-                        this.burst(c.x, c.y, '#EB8225', 8); // Reduced particles
-                        sound('coin');
-                    }
-                });
-                
-                // Finish
-                if (p.x > this.finishX && !this.won) {
-                    this.won = true;
-                    this.finishTime = Date.now();
-                    this.burst(p.x + p.w/2, p.y, '#73A03F', 20);
-                    
-                    // Use a flag to prevent multiple calls
-                    if (!this.resultsShown) {
-                        this.resultsShown = true;
-                        const allDone = Object.values(state.games).every(g => g.won || state.players[g.num].disconnected);
-                        if (allDone) {
-                            // Check one more time before showing results
-                            if (!state.resultsDisplayed) {
-                                state.resultsDisplayed = true;
-                                setTimeout(showResults, 1200);
-                            }
-                        }
+            } else {
+                p.vx *= PHYSICS.AIR_RESISTANCE;
+            }
+            
+            if (p.stunned > 0) p.stunned--;
+            
+            // Trail effect
+            if (Math.abs(p.vx) > 1 || Math.abs(p.vy) > 3) {
+                this.trail.push({ x: p.x, y: p.y, a: 0.4 });
+                if (this.trail.length > 4) this.trail.shift();
+            }
+            
+            for (let i = this.trail.length - 1; i >= 0; i--) {
+                this.trail[i].a *= 0.85;
+                if (this.trail[i].a <= 0.05) this.trail.splice(i, 1);
+            }
+        }
+
+        _updatePhysics(p, prevY) {
+            // Gravity
+            p.vy += PHYSICS.GRAVITY;
+            if (p.vy > PHYSICS.MAX_FALL_SPEED) p.vy = PHYSICS.MAX_FALL_SPEED;
+            
+            // Jump
+            if (this.keys.jump && this.grounded && !p.stunned) {
+                p.vy = PHYSICS.JUMP_POWER;
+                AudioManager.play('jump');
+                this.keys.jump = false;
+                this._burst(p.x + p.w/2, p.y + p.h, '#8BC34A', 5);
+            }
+            
+            // Variable jump height
+            if (!this.keys.jump && p.vy < PHYSICS.JUMP_CUT_THRESHOLD) {
+                p.vy *= PHYSICS.JUMP_CUT_MULTIPLIER;
+            }
+            
+            // Apply movement
+            p.x += p.vx;
+            p.y += p.vy;
+            
+            // Collisions
+            this.grounded = false;
+            
+            // Floor collision
+            this.floors.forEach(f => {
+                if (p.x + p.w > f.x + 2 && p.x < f.x + f.width - 2) {
+                    if (p.vy >= 0 && prevY + p.h <= f.y + 5 && p.y + p.h >= f.y) {
+                        p.y = f.y - p.h;
+                        p.vy = 0;
+                        this.grounded = true;
                     }
                 }
+            });
+            
+            // Platform collision
+            this.platforms.forEach(pl => {
+                if (p.x + p.w > pl.x + 2 && p.x < pl.x + pl.width - 2) {
+                    if (p.vy >= 0 && prevY + p.h <= pl.y + 5 && p.y + p.h >= pl.y && p.y < pl.y + pl.h) {
+                        p.y = pl.y - p.h;
+                        p.vy = 0;
+                        this.grounded = true;
+                    }
+                }
+            });
+            
+            // Fall death
+            if (p.y > this.canvas.height + 50) {
+                this._burst(p.x + p.w/2, this.canvas.height - 50, '#AB3D8B', 12);
+                p.x = 80;
+                p.y = 300 * (this.canvas.height / 700);
+                p.vx = p.vy = 0;
+                AudioManager.play('hit');
+            }
+            
+            // Bounds
+            p.x = Math.max(0, p.x);
+            
+            // Camera
+            this.camX = Math.max(0, Math.min(p.x - this.canvas.width / 2, this.finishX - this.canvas.width + 150));
+            
+            // Progress
+            if (this.progressEl) {
+                this.progressEl.style.width = Math.min(100, p.x / this.finishX * 100) + '%';
+            }
+        }
+
+        _updateObstacles(p) {
+            this.obstacles.forEach(o => {
+                o.x += o.dir * o.spd;
+                if (Math.abs(o.x - o.startX) > o.range) o.dir *= -1;
                 
-                // Particles - optimized loop
-                for (let i = this.particles.length - 1; i >= 0; i--) {
-                    const pt = this.particles[i];
-                    pt.x += pt.vx;
-                    pt.y += pt.vy;
-                    pt.vy += 0.15;
-                    pt.life--;
-                    if (pt.life <= 0) {
-                        this.particles.splice(i, 1);
+                // Culling
+                if (Math.abs(o.x - p.x) > 200) return;
+                
+                // Collision
+                const margin = 2;
+                if (!p.stunned && 
+                    p.x + p.w - margin > o.x && 
+                    p.x + margin < o.x + o.w && 
+                    p.y + p.h - margin > o.y && 
+                    p.y + margin < o.y + o.h) {
+                    p.stunned = 45;
+                    AudioManager.play('hit');
+                    this._burst(p.x + p.w/2, p.y + p.h/2, '#AB3D8B', 8);
+                    p.vy = -8;
+                    p.vx = o.dir * -4;
+                }
+            });
+        }
+
+        _updateCoins(p) {
+            this.coinList.forEach(c => {
+                if (c.got) return;
+                if (Math.abs(c.x - p.x) > 100) return;
+                
+                const dx = (p.x + p.w/2) - c.x;
+                const dy = (p.y + p.h/2) - c.y;
+                const distSq = dx * dx + dy * dy;
+                
+                if (distSq < 900) {
+                    c.got = true;
+                    this.coins++;
+                    if (this.coinsEl) this.coinsEl.textContent = this.coins;
+                    this._burst(c.x, c.y, '#EB8225', 8);
+                    AudioManager.play('coin');
+                }
+            });
+        }
+
+        _updateParticles() {
+            for (let i = this.particles.length - 1; i >= 0; i--) {
+                const pt = this.particles[i];
+                pt.x += pt.vx;
+                pt.y += pt.vy;
+                pt.vy += 0.15;
+                pt.life--;
+                if (pt.life <= 0) this.particles.splice(i, 1);
+            }
+        }
+
+        _checkFinish(p) {
+            if (p.x > this.finishX && !this.won) {
+                this.won = true;
+                this.finishTime = Date.now();
+                this._burst(p.x + p.w/2, p.y, '#73A03F', 20);
+                
+                if (!this.resultsShown) {
+                    this.resultsShown = true;
+                    const allDone = Object.values(GameManager.state.games).every(
+                        g => g.won || GameManager.state.players[g.num].disconnected
+                    );
+                    if (allDone && !GameManager.state.resultsDisplayed) {
+                        GameManager.state.resultsDisplayed = true;
+                        setTimeout(() => GameManager.showResults(), 1200);
                     }
                 }
             }
+        }
 
-            draw() {
-                const ctx = this.ctx;
-                const w = this.canvas.width;
-                const h = this.canvas.height;
-                
-                // Sky - clean solid colors
-                ctx.fillStyle = '#87CEEB';
-                ctx.fillRect(0, 0, w, h * 0.4);
-                ctx.fillStyle = '#98D8C8';
-                ctx.fillRect(0, h * 0.4, w, h * 0.3);
-                ctx.fillStyle = '#2D5A4A';
-                ctx.fillRect(0, h * 0.7, w, h * 0.3);
-                
-                ctx.save();
-                ctx.translate(-this.camX, 0);
-                
-                // Simple clouds - only draw visible ones (culling)
-                ctx.fillStyle = 'rgba(255,255,255,0.9)';
-                const clouds = [[100, 60], [400, 90], [800, 50], [1200, 80], [1700, 65], [2200, 75], [2700, 55]];
-                clouds.forEach(([x, y]) => {
-                    // Cull clouds outside view
-                    if (x < this.camX - 100 || x > this.camX + w + 100) return;
-                    ctx.beginPath();
-                    ctx.arc(x, y, 30, 0, Math.PI * 2);
-                    ctx.arc(x + 25, y - 5, 22, 0, Math.PI * 2);
-                    ctx.arc(x + 50, y, 28, 0, Math.PI * 2);
-                    ctx.fill();
-                });
-                
-                // Ground - with culling
-                this.floors.forEach(f => {
-                    // Only draw visible floor segments
-                    if (f.x + f.width < this.camX || f.x > this.camX + w) return;
-                    
-                    // Dirt
-                    ctx.fillStyle = '#5D4037';
-                    ctx.fillRect(f.x, f.y, f.width, 70);
-                    // Grass
-                    ctx.fillStyle = '#8BC34A';
-                    ctx.fillRect(f.x, f.y, f.width, 12);
-                    // Grass detail
-                    ctx.fillStyle = '#9CCC65';
-                    for (let gx = f.x + 10; gx < f.x + f.width - 10; gx += 25) {
-                        ctx.fillRect(gx, f.y - 4, 3, 8);
-                    }
-                });
-                
-                // Platforms - with culling
-                this.platforms.forEach(pl => {
-                    // Only draw visible platforms
-                    if (pl.x + pl.width < this.camX || pl.x > this.camX + w) return;
-                    
-                    ctx.fillStyle = '#546E7A';
-                    ctx.fillRect(pl.x, pl.y, pl.width, pl.h);
-                    ctx.fillStyle = '#78909C';
-                    ctx.fillRect(pl.x, pl.y, pl.width, 4);
-                });
-                
-                // Obstacles - with culling
-                this.obstacles.forEach(o => {
-                    // Only draw visible obstacles
-                    if (o.x + o.w < this.camX || o.x > this.camX + w) return;
-                    
-                    ctx.fillStyle = '#AB3D8B';
-                    ctx.beginPath();
-                    ctx.roundRect(o.x, o.y, o.w, o.h, 8);
-                    ctx.fill();
-                    // Eyes
-                    ctx.fillStyle = 'white';
-                    ctx.beginPath();
-                    ctx.arc(o.x + o.w * 0.3, o.y + o.h * 0.4, 6, 0, Math.PI * 2);
-                    ctx.arc(o.x + o.w * 0.7, o.y + o.h * 0.4, 6, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.fillStyle = '#333';
-                    ctx.beginPath();
-                    ctx.arc(o.x + o.w * 0.3 + o.dir * 2, o.y + o.h * 0.4, 3, 0, Math.PI * 2);
-                    ctx.arc(o.x + o.w * 0.7 + o.dir * 2, o.y + o.h * 0.4, 3, 0, Math.PI * 2);
-                    ctx.fill();
-                });
-                
-                // Coins - with culling
-                const t = performance.now();
-                this.coinList.forEach(c => {
-                    if (c.got) return;
-                    
-                    // Only draw visible coins
-                    if (c.x < this.camX - 50 || c.x > this.camX + w + 50) return;
-                    
-                    const bobY = Math.sin(t / 200 + c.bob) * 4;
-                    ctx.fillStyle = '#EB8225';
-                    ctx.beginPath();
-                    ctx.arc(c.x, c.y + bobY, 14, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.fillStyle = '#FFD700';
-                    ctx.beginPath();
-                    ctx.arc(c.x - 4, c.y + bobY - 4, 5, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.fillStyle = 'white';
-                    ctx.font = 'bold 12px Arial';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillText('$', c.x, c.y + bobY + 1);
-                });
-                
-                // Finish flag
-                const fx = this.finishX;
-                ctx.fillStyle = '#455A64';
-                ctx.fillRect(fx, this.floorY - 130, 6, 130);
-                ctx.fillStyle = '#73A03F';
+        draw() {
+            const ctx = this.ctx;
+            const w = this.canvas.width;
+            const h = this.canvas.height;
+            
+            this._drawBackground(ctx, w, h);
+            
+            ctx.save();
+            ctx.translate(-this.camX, 0);
+            
+            this._drawClouds(ctx, w);
+            this._drawFloors(ctx, w);
+            this._drawPlatforms(ctx, w);
+            this._drawObstacles(ctx, w);
+            this._drawCoins(ctx, w);
+            this._drawFinish(ctx);
+            this._drawParticles(ctx);
+            this._drawTrail(ctx);
+            this._drawPlayer(ctx);
+            
+            ctx.restore();
+        }
+
+        _drawBackground(ctx, w, h) {
+            ctx.fillStyle = '#87CEEB';
+            ctx.fillRect(0, 0, w, h * 0.4);
+            ctx.fillStyle = '#98D8C8';
+            ctx.fillRect(0, h * 0.4, w, h * 0.3);
+            ctx.fillStyle = '#2D5A4A';
+            ctx.fillRect(0, h * 0.7, w, h * 0.3);
+        }
+
+        _drawClouds(ctx, w) {
+            ctx.fillStyle = 'rgba(255,255,255,0.9)';
+            const clouds = [[100, 60], [400, 90], [800, 50], [1200, 80], [1700, 65], [2200, 75], [2700, 55]];
+            clouds.forEach(([x, y]) => {
+                if (x < this.camX - 100 || x > this.camX + w + 100) return;
                 ctx.beginPath();
-                ctx.moveTo(fx + 6, this.floorY - 130);
-                ctx.lineTo(fx + 60, this.floorY - 105);
-                ctx.lineTo(fx + 6, this.floorY - 80);
+                ctx.arc(x, y, 30, 0, Math.PI * 2);
+                ctx.arc(x + 25, y - 5, 22, 0, Math.PI * 2);
+                ctx.arc(x + 50, y, 28, 0, Math.PI * 2);
                 ctx.fill();
-                ctx.fillStyle = 'white';
-                ctx.font = 'bold 14px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText('META', fx + 33, this.floorY - 102);
+            });
+        }
+
+        _drawFloors(ctx, w) {
+            this.floors.forEach(f => {
+                if (f.x + f.width < this.camX || f.x > this.camX + w) return;
                 
-                // Checkered finish
-                for (let i = 0; i < 8; i++) {
-                    for (let j = 0; j < 2; j++) {
-                        ctx.fillStyle = (i + j) % 2 ? '#333' : '#fff';
-                        ctx.fillRect(fx - 40 + i * 12, this.floorY - 20 + j * 10, 12, 10);
-                    }
+                ctx.fillStyle = '#5D4037';
+                ctx.fillRect(f.x, f.y, f.width, 70);
+                ctx.fillStyle = '#8BC34A';
+                ctx.fillRect(f.x, f.y, f.width, 12);
+                ctx.fillStyle = '#9CCC65';
+                for (let gx = f.x + 10; gx < f.x + f.width - 10; gx += 25) {
+                    ctx.fillRect(gx, f.y - 4, 3, 8);
                 }
+            });
+        }
+
+        _drawPlatforms(ctx, w) {
+            this.platforms.forEach(pl => {
+                if (pl.x + pl.width < this.camX || pl.x > this.camX + w) return;
                 
-                // Particles
-                this.particles.forEach(pt => {
-                    ctx.globalAlpha = pt.life / 30;
-                    ctx.fillStyle = pt.color;
-                    ctx.beginPath();
-                    ctx.arc(pt.x, pt.y, 4, 0, Math.PI * 2);
-                    ctx.fill();
-                });
-                ctx.globalAlpha = 1;
+                ctx.fillStyle = '#546E7A';
+                ctx.fillRect(pl.x, pl.y, pl.width, pl.h);
+                ctx.fillStyle = '#78909C';
+                ctx.fillRect(pl.x, pl.y, pl.width, 4);
+            });
+        }
+
+        _drawObstacles(ctx, w) {
+            this.obstacles.forEach(o => {
+                if (o.x + o.w < this.camX || o.x > this.camX + w) return;
                 
-                // Trail
-                this.trail.forEach(tr => {
-                    ctx.globalAlpha = tr.a * 0.5;
-                    ctx.fillStyle = this.color;
-                    ctx.beginPath();
-                    ctx.roundRect(tr.x + 5, tr.y + 5, this.player.w - 10, this.player.h - 10, 8);
-                    ctx.fill();
-                });
-                ctx.globalAlpha = 1;
-                
-                // Player
-                const p = this.player;
-                if (p.stunned) ctx.globalAlpha = 0.4 + Math.sin(t / 40) * 0.3;
-                
-                // Shadow
-                ctx.fillStyle = 'rgba(0,0,0,0.2)';
+                ctx.fillStyle = '#AB3D8B';
                 ctx.beginPath();
-                ctx.ellipse(p.x + p.w/2, p.y + p.h + 4, p.w/2 * 0.7, 6, 0, 0, Math.PI * 2);
-                ctx.fill();
-                
-                // Body
-                ctx.fillStyle = this.color;
-                ctx.beginPath();
-                ctx.roundRect(p.x, p.y, p.w, p.h, 12);
-                ctx.fill();
-                
-                // Highlight
-                ctx.fillStyle = 'rgba(255,255,255,0.3)';
-                ctx.beginPath();
-                ctx.roundRect(p.x + 5, p.y + 4, p.w - 10, 12, 6);
+                ctx.roundRect(o.x, o.y, o.w, o.h, 8);
                 ctx.fill();
                 
                 // Eyes
-                const eyeY = p.y + p.h * 0.38;
-                const eyeX1 = p.x + p.w * 0.3;
-                const eyeX2 = p.x + p.w * 0.7;
-                const lookX = p.facing * 3;
-                
                 ctx.fillStyle = 'white';
                 ctx.beginPath();
-                ctx.arc(eyeX1, eyeY, 7, 0, Math.PI * 2);
-                ctx.arc(eyeX2, eyeY, 7, 0, Math.PI * 2);
+                ctx.arc(o.x + o.w * 0.3, o.y + o.h * 0.4, 6, 0, Math.PI * 2);
+                ctx.arc(o.x + o.w * 0.7, o.y + o.h * 0.4, 6, 0, Math.PI * 2);
                 ctx.fill();
                 
-                ctx.fillStyle = '#222';
+                ctx.fillStyle = '#333';
                 ctx.beginPath();
-                ctx.arc(eyeX1 + lookX, eyeY, 3, 0, Math.PI * 2);
-                ctx.arc(eyeX2 + lookX, eyeY, 3, 0, Math.PI * 2);
+                ctx.arc(o.x + o.w * 0.3 + o.dir * 2, o.y + o.h * 0.4, 3, 0, Math.PI * 2);
+                ctx.arc(o.x + o.w * 0.7 + o.dir * 2, o.y + o.h * 0.4, 3, 0, Math.PI * 2);
                 ctx.fill();
-                
-                ctx.globalAlpha = 1;
-                ctx.restore();
-            }
+            });
+        }
 
-            burst(x, y, color, count) {
-                // Limit total particle count for performance
-                const maxParticles = 150;
-                const actualCount = Math.min(count, maxParticles - this.particles.length);
+        _drawCoins(ctx, w) {
+            const t = performance.now();
+            this.coinList.forEach(c => {
+                if (c.got) return;
+                if (c.x < this.camX - 50 || c.x > this.camX + w + 50) return;
                 
-                for (let i = 0; i < actualCount; i++) {
-                    this.particles.push({
-                        x, y,
-                        vx: (Math.random() - 0.5) * 8,
-                        vy: (Math.random() - 0.5) * 8 - 3,
-                        life: 25 + Math.random() * 10,
-                        color
-                    });
-                }
-            }
+                const bobY = Math.sin(t / 200 + c.bob) * 4;
+                ctx.fillStyle = '#EB8225';
+                ctx.beginPath();
+                ctx.arc(c.x, c.y + bobY, 14, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#FFD700';
+                ctx.beginPath();
+                ctx.arc(c.x - 4, c.y + bobY - 4, 5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 12px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('$', c.x, c.y + bobY + 1);
+            });
+        }
 
-            resize(newWidth, newHeight) {
-                const oldWidth = this.canvas.width;
-                const oldHeight = this.canvas.height;
-                
-                // Update canvas dimensions
-                this.canvas.width = newWidth;
-                this.canvas.height = newHeight;
-                
-                // Calculate scaling ratios
-                const oldRatio = oldHeight / 700;
-                const newRatio = newHeight / 700;
-                const scaleY = newRatio / oldRatio;
-                
-                // Update floor Y position
-                this.floorY = newHeight - 70;
-                
-                // Recalculate all vertical positions
-                this.floors.forEach(f => f.y = this.floorY);
-                
-                this.platforms.forEach(p => {
-                    p.y *= scaleY;
-                });
-                
-                this.coinList.forEach(c => {
-                    c.y *= scaleY;
-                });
-                
-                this.obstacles.forEach(o => {
-                    o.y *= scaleY;
-                });
-                
-                // Recalculate player position
-                this.player.y *= scaleY;
-            }
-
-            loop() {
-                // Exit if game is no longer running
-                if (!this.running) {
-                    return;
-                }
-                
-                // Frame rate limiting for better performance
-                const now = performance.now();
-                const deltaTime = now - (this.lastFrameTime || now);
-                this.lastFrameTime = now;
-                
-                // Target 60fps (16.67ms per frame)
-                const targetFrameTime = 1000 / 60;
-                
-                // Only update if enough time has passed
-                if (deltaTime >= targetFrameTime * 0.9) {
-                    this.update();
-                    this.draw();
-                }
-                
-                this.animationFrameId = requestAnimationFrame(() => this.loop());
-            }
+        _drawFinish(ctx) {
+            const fx = this.finishX;
             
-            stop() {
-                this.running = false;
-                if (this.animationFrameId !== null) {
-                    cancelAnimationFrame(this.animationFrameId);
-                    this.animationFrameId = null;
+            // Flag pole
+            ctx.fillStyle = '#455A64';
+            ctx.fillRect(fx, this.floorY - 130, 6, 130);
+            
+            // Flag
+            ctx.fillStyle = '#73A03F';
+            ctx.beginPath();
+            ctx.moveTo(fx + 6, this.floorY - 130);
+            ctx.lineTo(fx + 60, this.floorY - 105);
+            ctx.lineTo(fx + 6, this.floorY - 80);
+            ctx.fill();
+            
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 14px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('META', fx + 33, this.floorY - 102);
+            
+            // Checkered pattern
+            for (let i = 0; i < 8; i++) {
+                for (let j = 0; j < 2; j++) {
+                    ctx.fillStyle = (i + j) % 2 ? '#333' : '#fff';
+                    ctx.fillRect(fx - 40 + i * 12, this.floorY - 20 + j * 10, 12, 10);
                 }
             }
         }
 
-        let resizeTimeout;
-        window.addEventListener('resize', () => {
-            if (state.started) {
-                // Debounce resize to prevent excessive recalculations
-                clearTimeout(resizeTimeout);
-                resizeTimeout = setTimeout(() => {
-                    for (let n in state.games) {
-                        const g = state.games[n];
-                        const container = document.getElementById(`screen${n}`);
-                        if (container && g.canvas) {
-                            g.resize(container.clientWidth, container.clientHeight);
-                        }
-                    }
-                }, 100);
+        _drawParticles(ctx) {
+            this.particles.forEach(pt => {
+                ctx.globalAlpha = pt.life / 30;
+                ctx.fillStyle = pt.color;
+                ctx.beginPath();
+                ctx.arc(pt.x, pt.y, 4, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            ctx.globalAlpha = 1;
+        }
+
+        _drawTrail(ctx) {
+            this.trail.forEach(tr => {
+                ctx.globalAlpha = tr.a * 0.5;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.roundRect(tr.x + 5, tr.y + 5, this.player.w - 10, this.player.h - 10, 8);
+                ctx.fill();
+            });
+            ctx.globalAlpha = 1;
+        }
+
+        _drawPlayer(ctx) {
+            const p = this.player;
+            const t = performance.now();
+            
+            if (p.stunned) ctx.globalAlpha = 0.4 + Math.sin(t / 40) * 0.3;
+            
+            // Shadow
+            ctx.fillStyle = 'rgba(0,0,0,0.2)';
+            ctx.beginPath();
+            ctx.ellipse(p.x + p.w/2, p.y + p.h + 4, p.w/2 * 0.7, 6, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Body
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.roundRect(p.x, p.y, p.w, p.h, 12);
+            ctx.fill();
+            
+            // Highlight
+            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+            ctx.beginPath();
+            ctx.roundRect(p.x + 5, p.y + 4, p.w - 10, 12, 6);
+            ctx.fill();
+            
+            // Eyes
+            const eyeY = p.y + p.h * 0.38;
+            const eyeX1 = p.x + p.w * 0.3;
+            const eyeX2 = p.x + p.w * 0.7;
+            const lookX = p.facing * 3;
+            
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(eyeX1, eyeY, 7, 0, Math.PI * 2);
+            ctx.arc(eyeX2, eyeY, 7, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = '#222';
+            ctx.beginPath();
+            ctx.arc(eyeX1 + lookX, eyeY, 3, 0, Math.PI * 2);
+            ctx.arc(eyeX2 + lookX, eyeY, 3, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.globalAlpha = 1;
+        }
+
+        _burst(x, y, color, count) {
+            const maxParticles = 150;
+            const actualCount = Math.min(count, maxParticles - this.particles.length);
+            
+            for (let i = 0; i < actualCount; i++) {
+                this.particles.push({
+                    x, y,
+                    vx: (Math.random() - 0.5) * 8,
+                    vy: (Math.random() - 0.5) * 8 - 3,
+                    life: 25 + Math.random() * 10,
+                    color
+                });
             }
-        });
+        }
+
+        resize(newWidth, newHeight) {
+            const oldHeight = this.canvas.height;
+            
+            this.canvas.width = newWidth;
+            this.canvas.height = newHeight;
+            
+            const oldRatio = oldHeight / 700;
+            const newRatio = newHeight / 700;
+            const scaleY = newRatio / oldRatio;
+            
+            this.floorY = newHeight - 70;
+            
+            this.floors.forEach(f => f.y = this.floorY);
+            this.platforms.forEach(p => p.y *= scaleY);
+            this.coinList.forEach(c => c.y *= scaleY);
+            this.obstacles.forEach(o => o.y *= scaleY);
+            this.player.y *= scaleY;
+        }
+
+        loop() {
+            if (!this.running) return;
+            
+            const now = performance.now();
+            const deltaTime = now - (this.lastFrameTime || now);
+            this.lastFrameTime = now;
+            
+            const targetFrameTime = 1000 / 60;
+            
+            if (deltaTime >= targetFrameTime * 0.9) {
+                this.update();
+                this.draw();
+            }
+            
+            this.animationFrameId = requestAnimationFrame(() => this.loop());
+        }
+
+        stop() {
+            this.running = false;
+            if (this.animationFrameId !== null) {
+                cancelAnimationFrame(this.animationFrameId);
+                this.animationFrameId = null;
+            }
+        }
+    }
+
+    // ==========================================================================
+    // GAME MANAGER
+    // ==========================================================================
+    
+    const GameManager = {
+        airconsole: null,
+        
+        state: {
+            players: {},
+            games: {},
+            started: false,
+            starting: false,
+            startTime: null,
+            admin: null,
+            resultsDisplayed: false
+        },
+        
+        init() {
+            DOM.init();
+            this.airconsole = new AirConsole();
+            this._setupAirConsole();
+            this._setupEventListeners();
+            LevelManager.init();
+        },
+        
+        _setupAirConsole() {
+            this.airconsole.onReady = () => {
+                console.log("Screen ready");
+                this.airconsole.setActivePlayers(CONFIG.MAX_PLAYERS);
+            };
+            
+            this.airconsole.onConnect = (id) => this._handleConnect(id);
+            this.airconsole.onDisconnect = (id) => this._handleDisconnect(id);
+            this.airconsole.onMessage = (id, data) => this._handleMessage(id, data);
+        },
+        
+        _setupEventListeners() {
+            DOM.elements.nextLevelBtn.addEventListener('click', () => this.goToNextLevel());
+            DOM.elements.levelSelectBtn.addEventListener('click', () => this.restart());
+            
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                if (this.state.started) {
+                    clearTimeout(resizeTimeout);
+                    resizeTimeout = setTimeout(() => {
+                        for (let n in this.state.games) {
+                            const g = this.state.games[n];
+                            const container = DOM.get(`screen${n}`);
+                            if (container && g.canvas) {
+                                g.resize(container.clientWidth, container.clientHeight);
+                            }
+                        }
+                    }, 100);
+                }
+            });
+        },
+        
+        _handleConnect(id) {
+            console.log("Device connected:", id);
+            
+            const playerNumber = this.airconsole.convertDeviceIdToPlayerNumber(id);
+            const connectedCount = Object.keys(this.state.players).filter(
+                slot => !this.state.players[slot].disconnected
+            ).length;
+            
+            if (playerNumber !== undefined && playerNumber >= 0 && playerNumber < CONFIG.MAX_PLAYERS) {
+                const playerSlot = playerNumber + 1;
+                
+                if (this.state.players[playerSlot]) {
+                    const existing = this.state.players[playerSlot];
+                    
+                    if (existing.disconnected) {
+                        // Reconnection
+                        existing.disconnected = false;
+                        existing.deviceId = id;
+                        
+                        this.airconsole.message(id, {
+                            action: 'reconnected',
+                            playerNum: playerSlot,
+                            color: existing.color,
+                            colorName: existing.name,
+                            isAdmin: existing.isAdmin
+                        });
+                        
+                        UIManager.updatePlayerSlots(this.state.players, this.state.admin);
+                        this.airconsole.broadcast({ action: 'gameState', players: this.state.players });
+                    }
+                } else if (connectedCount < CONFIG.MAX_PLAYERS) {
+                    // New player
+                    const isAdmin = !this.state.admin;
+                    if (isAdmin) this.state.admin = playerSlot;
+                    
+                    this.state.players[playerSlot] = {
+                        deviceId: id,
+                        playerNumber: playerNumber,
+                        name: CONFIG.NAMES[playerNumber],
+                        color: CONFIG.COLORS[playerNumber],
+                        isAdmin,
+                        disconnected: false
+                    };
+                    
+                    this.airconsole.message(id, {
+                        action: 'joined',
+                        playerNum: playerSlot,
+                        color: CONFIG.COLORS[playerNumber],
+                        colorName: CONFIG.NAMES[playerNumber],
+                        isAdmin
+                    });
+                    
+                    UIManager.updatePlayerSlots(this.state.players, this.state.admin);
+                    this.airconsole.broadcast({ action: 'gameState', players: this.state.players });
+                } else {
+                    this.airconsole.message(id, { action: 'gameFull' });
+                }
+            }
+        },
+        
+        _handleDisconnect(id) {
+            console.log("Device disconnected:", id);
+            
+            const playerNumber = this.airconsole.convertDeviceIdToPlayerNumber(id);
+            
+            if (playerNumber !== undefined && playerNumber >= 0 && playerNumber < CONFIG.MAX_PLAYERS) {
+                const playerSlot = playerNumber + 1;
+                
+                if (this.state.players[playerSlot]) {
+                    this.state.players[playerSlot].disconnected = true;
+                    UIManager.updatePlayerSlots(this.state.players, this.state.admin);
+                    
+                    this.airconsole.broadcast({ 
+                        action: 'playerDisconnected', 
+                        playerNum: playerSlot,
+                        playerName: this.state.players[playerSlot].name
+                    });
+                }
+            }
+        },
+        
+        _handleMessage(id, data) {
+            const playerNumber = this.airconsole.convertDeviceIdToPlayerNumber(id);
+            const playerSlot = playerNumber !== undefined ? playerNumber + 1 : null;
+            
+            switch (data.action) {
+                case 'join':
+                    this._handleJoinRequest(id, playerSlot);
+                    break;
+                    
+                case 'selectColor':
+                    this._handleColorSelect(id, data);
+                    break;
+                    
+                case 'startGame':
+                    if (playerSlot === this.state.admin) this.startGame();
+                    break;
+                    
+                case 'playAgain':
+                    if (playerSlot === this.state.admin) this.restart();
+                    break;
+                    
+                case 'nextLevel':
+                    if (playerSlot === this.state.admin) this.goToNextLevel();
+                    break;
+                    
+                case 'goToLevelSelect':
+                    if (playerSlot === this.state.admin) this.restart();
+                    break;
+                    
+                case 'move':
+                case 'stop':
+                case 'jump':
+                    this._handleGameInput(playerSlot, data);
+                    break;
+            }
+        },
+        
+        _handleJoinRequest(id, playerSlot) {
+            if (playerSlot && this.state.players[playerSlot]) {
+                const p = this.state.players[playerSlot];
+                this.airconsole.message(id, {
+                    action: 'joined',
+                    playerNum: playerSlot,
+                    color: p.color,
+                    colorName: p.name,
+                    isAdmin: p.isAdmin
+                });
+            }
+        },
+        
+        _handleColorSelect(id, data) {
+            for (let n in this.state.players) {
+                if (this.state.players[n].deviceId === id) {
+                    this.state.players[n].color = data.color;
+                    this.state.players[n].name = data.colorName;
+                    UIManager.updatePlayerSlots(this.state.players, this.state.admin);
+                    this.airconsole.message(id, { action: 'colorUpdated', color: data.color, colorName: data.colorName });
+                    break;
+                }
+            }
+        },
+        
+        _handleGameInput(playerSlot, data) {
+            if (playerSlot && this.state.games[playerSlot] && this.state.started) {
+                const g = this.state.games[playerSlot];
+                
+                if (data.action === 'move') {
+                    g.keys.left = data.direction === 'left';
+                    g.keys.right = data.direction === 'right';
+                } else if (data.action === 'stop') {
+                    g.keys.left = g.keys.right = false;
+                } else if (data.action === 'jump') {
+                    g.keys.jump = data.pressed;
+                }
+            }
+        },
+        
+        async startGame() {
+            if (this.state.started || this.state.starting) return;
+            this.state.starting = true;
+            
+            DOM.elements.startScreen.style.display = 'none';
+            DOM.elements.gameContainer.style.display = 'block';
+            
+            const players = Object.values(this.state.players).filter(p => !p.disconnected);
+            this._setupScreens(players.length);
+            
+            for (let n in this.state.players) {
+                if (!this.state.players[n].disconnected) {
+                    this.state.games[n] = new Game(n, this.state.players[n].color, this.state.players[n].name);
+                    this.state.games[n].init();
+                }
+            }
+            
+            await UIManager.countdown();
+            
+            this.state.started = true;
+            this.state.starting = false;
+            this.state.startTime = Date.now();
+            this.airconsole.broadcast({ action: 'gameStart' });
+        },
+        
+        _setupScreens(count) {
+            const container = DOM.elements.gameContainer;
+            container.innerHTML = '';
+            
+            let i = 0;
+            for (let n in this.state.players) {
+                if (this.state.players[n].disconnected) continue;
+                const p = this.state.players[n];
+                
+                const div = document.createElement('div');
+                div.id = `screen${n}`;
+                div.className = 'absolute overflow-hidden';
+                
+                // Layout
+                if (count === 1) {
+                    div.style.cssText = 'inset:0;';
+                } else if (count === 2) {
+                    div.style.cssText = `left:0;right:0;height:calc(50% - 2px);${i === 0 ? 'top:0' : 'bottom:0'};`;
+                } else if (count === 3) {
+                    if (i === 0) div.style.cssText = 'top:0;left:0;right:0;height:calc(50% - 2px);';
+                    else div.style.cssText = `bottom:0;width:calc(50% - 2px);height:calc(50% - 2px);${i === 1 ? 'left:0' : 'right:0'};`;
+                } else {
+                    const pos = [['top:0;left:0'], ['top:0;right:0'], ['bottom:0;left:0'], ['bottom:0;right:0']][i];
+                    div.style.cssText = `${pos};width:calc(50% - 2px);height:calc(50% - 2px);`;
+                }
+                
+                const levelData = LevelManager.getLevelData();
+                div.innerHTML = `
+                    <canvas id="canvas${n}" class="absolute inset-0 w-full h-full"></canvas>
+                    <div class="absolute top-3 left-3 sm:top-4 sm:left-4 bg-black/70 rounded-xl py-2 px-4 flex items-center gap-2 text-white font-bold text-sm sm:text-lg z-10" style="border-left:4px solid ${p.color}">
+                        <iconify-icon icon="mdi:cash-multiple" class="text-steam-naranja text-lg"></iconify-icon>
+                        <span id="coins${n}">0</span>/<span>${levelData.coins.length}</span>
+                    </div>
+                    <div class="absolute top-3 right-3 sm:top-4 sm:right-4 bg-black/70 rounded-xl py-2 px-3 flex items-center gap-2 font-bold z-10" style="border-left:4px solid ${p.color}">
+                        <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg relative" style="background:${p.color}">
+                            <span class="absolute top-1 left-1 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full"></span>
+                            <span class="absolute top-1 right-1 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full"></span>
+                        </div>
+                        <span class="text-white text-sm sm:text-base">${p.name}</span>
+                    </div>
+                    <div class="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 flex items-center gap-2 z-10">
+                        <div class="flex-1 h-2 bg-black/30 rounded-full overflow-hidden">
+                            <div id="progress${n}" class="h-full rounded-full transition-all" style="width:0%;background:${p.color}"></div>
+                        </div>
+                        <div class="bg-black/70 rounded-lg px-2 py-1 text-white text-xs font-bold">
+                            Nivel ${LevelManager.progress.currentLevel}
+                        </div>
+                    </div>
+                `;
+                
+                if (count > 1) {
+                    div.style.border = `3px solid ${p.color}`;
+                }
+                
+                container.appendChild(div);
+                i++;
+            }
+        },
+        
+        showResults() {
+            const results = [];
+            
+            for (let n in this.state.games) {
+                const g = this.state.games[n];
+                const p = this.state.players[n];
+                if (g.finishTime && !p.disconnected) {
+                    const timeBonus = Math.max(0, 1000 - (g.finishTime - this.state.startTime) / 100);
+                    const coinBonus = g.coins * 100;
+                    results.push({
+                        num: n,
+                        name: p.name,
+                        color: p.color,
+                        coins: g.coins,
+                        time: ((g.finishTime - this.state.startTime) / 1000).toFixed(1),
+                        score: Math.round(timeBonus + coinBonus)
+                    });
+                }
+            }
+            
+            results.sort((a, b) => b.score - a.score);
+            
+            const levelCompleted = results.length > 0;
+            if (levelCompleted) {
+                LevelManager.completeLevel(LevelManager.progress.currentLevel);
+            }
+            
+            UIManager.showResults(results, levelCompleted, LevelManager.hasNextLevel());
+            
+            this.airconsole.broadcast({ 
+                action: 'gameResults', 
+                results, 
+                winner: results[0], 
+                levelCompleted, 
+                hasNextLevel: LevelManager.hasNextLevel() 
+            });
+        },
+        
+        restart() {
+            if (!this.state.resultsDisplayed) return;
+            
+            DOM.elements.resultsScreen.style.display = 'none';
+            DOM.elements.startScreen.style.display = 'flex';
+            DOM.elements.gameContainer.style.display = 'none';
+            
+            // Stop all games
+            for (let n in this.state.games) {
+                if (this.state.games[n]?.stop) {
+                    this.state.games[n].stop();
+                }
+            }
+            
+            this.state.started = false;
+            this.state.starting = false;
+            this.state.games = {};
+            this.state.resultsDisplayed = false;
+            
+            // Remove disconnected players
+            for (let n in this.state.players) {
+                if (this.state.players[n].disconnected) {
+                    delete this.state.players[n];
+                }
+            }
+            
+            UIManager.updatePlayerSlots(this.state.players, this.state.admin);
+            LevelManager.updateButtons();
+            this.airconsole.broadcast({ action: 'gameRestart' });
+        },
+        
+        goToNextLevel() {
+            if (!this.state.resultsDisplayed) return;
+            
+            const nextLevel = LevelManager.progress.currentLevel + 1;
+            if (nextLevel <= 5) {
+                LevelManager.selectLevel(nextLevel);
+                this.restart();
+            }
+        }
+    };
+
+    // ==========================================================================
+    // INITIALIZATION
+    // ==========================================================================
+    
+    window.onload = () => GameManager.init();
     </script>
 </body>
 </html>

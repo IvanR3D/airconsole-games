@@ -4,9 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>STEAM Platformer - Control</title>
+    
+    <!-- External Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <script type="text/javascript" src="https://www.airconsole.com/api/airconsole-1.8.0.js"></script>
+    
+    <!-- Tailwind Configuration -->
     <script>
         tailwind.config = {
             theme: {
@@ -23,16 +27,34 @@
             }
         }
     </script>
+    
     <style>
+        /* ==========================================================================
+           BASE STYLES
+           ========================================================================== */
         * {
-            margin: 0; padding: 0; box-sizing: border-box;
-            -webkit-user-select: none; user-select: none;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            user-select: none;
             -webkit-tap-highlight-color: transparent;
         }
-        html, body { width: 100%; height: 100%; overflow: hidden; }
-        body { touch-action: none; font-family: 'Segoe UI', system-ui, sans-serif; }
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        body {
+            touch-action: none;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
 
-        /* Clean avatar with simple centered eyes + idle blink */
+        /* ==========================================================================
+           AVATAR STYLES
+           ========================================================================== */
         .avatar {
             width: clamp(70px, 22vw, 100px);
             height: clamp(70px, 22vw, 100px);
@@ -40,6 +62,7 @@
             position: relative;
             box-shadow: 0 8px 0 rgba(0,0,0,0.15), 0 10px 30px rgba(0,0,0,0.1);
         }
+        
         .avatar::before,
         .avatar::after {
             content: '';
@@ -47,11 +70,11 @@
             width: 24%;
             height: 24%;
             top: 32%;
-            background: radial-gradient(circle at 50% 50%, #222 35%, transparent 36%),
-                        white;
+            background: radial-gradient(circle at 50% 50%, #222 35%, transparent 36%), white;
             border-radius: 50%;
             animation: idleBlink 4s ease-in-out infinite;
         }
+        
         .avatar::before { left: 18%; }
         .avatar::after { right: 18%; animation-delay: 0.05s; }
         
@@ -62,6 +85,7 @@
             box-shadow: 0 5px 0 rgba(0,0,0,0.15);
             position: relative;
         }
+        
         .avatar-sm::before,
         .avatar-sm::after {
             content: '';
@@ -69,50 +93,17 @@
             width: 26%;
             height: 26%;
             top: 30%;
-            background: radial-gradient(circle at 50% 50%, #222 35%, transparent 36%),
-                        white;
+            background: radial-gradient(circle at 50% 50%, #222 35%, transparent 36%), white;
             border-radius: 50%;
             animation: idleBlink 4s ease-in-out infinite;
         }
+        
         .avatar-sm::before { left: 16%; }
         .avatar-sm::after { right: 16%; animation-delay: 0.05s; }
 
-        /* Idle blink - natural blinking */
-        @keyframes idleBlink {
-            0%, 42%, 48%, 100% { transform: scaleY(1); }
-            45% { transform: scaleY(0.05); }
-        }
-
-        /* Happy jump when selecting color */
-        .avatar.jump {
-            animation: happyJump 0.5s ease-out;
-        }
-        @keyframes happyJump {
-            0% { transform: scale(1); }
-            40% { transform: scale(1.15) translateY(-12px); }
-            70% { transform: scale(0.95) translateY(0); }
-            100% { transform: scale(1) translateY(0); }
-        }
-
-        /* Fast blink animation when selecting */
-        .avatar.blink::before,
-        .avatar.blink::after {
-            animation: blinkHappy 0.6s ease-out !important;
-        }
-        @keyframes blinkHappy {
-            0% { transform: scaleY(1); }
-            20% { transform: scaleY(0.05); }
-            40% { transform: scaleY(1); }
-            60% { transform: scaleY(0.05); }
-            80% { transform: scaleY(1); }
-            100% { transform: scaleY(1); }
-        }
-
-        /* Float animation */
-        @keyframes float { 50% { transform: translateY(-8px); } }
-        .float { animation: float 3s ease-in-out infinite; }
-
-        /* Color picker */
+        /* ==========================================================================
+           COLOR PICKER
+           ========================================================================== */
         .color-btn {
             width: clamp(52px, 15vw, 68px);
             height: clamp(52px, 15vw, 68px);
@@ -122,14 +113,21 @@
             cursor: pointer;
             transition: transform 0.15s, box-shadow 0.15s;
         }
-        .color-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,0.2); }
+        
+        .color-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2);
+        }
+        
         .color-btn.selected {
             transform: scale(1.12);
             border-color: #EB8225;
             box-shadow: 0 0 0 4px #EB8225, 0 6px 20px rgba(235,130,37,0.4);
         }
 
-        /* Action buttons */
+        /* ==========================================================================
+           ACTION BUTTONS
+           ========================================================================== */
         .btn {
             border: none;
             border-radius: 50px;
@@ -139,15 +137,21 @@
             cursor: pointer;
             transition: transform 0.1s, box-shadow 0.1s;
         }
+        
         .btn:active { transform: translateY(4px); }
+        
         .btn-verde { background: #73A03F; box-shadow: 0 6px 0 #5a8030; }
         .btn-verde:active { box-shadow: 0 2px 0 #5a8030; }
+        
         .btn-turquesa { background: #0595AE; box-shadow: 0 6px 0 #047a91; }
         .btn-turquesa:active { box-shadow: 0 2px 0 #047a91; }
+        
         .btn-morado { background: #AB3D8B; box-shadow: 0 6px 0 #8a3070; }
         .btn-morado:active { box-shadow: 0 2px 0 #8a3070; }
 
-        /* Game controls - responsive for both orientations */
+        /* ==========================================================================
+           GAME CONTROLS
+           ========================================================================== */
         .ctrl-btn {
             display: flex;
             flex-direction: column;
@@ -156,7 +160,9 @@
             cursor: pointer;
             transition: transform 0.08s, box-shadow 0.08s;
         }
-        .ctrl-btn:active, .ctrl-btn.pressed { transform: translateY(6px); }
+        
+        .ctrl-btn:active,
+        .ctrl-btn.pressed { transform: translateY(6px); }
 
         .jump-btn {
             width: clamp(100px, 30vmin, 150px);
@@ -165,22 +171,44 @@
             background: #73A03F;
             box-shadow: 0 10px 0 #5a8030;
         }
-        .jump-btn:active, .jump-btn.pressed { box-shadow: 0 2px 0 #5a8030; }
+        
+        .jump-btn:active,
+        .jump-btn.pressed { box-shadow: 0 2px 0 #5a8030; }
 
         .move-btn {
             width: clamp(70px, 22vmin, 100px);
             height: clamp(70px, 22vmin, 100px);
             border-radius: 20px;
         }
+        
         .left-btn { background: #AB3D8B; box-shadow: 0 8px 0 #8a3070; }
-        .left-btn:active, .left-btn.pressed { box-shadow: 0 2px 0 #8a3070; }
+        .left-btn:active,
+        .left-btn.pressed { box-shadow: 0 2px 0 #8a3070; }
+        
         .right-btn { background: #0595AE; box-shadow: 0 8px 0 #047a91; }
-        .right-btn:active, .right-btn.pressed { box-shadow: 0 2px 0 #047a91; }
+        .right-btn:active,
+        .right-btn.pressed { box-shadow: 0 2px 0 #047a91; }
 
-        .ctrl-icon { font-size: clamp(2rem, 10vmin, 3.5rem); color: white; line-height: 1; }
-        .ctrl-label { font-size: clamp(0.7rem, 3vmin, 1rem); font-weight: 700; color: white; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .ctrl-icon {
+            font-size: clamp(2rem, 10vmin, 3.5rem);
+            color: white;
+            line-height: 1;
+        }
+        
+        .ctrl-label {
+            font-size: clamp(0.7rem, 3vmin, 1rem);
+            font-weight: 700;
+            color: white;
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
 
-        /* Portrait - vertical layout */
+        /* ==========================================================================
+           RESPONSIVE LAYOUTS
+           ========================================================================== */
+        
+        /* Portrait */
         @media (orientation: portrait) {
             .game-controls {
                 flex-direction: column !important;
@@ -190,7 +218,7 @@
             .game-header { display: flex !important; }
         }
 
-        /* Landscape - horizontal layout */
+        /* Landscape */
         @media (orientation: landscape) {
             .game-controls {
                 flex-direction: row !important;
@@ -214,16 +242,47 @@
             .move-btn { width: 60px; height: 60px; }
         }
 
-        /* Rotate warning */
+        /* ==========================================================================
+           ANIMATIONS
+           ========================================================================== */
+        @keyframes idleBlink {
+            0%, 42%, 48%, 100% { transform: scaleY(1); }
+            45% { transform: scaleY(0.05); }
+        }
+
+        @keyframes happyJump {
+            0% { transform: scale(1); }
+            40% { transform: scale(1.15) translateY(-12px); }
+            70% { transform: scale(0.95) translateY(0); }
+            100% { transform: scale(1) translateY(0); }
+        }
+        
+        .avatar.jump { animation: happyJump 0.5s ease-out; }
+
+        @keyframes blinkHappy {
+            0% { transform: scaleY(1); }
+            20% { transform: scaleY(0.05); }
+            40% { transform: scaleY(1); }
+            60% { transform: scaleY(0.05); }
+            80%, 100% { transform: scaleY(1); }
+        }
+        
+        .avatar.blink::before,
+        .avatar.blink::after { animation: blinkHappy 0.6s ease-out !important; }
+
+        @keyframes float { 50% { transform: translateY(-8px); } }
+        .float { animation: float 3s ease-in-out infinite; }
+
         @keyframes spin { 50% { transform: rotate(90deg); } }
         .spin { animation: spin 2s ease-in-out infinite; }
 
-        /* Pulse */
         @keyframes pulse { 50% { opacity: 0.6; } }
         .pulse { animation: pulse 2s ease infinite; }
 
-        /* Pop in */
-        @keyframes pop { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes pop {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
         .pop { animation: pop 0.4s ease-out; }
     </style>
 </head>
@@ -298,13 +357,11 @@
 
     <!-- GAME CONTROLLER -->
     <div class="screen hidden flex-col items-center justify-evenly w-full h-full p-4 bg-[#1B4D3E]" id="gameScreen">
-        <!-- Header - shown in portrait -->
         <div class="flex items-center gap-3 game-header">
             <div class="avatar-sm" id="gameAvatar" style="background:#73A03F"></div>
             <span class="text-xl font-bold text-white" id="gameName">Verde</span>
         </div>
         
-        <!-- Controls -->
         <div class="flex flex-col items-center w-full game-controls">
             <div class="ctrl-btn jump-btn" id="jumpBtn">
                 <iconify-icon icon="mdi:arrow-up-bold" class="ctrl-icon"></iconify-icon>
@@ -323,7 +380,6 @@
             </div>
         </div>
         
-        <!-- Spacer for portrait mode -->
         <div class="game-header"></div>
     </div>
 
@@ -362,224 +418,212 @@
     </div>
 
     <script>
-        const airconsole = new AirConsole();
-        
-        const COLORS = [
+    /**
+     * STEAM Platformer - Mobile Controller
+     * 
+     * Handles player input and communicates with the screen via AirConsole messages.
+     * 
+     * @fileoverview Controller module for the STEAM Platformer game
+     * @version 2.0.0
+     */
+
+    // ==========================================================================
+    // CONFIGURATION
+    // ==========================================================================
+    
+    const CONFIG = {
+        COLORS: [
             { hex: '#73A03F', name: 'Verde' },
             { hex: '#AB3D8B', name: 'Morado' },
             { hex: '#0595AE', name: 'Turquesa' },
             { hex: '#EB8225', name: 'Naranja' }
-        ];
+        ],
+        VIBRATION: {
+            ERROR: [200, 100, 200],
+            SELECT: 25,
+            BUTTON: 15,
+            WIN: [80, 40, 80, 40, 80],
+            DISCONNECT: 100
+        },
+        ANIMATION_DURATION: {
+            BLINK: 600,
+            JUMP: 500
+        }
+    };
+
+    // ==========================================================================
+    // MESSAGE PROTOCOL
+    // ==========================================================================
+    
+    /**
+     * Message Protocol Documentation
+     * 
+     * CONTROLLER → SCREEN:
+     * - { action: 'join' } - Fallback join request
+     * - { action: 'selectColor', color: string, colorName: string }
+     * - { action: 'startGame' } - Admin only
+     * - { action: 'playAgain' } - Admin only
+     * - { action: 'nextLevel' } - Admin only
+     * - { action: 'goToLevelSelect' } - Admin only
+     * - { action: 'move', direction: 'left' | 'right' }
+     * - { action: 'stop' }
+     * - { action: 'jump', pressed: boolean }
+     * 
+     * SCREEN → CONTROLLER:
+     * - { action: 'joined', playerNum, color, colorName, isAdmin }
+     * - { action: 'reconnected', playerNum, color, colorName, isAdmin }
+     * - { action: 'gameFull' }
+     * - { action: 'colorUpdated', color, colorName }
+     * - { action: 'gameState', players }
+     * - { action: 'levelChanged', level, name }
+     * - { action: 'playerDisconnected', playerNum, playerName }
+     * - { action: 'gameStart' }
+     * - { action: 'gameRestart' }
+     * - { action: 'gameResults', results, winner, levelCompleted, hasNextLevel }
+     */
+
+    // ==========================================================================
+    // DOM UTILITIES
+    // ==========================================================================
+    
+    const DOM = {
+        get: (id) => document.getElementById(id),
         
-        let player = { num: null, color: '#73A03F', name: 'Verde', isAdmin: false };
-        let keys = { left: false, right: false, jump: false };
-        let controlsBound = false;
+        elements: {
+            // Screens
+            joinScreen: null,
+            selectScreen: null,
+            gameScreen: null,
+            resultsScreen: null,
+            
+            // Join screen
+            connectingMsg: null,
+            errorMsg: null,
+            
+            // Select screen
+            adminBadge: null,
+            avatarDisplay: null,
+            colorGrid: null,
+            startBtn: null,
+            waitingHint: null,
+            
+            // Game screen
+            gameAvatar: null,
+            gameName: null,
+            jumpBtn: null,
+            leftBtn: null,
+            rightBtn: null,
+            
+            // Results screen
+            rankDisplay: null,
+            resultAvatar: null,
+            resultMsg: null,
+            resultScore: null,
+            nextLevelBtn: null,
+            levelSelectBtn: null,
+            waitingResult: null
+        },
         
-        const $ = (id) => document.getElementById(id);
-        const send = (msg) => airconsole.message(AirConsole.SCREEN, msg);
-
-        function init() {
-            airconsole.onReady = () => console.log('Controller ready');
+        init() {
+            // Cache all DOM elements
+            this.elements.joinScreen = this.get('joinScreen');
+            this.elements.selectScreen = this.get('selectScreen');
+            this.elements.gameScreen = this.get('gameScreen');
+            this.elements.resultsScreen = this.get('resultsScreen');
             
-            airconsole.onMessage = (from, data) => {
-                switch(data.action || data.type) {
-                    case 'joined':
-                        player = { num: data.playerNum, color: data.color, name: data.colorName, isAdmin: data.isAdmin };
-                        setupSelect();
-                        showScreen('select');
-                        break;
-                    case 'reconnected':
-                        player = { num: data.playerNum, color: data.color, name: data.colorName, isAdmin: data.isAdmin };
-                        setupSelect();
-                        showScreen('select');
-                        break;
-                    case 'gameFull':
-                        $('connectingMsg').classList.add('hidden');
-                        $('errorMsg').classList.remove('hidden');
-                        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-                        break;
-                    case 'colorUpdated':
-                        player.color = data.color;
-                        player.name = data.colorName;
-                        updateAvatars();
-                        break;
-                    case 'gameStart':
-                        showScreen('game');
-                        setupControls();
-                        lockLandscape();
-                        break;
-                    case 'gameRestart':
-                        unlock();
-                        showScreen('select');
-                        // Reset error messages
-                        $('connectingMsg').classList.remove('hidden');
-                        $('errorMsg').classList.add('hidden');
-                        break;
-                    case 'gameResults':
-                        showResults(data.results, data.winner, data.levelCompleted, data.hasNextLevel);
-                        break;
-                }
-            };
+            this.elements.connectingMsg = this.get('connectingMsg');
+            this.elements.errorMsg = this.get('errorMsg');
             
-            $('startBtn').onclick = () => send({ action: 'startGame' });
-            $('nextLevelBtn').onclick = () => send({ action: 'nextLevel' });
-            $('levelSelectBtn').onclick = () => send({ action: 'goToLevelSelect' });
+            this.elements.adminBadge = this.get('adminBadge');
+            this.elements.avatarDisplay = this.get('avatarDisplay');
+            this.elements.colorGrid = this.get('colorGrid');
+            this.elements.startBtn = this.get('startBtn');
+            this.elements.waitingHint = this.get('waitingHint');
+            
+            this.elements.gameAvatar = this.get('gameAvatar');
+            this.elements.gameName = this.get('gameName');
+            this.elements.jumpBtn = this.get('jumpBtn');
+            this.elements.leftBtn = this.get('leftBtn');
+            this.elements.rightBtn = this.get('rightBtn');
+            
+            this.elements.rankDisplay = this.get('rankDisplay');
+            this.elements.resultAvatar = this.get('resultAvatar');
+            this.elements.resultMsg = this.get('resultMsg');
+            this.elements.resultScore = this.get('resultScore');
+            this.elements.nextLevelBtn = this.get('nextLevelBtn');
+            this.elements.levelSelectBtn = this.get('levelSelectBtn');
+            this.elements.waitingResult = this.get('waitingResult');
         }
+    };
 
-        function setupSelect() {
-            updateAvatars();
-            
-            // Play join animation
-            const avatar = $('avatarDisplay');
-            avatar.classList.add('jump', 'blink');
-            setTimeout(() => avatar.classList.remove('blink'), 600);
-            setTimeout(() => avatar.classList.remove('jump'), 500);
-            
-            $('adminBadge').classList.toggle('hidden', !player.isAdmin);
-            $('startBtn').classList.toggle('hidden', !player.isAdmin);
-            $('waitingHint').classList.toggle('hidden', player.isAdmin);
-            
-            const grid = $('colorGrid');
-            grid.innerHTML = '';
-            
-            COLORS.forEach(c => {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'flex flex-col items-center gap-2';
-                
-                const btn = document.createElement('div');
-                btn.className = `color-btn ${c.hex === player.color ? 'selected' : ''}`;
-                btn.style.background = c.hex;
-                btn.onclick = () => selectColor(c.hex, c.name);
-                
-                const label = document.createElement('span');
-                label.className = 'text-xs font-bold text-gray-600';
-                label.textContent = c.name;
-                
-                wrapper.appendChild(btn);
-                wrapper.appendChild(label);
-                grid.appendChild(wrapper);
-            });
-        }
-
-        function updateAvatars() {
-            $('avatarDisplay').style.background = player.color;
-            $('gameAvatar').style.background = player.color;
-            $('gameName').textContent = player.name;
-            $('resultAvatar').style.background = player.color;
-        }
-
-        function selectColor(hex, name) {
-            player.color = hex;
-            player.name = name;
-            updateAvatars();
-            
-            document.querySelectorAll('.color-btn').forEach(btn => {
-                btn.classList.toggle('selected', btn.style.background === hex);
-            });
-            
-            // Trigger jump + blink animation
-            const avatar = $('avatarDisplay');
-            avatar.classList.remove('jump', 'blink');
-            void avatar.offsetWidth; // Force reflow
-            avatar.classList.add('jump', 'blink');
-            setTimeout(() => avatar.classList.remove('blink'), 600);
-            setTimeout(() => avatar.classList.remove('jump'), 500);
-            
-            send({ action: 'selectColor', color: hex, colorName: name });
-            if (navigator.vibrate) navigator.vibrate(25);
-        }
-
-        function setupControls() {
-            // Guard to prevent duplicate listener registration
-            if (controlsBound) return;
-            controlsBound = true;
-            
-            const btns = [
-                [$('leftBtn'), 'left'],
-                [$('rightBtn'), 'right'],
-                [$('jumpBtn'), 'jump']
-            ];
-            
-            btns.forEach(([el, action]) => {
-                ['touchstart', 'touchend', 'touchcancel'].forEach(evt => {
-                    el.addEventListener(evt, (e) => {
-                        e.preventDefault();
-                        handleInput(action, evt === 'touchstart', el);
-                    }, { passive: false });
-                });
-                
-                el.addEventListener('mousedown', () => handleInput(action, true, el));
-                el.addEventListener('mouseup', () => handleInput(action, false, el));
-                el.addEventListener('mouseleave', () => handleInput(action, false, el));
-            });
-        }
-
-        function handleInput(action, pressed, el) {
-            el.classList.toggle('pressed', pressed);
-            if (pressed && navigator.vibrate) navigator.vibrate(15);
-            
-            if (action === 'jump') {
-                if (pressed && !keys.jump) {
-                    keys.jump = true;
-                    send({ action: 'jump', pressed: true });
-                } else if (!pressed && keys.jump) {
-                    keys.jump = false;
-                    send({ action: 'jump', pressed: false });
-                }
-            } else {
-                if (pressed) {
-                    keys[action] = true;
-                    keys[action === 'left' ? 'right' : 'left'] = false;
-                    send({ action: 'move', direction: action });
-                } else if (keys[action]) {
-                    keys[action] = false;
-                    const other = action === 'left' ? 'right' : 'left';
-                    send(keys[other] ? { action: 'move', direction: other } : { action: 'stop' });
-                }
+    // ==========================================================================
+    // VIBRATION MANAGER
+    // ==========================================================================
+    
+    const Vibration = {
+        trigger(pattern) {
+            if (navigator.vibrate) {
+                navigator.vibrate(pattern);
             }
         }
+    };
 
-        let orientationLocked = false;
-        let orientationWarning = null;
-
-        function lockLandscape() {
-            orientationLocked = true;
+    // ==========================================================================
+    // ORIENTATION MANAGER
+    // ==========================================================================
+    
+    const OrientationManager = {
+        locked: false,
+        warningElement: null,
+        
+        lock() {
+            this.locked = true;
             
-            // Try to lock screen orientation using Screen Orientation API
-            if (screen.orientation && screen.orientation.lock) {
-                screen.orientation.lock('landscape').catch(err => {
-                    console.log('Orientation lock not supported:', err);
-                    // Fallback to visual warning if API not supported - check orientation and add listener
-                    checkOrientation();
-                    window.addEventListener('resize', checkOrientation);
-                    window.addEventListener('orientationchange', checkOrientation);
+            if (screen.orientation?.lock) {
+                screen.orientation.lock('landscape').catch(() => {
+                    this._setupFallback();
                 });
             } else {
-                // Show warning for devices that don't support orientation API
-                checkOrientation();
-                window.addEventListener('resize', checkOrientation);
-                window.addEventListener('orientationchange', checkOrientation);
+                this._setupFallback();
             }
-        }
-
-        function checkOrientation() {
-            if (!orientationLocked) return;
+        },
+        
+        unlock() {
+            this.locked = false;
+            this._hideWarning();
+            window.removeEventListener('resize', this._checkBound);
+            window.removeEventListener('orientationchange', this._checkBound);
+            
+            if (screen.orientation?.unlock) {
+                screen.orientation.unlock();
+            }
+        },
+        
+        _setupFallback() {
+            this._checkBound = this._check.bind(this);
+            this._check();
+            window.addEventListener('resize', this._checkBound);
+            window.addEventListener('orientationchange', this._checkBound);
+        },
+        
+        _check() {
+            if (!this.locked) return;
             
             const isPortrait = window.innerHeight > window.innerWidth;
             
-            if (isPortrait && !orientationWarning) {
-                showOrientationWarning();
-            } else if (!isPortrait && orientationWarning) {
-                hideOrientationWarning();
+            if (isPortrait && !this.warningElement) {
+                this._showWarning();
+            } else if (!isPortrait && this.warningElement) {
+                this._hideWarning();
             }
-        }
-
-        function showOrientationWarning() {
-            if (orientationWarning) return;
+        },
+        
+        _showWarning() {
+            if (this.warningElement) return;
             
-            orientationWarning = document.createElement('div');
-            orientationWarning.id = 'orientationWarning';
-            orientationWarning.style.cssText = `
+            this.warningElement = document.createElement('div');
+            this.warningElement.id = 'orientationWarning';
+            this.warningElement.style.cssText = `
                 position: fixed;
                 inset: 0;
                 background: rgba(0,0,0,0.95);
@@ -592,86 +636,329 @@
                 text-align: center;
                 padding: 20px;
             `;
-            orientationWarning.innerHTML = `
+            this.warningElement.innerHTML = `
                 <iconify-icon icon="mdi:phone-rotate-landscape" class="text-6xl mb-4 spin"></iconify-icon>
                 <h2 class="text-2xl font-bold mb-2">Gira tu dispositivo</h2>
                 <p class="text-lg">Para mejor experiencia, usa modo horizontal</p>
             `;
-            document.body.appendChild(orientationWarning);
-        }
-
-        function hideOrientationWarning() {
-            if (orientationWarning) {
-                orientationWarning.remove();
-                orientationWarning = null;
+            document.body.appendChild(this.warningElement);
+        },
+        
+        _hideWarning() {
+            if (this.warningElement) {
+                this.warningElement.remove();
+                this.warningElement = null;
             }
         }
+    };
 
-        function unlock() {
-            orientationLocked = false;
-            hideOrientationWarning();
-            window.removeEventListener('resize', checkOrientation);
-            window.removeEventListener('orientationchange', checkOrientation);
+    // ==========================================================================
+    // SCREEN MANAGER
+    // ==========================================================================
+    
+    const ScreenManager = {
+        screens: ['join', 'select', 'game', 'results'],
+        
+        show(name) {
+            this.screens.forEach(s => {
+                const el = DOM.get(s + 'Screen');
+                const isTarget = s === name;
+                el.classList.toggle('hidden', !isTarget);
+                el.classList.toggle('flex', isTarget);
+            });
+        }
+    };
+
+    // ==========================================================================
+    // AVATAR MANAGER
+    // ==========================================================================
+    
+    const AvatarManager = {
+        update(player) {
+            DOM.elements.avatarDisplay.style.background = player.color;
+            DOM.elements.gameAvatar.style.background = player.color;
+            DOM.elements.gameName.textContent = player.name;
+            DOM.elements.resultAvatar.style.background = player.color;
+        },
+        
+        playAnimation(type) {
+            const avatar = DOM.elements.avatarDisplay;
             
-            // Unlock screen orientation if supported
-            if (screen.orientation && screen.orientation.unlock) {
-                screen.orientation.unlock();
+            avatar.classList.remove('jump', 'blink');
+            void avatar.offsetWidth; // Force reflow
+            
+            if (type === 'jump') {
+                avatar.classList.add('jump', 'blink');
+                setTimeout(() => avatar.classList.remove('blink'), CONFIG.ANIMATION_DURATION.BLINK);
+                setTimeout(() => avatar.classList.remove('jump'), CONFIG.ANIMATION_DURATION.JUMP);
             }
         }
+    };
 
-        function showResults(results, winner, levelCompleted, hasNextLevel) {
-            unlock();
-            showScreen('results');
+    // ==========================================================================
+    // CONTROLLER
+    // ==========================================================================
+    
+    const Controller = {
+        airconsole: null,
+        player: { num: null, color: '#73A03F', name: 'Verde', isAdmin: false },
+        keys: { left: false, right: false, jump: false },
+        controlsBound: false,
+        
+        init() {
+            DOM.init();
+            this.airconsole = new AirConsole();
+            this._setupAirConsole();
+            this._setupEventListeners();
+        },
+        
+        send(msg) {
+            this.airconsole.message(AirConsole.SCREEN, msg);
+        },
+        
+        _setupAirConsole() {
+            this.airconsole.onReady = () => {
+                console.log('Controller ready');
+            };
             
-            const me = results.find(r => r.num == player.num);
+            this.airconsole.onMessage = (from, data) => {
+                this._handleMessage(data);
+            };
+        },
+        
+        _handleMessage(data) {
+            const handlers = {
+                'joined': () => this._onJoined(data),
+                'reconnected': () => this._onJoined(data),
+                'gameFull': () => this._onGameFull(),
+                'colorUpdated': () => this._onColorUpdated(data),
+                'gameState': () => console.log('Game state updated:', data.players),
+                'levelChanged': () => console.log(`Level changed to ${data.level}: ${data.name}`),
+                'playerDisconnected': () => this._onPlayerDisconnected(data),
+                'gameStart': () => this._onGameStart(),
+                'gameRestart': () => this._onGameRestart(),
+                'gameResults': () => this._onGameResults(data)
+            };
+            
+            const handler = handlers[data.action];
+            if (handler) handler();
+        },
+        
+        _onJoined(data) {
+            this.player = {
+                num: data.playerNum,
+                color: data.color,
+                name: data.colorName,
+                isAdmin: data.isAdmin
+            };
+            this._setupSelectScreen();
+            ScreenManager.show('select');
+        },
+        
+        _onGameFull() {
+            DOM.elements.connectingMsg.classList.add('hidden');
+            DOM.elements.errorMsg.classList.remove('hidden');
+            Vibration.trigger(CONFIG.VIBRATION.ERROR);
+        },
+        
+        _onColorUpdated(data) {
+            this.player.color = data.color;
+            this.player.name = data.colorName;
+            AvatarManager.update(this.player);
+        },
+        
+        _onPlayerDisconnected(data) {
+            if (data.playerNum !== this.player.num) {
+                console.log(`Player ${data.playerName} disconnected`);
+                Vibration.trigger(CONFIG.VIBRATION.DISCONNECT);
+            }
+        },
+        
+        _onGameStart() {
+            ScreenManager.show('game');
+            this._setupControls();
+            OrientationManager.lock();
+        },
+        
+        _onGameRestart() {
+            OrientationManager.unlock();
+            ScreenManager.show('select');
+            DOM.elements.connectingMsg.classList.remove('hidden');
+            DOM.elements.errorMsg.classList.add('hidden');
+        },
+        
+        _onGameResults(data) {
+            OrientationManager.unlock();
+            this._showResults(data.results, data.winner, data.levelCompleted, data.hasNextLevel);
+        },
+        
+        _setupEventListeners() {
+            DOM.elements.startBtn.onclick = () => this.send({ action: 'startGame' });
+            DOM.elements.nextLevelBtn.onclick = () => this.send({ action: 'nextLevel' });
+            DOM.elements.levelSelectBtn.onclick = () => this.send({ action: 'goToLevelSelect' });
+            
+            // Prevent default touch behaviors
+            document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+            document.addEventListener('gesturestart', e => e.preventDefault());
+        },
+        
+        _setupSelectScreen() {
+            AvatarManager.update(this.player);
+            AvatarManager.playAnimation('jump');
+            
+            DOM.elements.adminBadge.classList.toggle('hidden', !this.player.isAdmin);
+            DOM.elements.startBtn.classList.toggle('hidden', !this.player.isAdmin);
+            DOM.elements.waitingHint.classList.toggle('hidden', this.player.isAdmin);
+            
+            this._renderColorPicker();
+        },
+        
+        _renderColorPicker() {
+            const grid = DOM.elements.colorGrid;
+            grid.innerHTML = '';
+            
+            CONFIG.COLORS.forEach(color => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'flex flex-col items-center gap-2';
+                
+                const btn = document.createElement('div');
+                btn.className = `color-btn ${color.hex === this.player.color ? 'selected' : ''}`;
+                btn.style.background = color.hex;
+                btn.onclick = () => this._selectColor(color.hex, color.name);
+                
+                const label = document.createElement('span');
+                label.className = 'text-xs font-bold text-gray-600';
+                label.textContent = color.name;
+                
+                wrapper.appendChild(btn);
+                wrapper.appendChild(label);
+                grid.appendChild(wrapper);
+            });
+        },
+        
+        _selectColor(hex, name) {
+            this.player.color = hex;
+            this.player.name = name;
+            AvatarManager.update(this.player);
+            
+            document.querySelectorAll('.color-btn').forEach(btn => {
+                btn.classList.toggle('selected', btn.style.background === hex);
+            });
+            
+            AvatarManager.playAnimation('jump');
+            this.send({ action: 'selectColor', color: hex, colorName: name });
+            Vibration.trigger(CONFIG.VIBRATION.SELECT);
+        },
+        
+        _setupControls() {
+            if (this.controlsBound) return;
+            this.controlsBound = true;
+            
+            const buttons = [
+                [DOM.elements.leftBtn, 'left'],
+                [DOM.elements.rightBtn, 'right'],
+                [DOM.elements.jumpBtn, 'jump']
+            ];
+            
+            buttons.forEach(([element, action]) => {
+                // Touch events
+                ['touchstart', 'touchend', 'touchcancel'].forEach(evt => {
+                    element.addEventListener(evt, (e) => {
+                        e.preventDefault();
+                        this._handleInput(action, evt === 'touchstart', element);
+                    }, { passive: false });
+                });
+                
+                // Mouse events (for testing)
+                element.addEventListener('mousedown', () => this._handleInput(action, true, element));
+                element.addEventListener('mouseup', () => this._handleInput(action, false, element));
+                element.addEventListener('mouseleave', () => this._handleInput(action, false, element));
+            });
+        },
+        
+        _handleInput(action, pressed, element) {
+            element.classList.toggle('pressed', pressed);
+            
+            if (pressed) {
+                Vibration.trigger(CONFIG.VIBRATION.BUTTON);
+            }
+            
+            if (action === 'jump') {
+                this._handleJump(pressed);
+            } else {
+                this._handleMove(action, pressed);
+            }
+        },
+        
+        _handleJump(pressed) {
+            if (pressed && !this.keys.jump) {
+                this.keys.jump = true;
+                this.send({ action: 'jump', pressed: true });
+            } else if (!pressed && this.keys.jump) {
+                this.keys.jump = false;
+                this.send({ action: 'jump', pressed: false });
+            }
+        },
+        
+        _handleMove(direction, pressed) {
+            const opposite = direction === 'left' ? 'right' : 'left';
+            
+            if (pressed) {
+                this.keys[direction] = true;
+                this.keys[opposite] = false;
+                this.send({ action: 'move', direction });
+            } else if (this.keys[direction]) {
+                this.keys[direction] = false;
+                this.send(this.keys[opposite] ? { action: 'move', direction: opposite } : { action: 'stop' });
+            }
+        },
+        
+        _showResults(results, winner, levelCompleted, hasNextLevel) {
+            ScreenManager.show('results');
+            
+            const me = results.find(r => r.num == this.player.num);
             const rank = me ? results.indexOf(me) + 1 : results.length;
             
             const medals = ['1ro', '2do', '3ro'];
             const colors = ['#EB8225', '#0595AE', '#AB3D8B'];
             
-            $('rankDisplay').textContent = medals[rank - 1] || `#${rank}`;
-            $('rankDisplay').style.color = colors[rank - 1] || '#73A03F';
+            DOM.elements.rankDisplay.textContent = medals[rank - 1] || `#${rank}`;
+            DOM.elements.rankDisplay.style.color = colors[rank - 1] || '#73A03F';
             
-            if (winner?.num == player.num) {
-                $('resultMsg').textContent = 'GANASTE!';
-                $('resultMsg').style.color = '#EB8225';
-                if (navigator.vibrate) navigator.vibrate([80, 40, 80, 40, 80]);
+            if (winner?.num == this.player.num) {
+                DOM.elements.resultMsg.textContent = 'GANASTE!';
+                DOM.elements.resultMsg.style.color = '#EB8225';
+                Vibration.trigger(CONFIG.VIBRATION.WIN);
             } else {
-                $('resultMsg').textContent = winner ? `Gano ${winner.name}` : 'Buen juego!';
-                $('resultMsg').style.color = '#0595AE';
+                DOM.elements.resultMsg.textContent = winner ? `Gano ${winner.name}` : 'Buen juego!';
+                DOM.elements.resultMsg.style.color = '#0595AE';
             }
             
-            $('resultScore').textContent = `${me?.score || 0} pts`;
+            DOM.elements.resultScore.textContent = `${me?.score || 0} pts`;
             
-            // Show appropriate buttons for admin
-            if (player.isAdmin) {
+            // Show/hide buttons based on admin status
+            if (this.player.isAdmin) {
                 const showNextLevel = levelCompleted && hasNextLevel;
-                $('nextLevelBtn').classList.toggle('hidden', !showNextLevel);
-                $('levelSelectBtn').classList.remove('hidden');
-                $('waitingResult').classList.add('hidden');
+                DOM.elements.nextLevelBtn.classList.toggle('hidden', !showNextLevel);
+                DOM.elements.levelSelectBtn.classList.remove('hidden');
+                DOM.elements.waitingResult.classList.add('hidden');
             } else {
-                $('nextLevelBtn').classList.add('hidden');
-                $('levelSelectBtn').classList.add('hidden');
-                $('waitingResult').classList.remove('hidden');
+                DOM.elements.nextLevelBtn.classList.add('hidden');
+                DOM.elements.levelSelectBtn.classList.add('hidden');
+                DOM.elements.waitingResult.classList.remove('hidden');
             }
-        }
-
-        function showScreen(name) {
-            ['join', 'select', 'game', 'results'].forEach(s => {
-                const el = $(s + 'Screen');
-                el.classList.toggle('hidden', s !== name);
-                el.classList.toggle('flex', s === name);
-            });
-            
-            if (name !== 'game') {
-                keys = { left: false, right: false, jump: false };
-            }
-        }
-
-        document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
-        document.addEventListener('gesturestart', e => e.preventDefault());
+        },
         
-        window.onload = init;
+        resetKeys() {
+            this.keys = { left: false, right: false, jump: false };
+        }
+    };
+
+    // ==========================================================================
+    // INITIALIZATION
+    // ==========================================================================
+    
+    window.onload = () => Controller.init();
     </script>
 </body>
 </html>
