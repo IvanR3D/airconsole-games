@@ -8,7 +8,7 @@
     <!-- External Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
-    <script type="text/javascript" src="https://www.airconsole.com/api/airconsole-1.8.0.js"></script>
+    <script type="text/javascript" src="https://www.airconsole.com/api/airconsole-1.9.0.js"></script>
     
     <!-- Tailwind Configuration -->
     <script>
@@ -1642,6 +1642,10 @@
             }
             
             switch (data.action) {
+                case 'requestJoin':
+                    this._handleRequestJoin(id);
+                    break;
+                    
                 case 'join':
                     this._handleJoinRequest(id, playerSlot);
                     break;
@@ -1680,7 +1684,7 @@
                 if (this.state.players[slot] && this.state.players[slot].deviceId === id) {
                     // Already joined - send joined message
                     const p = this.state.players[slot];
-                    this.safeMessage(id, {
+                    airconsole.message(id, {
                         action: 'joined',
                         playerNum: slot,
                         color: p.color,
@@ -1701,19 +1705,19 @@
             
             if (availableSlots === 0) {
                 // Game is full
-                this.safeMessage(id, { action: 'gameFull' });
+                airconsole.message(id, { action: 'gameFull' });
                 return;
             }
             
             // Send canJoin message
-            this.safeMessage(id, { action: 'canJoin' });
+            airconsole.message(id, { action: 'canJoin' });
         },
         
         _handleJoinRequest(id, playerSlot) {
             // If player is already assigned, just resend the joined message
             if (playerSlot && this.state.players[playerSlot]) {
                 const p = this.state.players[playerSlot];
-                this.safeMessage(id, {
+                airconsole.message(id, {
                     action: 'joined',
                     playerNum: playerSlot,
                     color: p.color,
@@ -1735,7 +1739,7 @@
             
             if (availableSlot === null) {
                 // Game is full
-                this.safeMessage(id, { action: 'gameFull' });
+                airconsole.message(id, { action: 'gameFull' });
                 return;
             }
             
@@ -1754,7 +1758,7 @@
             };
             
             // Send joined message to controller
-            this.safeMessage(id, {
+            airconsole.message(id, {
                 action: 'joined',
                 playerNum: availableSlot,
                 color: CONFIG.COLORS[playerIndex],
