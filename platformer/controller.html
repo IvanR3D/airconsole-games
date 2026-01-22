@@ -715,8 +715,8 @@
                 'reconnected': () => this._onJoined(data),
                 'gameFull': () => this._onGameFull(),
                 'colorUpdated': () => this._onColorUpdated(data),
-                'gameState': () => console.log('Game state updated:', data.players),
-                'levelChanged': () => console.log(`Level changed to ${data.level}: ${data.name}`),
+                'gameState': () => {},
+                'levelChanged': () => {},
                 'playerDisconnected': () => this._onPlayerDisconnected(data),
                 'gameStart': () => this._onGameStart(),
                 'gameRestart': () => this._onGameRestart(),
@@ -752,7 +752,6 @@
         
         _onPlayerDisconnected(data) {
             if (data.playerNum !== this.player.num) {
-                console.log(`Player ${data.playerName} disconnected`);
                 Vibration.trigger(CONFIG.VIBRATION.DISCONNECT);
             }
         },
@@ -941,26 +940,26 @@
     // INITIALIZATION
     // ==========================================================================
     
-    // Initialize AirConsole immediately (not on window.onload) to catch early events
-    const airconsole = new AirConsole();
-    
-    // DOM must wait for load, but AirConsole handlers are set immediately
-    airconsole.onReady = () => {
-        console.log('Controller ready');
-    };
-    
-    airconsole.onMessage = (from, data) => {
-        Controller._handleMessage(data);
-    };
-    
-    // Store reference in Controller
-    Controller.airconsole = airconsole;
-    
-    // Initialize DOM elements when page loads
-    window.onload = () => {
+    // Initialize everything immediately (script is at end of body, so DOM is ready)
+    (function init() {
+        // Initialize DOM cache
         DOM.init();
+        
+        // Initialize AirConsole
+        const airconsole = new AirConsole();
+        Controller.airconsole = airconsole;
+        
+        // Setup AirConsole handlers
+        airconsole.onReady = () => {
+        };
+        
+        airconsole.onMessage = (from, data) => {
+            Controller._handleMessage(data);
+        };
+        
+        // Setup UI event listeners
         Controller._setupEventListeners();
-    };
+    })();
     </script>
 </body>
 </html>
