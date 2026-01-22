@@ -393,7 +393,7 @@
         GRAVITY: 0.5,
         MAX_FALL_SPEED: 15,
         MOVE_SPEED: 7,
-        JUMP_POWER: -40,
+        JUMP_POWER: -70,
         AIR_ACCELERATION: 0.7,
         GROUND_ACCELERATION: 0.85,
         FRICTION: 0.7,
@@ -1013,7 +1013,14 @@
             // Level data (cloned from level manager)
             const levelData = LevelManager.getLevelData();
             this.floors = levelData.floorSegments.map(f => ({...f}));
-            this.platforms = levelData.platforms.map(p => ({...p, h: 16}));
+            this.platforms = levelData.platforms.map((p, i) => ({
+                ...p, 
+                h: 16,
+                startX: p.x,
+                dir: i % 2 === 0 ? 1 : -1,
+                speed: 1 + Math.random() * 0.5,
+                range: 60 + Math.random() * 40
+            }));
             this.coinList = levelData.coins.map(c => ({...c, got: false, bob: Math.random() * 6.28}));
             this.obstacles = levelData.obstacles.map(o => ({
                 ...o, 
@@ -1061,12 +1068,22 @@
             const p = this.player;
             const prevY = p.y;
             
+            this._updatePlatforms();
             this._updateMovement(p);
             this._updatePhysics(p, prevY);
             this._updateObstacles(p);
             this._updateCoins(p);
             this._updateParticles();
             this._checkFinish(p);
+        }
+        
+        _updatePlatforms() {
+            this.platforms.forEach(pl => {
+                pl.x += pl.dir * pl.speed;
+                if (Math.abs(pl.x - pl.startX) > pl.range) {
+                    pl.dir *= -1;
+                }
+            });
         }
 
         _updateMovement(p) {
@@ -1337,7 +1354,7 @@
                 
                 // Animación de mordedura
                 const biteAnim = (Math.sin(o.bitePhase) + 1) / 2;
-                const mouthAngle = 0.25 + biteAnim * 0.4; // Ángulo de apertura
+                const mouthAngle = 0.25 + biteAnim * 0.4;
                 
                 // Rebote
                 const bounceY = Math.abs(Math.sin(o.bitePhase * 0.6)) * 4;
@@ -1348,7 +1365,7 @@
                 // Voltear según dirección
                 if (o.dir < 0) ctx.scale(-1, 1);
                 
-                // === CUERPO NEGRO ===
+                // === CUERPO NEGRO (con boca estilo Pac-Man) ===
                 ctx.fillStyle = '#1a1a1a';
                 ctx.beginPath();
                 ctx.arc(0, 0, radius, mouthAngle, Math.PI * 2 - mouthAngle);
@@ -1362,68 +1379,10 @@
                 ctx.ellipse(-radius * 0.25, -radius * 0.35, radius * 0.4, radius * 0.2, -0.4, 0, Math.PI * 2);
                 ctx.fill();
                 
-                // === LABIOS ROJOS ===
-                ctx.fillStyle = '#CC0000';
-                ctx.lineWidth = 6;
-                ctx.strokeStyle = '#CC0000';
-                
-                // Labio superior
-                ctx.beginPath();
-                ctx.arc(0, 0, radius - 2, mouthAngle - 0.05, mouthAngle + 0.5);
-                ctx.stroke();
-                
-                // Labio inferior  
-                ctx.beginPath();
-                ctx.arc(0, 0, radius - 2, -mouthAngle - 0.5, -mouthAngle + 0.05);
-                ctx.stroke();
-                
-                // Interior boca oscuro
-                ctx.fillStyle = '#330000';
-                ctx.beginPath();
-                ctx.moveTo(radius * 0.3, 0);
-                ctx.arc(0, 0, radius * 0.5, mouthAngle * 0.5, -mouthAngle * 0.5, true);
-                ctx.closePath();
-                ctx.fill();
-                
-                // === DIENTES BLANCOS ===
-                ctx.fillStyle = '#FFFFFF';
-                
-                // Dientes superiores (3 grandes)
-                for (let i = 0; i < 3; i++) {
-                    const angle = mouthAngle - 0.1 + i * 0.18;
-                    const baseX = Math.cos(angle) * radius * 0.95;
-                    const baseY = Math.sin(angle) * radius * 0.95;
-                    const tipX = Math.cos(angle + 0.08) * radius * 0.5;
-                    const tipY = Math.sin(angle + 0.08) * radius * 0.5;
-                    
-                    ctx.beginPath();
-                    ctx.moveTo(baseX - 5, baseY - 2);
-                    ctx.lineTo(tipX, tipY + 4);
-                    ctx.lineTo(baseX + 5, baseY + 2);
-                    ctx.closePath();
-                    ctx.fill();
-                }
-                
-                // Dientes inferiores (3 grandes)
-                for (let i = 0; i < 3; i++) {
-                    const angle = -mouthAngle + 0.1 - i * 0.18;
-                    const baseX = Math.cos(angle) * radius * 0.95;
-                    const baseY = Math.sin(angle) * radius * 0.95;
-                    const tipX = Math.cos(angle - 0.08) * radius * 0.5;
-                    const tipY = Math.sin(angle - 0.08) * radius * 0.5;
-                    
-                    ctx.beginPath();
-                    ctx.moveTo(baseX - 5, baseY + 2);
-                    ctx.lineTo(tipX, tipY - 4);
-                    ctx.lineTo(baseX + 5, baseY - 2);
-                    ctx.closePath();
-                    ctx.fill();
-                }
-                
                 // === OJO ===
                 const eyeX = -radius * 0.3;
                 const eyeY = -radius * 0.25;
-                const eyeR = radius * 0.32;
+                const eyeR = radius * 0.35;
                 
                 // Ojo blanco
                 ctx.fillStyle = '#FFFFFF';
