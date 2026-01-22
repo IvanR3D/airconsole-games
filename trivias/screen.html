@@ -463,6 +463,10 @@
 
             airconsole.onReady = function() {
                 console.log('Screen ready');
+                // IMPORTANTE: Establecer el número máximo de jugadores activos
+                // Sin esto, convertDeviceIdToPlayerNumber() no funciona
+                airconsole.setActivePlayers(4);
+                console.log('Active players set to 4');
                 setupCategories();
             };
 
