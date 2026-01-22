@@ -393,7 +393,7 @@
         GRAVITY: 0.5,
         MAX_FALL_SPEED: 15,
         MOVE_SPEED: 7,
-        JUMP_POWER: -120,
+        JUMP_POWER: -22,
         AIR_ACCELERATION: 0.7,
         GROUND_ACCELERATION: 0.85,
         FRICTION: 0.7,
@@ -1126,13 +1126,8 @@
             if (this.keys.jump && this.grounded && !p.stunned) {
                 p.vy = PHYSICS.JUMP_POWER;
                 AudioManager.play('jump');
-                this.keys.jump = false;
+                this.grounded = false;
                 this._burst(p.x + p.w/2, p.y + p.h, '#8BC34A', 5);
-            }
-            
-            // Variable jump height
-            if (!this.keys.jump && p.vy < PHYSICS.JUMP_CUT_THRESHOLD) {
-                p.vy *= PHYSICS.JUMP_CUT_MULTIPLIER;
             }
             
             // Apply movement
