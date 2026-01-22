@@ -1,0 +1,20 @@
+---
+name: air-console-doc
+description: Always follow AirConsole quick-start documentation
+---
+
+# Overview
+
+Always follow the official AirConsole Quick Start documentation for initialization,
+connection flow, and messaging between `screen.html` and `controller.html`.
+
+# Rules
+
+- Mirror the patterns in the Quick Start guide for:
+  - Creating `new AirConsole()`
+  - Setting `onReady`, `onConnect`, `onDisconnect`, and `onMessage`
+  - Sending messages with `airconsole.message(...)` and `airconsole.broadcast(...)`
+- Avoid assuming or hardcoding device IDs.
+- Keep controller connection flow simple: connect, receive `joined`, then show UI.
+- When unsure, consult and align with the Quick Start documentation:
+  https://developers.airconsole.com/quick-start

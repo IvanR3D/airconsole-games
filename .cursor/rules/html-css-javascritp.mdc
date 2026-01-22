@@ -1,0 +1,17 @@
+---
+name: html-css-javascritp
+description: Follow SOLID and best practices for HTML/CSS/JS
+---
+
+# Overview
+
+Apply SOLID principles and best practices when editing HTML, CSS, and JavaScript.
+Prefer simple, maintainable solutions over clever or complex ones.
+
+# Rules
+
+- Favor clear, small functions with single responsibility.
+- Avoid over-engineering; pick the simplest solution that meets requirements.
+- Use best practices for readability: consistent naming, grouping, and structure.
+- Optimize for performance with minimal code and DOM operations.
+- Prefer composition and reuse instead of duplication.

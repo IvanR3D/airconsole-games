@@ -8,7 +8,7 @@
     <!-- External Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
-    <script type="text/javascript" src="https://www.airconsole.com/api/airconsole-1.8.0.js"></script>
+    <script type="text/javascript" src="https://www.airconsole.com/api/airconsole-1.9.0.js"></script>
     
     <!-- Tailwind Configuration -->
     <script>
@@ -300,10 +300,14 @@
             </h2>
         </div>
         <p class="text-sm text-gray-500">Fundacion STEAM RD</p>
-        <div class="bg-steam-verde/10 border-2 border-steam-verde rounded-2xl py-4 px-6 pulse flex items-center gap-2" id="connectingMsg">
+        <div class="bg-steam-verde/10 border-2 border-steam-verde rounded-2xl py-4 px-6 pulse flex items-center gap-2 hidden" id="connectingMsg">
             <iconify-icon icon="mdi:loading" class="text-steam-verde text-2xl animate-spin"></iconify-icon>
             <span class="text-steam-verde font-bold">Conectando...</span>
         </div>
+        <button class="btn btn-verde py-4 px-8 text-base flex items-center gap-2" id="joinBtn">
+            <iconify-icon icon="mdi:account-plus"></iconify-icon>
+            UNIRSE AL JUEGO
+        </button>
         <div class="bg-red-500/10 border-2 border-red-500 rounded-2xl py-4 px-6 hidden flex items-center gap-2" id="errorMsg">
             <iconify-icon icon="mdi:alert-circle" class="text-red-500 text-2xl"></iconify-icon>
             <div>
@@ -459,7 +463,8 @@
      * Message Protocol Documentation
      * 
      * CONTROLLER → SCREEN:
-     * - { action: 'join' } - Fallback join request
+     * - { action: 'requestJoin' } - Request to join (sent when controller is ready)
+     * - { action: 'join' } - User pressed join button
      * - { action: 'selectColor', color: string, colorName: string }
      * - { action: 'startGame' } - Admin only
      * - { action: 'playAgain' } - Admin only
@@ -470,6 +475,7 @@
      * - { action: 'jump', pressed: boolean }
      * 
      * SCREEN → CONTROLLER:
+     * - { action: 'canJoin' } - Screen is ready, player can join
      * - { action: 'joined', playerNum, color, colorName, isAdmin }
      * - { action: 'reconnected', playerNum, color, colorName, isAdmin }
      * - { action: 'gameFull' }
@@ -498,6 +504,7 @@
             
             // Join screen
             connectingMsg: null,
+            joinBtn: null,
             errorMsg: null,
             
             // Select screen
@@ -532,6 +539,7 @@
             this.elements.resultsScreen = this.get('resultsScreen');
             
             this.elements.connectingMsg = this.get('connectingMsg');
+            this.elements.joinBtn = this.get('joinBtn');
             this.elements.errorMsg = this.get('errorMsg');
             
             this.elements.adminBadge = this.get('adminBadge');
@@ -706,11 +714,14 @@
         controlsBound: false,
         
         send(msg) {
-            this.airconsole.message(AirConsole.SCREEN, msg);
+            if (this.airconsole && msg) {
+                this.airconsole.message(AirConsole.SCREEN, msg);
+            }
         },
         
         _handleMessage(data) {
             const handlers = {
+                'canJoin': () => this._onCanJoin(),
                 'joined': () => this._onJoined(data),
                 'reconnected': () => this._onJoined(data),
                 'gameFull': () => this._onGameFull(),
@@ -727,7 +738,19 @@
             if (handler) handler();
         },
         
+        _onCanJoin() {
+            // Screen confirmed we can join - ensure button is visible
+            DOM.elements.connectingMsg.classList.add('hidden');
+            DOM.elements.joinBtn.classList.remove('hidden');
+            DOM.elements.errorMsg.classList.add('hidden');
+        },
+        
         _onJoined(data) {
+            // Hide join button
+            DOM.elements.joinBtn.classList.add('hidden');
+            DOM.elements.connectingMsg.classList.add('hidden');
+            DOM.elements.errorMsg.classList.add('hidden');
+            
             this.player = {
                 num: data.playerNum,
                 color: data.color,
@@ -740,6 +763,7 @@
         
         _onGameFull() {
             DOM.elements.connectingMsg.classList.add('hidden');
+            DOM.elements.joinBtn.classList.add('hidden');
             DOM.elements.errorMsg.classList.remove('hidden');
             Vibration.trigger(CONFIG.VIBRATION.ERROR);
         },
@@ -764,9 +788,14 @@
         
         _onGameRestart() {
             OrientationManager.unlock();
-            ScreenManager.show('select');
-            DOM.elements.connectingMsg.classList.remove('hidden');
+            ScreenManager.show('join');
+            // Show join button immediately when restarting
+            DOM.elements.connectingMsg.classList.add('hidden');
+            DOM.elements.joinBtn.classList.remove('hidden');
             DOM.elements.errorMsg.classList.add('hidden');
+            this.player = { num: null, color: '#73A03F', name: 'Verde', isAdmin: false };
+            // Request to join again
+            this.send({ action: 'requestJoin' });
         },
         
         _onGameResults(data) {
@@ -775,6 +804,14 @@
         },
         
         _setupEventListeners() {
+            DOM.elements.joinBtn.onclick = () => {
+                // User pressed join - send join request
+                this.send({ action: 'join' });
+                // Show connecting state while waiting for response
+                DOM.elements.joinBtn.classList.add('hidden');
+                DOM.elements.connectingMsg.classList.remove('hidden');
+                DOM.elements.errorMsg.classList.add('hidden');
+            };
             DOM.elements.startBtn.onclick = () => this.send({ action: 'startGame' });
             DOM.elements.nextLevelBtn.onclick = () => this.send({ action: 'nextLevel' });
             DOM.elements.levelSelectBtn.onclick = () => this.send({ action: 'goToLevelSelect' });
@@ -937,29 +974,34 @@
     };
 
     // ==========================================================================
-    // INITIALIZATION
+    // INITIALIZATION (following AirConsole quick-start pattern)
     // ==========================================================================
     
-    // Initialize everything immediately (script is at end of body, so DOM is ready)
-    (function init() {
-        // Initialize DOM cache
-        DOM.init();
-        
-        // Initialize AirConsole
-        const airconsole = new AirConsole();
-        Controller.airconsole = airconsole;
-        
-        // Setup AirConsole handlers
-        airconsole.onReady = () => {
-        };
-        
-        airconsole.onMessage = (from, data) => {
+    // Initialize DOM
+    DOM.init();
+    
+    // Create AirConsole instance
+    var airconsole = new AirConsole();
+    Controller.airconsole = airconsole;
+    
+    // AirConsole ready handler
+    airconsole.onReady = function() {
+        // Controller is connected and ready
+        // Button is already visible from HTML, just ensure connecting is hidden
+        DOM.elements.connectingMsg.classList.add('hidden');
+        DOM.elements.joinBtn.classList.remove('hidden');
+        DOM.elements.errorMsg.classList.add('hidden');
+    };
+    
+    // Listen for messages from screen
+    airconsole.onMessage = function(from, data) {
+        if (data && data.action) {
             Controller._handleMessage(data);
-        };
-        
-        // Setup UI event listeners
-        Controller._setupEventListeners();
-    })();
+        }
+    };
+    
+    // Setup UI event listeners
+    Controller._setupEventListeners();
     </script>
 </body>
 </html>

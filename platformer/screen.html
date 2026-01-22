@@ -1560,93 +1560,86 @@
         },
         
         _handleConnect(id) {
+            // Ignore screen device (id = 0)
+            if (id === AirConsole.SCREEN || id === 0) return;
+            
             // If not ready yet, queue the connection for later
             if (!this.isReady) {
                 this.pendingConnections.push(id);
                 return;
             }
             
-            const playerNumber = this.airconsole.convertDeviceIdToPlayerNumber(id);
-            
-            const connectedCount = Object.keys(this.state.players).filter(
-                slot => !this.state.players[slot].disconnected
-            ).length;
-            
-            if (playerNumber !== undefined && playerNumber >= 0 && playerNumber < CONFIG.MAX_PLAYERS) {
-                const playerSlot = playerNumber + 1;
-                
-                if (this.state.players[playerSlot]) {
-                    const existing = this.state.players[playerSlot];
-                    
-                    if (existing.disconnected) {
-                        // Reconnection
-                        existing.disconnected = false;
-                        existing.deviceId = id;
+            // Check if this device is already connected (reconnection)
+            for (let slot = 1; slot <= CONFIG.MAX_PLAYERS; slot++) {
+                if (this.state.players[slot] && this.state.players[slot].deviceId === id) {
+                    // Device reconnecting to same slot
+                    if (this.state.players[slot].disconnected) {
+                        this.state.players[slot].disconnected = false;
                         
-                        this.airconsole.message(id, {
+                        // Send reconnect message immediately
+                        airconsole.message(id, {
                             action: 'reconnected',
-                            playerNum: playerSlot,
-                            color: existing.color,
-                            colorName: existing.name,
-                            isAdmin: existing.isAdmin
+                            playerNum: slot,
+                            color: this.state.players[slot].color,
+                            colorName: this.state.players[slot].name,
+                            isAdmin: this.state.players[slot].isAdmin
                         });
                         
                         UIManager.updatePlayerSlots(this.state.players, this.state.admin);
-                        this.airconsole.broadcast({ action: 'gameState', players: this.state.players });
+                        
+                        // Delay broadcast to ensure device is fully registered
+                        setTimeout(function() {
+                            airconsole.broadcast({ action: 'gameState', players: GameManager.state.players });
+                        }, 100);
                     }
-                } else if (connectedCount < CONFIG.MAX_PLAYERS) {
-                    // New player
-                    const isAdmin = !this.state.admin;
-                    if (isAdmin) this.state.admin = playerSlot;
-                    
-                    this.state.players[playerSlot] = {
-                        deviceId: id,
-                        playerNumber: playerNumber,
-                        name: CONFIG.NAMES[playerNumber],
-                        color: CONFIG.COLORS[playerNumber],
-                        isAdmin,
-                        disconnected: false
-                    };
-                    
-                    this.airconsole.message(id, {
-                        action: 'joined',
-                        playerNum: playerSlot,
-                        color: CONFIG.COLORS[playerNumber],
-                        colorName: CONFIG.NAMES[playerNumber],
-                        isAdmin
-                    });
-                    
-                    UIManager.updatePlayerSlots(this.state.players, this.state.admin);
-                    this.airconsole.broadcast({ action: 'gameState', players: this.state.players });
-                } else {
-                    this.airconsole.message(id, { action: 'gameFull' });
+                    return;
                 }
             }
+            
+            // Check if game is full before allowing join
+            let availableSlots = 0;
+            for (let slot = 1; slot <= CONFIG.MAX_PLAYERS; slot++) {
+                if (!this.state.players[slot]) {
+                    availableSlots++;
+                }
+            }
+            
+            if (availableSlots === 0) {
+                // Game is full
+                airconsole.message(id, { action: 'gameFull' });
+                return;
+            }
+            
+            // Send message to controller that they can join (but don't assign yet)
+            airconsole.message(id, { action: 'canJoin' });
         },
         
         _handleDisconnect(id) {
-            
-            const playerNumber = this.airconsole.convertDeviceIdToPlayerNumber(id);
-            
-            if (playerNumber !== undefined && playerNumber >= 0 && playerNumber < CONFIG.MAX_PLAYERS) {
-                const playerSlot = playerNumber + 1;
-                
-                if (this.state.players[playerSlot]) {
-                    this.state.players[playerSlot].disconnected = true;
+            // Find player by device ID
+            for (let slot = 1; slot <= CONFIG.MAX_PLAYERS; slot++) {
+                if (this.state.players[slot] && this.state.players[slot].deviceId === id) {
+                    this.state.players[slot].disconnected = true;
                     UIManager.updatePlayerSlots(this.state.players, this.state.admin);
                     
-                    this.airconsole.broadcast({ 
+                    GameManager.airconsole.broadcast({ 
                         action: 'playerDisconnected', 
-                        playerNum: playerSlot,
-                        playerName: this.state.players[playerSlot].name
+                        playerNum: slot,
+                        playerName: this.state.players[slot].name
                     });
+                    return;
                 }
             }
         },
         
         _handleMessage(id, data) {
-            const playerNumber = this.airconsole.convertDeviceIdToPlayerNumber(id);
-            const playerSlot = playerNumber !== undefined ? playerNumber + 1 : null;
+            // Find player slot by device ID
+            let playerSlot = null;
+            for (let slot = 1; slot <= CONFIG.MAX_PLAYERS; slot++) {
+                if (this.state.players[slot] && this.state.players[slot].deviceId === id) {
+                    playerSlot = slot;
+                    break;
+                }
+            }
             
             switch (data.action) {
                 case 'join':
@@ -1681,17 +1674,100 @@
             }
         },
         
+        _handleRequestJoin(id) {
+            // Check if this device is already assigned
+            for (let slot = 1; slot <= CONFIG.MAX_PLAYERS; slot++) {
+                if (this.state.players[slot] && this.state.players[slot].deviceId === id) {
+                    // Already joined - send joined message
+                    const p = this.state.players[slot];
+                    this.safeMessage(id, {
+                        action: 'joined',
+                        playerNum: slot,
+                        color: p.color,
+                        colorName: p.name,
+                        isAdmin: p.isAdmin
+                    });
+                    return;
+                }
+            }
+            
+            // Check if game is full
+            let availableSlots = 0;
+            for (let slot = 1; slot <= CONFIG.MAX_PLAYERS; slot++) {
+                if (!this.state.players[slot]) {
+                    availableSlots++;
+                }
+            }
+            
+            if (availableSlots === 0) {
+                // Game is full
+                this.safeMessage(id, { action: 'gameFull' });
+                return;
+            }
+            
+            // Send canJoin message
+            this.safeMessage(id, { action: 'canJoin' });
+        },
+        
         _handleJoinRequest(id, playerSlot) {
+            // If player is already assigned, just resend the joined message
             if (playerSlot && this.state.players[playerSlot]) {
                 const p = this.state.players[playerSlot];
-                this.airconsole.message(id, {
+                this.safeMessage(id, {
                     action: 'joined',
                     playerNum: playerSlot,
                     color: p.color,
                     colorName: p.name,
                     isAdmin: p.isAdmin
                 });
+                return;
             }
+            
+            // New player wants to join - assign them a slot
+            // Check if game is full
+            let availableSlot = null;
+            for (let slot = 1; slot <= CONFIG.MAX_PLAYERS; slot++) {
+                if (!this.state.players[slot]) {
+                    availableSlot = slot;
+                    break;
+                }
+            }
+            
+            if (availableSlot === null) {
+                // Game is full
+                this.safeMessage(id, { action: 'gameFull' });
+                return;
+            }
+            
+            // Assign player to slot
+            const playerIndex = availableSlot - 1;
+            const isAdmin = !this.state.admin;
+            if (isAdmin) this.state.admin = availableSlot;
+            
+            this.state.players[availableSlot] = {
+                deviceId: id,
+                playerNumber: playerIndex,
+                name: CONFIG.NAMES[playerIndex],
+                color: CONFIG.COLORS[playerIndex],
+                isAdmin: isAdmin,
+                disconnected: false
+            };
+            
+            // Send joined message to controller
+            this.safeMessage(id, {
+                action: 'joined',
+                playerNum: availableSlot,
+                color: CONFIG.COLORS[playerIndex],
+                colorName: CONFIG.NAMES[playerIndex],
+                isAdmin: isAdmin
+            });
+            
+            UIManager.updatePlayerSlots(this.state.players, this.state.admin);
+            
+            // Delay broadcast to ensure device is fully registered
+            setTimeout(function() {
+                airconsole.broadcast({ action: 'gameState', players: GameManager.state.players });
+            }, 100);
         },
         
         _handleColorSelect(id, data) {
@@ -1700,7 +1776,7 @@
                     this.state.players[n].color = data.color;
                     this.state.players[n].name = data.colorName;
                     UIManager.updatePlayerSlots(this.state.players, this.state.admin);
-                    this.airconsole.message(id, { action: 'colorUpdated', color: data.color, colorName: data.colorName });
+                    GameManager.airconsole.message(id, { action: 'colorUpdated', color: data.color, colorName: data.colorName });
                     break;
                 }
             }
@@ -1743,7 +1819,7 @@
             this.state.started = true;
             this.state.starting = false;
             this.state.startTime = Date.now();
-            this.airconsole.broadcast({ action: 'gameStart' });
+            GameManager.airconsole.broadcast({ action: 'gameStart' });
         },
         
         _setupScreens(count) {
@@ -1834,7 +1910,7 @@
             
             UIManager.showResults(results, levelCompleted, LevelManager.hasNextLevel());
             
-            this.airconsole.broadcast({ 
+            GameManager.airconsole.broadcast({ 
                 action: 'gameResults', 
                 results, 
                 winner: results[0], 
@@ -1871,7 +1947,7 @@
             
             UIManager.updatePlayerSlots(this.state.players, this.state.admin);
             LevelManager.updateButtons();
-            this.airconsole.broadcast({ action: 'gameRestart' });
+            GameManager.airconsole.broadcast({ action: 'gameRestart' });
         },
         
         goToNextLevel() {
@@ -1886,38 +1962,47 @@
     };
 
     // ==========================================================================
-    // INITIALIZATION
+    // INITIALIZATION (following AirConsole quick-start pattern)
     // ==========================================================================
     
-    // Initialize everything immediately (script is at end of body, so DOM is ready)
-    (function init() {
-        // Initialize DOM cache
-        DOM.init();
+    // Initialize DOM
+    DOM.init();
+    
+    // Create AirConsole instance
+    var airconsole = new AirConsole();
+    GameManager.airconsole = airconsole;
+    
+    // AirConsole ready handler
+    airconsole.onReady = function() {
+        GameManager.isReady = true;
         
-        // Initialize AirConsole
-        const airconsole = new AirConsole();
-        GameManager.airconsole = airconsole;
-        
-        // Setup AirConsole handlers
-        airconsole.onReady = () => {
-            airconsole.setActivePlayers(CONFIG.MAX_PLAYERS);
-            
-            // Mark as ready and process any pending connections
-            GameManager.isReady = true;
-            GameManager.pendingConnections.forEach(id => {
-                GameManager._handleConnect(id);
-            });
-            GameManager.pendingConnections = [];
-        };
-        
-        airconsole.onConnect = (id) => GameManager._handleConnect(id);
-        airconsole.onDisconnect = (id) => GameManager._handleDisconnect(id);
-        airconsole.onMessage = (id, data) => GameManager._handleMessage(id, data);
-        
-        // Setup UI and level selector
-        GameManager._setupEventListeners();
-        LevelManager.init();
-    })();
+        // Process any connections that arrived before ready
+        GameManager.pendingConnections.forEach(function(id) {
+            GameManager._handleConnect(id);
+        });
+        GameManager.pendingConnections = [];
+    };
+    
+    // Handle new device connections
+    airconsole.onConnect = function(device_id) {
+        GameManager._handleConnect(device_id);
+    };
+    
+    // Handle device disconnections
+    airconsole.onDisconnect = function(device_id) {
+        GameManager._handleDisconnect(device_id);
+    };
+    
+    // Listen for messages from controllers
+    airconsole.onMessage = function(from, data) {
+        if (data && data.action) {
+            GameManager._handleMessage(from, data);
+        }
+    };
+    
+    // Setup UI and level selector
+    GameManager._setupEventListeners();
+    LevelManager.init();
     </script>
 </body>
 </html>
