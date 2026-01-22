@@ -783,11 +783,9 @@
         _onGameStart() {
             ScreenManager.show('game');
             this._setupControls();
-            OrientationManager.lock();
         },
         
         _onGameRestart() {
-            OrientationManager.unlock();
             ScreenManager.show('join');
             // Show join button immediately when restarting
             DOM.elements.connectingMsg.classList.add('hidden');
@@ -799,7 +797,6 @@
         },
         
         _onGameResults(data) {
-            OrientationManager.unlock();
             this._showResults(data.results, data.winner, data.levelCompleted, data.hasNextLevel);
         },
         
