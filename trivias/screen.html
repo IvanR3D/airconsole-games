@@ -199,44 +199,192 @@
 
         /* Intro logo animation */
         @keyframes logoScale {
-            0% { transform: scale(0.5); opacity: 0; }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); opacity: 1; }
+            0% { transform: scale(0.5) rotate(-5deg); opacity: 0; }
+            60% { transform: scale(1.05) rotate(2deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
         }
 
         .logo-intro {
-            animation: logoScale 1s ease-out forwards;
+            animation: logoScale 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes slideInFromBottom {
+            0% { transform: translateY(50px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        .slide-in-bottom {
+            animation: slideInFromBottom 0.8s ease-out forwards;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+
+        .shimmer-text {
+            background: linear-gradient(90deg, 
+                rgba(255,255,255,0.8) 0%, 
+                rgba(255,255,255,1) 50%, 
+                rgba(255,255,255,0.8) 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 3s linear infinite;
+        }
+
+        .intro-gradient-bg {
+            background: linear-gradient(135deg, 
+                #0595AE 0%, 
+                #1a7a8e 25%, 
+                #AB3D8B 50%, 
+                #8a3070 75%, 
+                #73A03F 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .steam-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: clamp(8px, 2vw, 12px);
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: clamp(12px, 3vw, 20px);
+            padding: clamp(8px, 2vw, 16px) clamp(16px, 4vw, 32px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .steam-letter {
+            font-weight: 900;
+            font-size: clamp(1.2rem, 3vw, 2rem);
+            line-height: 1;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .letter-s { color: #0595AE; }
+        .letter-t { color: #EB8225; }
+        .letter-e { color: #73A03F; }
+        .letter-a { color: #AB3D8B; }
+        .letter-m { color: #0595AE; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .float-icon {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .intro-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: clamp(16px, 4vw, 32px);
+            padding: clamp(20px, 5vw, 40px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 3px solid rgba(255, 255, 255, 0.5);
         }
     </style>
 </head>
 <body class="cat-default font-sans text-steam-negro overflow-hidden">
     <div class="w-screen h-screen flex flex-col relative">
         <!-- INTRO SCREEN -->
-        <div class="screen intro-screen active flex-col items-center justify-center p-4 sm:p-6 lg:p-10 bg-gradient-to-br from-steam-turquesa via-steam-morado to-steam-verde" id="introScreen">
-            <div class="logo-intro text-center">
-                <div class="mb-6 sm:mb-10">
-                    <div class="text-6xl sm:text-8xl lg:text-9xl mb-4 sm:mb-6">🎓</div>
-                    <h1 class="text-4xl sm:text-6xl lg:text-8xl font-black text-white drop-shadow-2xl mb-2 sm:mb-4">STEAM RD</h1>
-                    <p class="text-lg sm:text-2xl lg:text-3xl text-white/90 font-bold">Fundacion STEAM</p>
+        <div class="screen intro-screen active flex-col items-center justify-center p-4 sm:p-6 lg:p-10 intro-gradient-bg" id="introScreen">
+            <div class="logo-intro text-center max-w-4xl w-full">
+                <!-- Logo Icon -->
+                <div class="mb-6 sm:mb-8 lg:mb-10 float-icon">
+                    <div class="text-6xl sm:text-7xl lg:text-9xl mb-4 sm:mb-6">🎓</div>
                 </div>
-                <div class="float-up" style="animation-delay: 0.3s;">
-                    <h2 class="text-2xl sm:text-4xl lg:text-5xl font-black text-white mb-2 sm:mb-4 logo-gradient" style="-webkit-text-fill-color: white;">TRIVIA</h2>
-                    <p class="text-sm sm:text-lg lg:text-xl text-white/80">Demuestra tus conocimientos</p>
+                
+                <!-- STEAM Badge -->
+                <div class="flex justify-center mb-4 sm:mb-6 lg:mb-8">
+                    <div class="steam-badge">
+                        <span class="steam-letter letter-s">S</span>
+                        <span class="steam-letter letter-t">T</span>
+                        <span class="steam-letter letter-e">E</span>
+                        <span class="steam-letter letter-a">A</span>
+                        <span class="steam-letter letter-m">M</span>
+                    </div>
+                </div>
+                
+                <!-- Main Title -->
+                <h1 class="text-3xl sm:text-5xl lg:text-7xl font-black text-white drop-shadow-2xl mb-2 sm:mb-3 lg:mb-4 shimmer-text">
+                    FUNDACIÓN STEAM RD
+                </h1>
+                
+                <!-- Subtitle Card -->
+                <div class="slide-in-bottom inline-block" style="animation-delay: 0.3s;">
+                    <div class="intro-card">
+                        <h2 class="text-2xl sm:text-3xl lg:text-5xl font-black mb-2 sm:mb-3 logo-gradient">TRIVIA</h2>
+                        <p class="text-sm sm:text-base lg:text-xl text-steam-turquesa font-bold">Demuestra tus conocimientos</p>
+                        <div class="flex justify-center gap-2 sm:gap-3 mt-3 sm:mt-4">
+                            <span class="text-xl sm:text-2xl lg:text-3xl">🧪</span>
+                            <span class="text-xl sm:text-2xl lg:text-3xl">🔬</span>
+                            <span class="text-xl sm:text-2xl lg:text-3xl">🤖</span>
+                            <span class="text-xl sm:text-2xl lg:text-3xl">💻</span>
+                            <span class="text-xl sm:text-2xl lg:text-3xl">📐</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- WAITING SCREEN -->
         <div class="screen waiting-screen flex-col items-center justify-center p-4 sm:p-6 lg:p-10" id="waitingScreen">
-            <div class="mb-4 sm:mb-8 float-up">
-                <h1 class="responsive-title font-black logo-gradient drop-shadow">STEAM TRIVIA</h1>
+            <!-- Header -->
+            <div class="mb-6 sm:mb-8 lg:mb-10 text-center float-up">
+                <div class="flex justify-center mb-3 sm:mb-4">
+                    <div class="steam-badge bg-white/90">
+                        <span class="steam-letter letter-s">S</span>
+                        <span class="steam-letter letter-t">T</span>
+                        <span class="steam-letter letter-e">E</span>
+                        <span class="steam-letter letter-a">A</span>
+                        <span class="steam-letter letter-m">M</span>
+                    </div>
+                </div>
+                <h1 class="text-3xl sm:text-4xl lg:text-6xl font-black logo-gradient drop-shadow mb-2">TRIVIA</h1>
+                <p class="text-xs sm:text-sm lg:text-base text-gray-500">Fundación STEAM RD</p>
             </div>
-            <h2 class="text-lg sm:text-xl lg:text-2xl mb-2 sm:mb-4 text-steam-turquesa font-bold float-up" style="animation-delay: 0.2s;">Esperando Jugadores!</h2>
-            <p class="text-sm sm:text-base lg:text-lg text-steam-negro/70 mb-4 sm:mb-8 float-up" style="animation-delay: 0.3s;">Escanea el codigo QR con tu telefono para unirte</p>
-            <div class="flex flex-wrap gap-2 sm:gap-4 lg:gap-5 justify-center mb-4 sm:mb-8 max-w-xs sm:max-w-2xl lg:max-w-3xl float-up" style="animation-delay: 0.4s;" id="playersGrid"></div>
-            <div class="bg-orange-50 border-2 border-steam-naranja rounded-xl sm:rounded-2xl py-2 sm:py-4 px-4 sm:px-6 mt-2 sm:mt-5 text-center hidden float-up" style="animation-delay: 0.5s;" id="adminHint">
-                <p class="text-steam-naranja font-bold text-xs sm:text-sm lg:text-base">El Jugador 1 controla el juego desde su telefono</p>
+            
+            <!-- Status Message -->
+            <div class="mb-4 sm:mb-6 lg:mb-8 text-center float-up" style="animation-delay: 0.2s;">
+                <div class="inline-flex items-center gap-2 sm:gap-3 bg-steam-turquesa/10 border-2 border-steam-turquesa rounded-full py-2 sm:py-3 px-4 sm:px-6 lg:px-8">
+                    <div class="w-2 h-2 sm:w-3 sm:h-3 bg-steam-turquesa rounded-full pulse-anim"></div>
+                    <h2 class="text-base sm:text-lg lg:text-xl text-steam-turquesa font-bold">Esperando Jugadores</h2>
+                </div>
             </div>
+            
+            <!-- Instructions -->
+            <p class="text-xs sm:text-sm lg:text-base text-steam-negro/70 mb-6 sm:mb-8 lg:mb-10 text-center float-up max-w-md" style="animation-delay: 0.3s;">
+                📱 Escanea el código QR con tu teléfono para unirte
+            </p>
+            
+            <!-- Players Grid -->
+            <div class="flex flex-wrap gap-3 sm:gap-4 lg:gap-6 justify-center mb-6 sm:mb-8 max-w-xs sm:max-w-2xl lg:max-w-4xl float-up" style="animation-delay: 0.4s;" id="playersGrid">
+                <!-- Players will be added here dynamically -->
+            </div>
+            
+            <!-- Admin Hint -->
+            <div class="bg-orange-50 border-2 border-steam-naranja rounded-xl sm:rounded-2xl py-3 sm:py-4 px-4 sm:px-6 lg:px-8 text-center hidden float-up max-w-md" style="animation-delay: 0.5s;" id="adminHint">
+                <div class="flex items-center justify-center gap-2 sm:gap-3">
+                    <span class="text-xl sm:text-2xl">👑</span>
+                    <p class="text-steam-naranja font-bold text-xs sm:text-sm lg:text-base">El Jugador 1 controla el juego</p>
+                </div>
+            </div>
+            
+            <!-- Decorative Icons -->
+            <div class="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 text-2xl sm:text-3xl lg:text-4xl opacity-20 float-icon">🧪</div>
+            <div class="absolute bottom-4 sm:bottom-6 right-4 sm:right-6 text-2xl sm:text-3xl lg:text-4xl opacity-20 float-icon" style="animation-delay: 0.5s;">🔬</div>
+            <div class="absolute top-4 sm:top-6 left-4 sm:left-6 text-2xl sm:text-3xl lg:text-4xl opacity-20 float-icon" style="animation-delay: 1s;">🤖</div>
+            <div class="absolute top-4 sm:top-6 right-4 sm:right-6 text-2xl sm:text-3xl lg:text-4xl opacity-20 float-icon" style="animation-delay: 1.5s;">💻</div>
         </div>
 
         <!-- CATEGORY SCREEN -->
@@ -502,8 +650,6 @@
 
             airconsole.onReady = function() {
                 console.log('Screen ready');
-                airconsole.setActivePlayers(4);
-                console.log('Active players set to 4');
                 setupCategories();
                 
                 // Show intro for 3 seconds then transition to waiting screen
@@ -543,93 +689,86 @@
                 console.log("Received:", data.action, "from", deviceId);
                 
                 if (data.action === 'join') {
-                    const playerNumber = airconsole.convertDeviceIdToPlayerNumber(deviceId);
-                    
-                    if (playerNumber !== undefined && playerNumber >= 0) {
-                        // Check if player already exists
-                        if (players[deviceId]) {
-                            if (players[deviceId].disconnected) {
-                                // Reconnecting player
-                                const existingPlayer = players[deviceId];
-                                existingPlayer.disconnected = false;
-                                
-                                airconsole.message(deviceId, {
-                                    action: 'reconnected',
-                                    color: existingPlayer.color,
-                                    isAdmin: existingPlayer.isAdmin,
-                                    gameState: gameState,
-                                    selectedCategory: selectedCategory,
-                                    score: existingPlayer.score
-                                });
-                                
-                                console.log(`✨ Player ${existingPlayer.name} reconnected`);
-                                updatePlayersDisplay();
-                                broadcastGameState();
-                            } else {
-                                // Already joined, just confirm
-                                const p = players[deviceId];
-                                airconsole.message(deviceId, {
-                                    action: 'joined',
-                                    color: p.color,
-                                    isAdmin: p.isAdmin,
-                                    gameState: gameState,
-                                    selectedCategory: selectedCategory
-                                });
-                            }
-                        } else {
-                            // New player joining
-                            const connectedPlayersCount = Object.keys(players).filter(
-                                id => !players[id].disconnected
-                            ).length;
+                    // Check if player already exists
+                    if (players[deviceId]) {
+                        if (players[deviceId].disconnected) {
+                            // Reconnecting player
+                            const existingPlayer = players[deviceId];
+                            existingPlayer.disconnected = false;
                             
-                            if (connectedPlayersCount < 4) {
-                                const isAdmin = adminDeviceId === null;
-                                if (isAdmin) {
-                                    adminDeviceId = deviceId;
-                                    console.log(`👑 Device ${deviceId} assigned as admin`);
-                                }
-                                
-                                const playerColor = playerColors[Object.keys(players).length % playerColors.length];
-                                const playerName = airconsole.getNickname(deviceId) || `Jugador ${Object.keys(players).length + 1}`;
-                                
-                                players[deviceId] = {
-                                    id: deviceId,
-                                    playerNumber: playerNumber,
-                                    name: playerName,
-                                    score: 0,
-                                    color: playerColor,
-                                    isAdmin: isAdmin,
-                                    disconnected: false
-                                };
-                                
-                                playSound('join');
-                                
-                                airconsole.message(deviceId, {
-                                    action: 'joined',
-                                    color: playerColor,
-                                    isAdmin: isAdmin,
-                                    gameState: gameState,
-                                    selectedCategory: selectedCategory
-                                });
-                                
-                                console.log(`✅ Player ${playerName} joined successfully!`);
-                                updatePlayersDisplay();
-                                
-                                if (isAdmin && gameState === 'waiting') {
-                                    showScreen('category');
-                                    gameState = 'categorySelect';
-                                }
-                                
-                                broadcastGameState();
-                            } else {
-                                console.log(`⚠️ Cannot join: Game is full (4/4 players)`);
-                                airconsole.message(deviceId, {
-                                    action: 'gameFull'
-                                });
-                            }
+                            airconsole.message(deviceId, {
+                                action: 'reconnected',
+                                color: existingPlayer.color,
+                                isAdmin: existingPlayer.isAdmin,
+                                gameState: gameState,
+                                selectedCategory: selectedCategory,
+                                score: existingPlayer.score
+                            });
+                            
+                            console.log(`✨ Player ${existingPlayer.name} reconnected`);
+                            updatePlayersDisplay();
+                            broadcastGameState();
+                        } else {
+                            // Already joined, just confirm
+                            const p = players[deviceId];
+                            airconsole.message(deviceId, {
+                                action: 'joined',
+                                color: p.color,
+                                isAdmin: p.isAdmin,
+                                gameState: gameState,
+                                selectedCategory: selectedCategory
+                            });
                         }
                     } else {
-                        console.log(`⚠️ Device ${deviceId} is not an active player`);
+                        // New player joining
+                        const connectedPlayersCount = Object.keys(players).filter(
+                            id => !players[id].disconnected
+                        ).length;
+                        
+                        if (connectedPlayersCount < 4) {
+                            const isAdmin = adminDeviceId === null;
+                            if (isAdmin) {
+                                adminDeviceId = deviceId;
+                                console.log(`👑 Device ${deviceId} assigned as admin`);
+                            }
+                            
+                            const playerColor = playerColors[Object.keys(players).length % playerColors.length];
+                            const playerName = airconsole.getNickname(deviceId) || `Jugador ${Object.keys(players).length + 1}`;
+                            
+                            players[deviceId] = {
+                                id: deviceId,
+                                name: playerName,
+                                score: 0,
+                                color: playerColor,
+                                isAdmin: isAdmin,
+                                disconnected: false
+                            };
+                            
+                            playSound('join');
+                            
+                            airconsole.message(deviceId, {
+                                action: 'joined',
+                                color: playerColor,
+                                isAdmin: isAdmin,
+                                gameState: gameState,
+                                selectedCategory: selectedCategory
+                            });
+                            
+                            console.log(`✅ Player ${playerName} joined successfully!`);
+                            updatePlayersDisplay();
+                            
+                            if (isAdmin && gameState === 'waiting') {
+                                showScreen('category');
+                                gameState = 'categorySelect';
+                            }
+                            
+                            broadcastGameState();
+                        } else {
+                            console.log(`⚠️ Cannot join: Game is full (4/4 players)`);
+                            airconsole.message(deviceId, {
+                                action: 'gameFull'
+                            });
+                        }
                     }
                     
                 } else if (data.action === 'selectCategory' && deviceId === adminDeviceId) {
