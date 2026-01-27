@@ -6,6 +6,13 @@
     <title>STEAM Trivia - Control</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.airconsole.com/api/airconsole-1.8.0.js"></script>
+    <script type="module">
+        // Import Anime.js v4 from esm.sh
+        import { animate, stagger } from 'https://esm.sh/animejs';
+        window.anime = { animate, stagger };
+        console.log('Anime.js v4 loaded from esm.sh');
+    </script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -36,10 +43,12 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
+            background: white;
         }
 
         body {
             touch-action: manipulation;
+            background: white;
         }
 
         .screen {
@@ -149,14 +158,20 @@
             50% { transform: translateY(-10px); }
         }
 
-        .bounce-anim { animation: bounce 1s ease infinite; }
+        .bounce-anim { 
+            animation: bounce 1s ease infinite;
+            display: inline-block;
+        }
 
         @keyframes popIn {
             from { transform: scale(0.5); opacity: 0; }
             to { transform: scale(1); opacity: 1; }
         }
 
-        .pop-in { animation: popIn 0.25s ease; }
+        .pop-in { 
+            animation: popIn 0.25s ease forwards;
+            display: block;
+        }
 
         /* Answer grid responsive */
         .answer-grid {
@@ -173,95 +188,178 @@
 
         /* Pulse animation */
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.02); }
         }
 
         .pulse {
             animation: pulse 2s ease infinite;
+            display: inline-flex;
+        }
+
+        /* Animated background particles */
+        .bg-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.4;
+            animation: floatParticle 15s infinite ease-in-out;
+            will-change: transform;
+        }
+
+        @keyframes floatParticle {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 0.4; }
+            25% { transform: translate(30px, -30px) rotate(90deg); opacity: 0.6; }
+            50% { transform: translate(0, -60px) rotate(180deg); opacity: 0.4; }
+            75% { transform: translate(-30px, -30px) rotate(270deg); opacity: 0.6; }
+        }
+
+        .category-icon {
+            font-size: clamp(2rem, 8vw, 3rem);
+            display: inline-block;
         }
     </style>
 </head>
 <body class="w-screen h-screen overflow-hidden font-sans bg-white text-steam-negro">
     <div class="w-full h-full flex flex-col">
         <!-- JOIN SCREEN -->
-        <div class="screen active flex-col items-center justify-center p-4 sm:p-8 text-center gap-4 sm:gap-6 bg-white" id="joinScreen">
-            <!-- Logo Section -->
-            <div class="mb-4">
-                <div class="text-5xl sm:text-6xl mb-3 bounce-anim">🎓</div>
-                <div class="flex justify-center mb-3">
-                    <div class="inline-flex items-center gap-1 sm:gap-2 bg-white border-3 border-purple-300 rounded-full py-2 px-4 shadow-lg">
-                        <span class="font-black text-lg sm:text-xl" style="color: #0595AE;">S</span>
-                        <span class="font-black text-lg sm:text-xl" style="color: #EB8225;">T</span>
-                        <span class="font-black text-lg sm:text-xl" style="color: #73A03F;">E</span>
-                        <span class="font-black text-lg sm:text-xl" style="color: #AB3D8B;">A</span>
-                        <span class="font-black text-lg sm:text-xl" style="color: #0595AE;">M</span>
+        <div class="screen active flex-col items-center justify-center p-4 sm:p-8 text-center gap-4 sm:gap-6 relative overflow-hidden bg-white" id="joinScreen">
+            <!-- Animated background removed -->
+            
+            <!-- Content -->
+            <div class="relative z-10 w-full max-w-md">
+                <!-- Logo Section -->
+                <div class="mb-6">
+                    <img src="../LogoSteamRD-Color.webp" alt="STEAM RD Logo" class="w-32 h-32 mx-auto mb-4" style="filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1));">
+                </div>
+                
+                <h1 class="text-4xl sm:text-5xl font-black mb-8 text-steam-turquesa">TRIVIA</h1>
+                
+                <!-- Info Cards -->
+                <div class="space-y-3 mb-8">
+                    <div class="bg-white border-2 border-gray-200 rounded-xl p-4 shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div class="text-2xl">🎯</div>
+                            <div>
+                                <h3 class="font-bold text-sm text-gray-800">Pon a prueba tus conocimientos</h3>
+                                <p class="text-xs text-gray-600">Responde preguntas de diferentes categorías</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white border-2 border-gray-200 rounded-xl p-4 shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div class="text-2xl">👥</div>
+                            <div>
+                                <h3 class="font-bold text-sm text-gray-800">Juega con amigos</h3>
+                                <p class="text-xs text-gray-600">Hasta 4 jugadores pueden competir</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white border-2 border-gray-200 rounded-xl p-4 shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div class="text-2xl">⚡</div>
+                            <div>
+                                <h3 class="font-bold text-sm text-gray-800">Responde rápido</h3>
+                                <p class="text-xs text-gray-600">Gana más puntos por velocidad</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <h1 class="text-2xl sm:text-3xl font-black mb-1" style="color: #AB3D8B;">TRIVIA</h1>
-            <p class="text-sm sm:text-base text-gray-600 font-semibold mb-2">Fundación STEAM RD</p>
-            <p class="text-xs sm:text-sm text-gray-500 mb-6">Demuestra tus conocimientos!</p>
-            
-            <!-- Education Icons -->
-            <div class="flex justify-center gap-3 mb-6 flex-wrap">
-                <span class="text-2xl sm:text-3xl">📐</span>
-                <span class="text-2xl sm:text-3xl">🔬</span>
-                <span class="text-2xl sm:text-3xl">⚗️</span>
-                <span class="text-2xl sm:text-3xl">🤖</span>
-                <span class="text-2xl sm:text-3xl">💻</span>
-            </div>
-            
-            <button class="bg-steam-verde text-white border-none py-4 px-8 text-lg font-black rounded-full cursor-pointer uppercase btn-3d btn-verde w-full max-w-xs shadow-xl" id="joinBtn">
-                UNIRSE AL JUEGO
-            </button>
-            
-            <div class="bg-steam-verde/10 border-2 border-steam-verde rounded-2xl py-4 px-6 pulse hidden flex items-center gap-2" id="connectingMsg">
-                <div class="w-5 h-5 border-3 border-steam-verde border-t-transparent rounded-full animate-spin"></div>
-                <span class="text-steam-verde font-bold">Conectando...</span>
-            </div>
-            <div class="bg-red-500/10 border-2 border-red-500 rounded-2xl py-4 px-6 hidden flex items-center gap-2" id="errorMsg">
-                <div class="text-red-500 text-2xl">⚠</div>
-                <div>
-                    <p class="text-red-500 font-bold">Juego Lleno</p>
-                    <p class="text-red-500 text-sm">Ya hay 4 jugadores conectados</p>
+                
+                <button class="bg-steam-verde text-white border-none py-5 px-10 text-xl font-black rounded-full cursor-pointer uppercase w-full shadow-lg transition-all active:scale-95 flex items-center justify-center gap-3" id="joinBtn">
+                    <iconify-icon icon="mdi:gamepad-variant" style="font-size: 1.5rem;"></iconify-icon>
+                    UNIRSE AL JUEGO
+                </button>
+                
+                <div class="bg-green-50 border-2 border-steam-verde rounded-2xl py-4 px-6 pulse hidden items-center gap-3 mt-4" id="connectingMsg">
+                    <div class="w-5 h-5 border-3 border-steam-verde rounded-full animate-spin" style="border-top-color: transparent;"></div>
+                    <span class="font-bold text-steam-verde">Conectando...</span>
+                </div>
+                <div class="bg-red-50 border-2 border-red-500 rounded-2xl py-4 px-6 hidden items-center gap-3 mt-4" id="errorMsg">
+                    <div class="text-3xl">⚠</div>
+                    <div>
+                        <p class="font-bold text-red-600">Juego Lleno</p>
+                        <p class="text-sm text-gray-600">Ya hay 4 jugadores conectados</p>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- WAITING SCREEN (Non-admin) -->
-        <div class="screen flex-col items-center justify-center p-4 sm:p-6 text-center" id="waitingScreen">
-            <div class="mb-4 sm:mb-6">
-                <div class="player-avatar-visual mx-auto mb-3 sm:mb-4" id="playerAvatar"></div>
-                <div class="text-lg sm:text-xl font-bold" id="playerNameDisplay"></div>
-            </div>
-            <div class="text-3xl sm:text-4xl mb-3 sm:mb-4 bounce-anim">...</div>
-            <p class="text-base sm:text-lg text-steam-turquesa font-bold mb-3 sm:mb-4">Esperando que inicie el juego...</p>
-            <div class="text-center" id="nonAdminWaiting">
-                <p class="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">El Jugador 1 esta seleccionando la categoria</p>
-                <div class="bg-gray-100 rounded-xl sm:rounded-2xl p-4 sm:p-5 border-2 border-gray-200 hidden" id="selectedCategoryDisplay">
-                    <div class="text-4xl sm:text-5xl mb-2 sm:mb-3" id="selectedCategoryEmoji">🌍</div>
-                    <div class="text-lg sm:text-xl font-bold text-steam-turquesa" id="selectedCategoryName">General</div>
+        <div class="screen flex-col items-center justify-center p-4 sm:p-6 text-center relative overflow-hidden bg-white" id="waitingScreen">
+            <!-- Animated background -->
+            <div class="bg-particles" id="waitingControllerBgParticles"></div>
+            
+            <!-- Content -->
+            <div class="relative z-10 w-full max-w-md">
+                <div class="mb-6 sm:mb-8">
+                    <div class="mx-auto mb-4 sm:mb-5 w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center relative border-4 border-white shadow-lg" id="playerAvatar">
+                        <iconify-icon icon="mdi:gamepad-variant" style="font-size: clamp(2.5rem, 8vw, 3.5rem); color: white;"></iconify-icon>
+                    </div>
+                    <div class="text-xl sm:text-2xl font-black mb-2 text-steam-turquesa" id="playerNameDisplay"></div>
+                </div>
+                
+                <iconify-icon icon="mdi:timer-sand" class="bounce-anim" style="font-size: clamp(3rem, 10vw, 4rem); color: #0595AE;"></iconify-icon>
+                
+                <div class="bg-green-50 border-3 border-steam-verde rounded-2xl py-4 px-6 mb-6 shadow-lg">
+                    <p class="text-lg sm:text-xl font-black text-steam-verde">Esperando que inicie el juego...</p>
+                </div>
+                
+                <div class="text-center" id="nonAdminWaiting">
+                    <p class="text-sm sm:text-base mb-4 sm:mb-5 text-gray-600">El Jugador 1 está seleccionando la categoría</p>
+                    <div class="bg-blue-50 rounded-2xl p-5 sm:p-6 border-2 border-steam-turquesa hidden" id="selectedCategoryDisplay">
+                        <div class="text-5xl sm:text-6xl mb-3 sm:mb-4" id="selectedCategoryEmoji">🌍</div>
+                        <div class="text-xl sm:text-2xl font-black text-steam-turquesa" id="selectedCategoryName">General</div>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- ADMIN CATEGORY SELECT SCREEN -->
-        <div class="screen flex-col p-3 sm:p-5 overflow-y-auto bg-white" id="categorySelectScreen">
-            <!-- Admin Badge -->
-            <div class="text-center mb-4 sm:mb-5">
-                <div class="inline-flex items-center gap-2 bg-gradient-to-r from-orange-100 to-amber-100 border-3 border-steam-naranja rounded-full py-2 px-5 mb-3 shadow-lg">
-                    <span class="text-2xl">👑</span>
-                    <span class="text-steam-naranja font-black text-sm sm:text-base">ERES EL ADMIN</span>
-                </div>
-                <div class="player-avatar-visual mx-auto mb-2 sm:mb-3" id="adminAvatar"></div>
-                <div class="text-base sm:text-lg font-bold" id="adminNameDisplay"></div>
-            </div>
+        <div class="screen flex-col p-3 sm:p-5 h-screen overflow-hidden relative bg-white" id="categorySelectScreen">
+            <!-- Animated Background -->
+            <div class="bg-particles" id="controllerBgParticles"></div>
+            <div class="grid-bg"></div>
             
-            <h2 class="text-lg sm:text-xl font-black text-center mb-4 sm:mb-5" style="color: #AB3D8B;">Selecciona una Categoría</h2>
-            <div class="grid grid-cols-2 gap-2 sm:gap-3 mb-4 sm:mb-5" id="categoryGrid"></div>
-            <button class="bg-steam-turquesa text-white border-none py-3 sm:py-4 px-6 sm:px-8 text-base sm:text-lg font-black rounded-full cursor-pointer uppercase btn-3d btn-turquesa w-full shadow-xl" id="startGameBtn">INICIAR JUEGO!</button>
+            <!-- Content -->
+            <div class="relative z-10 flex flex-col h-full">
+                <!-- Admin Badge -->
+                <div class="text-center mb-4 sm:mb-5">
+                    <div class="inline-flex items-center gap-2 bg-orange-50 border-3 border-steam-naranja rounded-full py-3 px-5 mb-3 shadow-lg">
+                        <iconify-icon icon="mdi:crown" style="font-size: 1.5rem; color: #EB8225;"></iconify-icon>
+                        <span class="font-black text-sm sm:text-base text-steam-naranja">ERES EL ADMIN</span>
+                    </div>
+                    <div class="mx-auto mb-2 sm:mb-3 w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center border-3 border-white shadow-lg" id="adminAvatar">
+                        <iconify-icon icon="mdi:crown" style="font-size: clamp(2rem, 6vw, 2.5rem); color: white;"></iconify-icon>
+                    </div>
+                    <div class="text-base sm:text-lg font-black text-steam-naranja" id="adminNameDisplay"></div>
+                </div>
+                
+                <h2 class="text-lg sm:text-xl font-black text-center mb-4 sm:mb-5 text-steam-turquesa">Selecciona una Categoría</h2>
+                
+                <!-- Categories Grid -->
+                <div class="flex-1 overflow-y-auto">
+                    <div class="grid grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-5" id="categoryGrid"></div>
+                </div>
+                
+                <!-- Start Button -->
+                <button class="bg-steam-turquesa text-white border-none py-4 sm:py-5 px-6 sm:px-8 text-base sm:text-lg font-black rounded-full cursor-pointer uppercase w-full shadow-lg transition-all active:scale-95 flex items-center justify-center gap-3" id="startGameBtn">
+                    <iconify-icon icon="mdi:rocket-launch" style="font-size: 1.5rem;"></iconify-icon>
+                    INICIAR JUEGO!
+                </button>
+            </div>
         </div>
 
         <!-- PLAYING SCREEN -->
@@ -310,14 +408,14 @@
 
     <script>
         const categories = {
-            general: { name: "General", emoji: "🌍" },
-            science: { name: "Ciencia", emoji: "🔬" },
-            mathematics: { name: "Matematicas", emoji: "📐" },
-            robotics: { name: "Robotica", emoji: "🤖" },
-            chemistry: { name: "Quimica", emoji: "⚗️" },
-            technology: { name: "Tecnologia", emoji: "💻" },
-            history: { name: "Historia", emoji: "📜" },
-            geography: { name: "Geografia", emoji: "🗺️" }
+            general: { name: "General", icon: "mdi:earth" },
+            science: { name: "Ciencia", icon: "mdi:microscope" },
+            mathematics: { name: "Matematicas", icon: "mdi:math-compass" },
+            robotics: { name: "Robotica", icon: "mdi:robot" },
+            chemistry: { name: "Quimica", icon: "mdi:flask" },
+            technology: { name: "Tecnologia", icon: "mdi:laptop" },
+            history: { name: "Historia", icon: "mdi:book-open-page-variant" },
+            geography: { name: "Geografia", icon: "mdi:map" }
         };
 
         let airconsole;
@@ -360,6 +458,7 @@
                 console.log('Controller ready');
                 setupCategoryGrid();
                 setupAnswerButtons();
+                createJoinParticles();
                 
                 // Get player name but don't auto-join
                 playerName = airconsole.getNickname() || `Jugador ${airconsole.device_id}`;
@@ -430,21 +529,77 @@
             document.getElementById('playAgainBtn').addEventListener('click', playAgain);
         }
 
+        function createJoinParticles() {
+            // Particles disabled - clean background
+        }
+
+        function createWaitingControllerParticles() {
+            const container = document.getElementById('waitingControllerBgParticles');
+            if (!container || container.children.length > 0) return;
+            
+            const colors = ['#00d9ff', '#00ff88', '#ff00ff', '#ff9900'];
+            const icons = ['⏳', '⭐', '💡', '🎯'];
+            
+            for (let i = 0; i < 6; i++) {
+                const particle = document.createElement('div');
+                const size = Math.random() * 40 + 20;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                
+                particle.className = 'particle';
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.borderRadius = '50%';
+                particle.style.background = `radial-gradient(circle, ${color}, transparent)`;
+                particle.style.boxShadow = `0 0 ${size}px ${color}`;
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 5 + 's';
+                particle.style.animationDuration = (Math.random() * 15 + 15) + 's';
+                particle.style.opacity = '0.4';
+                
+                container.appendChild(particle);
+            }
+            
+            for (let i = 0; i < 4; i++) {
+                const iconEl = document.createElement('div');
+                const icon = icons[Math.floor(Math.random() * icons.length)];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                
+                iconEl.className = 'particle icon-particle';
+                iconEl.textContent = icon;
+                iconEl.style.color = color;
+                iconEl.style.fontSize = (Math.random() * 30 + 20) + 'px';
+                iconEl.style.left = Math.random() * 100 + '%';
+                iconEl.style.top = Math.random() * 100 + '%';
+                iconEl.style.animationDelay = Math.random() * 5 + 's';
+                iconEl.style.animationDuration = (Math.random() * 20 + 20) + 's';
+                iconEl.style.filter = `drop-shadow(0 0 8px ${color})`;
+                iconEl.style.opacity = '0.5';
+                
+                container.appendChild(iconEl);
+            }
+        }
+
         function setupCategoryGrid() {
             const grid = document.getElementById('categoryGrid');
             grid.innerHTML = '';
             
             Object.entries(categories).forEach(([key, cat]) => {
                 const btn = document.createElement('div');
-                btn.className = `category-btn bg-white border-[3px] ${key === selectedCategory ? 'border-steam-verde bg-green-50' : 'border-gray-200'} rounded-lg sm:rounded-xl p-3 sm:p-4 text-center cursor-pointer transition-all shadow-md active:scale-95`;
+                btn.className = `category-btn bg-white border-[3px] ${key === selectedCategory ? 'border-steam-verde bg-green-50' : 'border-gray-200'} rounded-xl sm:rounded-2xl p-3 sm:p-4 text-center cursor-pointer transition-all shadow-md active:scale-95`;
                 btn.dataset.category = key;
                 btn.innerHTML = `
-                    <div class="text-2xl sm:text-3xl mb-1 sm:mb-2">${cat.emoji}</div>
+                    <iconify-icon icon="${cat.icon}" class="category-icon mb-2"></iconify-icon>
                     <div class="text-xs sm:text-sm font-bold">${cat.name}</div>
                 `;
                 btn.addEventListener('click', () => selectCategory(key));
                 grid.appendChild(btn);
             });
+            
+            // Initialize particles for default category
+            if (isAdmin) {
+                createControllerParticles(selectedCategory);
+            }
         }
 
         function setupAnswerButtons() {
@@ -478,6 +633,7 @@
             if (isAdmin) {
                 showScreen('categorySelect');
             } else {
+                createWaitingControllerParticles();
                 showScreen('waiting');
             }
         }
@@ -512,12 +668,14 @@
                 if (isAdmin) {
                     showScreen('categorySelect');
                 } else {
+                    createWaitingControllerParticles();
                     showScreen('waiting');
                 }
             } else {
                 if (isAdmin) {
                     showScreen('categorySelect');
                 } else {
+                    createWaitingControllerParticles();
                     showScreen('waiting');
                 }
             }
@@ -565,10 +723,87 @@
                 if (btn.dataset.category === category) {
                     btn.classList.remove('border-gray-200');
                     btn.classList.add('border-steam-verde', 'bg-green-50');
+                    
+                    // Animate selected icon
+                    const icon = btn.querySelector('.category-icon');
+                    if (icon && anime && anime.animate) {
+                        anime.animate(icon, {
+                            scale: [1, 1.3, 1],
+                            rotate: ['0deg', '360deg'],
+                            duration: 600,
+                            ease: 'inOutQuad'
+                        });
+                    }
                 }
             });
             
+            // Create background particles
+            createControllerParticles(category);
+            
             sendMessage({ action: 'selectCategory', category: category });
+        }
+
+        function createControllerParticles(category) {
+            const container = document.getElementById('controllerBgParticles');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            const colorMap = {
+                general: ['#0595AE', '#73A03F', '#EB8225'],
+                science: ['#4CAF50', '#8BC34A', '#CDDC39'],
+                mathematics: ['#2196F3', '#03A9F4', '#00BCD4'],
+                robotics: ['#E91E63', '#F06292', '#F48FB1'],
+                chemistry: ['#4CAF50', '#66BB6A', '#81C784'],
+                technology: ['#9C27B0', '#BA68C8', '#CE93D8'],
+                history: ['#FF9800', '#FFB74D', '#FFCC80'],
+                geography: ['#00BCD4', '#4DD0E1', '#80DEEA']
+            };
+            
+            const colors = colorMap[category] || colorMap.general;
+            const icon = categories[category]?.emoji || '🌍';
+            
+            for (let i = 0; i < 10; i++) {
+                const particle = document.createElement('div');
+                const size = Math.random() * 40 + 20;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                
+                particle.className = 'particle';
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.backgroundColor = color;
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 5 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                
+                container.appendChild(particle);
+            }
+            
+            // Add floating icons
+            for (let i = 0; i < 5; i++) {
+                const iconEl = document.createElement('div');
+                iconEl.className = 'particle';
+                iconEl.textContent = icon;
+                iconEl.style.fontSize = (Math.random() * 20 + 15) + 'px';
+                iconEl.style.left = Math.random() * 100 + '%';
+                iconEl.style.top = Math.random() * 100 + '%';
+                iconEl.style.animationDelay = Math.random() * 5 + 's';
+                iconEl.style.animationDuration = (Math.random() * 15 + 15) + 's';
+                iconEl.style.backgroundColor = 'transparent';
+                
+                container.appendChild(iconEl);
+            }
+            
+            if (typeof anime !== 'undefined' && anime.animate && anime.stagger) {
+                anime.animate('.particle', {
+                    opacity: [0, 0.2],
+                    scale: [0, 1],
+                    duration: 800,
+                    delay: anime.stagger(40),
+                    ease: 'outElastic(1, .8)'
+                });
+            }
         }
 
         function updateSelectedCategory(category) {
@@ -576,7 +811,8 @@
             
             const cat = categories[category];
             if (cat) {
-                document.getElementById('selectedCategoryEmoji').textContent = cat.emoji;
+                const emojiEl = document.getElementById('selectedCategoryEmoji');
+                emojiEl.innerHTML = `<iconify-icon icon="${cat.icon}" style="font-size: clamp(3rem, 10vw, 4rem); color: #0595AE;"></iconify-icon>`;
                 document.getElementById('selectedCategoryName').textContent = cat.name;
                 document.getElementById('selectedCategoryDisplay').classList.remove('hidden');
             }

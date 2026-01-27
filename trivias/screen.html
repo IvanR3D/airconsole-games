@@ -6,6 +6,13 @@
     <title>STEAM Trivia - Fundacion STEAM RD</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.airconsole.com/api/airconsole-1.8.0.js"></script>
+    <script type="module">
+        // Import Anime.js v4 from esm.sh
+        import { animate, stagger } from 'https://esm.sh/animejs';
+        window.anime = { animate, stagger };
+        console.log('Anime.js v4 loaded from esm.sh');
+    </script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -41,16 +48,237 @@
             transition: background 0.5s ease;
         }
 
-        /* Category backgrounds */
-        body.cat-general { background: #FFFFFF; }
-        body.cat-science { background: #FFFFFF; }
-        body.cat-mathematics { background: #FFFFFF; }
-        body.cat-robotics { background: #FFFFFF; }
-        body.cat-chemistry { background: #FFFFFF; }
-        body.cat-technology { background: #FFFFFF; }
-        body.cat-history { background: #FFFFFF; }
-        body.cat-geography { background: #FFFFFF; }
-        body.cat-default { background: #FFFFFF; }
+        /* Category backgrounds - Clean white background */
+        body.cat-general { 
+            background: #FFFFFF;
+            position: relative;
+        }
+        body.cat-science { 
+            background: #FFFFFF;
+            position: relative;
+        }
+        body.cat-mathematics { 
+            background: #FFFFFF;
+            position: relative;
+        }
+        body.cat-robotics { 
+            background: #FFFFFF;
+            position: relative;
+        }
+        body.cat-chemistry { 
+            background: #FFFFFF;
+            position: relative;
+        }
+        body.cat-technology { 
+            background: #FFFFFF;
+            position: relative;
+        }
+        body.cat-history { 
+            background: #FFFFFF;
+            position: relative;
+        }
+        body.cat-geography { 
+            background: #FFFFFF;
+            position: relative;
+        }
+        body.cat-default { 
+            background: #FFFFFF;
+            position: relative;
+        }
+
+        /* Animated background particles - Neon style */
+        .bg-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            opacity: 0.5;
+            animation: floatParticle 25s infinite ease-in-out;
+            will-change: transform;
+        }
+
+        .particle.icon-particle {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            opacity: 0.6;
+        }
+
+        @keyframes floatParticle {
+            0%, 100% { 
+                transform: translate(0, 0) rotate(0deg); 
+                opacity: 0.5;
+            }
+            25% { 
+                transform: translate(50px, -50px) rotate(45deg); 
+                opacity: 0.7;
+            }
+            50% { 
+                transform: translate(0, -100px) rotate(90deg); 
+                opacity: 0.5;
+            }
+            75% { 
+                transform: translate(-50px, -50px) rotate(135deg); 
+                opacity: 0.7;
+            }
+        }
+
+        /* Animated grid background - Subtle */
+        .grid-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(5, 149, 174, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(5, 149, 174, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Wavy lines background */
+        .wavy-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.1;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .wavy-bg path {
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+            animation: wavyMove 8s ease-in-out infinite;
+        }
+
+        @keyframes wavyMove {
+            0%, 100% { d: path('M0,50 Q25,25 50,50 T100,50'); }
+            50% { d: path('M0,50 Q25,75 50,50 T100,50'); }
+        }
+
+        /* Category icon animations */
+        .category-icon {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            display: inline-block;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+
+        .category-card {
+            position: relative;
+            overflow: hidden;
+            background: white;
+            border: 3px solid #E0E0E0;
+        }
+
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 30%,
+                rgba(255, 255, 255, 0.5) 50%,
+                transparent 70%
+            );
+            transform: rotate(45deg);
+            animation: shine 4s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .category-card:hover {
+            transform: translateY(-4px);
+            border-color: #0595AE;
+            box-shadow: 0 8px 24px rgba(5, 149, 174, 0.2);
+        }
+
+        .category-card:hover .category-icon {
+            transform: scale(1.1);
+        }
+
+        .category-card.selected {
+            border-color: #73A03F;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            box-shadow: 0 4px 20px rgba(115, 160, 63, 0.3);
+        }
+
+        .category-card.selected .category-icon {
+            animation: iconFloat 2s ease-in-out infinite;
+        }
+
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Glow effect */
+        .glow {
+            position: relative;
+        }
+
+        .glow::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .glow:hover::after {
+            opacity: 0.5;
+        }
+
+        /* Power-up effect */
+        @keyframes powerUp {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .power-up {
+            animation: powerUp 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        /* Removed neon text effects - replaced with clean styles */
+
+        /* Star burst effect */
+        .star-burst {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            animation: burst 1s ease-out forwards;
+        }
+
+        @keyframes burst {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(20); opacity: 0; }
+        }
 
         .screen {
             display: none;
@@ -85,15 +313,17 @@
 
         .float-up {
             animation: floatUp 0.8s ease-out forwards;
+            display: block;
         }
 
         @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
         }
 
         .pulse-anim {
             animation: pulse 2s ease infinite;
+            display: inline-block;
         }
 
         @keyframes shake {
@@ -138,6 +368,7 @@
             width: 10px;
             height: 10px;
             animation: confettiFall 3s ease-out forwards;
+            will-change: transform;
         }
 
         /* Player avatar visual - responsive */
@@ -218,37 +449,121 @@
         }
 
         @keyframes shimmer {
-            0% { background-position: -200% center; }
-            100% { background-position: 200% center; }
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
         }
 
         .shimmer-text {
-            background: linear-gradient(90deg, 
-                rgba(255,255,255,0.8) 0%, 
-                rgba(255,255,255,1) 50%, 
-                rgba(255,255,255,0.8) 100%);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: shimmer 3s linear infinite;
+            animation: shimmer 3s ease-in-out infinite;
         }
 
-        .intro-gradient-bg {
-            background: linear-gradient(135deg, #AB3D8B 0%, #8B2F6F 100%);
+        @keyframes loadingPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        @keyframes loadingShine {
+            0% { left: -100%; }
+            100% { left: 200%; }
+        }
+
+        @keyframes loadingGlow {
+            0%, 100% { box-shadow: 0 0 10px rgba(115, 160, 63, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(115, 160, 63, 0.8), 0 0 30px rgba(115, 160, 63, 0.4); }
+        }
+
+        .loading-bar {
+            width: 100%;
+            position: relative;
+            animation: loadingGlow 2s ease-in-out infinite;
+        }
+
+        .loading-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+            animation: loadingShine 1.5s infinite;
+        }
+
+        .loading-text {
+            animation: loadingPulse 1.5s ease-in-out infinite;
+        }
+
+        /* Intro screen - clean white background */
+        
+        /* Glassmorphism card - Clean style */
+        .intro-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 2px solid transparent;
+            border-radius: clamp(32px, 8vw, 56px);
+            padding: clamp(32px, 8vw, 64px);
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.08),
+                0 8px 24px rgba(0, 0, 0, 0.04);
+            transition: all 0.4s ease;
             position: relative;
             overflow: hidden;
         }
-
-        .intro-gradient-bg::before {
+        
+        /* Animated border - Simplified */
+        .intro-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(135deg, 
+                #AB3D8B 0%, 
+                #0595AE 100%);
+            border-radius: clamp(32px, 8vw, 56px);
+            z-index: -1;
+            opacity: 0.3;
+        }
+        
+        /* Shimmer effect - Subtle */
+        .intro-card::after {
             content: '';
             position: absolute;
             top: -50%;
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: rotate 20s linear infinite;
+            background: linear-gradient(45deg, 
+                transparent 40%, 
+                rgba(255, 255, 255, 0.3) 50%, 
+                transparent 60%);
+            animation: shimmer 8s linear infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+        
+        .intro-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 
+                0 30px 80px rgba(0, 0, 0, 0.12),
+                0 12px 32px rgba(0, 0, 0, 0.06);
+        }
+        
+        /* Canvas for animated icon network */
+        #particleCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
         }
 
         @keyframes rotate {
@@ -257,24 +572,60 @@
         }
 
         .education-icon {
-            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-size: clamp(3rem, 8vw, 5rem);
             display: inline-block;
-            transition: transform 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15));
+            cursor: pointer;
+            position: relative;
         }
 
         .education-icon:hover {
-            transform: scale(1.2) rotate(5deg);
+            transform: scale(1.3) translateY(-12px) rotate(8deg);
+            filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.25));
         }
+        
+        .education-icon::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 150%;
+            height: 150%;
+            border-radius: 50%;
+            background: currentColor;
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.5);
+            transition: all 0.3s ease;
+            z-index: -1;
+            filter: blur(20px);
+        }
+        
+        .education-icon:hover::before {
+            opacity: 0.15;
+            transform: translate(-50%, -50%) scale(1.3);
+        }
+        
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            25% { transform: translateY(-25px) rotate(-5deg); }
+            50% { transform: translateY(0px) rotate(0deg); }
+            75% { transform: translateY(-25px) rotate(5deg); }
+        }
+        
+        .intro-edu-icon {
+            animation: iconFloat 6s ease-in-out infinite;
+        }
+        
+        .intro-edu-icon:nth-child(1) { animation-delay: 0s; }
+        .intro-edu-icon:nth-child(2) { animation-delay: 0.5s; }
+        .intro-edu-icon:nth-child(3) { animation-delay: 1s; }
+        .intro-edu-icon:nth-child(4) { animation-delay: 1.5s; }
+        .intro-edu-icon:nth-child(5) { animation-delay: 2s; }
+        .intro-edu-icon:nth-child(6) { animation-delay: 2.5s; }
+        .intro-edu-icon:nth-child(7) { animation-delay: 3s; }
 
-        @keyframes bounceIn {
-            0% { transform: scale(0) rotate(-180deg); opacity: 0; }
-            50% { transform: scale(1.1) rotate(10deg); }
-            100% { transform: scale(1) rotate(0deg); opacity: 1; }
-        }
-
-        .bounce-in {
-            animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
-        }
+        /* Removed old bounce-in animation - using Anime.js instead */
 
         .intro-title {
             font-family: 'Segoe UI', 'Arial Rounded MT Bold', sans-serif;
@@ -282,30 +633,27 @@
             letter-spacing: -0.02em;
         }
 
-        .steam-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: clamp(8px, 2vw, 12px);
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: clamp(12px, 3vw, 20px);
-            padding: clamp(8px, 2vw, 16px) clamp(16px, 4vw, 32px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        /* Logo animation - Gaming style */
+        .intro-logo {
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1));
         }
-
-        .steam-letter {
-            font-weight: 900;
-            font-size: clamp(1.2rem, 3vw, 2rem);
-            line-height: 1;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        
+        .intro-logo:hover {
+            transform: scale(1.08) rotate(3deg);
+            filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.15));
         }
-
-        .letter-s { color: #0595AE; }
-        .letter-t { color: #EB8225; }
-        .letter-e { color: #73A03F; }
-        .letter-a { color: #AB3D8B; }
-        .letter-m { color: #0595AE; }
+        
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            25% { transform: translateY(-12px) rotate(-2deg); }
+            50% { transform: translateY(0px) rotate(0deg); }
+            75% { transform: translateY(-12px) rotate(2deg); }
+        }
+        
+        .intro-logo img {
+            animation: logoFloat 4s ease-in-out infinite;
+        }
 
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
@@ -317,162 +665,241 @@
         }
 
         .intro-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: clamp(16px, 4vw, 32px);
-            padding: clamp(20px, 5vw, 40px);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            border: 3px solid rgba(255, 255, 255, 0.5);
+            background: white;
+            border-radius: clamp(24px, 6vw, 40px);
+            padding: clamp(32px, 8vw, 56px);
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.08),
+                0 4px 12px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: visible;
+            transition: all 0.4s ease;
+        }
+        
+        .intro-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 
+                0 30px 80px rgba(0, 0, 0, 0.12),
+                0 8px 20px rgba(0, 0, 0, 0.06);
         }
     </style>
 </head>
 <body class="cat-default font-sans text-steam-negro overflow-hidden">
     <div class="w-screen h-screen flex flex-col relative">
         <!-- INTRO SCREEN -->
-        <div class="screen intro-screen active flex-col items-center justify-center p-4 sm:p-6 lg:p-10 intro-gradient-bg min-h-screen" id="introScreen">
-            <div class="relative z-10 text-center max-w-5xl w-full">
-                <!-- Graduation Cap Icon -->
-                <div class="mb-6 sm:mb-8 bounce-in">
-                    <div class="text-7xl sm:text-8xl lg:text-9xl">🎓</div>
+        <div class="screen intro-screen active flex-col items-center justify-center p-4 sm:p-6 lg:p-10 bg-white min-h-screen relative overflow-hidden" id="introScreen">
+            <!-- Background Icons Pattern -->
+            <div class="absolute inset-0 grid grid-cols-8 grid-rows-6 gap-8 p-8 opacity-10" style="z-index: 0;">
+                <iconify-icon icon="mdi:math-compass" style="font-size: 3rem; color: #0595AE;"></iconify-icon>
+                <iconify-icon icon="mdi:test-tube" style="font-size: 3rem; color: #73A03F;"></iconify-icon>
+                <iconify-icon icon="mdi:flask-outline" style="font-size: 3rem; color: #EB8225;"></iconify-icon>
+                <iconify-icon icon="mdi:robot-outline" style="font-size: 3rem; color: #AB3D8B;"></iconify-icon>
+                <iconify-icon icon="mdi:desktop-classic" style="font-size: 3rem; color: #0595AE;"></iconify-icon>
+                <iconify-icon icon="mdi:book-open-variant" style="font-size: 3rem; color: #EB8225;"></iconify-icon>
+                <iconify-icon icon="mdi:earth" style="font-size: 3rem; color: #73A03F;"></iconify-icon>
+                <iconify-icon icon="mdi:atom-variant" style="font-size: 3rem; color: #AB3D8B;"></iconify-icon>
+                
+                <iconify-icon icon="mdi:calculator-variant" style="font-size: 3rem; color: #0595AE;"></iconify-icon>
+                <iconify-icon icon="mdi:dna" style="font-size: 3rem; color: #73A03F;"></iconify-icon>
+                <iconify-icon icon="mdi:beaker" style="font-size: 3rem; color: #EB8225;"></iconify-icon>
+                <iconify-icon icon="mdi:chip" style="font-size: 3rem; color: #AB3D8B;"></iconify-icon>
+                <iconify-icon icon="mdi:code-tags" style="font-size: 3rem; color: #0595AE;"></iconify-icon>
+                <iconify-icon icon="mdi:castle" style="font-size: 3rem; color: #EB8225;"></iconify-icon>
+                <iconify-icon icon="mdi:compass-outline" style="font-size: 3rem; color: #73A03F;"></iconify-icon>
+                <iconify-icon icon="mdi:telescope" style="font-size: 3rem; color: #AB3D8B;"></iconify-icon>
+                
+                <iconify-icon icon="mdi:function-variant" style="font-size: 3rem; color: #0595AE;"></iconify-icon>
+                <iconify-icon icon="mdi:leaf" style="font-size: 3rem; color: #73A03F;"></iconify-icon>
+                <iconify-icon icon="mdi:molecule" style="font-size: 3rem; color: #EB8225;"></iconify-icon>
+                <iconify-icon icon="mdi:cog" style="font-size: 3rem; color: #AB3D8B;"></iconify-icon>
+                <iconify-icon icon="mdi:wifi" style="font-size: 3rem; color: #0595AE;"></iconify-icon>
+                <iconify-icon icon="mdi:scroll-text" style="font-size: 3rem; color: #EB8225;"></iconify-icon>
+                <iconify-icon icon="mdi:mountain" style="font-size: 3rem; color: #73A03F;"></iconify-icon>
+                <iconify-icon icon="mdi:rocket-launch" style="font-size: 3rem; color: #AB3D8B;"></iconify-icon>
+                
+                <iconify-icon icon="mdi:pi" style="font-size: 3rem; color: #0595AE;"></iconify-icon>
+                <iconify-icon icon="mdi:bacteria" style="font-size: 3rem; color: #73A03F;"></iconify-icon>
+                <iconify-icon icon="mdi:flask-round-bottom" style="font-size: 3rem; color: #EB8225;"></iconify-icon>
+                <iconify-icon icon="mdi:memory" style="font-size: 3rem; color: #AB3D8B;"></iconify-icon>
+                <iconify-icon icon="mdi:cellphone" style="font-size: 3rem; color: #0595AE;"></iconify-icon>
+                <iconify-icon icon="mdi:crown-outline" style="font-size: 3rem; color: #EB8225;"></iconify-icon>
+                <iconify-icon icon="mdi:waves" style="font-size: 3rem; color: #73A03F;"></iconify-icon>
+                <iconify-icon icon="mdi:satellite-variant" style="font-size: 3rem; color: #AB3D8B;"></iconify-icon>
+                
+                <iconify-icon icon="mdi:chart-line" style="font-size: 3rem; color: #0595AE;"></iconify-icon>
+                <iconify-icon icon="mdi:sprout" style="font-size: 3rem; color: #73A03F;"></iconify-icon>
+                <iconify-icon icon="mdi:water" style="font-size: 3rem; color: #EB8225;"></iconify-icon>
+                <iconify-icon icon="mdi:robot-industrial" style="font-size: 3rem; color: #AB3D8B;"></iconify-icon>
+                <iconify-icon icon="mdi:lan" style="font-size: 3rem; color: #0595AE;"></iconify-icon>
+                <iconify-icon icon="mdi:pyramid" style="font-size: 3rem; color: #EB8225;"></iconify-icon>
+                <iconify-icon icon="mdi:island" style="font-size: 3rem; color: #73A03F;"></iconify-icon>
+                <iconify-icon icon="mdi:space-station" style="font-size: 3rem; color: #AB3D8B;"></iconify-icon>
+                
+                <iconify-icon icon="mdi:sigma" style="font-size: 3rem; color: #0595AE;"></iconify-icon>
+                <iconify-icon icon="mdi:virus" style="font-size: 3rem; color: #73A03F;"></iconify-icon>
+                <iconify-icon icon="mdi:fire" style="font-size: 3rem; color: #EB8225;"></iconify-icon>
+                <iconify-icon icon="mdi:robot-happy" style="font-size: 3rem; color: #AB3D8B;"></iconify-icon>
+                <iconify-icon icon="mdi:cloud-outline" style="font-size: 3rem; color: #0595AE;"></iconify-icon>
+                <iconify-icon icon="mdi:sword" style="font-size: 3rem; color: #EB8225;"></iconify-icon>
+                <iconify-icon icon="mdi:pine-tree" style="font-size: 3rem; color: #73A03F;"></iconify-icon>
+                <iconify-icon icon="mdi:star-four-points" style="font-size: 3rem; color: #AB3D8B;"></iconify-icon>
+            </div>
+            
+            <!-- Center Content -->
+            <div class="relative z-10 text-center max-w-4xl w-full px-4">
+                <!-- Logo -->
+                <div class="mb-8">
+                    <img src="../LogoSteamRD-Color.webp" alt="STEAM RD Logo" class="w-48 h-48 sm:w-56 sm:h-56 mx-auto mb-6" style="filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1));">
                 </div>
                 
-                <!-- STEAM Badge -->
-                <div class="flex justify-center mb-6 sm:mb-8 bounce-in" style="animation-delay: 0.2s;">
-                    <div class="steam-badge">
-                        <span class="steam-letter letter-s">S</span>
-                        <span class="steam-letter letter-t">T</span>
-                        <span class="steam-letter letter-e">E</span>
-                        <span class="steam-letter letter-a">A</span>
-                        <span class="steam-letter letter-m">M</span>
-                    </div>
-                </div>
-                
-                <!-- Main Title -->
-                <h1 class="intro-title text-3xl sm:text-5xl lg:text-7xl text-white drop-shadow-2xl mb-6 sm:mb-8 shimmer-text bounce-in" style="animation-delay: 0.3s;">
-                    FUNDACIÓN STEAM RD
+                <!-- Title -->
+                <h1 class="text-6xl sm:text-7xl lg:text-8xl font-black mb-4" style="color: #AB3D8B; letter-spacing: -0.02em;">
+                    TRIVIA
                 </h1>
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black mb-12" style="color: #0595AE; letter-spacing: -0.01em;">
+                    STEAM RD
+                </h2>
                 
-                <!-- Trivia Card -->
-                <div class="bounce-in" style="animation-delay: 0.5s;">
-                    <div class="intro-card max-w-2xl mx-auto">
-                        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black mb-3 sm:mb-4" style="color: #AB3D8B;">TRIVIA</h2>
-                        <p class="text-base sm:text-lg lg:text-xl text-steam-turquesa font-bold mb-4 sm:mb-6">Demuestra tus conocimientos</p>
-                        
-                        <!-- Education Icons -->
-                        <div class="flex justify-center gap-3 sm:gap-4 lg:gap-6 flex-wrap">
-                            <span class="education-icon" title="Matemáticas">📐</span>
-                            <span class="education-icon" title="Ciencia">🔬</span>
-                            <span class="education-icon" title="Química">⚗️</span>
-                            <span class="education-icon" title="Robótica">🤖</span>
-                            <span class="education-icon" title="Tecnología">💻</span>
-                            <span class="education-icon" title="Historia">📜</span>
-                            <span class="education-icon" title="Geografía">🗺️</span>
-                        </div>
+                <!-- Loading Bar Container -->
+                <div class="max-w-md mx-auto">
+                    <p class="text-lg sm:text-xl font-bold mb-4 text-steam-verde loading-text">Esperando Jugadores...</p>
+                    <div class="w-full h-6 bg-gray-200 rounded-full overflow-hidden shadow-inner relative">
+                        <div class="h-full bg-gradient-to-r from-steam-verde via-green-400 to-steam-verde rounded-full loading-bar"></div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- WAITING SCREEN -->
-        <div class="screen waiting-screen flex-col items-center justify-center p-4 sm:p-6 lg:p-10 bg-white min-h-screen" id="waitingScreen">
-            <!-- Header -->
-            <div class="mb-6 sm:mb-8 lg:mb-10 text-center float-up">
-                <div class="flex justify-center mb-4 sm:mb-5">
-                    <div class="steam-badge" style="background: white; border-color: #AB3D8B;">
-                        <span class="steam-letter letter-s">S</span>
-                        <span class="steam-letter letter-t">T</span>
-                        <span class="steam-letter letter-e">E</span>
-                        <span class="steam-letter letter-a">A</span>
-                        <span class="steam-letter letter-m">M</span>
+        <div class="screen waiting-screen flex-col items-center justify-center p-4 sm:p-6 lg:p-10 min-h-screen relative overflow-hidden bg-white" id="waitingScreen">
+            <!-- Animated background removed -->
+            
+            <!-- Content -->
+            <div class="relative z-10 w-full max-w-6xl">
+                <!-- Header -->
+                <div class="mb-6 sm:mb-8 lg:mb-10 text-center float-up">
+                    <div class="flex justify-center mb-4 sm:mb-5">
+                        <div class="inline-flex items-center gap-2 bg-white border-3 rounded-full py-3 px-6 shadow-lg" style="border-color: #0595AE;">
+                            <span class="font-black text-xl sm:text-2xl text-steam-turquesa">S</span>
+                            <span class="font-black text-xl sm:text-2xl text-steam-naranja">T</span>
+                            <span class="font-black text-xl sm:text-2xl text-steam-verde">E</span>
+                            <span class="font-black text-xl sm:text-2xl text-steam-morado">A</span>
+                            <span class="font-black text-xl sm:text-2xl text-steam-turquesa">M</span>
+                        </div>
+                    </div>
+                    <h1 class="text-4xl sm:text-5xl lg:text-7xl font-black mb-3 text-steam-morado">TRIVIA</h1>
+                    <p class="text-sm sm:text-base lg:text-lg font-semibold text-steam-turquesa">Fundación STEAM RD</p>
+                </div>
+                
+                <!-- Status Message -->
+                <div class="mb-8 sm:mb-10 text-center float-up" style="animation-delay: 0.2s;">
+                    <div class="inline-flex items-center gap-3 bg-green-50 border-3 rounded-full py-4 px-8 shadow-lg" style="border-color: #73A03F;">
+                        <div class="w-4 h-4 rounded-full pulse-anim bg-steam-verde"></div>
+                        <h2 class="text-xl sm:text-2xl lg:text-3xl font-black text-steam-verde">Esperando Jugadores</h2>
                     </div>
                 </div>
-                <h1 class="text-3xl sm:text-4xl lg:text-6xl font-black mb-2" style="color: #AB3D8B;">TRIVIA</h1>
-                <p class="text-xs sm:text-sm lg:text-base text-gray-600 font-semibold">Fundación STEAM RD</p>
-            </div>
-            
-            <!-- Status Message -->
-            <div class="mb-6 sm:mb-8 text-center float-up" style="animation-delay: 0.2s;">
-                <div class="inline-flex items-center gap-2 sm:gap-3 bg-steam-turquesa/10 border-3 border-steam-turquesa rounded-full py-3 sm:py-4 px-6 sm:px-8 lg:px-10 shadow-lg">
-                    <div class="w-3 h-3 sm:w-4 sm:h-4 bg-steam-turquesa rounded-full pulse-anim"></div>
-                    <h2 class="text-lg sm:text-xl lg:text-2xl text-steam-turquesa font-black">Esperando Jugadores</h2>
+                
+                <!-- Instructions -->
+                <div class="text-center mb-8 sm:mb-10 float-up max-w-md mx-auto" style="animation-delay: 0.3s;">
+                    <div class="bg-blue-50 rounded-2xl py-4 px-6 border-2 border-steam-turquesa">
+                        <p class="text-base sm:text-lg lg:text-xl font-bold mb-2 text-steam-turquesa">📱 Escanea el código QR</p>
+                        <p class="text-sm sm:text-base text-gray-600">Usa tu teléfono para unirte al juego</p>
+                    </div>
                 </div>
-            </div>
-            
-            <!-- Instructions -->
-            <div class="text-center mb-6 sm:mb-8 float-up max-w-md mx-auto" style="animation-delay: 0.3s;">
-                <p class="text-sm sm:text-base lg:text-lg text-gray-700 font-semibold mb-2">📱 Escanea el código QR</p>
-                <p class="text-xs sm:text-sm text-gray-500">Usa tu teléfono para unirte al juego</p>
-            </div>
-            
-            <!-- Players Grid -->
-            <div class="flex flex-wrap gap-3 sm:gap-4 lg:gap-5 justify-center mb-6 sm:mb-8 max-w-xs sm:max-w-2xl lg:max-w-4xl float-up" style="animation-delay: 0.4s;" id="playersGrid">
-                <!-- Players will be added here dynamically -->
-            </div>
-            
-            <!-- Admin Hint -->
-            <div class="bg-orange-50 border-3 border-steam-naranja rounded-2xl py-3 sm:py-4 px-5 sm:px-7 text-center hidden float-up max-w-md shadow-lg" style="animation-delay: 0.5s;" id="adminHint">
-                <div class="flex items-center justify-center gap-2 sm:gap-3">
-                    <span class="text-2xl sm:text-3xl">👑</span>
-                    <p class="text-steam-naranja font-black text-sm sm:text-base">Jugador 1 es el Admin</p>
+                
+                <!-- Players Grid -->
+                <div class="flex flex-wrap gap-4 sm:gap-5 lg:gap-6 justify-center mb-8 sm:mb-10 float-up" style="animation-delay: 0.4s;" id="playersGrid">
+                    <!-- Players will be added here dynamically -->
                 </div>
-            </div>
-            
-            <!-- Education Icons Footer -->
-            <div class="mt-8 sm:mt-10 flex justify-center gap-4 sm:gap-6 lg:gap-8 flex-wrap opacity-30 float-up" style="animation-delay: 0.6s;">
-                <span class="text-2xl sm:text-3xl lg:text-4xl">📐</span>
-                <span class="text-2xl sm:text-3xl lg:text-4xl">🔬</span>
-                <span class="text-2xl sm:text-3xl lg:text-4xl">⚗️</span>
-                <span class="text-2xl sm:text-3xl lg:text-4xl">🤖</span>
-                <span class="text-2xl sm:text-3xl lg:text-4xl">💻</span>
-                <span class="text-2xl sm:text-3xl lg:text-4xl">📜</span>
-                <span class="text-2xl sm:text-3xl lg:text-4xl">🗺️</span>
+                
+                <!-- Admin Hint -->
+                <div class="backdrop-blur-sm border-3 rounded-2xl py-4 px-6 text-center hidden float-up max-w-md mx-auto shadow-2xl" style="animation-delay: 0.5s; background: rgba(0, 0, 0, 0.3); border-color: #ff9900; box-shadow: 0 0 30px rgba(255, 153, 0, 0.5);" id="adminHint">
+                    <div class="flex items-center justify-center gap-3">
+                        <span class="text-3xl">�</span>
+                        <p class="font-black text-base sm:text-lg" style="color: #fff; text-shadow: 0 0 10px #ff9900;">Jugador 1 es el Admin</p>
+                    </div>
+                </div>
+                
+                <!-- Education Icons Footer -->
+                <div class="mt-10 sm:mt-12 flex justify-center gap-6 sm:gap-8 lg:gap-10 flex-wrap float-up" style="animation-delay: 0.6s;">
+                    <iconify-icon icon="mdi:math-compass" class="text-3xl sm:text-4xl lg:text-5xl" style="color: #0595AE;"></iconify-icon>
+                    <iconify-icon icon="mdi:microscope" class="text-3xl sm:text-4xl lg:text-5xl" style="color: #73A03F;"></iconify-icon>
+                    <iconify-icon icon="mdi:flask" class="text-3xl sm:text-4xl lg:text-5xl" style="color: #EB8225;"></iconify-icon>
+                    <iconify-icon icon="mdi:robot" class="text-3xl sm:text-4xl lg:text-5xl" style="color: #AB3D8B;"></iconify-icon>
+                    <iconify-icon icon="mdi:laptop" class="text-3xl sm:text-4xl lg:text-5xl" style="color: #0595AE;"></iconify-icon>
+                    <iconify-icon icon="mdi:book-open-page-variant" class="text-3xl sm:text-4xl lg:text-5xl" style="color: #EB8225;"></iconify-icon>
+                    <iconify-icon icon="mdi:map" class="text-3xl sm:text-4xl lg:text-5xl" style="color: #73A03F;"></iconify-icon>
+                </div>
             </div>
         </div>
 
         <!-- CATEGORY SCREEN -->
-        <div class="screen flex-col p-4 sm:p-6 lg:p-8 overflow-y-auto" id="categoryScreen">
-            <h2 class="text-lg sm:text-xl lg:text-2xl text-steam-turquesa mb-4 sm:mb-6 lg:mb-8 text-center font-bold">Jugador 1: Selecciona una Categoria</h2>
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4 max-w-xs sm:max-w-2xl lg:max-w-4xl mx-auto mb-4 sm:mb-6 lg:mb-8" id="categoryGrid"></div>
-            <div class="bg-orange-50 border-2 border-steam-naranja rounded-xl sm:rounded-2xl py-2 sm:py-4 px-4 sm:px-6 text-center max-w-xs sm:max-w-md mx-auto">
-                <p class="text-steam-naranja font-bold text-xs sm:text-sm lg:text-base">Esperando que el Jugador 1 seleccione categoria e inicie...</p>
+        <div class="screen flex-col p-4 sm:p-6 lg:p-8 h-screen overflow-hidden relative bg-white" id="categoryScreen">
+            <!-- Animated Grid Background -->
+            <div class="grid-bg"></div>
+            
+            <!-- Animated Background Particles -->
+            <div class="bg-particles" id="bgParticles"></div>
+            
+            <!-- Content Container -->
+            <div class="relative z-10 flex flex-col h-full">
+                <!-- Header -->
+                <div class="text-center mb-4 sm:mb-6 power-up">
+                    <div class="inline-flex items-center gap-3 bg-white border-3 border-steam-turquesa rounded-full py-3 px-6 mb-3 shadow-lg">
+                        <iconify-icon icon="mdi:crown" class="animate-bounce" style="font-size: clamp(1.5rem, 4vw, 2rem); color: #EB8225;"></iconify-icon>
+                        <span class="font-black text-base sm:text-lg text-steam-turquesa">JUGADOR 1: ELIGE TU DESAFÍO</span>
+                        <iconify-icon icon="mdi:gamepad-variant" class="animate-bounce" style="font-size: clamp(1.5rem, 4vw, 2rem); color: #AB3D8B; animation-delay: 0.2s;"></iconify-icon>
+                    </div>
+                    
+                    <!-- Level indicator -->
+                    <div class="flex justify-center gap-2 mt-3">
+                        <div class="w-3 h-3 rounded-full animate-pulse bg-steam-verde"></div>
+                        <div class="w-3 h-3 rounded-full animate-pulse bg-steam-naranja" style="animation-delay: 0.2s;"></div>
+                        <div class="w-3 h-3 rounded-full animate-pulse bg-steam-morado" style="animation-delay: 0.4s;"></div>
+                    </div>
+                </div>
+                
+                <!-- Categories Grid with Game Cards -->
+                <div class="flex-1 flex items-center justify-center px-2">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6 max-w-6xl w-full" id="categoryGrid"></div>
+                </div>
+                
+                <!-- Footer Message -->
+                <div class="text-center mt-4 sm:mt-6 power-up" style="animation-delay: 0.3s;">
+                    <div class="inline-block bg-orange-50 border-3 border-steam-naranja rounded-2xl py-3 px-6 shadow-lg">
+                        <p class="font-black text-sm sm:text-base flex items-center gap-3 justify-center text-steam-naranja">
+                            <iconify-icon icon="mdi:timer-sand" class="animate-spin" style="font-size: 1.5rem; animation-duration: 2s;"></iconify-icon>
+                            <span>Esperando selección...</span>
+                            <iconify-icon icon="mdi:target" style="font-size: 1.5rem;"></iconify-icon>
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- PLAYING SCREEN -->
-        <div class="screen flex-col h-full" id="playingScreen">
-            <!-- Header -->
-            <div class="flex justify-between items-center p-2 sm:p-4 lg:p-5">
-                <div class="flex-1 flex justify-center items-center">
-                    <div class="w-2/5 sm:w-1/2 lg:w-3/5 h-5 sm:h-6 lg:h-8 bg-black/10 rounded-full overflow-visible relative border-2 sm:border-[3px] border-steam-turquesa">
-                        <div class="h-full bg-gradient-to-r from-steam-verde via-steam-naranja to-steam-morado rounded-full transition-all duration-100 relative" id="timerBarFill" style="width: 100%;">
-                            <div class="absolute -right-3 sm:-right-4 top-1/2 -translate-y-1/2 w-0 h-0 border-l-[12px] sm:border-l-[16px] lg:border-l-[20px] border-l-steam-morado border-y-[9px] sm:border-y-[12px] lg:border-y-[15px] border-y-transparent"></div>
-                        </div>
-                    </div>
+        <div class="screen flex-col h-full bg-white" id="playingScreen">
+            <!-- Players Header Bar -->
+            <div class="flex items-center justify-between p-2 sm:p-3 lg:p-4 gap-2 sm:gap-3 relative z-10 bg-white shadow-md">
+                <div class="flex gap-2 sm:gap-3 flex-1 justify-center flex-wrap" id="playersHeaderBar">
+                    <!-- Players will be added here dynamically -->
                 </div>
-                <div class="w-12 sm:w-16 lg:w-20 h-12 sm:h-16 lg:h-20 bg-steam-turquesa rounded-full flex items-center justify-center text-xl sm:text-3xl lg:text-4xl font-bold text-white shadow-lg border-2 sm:border-4 border-white transition-all ml-2 sm:ml-4" id="timerCircle">20</div>
+                
+                <!-- Timer Circle -->
+                <div class="w-12 sm:w-16 lg:w-20 h-12 sm:h-16 lg:h-20 rounded-full flex items-center justify-center text-xl sm:text-3xl lg:text-4xl font-bold text-white shadow-lg border-3 transition-all flex-shrink-0 bg-steam-turquesa" id="timerCircle" style="border-color: #fff;">20</div>
             </div>
 
             <!-- Content -->
-            <div class="flex-1 flex flex-col px-3 sm:px-6 lg:px-10 pb-2 sm:pb-4 lg:pb-8">
-                <div class="flex-1 flex flex-col items-center justify-center">
-                    <div class="text-sm sm:text-base lg:text-lg text-steam-turquesa mb-2 sm:mb-3 lg:mb-4 font-bold" id="questionNumber">Pregunta 1 de 5</div>
-                    <h2 class="responsive-question text-center max-w-xs sm:max-w-2xl lg:max-w-4xl leading-tight mb-4 sm:mb-6 lg:mb-10" id="questionText">Cual es la capital de Francia?</h2>
+            <div class="flex-1 flex flex-col px-3 sm:px-6 lg:px-10 pb-2 sm:pb-4 lg:pb-8 relative">
+                <!-- Background particles for playing screen -->
+                <div class="bg-particles" id="playingBgParticles"></div>
+                
+                <div class="flex-1 flex flex-col items-center justify-center relative z-10">
+                    <div class="text-sm sm:text-base lg:text-lg mb-2 sm:mb-3 lg:mb-4 font-bold text-steam-turquesa" id="questionNumber">Pregunta 1 de 5</div>
+                    <h2 class="responsive-question text-center max-w-xs sm:max-w-2xl lg:max-w-4xl leading-tight mb-4 sm:mb-6 lg:mb-10 text-steam-negro" id="questionText">Cual es la capital de Francia?</h2>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 lg:gap-4 max-w-xs sm:max-w-2xl lg:max-w-4xl w-full" id="optionsGrid"></div>
                 </div>
-            </div>
-
-            <!-- Footer -->
-            <div class="flex items-center p-2 sm:p-3 lg:p-4 gap-2 sm:gap-4 lg:gap-5 bg-white/90 border-t-2 border-gray-200">
-                <div class="w-16 sm:w-20 lg:w-28 h-10 sm:h-14 lg:h-20 bg-gradient-to-br from-steam-turquesa to-steam-morado rounded-lg sm:rounded-xl flex items-center justify-center">
-                    <span class="text-sm sm:text-lg lg:text-xl font-bold text-white">STEAM</span>
-                </div>
-                <div class="flex gap-1 sm:gap-2 lg:gap-3 flex-1 flex-wrap" id="playersStatus"></div>
-            </div>
-
-            <!-- Scoreboard -->
-            <div class="absolute top-16 sm:top-24 lg:top-28 right-2 sm:right-4 lg:right-5 bg-white rounded-lg sm:rounded-xl lg:rounded-2xl p-2 sm:p-3 lg:p-4 min-w-[120px] sm:min-w-[150px] lg:min-w-[180px] border-2 border-gray-200 shadow-lg hidden sm:block" id="scoreboard">
-                <div class="text-sm sm:text-base lg:text-lg text-steam-turquesa mb-2 sm:mb-3 text-center font-bold">Puntuacion</div>
-                <div class="flex flex-col gap-1 sm:gap-2" id="scoreboardList"></div>
             </div>
         </div>
 
@@ -495,14 +922,14 @@
 
     <script>
         const categories = {
-            general: { name: "General", emoji: "🌍", color: "general" },
-            science: { name: "Ciencia", emoji: "🔬", color: "science" },
-            mathematics: { name: "Matematicas", emoji: "📐", color: "mathematics" },
-            robotics: { name: "Robotica", emoji: "🤖", color: "robotics" },
-            chemistry: { name: "Quimica", emoji: "⚗️", color: "chemistry" },
-            technology: { name: "Tecnologia", emoji: "💻", color: "technology" },
-            history: { name: "Historia", emoji: "📜", color: "history" },
-            geography: { name: "Geografia", emoji: "🗺️", color: "geography" }
+            general: { name: "General", icon: "mdi:earth", color: "general" },
+            science: { name: "Ciencia", icon: "mdi:microscope", color: "science" },
+            mathematics: { name: "Matematicas", icon: "mdi:math-compass", color: "mathematics" },
+            robotics: { name: "Robotica", icon: "mdi:robot", color: "robotics" },
+            chemistry: { name: "Quimica", icon: "mdi:flask", color: "chemistry" },
+            technology: { name: "Tecnologia", icon: "mdi:laptop", color: "technology" },
+            history: { name: "Historia", icon: "mdi:book-open-page-variant", color: "history" },
+            geography: { name: "Geografia", icon: "mdi:map", color: "geography" }
         };
 
         const questions = {
@@ -583,12 +1010,9 @@
 
         function cacheDomElements() {
             domCache.timerCircle = document.getElementById('timerCircle');
-            domCache.timerBarFill = document.getElementById('timerBarFill');
             domCache.questionNumber = document.getElementById('questionNumber');
             domCache.questionText = document.getElementById('questionText');
             domCache.optionsGrid = document.getElementById('optionsGrid');
-            domCache.playersStatus = document.getElementById('playersStatus');
-            domCache.scoreboardList = document.getElementById('scoreboardList');
             domCache.playersGrid = document.getElementById('playersGrid');
             domCache.adminHint = document.getElementById('adminHint');
         }
@@ -689,15 +1113,35 @@
         function init() {
             airconsole = new AirConsole();
             cacheDomElements();
+            
+            // Initialize particle network background
+            initParticleNetwork();
+            
+            function animateIntroScreen() {
+                console.log('Starting intro animations...');
+                
+                // Simple fade in for intro screen
+                const introScreen = document.getElementById('introScreen');
+                if (introScreen) {
+                    introScreen.style.opacity = '1';
+                }
+                
+                console.log('Intro animation complete!');
+            }
 
             airconsole.onReady = function() {
                 console.log('Screen ready');
                 setupCategories();
                 
-                // Show intro for 3 seconds then transition to waiting screen
+                // Animate intro screen
+                setTimeout(() => {
+                    animateIntroScreen();
+                }, 100);
+                
+                // Show intro for 4 seconds then transition to waiting screen
                 setTimeout(() => {
                     showScreen('waiting');
-                }, 3000);
+                }, 4500);
             };
 
             airconsole.onConnect = function(deviceId) {
@@ -857,55 +1301,278 @@
             soundEnabled = !soundEnabled;
             document.getElementById('soundToggle').textContent = soundEnabled ? '🔊' : '🔇';
         }
+        
+        // Particle Network Animation - Disabled for clean background
+        function initParticleNetwork() {
+            // Clean white background - no particles
+        }
 
         function setupCategories() {
             const grid = document.getElementById('categoryGrid');
             grid.innerHTML = '';
-            Object.entries(categories).forEach(([key, category]) => {
+            
+            const categoryColors = {
+                general: { primary: '#0595AE', bg: '#E8F4F8' },
+                science: { primary: '#73A03F', bg: '#E8F5E9' },
+                mathematics: { primary: '#0595AE', bg: '#E3F2FD' },
+                robotics: { primary: '#AB3D8B', bg: '#F3E5F5' },
+                chemistry: { primary: '#73A03F', bg: '#E0F2F1' },
+                technology: { primary: '#AB3D8B', bg: '#FCE4EC' },
+                history: { primary: '#EB8225', bg: '#FFF3E0' },
+                geography: { primary: '#0595AE', bg: '#E0F7FA' }
+            };
+            
+            Object.entries(categories).forEach(([key, category], index) => {
                 const card = document.createElement('div');
-                card.className = 'category-card bg-white border-2 sm:border-[3px] border-gray-200 rounded-lg sm:rounded-xl lg:rounded-2xl p-2 sm:p-3 lg:p-5 text-center cursor-pointer transition-all shadow-md hover:border-steam-turquesa hover:-translate-y-1 hover:shadow-lg';
+                const colors = categoryColors[key] || categoryColors.general;
+                
+                card.className = 'category-card bg-white rounded-3xl p-4 sm:p-5 lg:p-6 text-center cursor-pointer transition-all shadow-lg hover:shadow-xl relative overflow-hidden power-up';
+                card.style.animationDelay = `${index * 0.1}s`;
+                card.style.border = `3px solid ${colors.primary}`;
                 card.dataset.category = key;
+                
                 card.innerHTML = `
-                    <div class="text-2xl sm:text-3xl lg:text-4xl mb-1 sm:mb-2 lg:mb-3">${category.emoji}</div>
-                    <div class="text-xs sm:text-sm lg:text-lg font-bold">${category.name}</div>
+                    <!-- Icon container -->
+                    <div class="relative mb-3 sm:mb-4">
+                        <iconify-icon icon="${category.icon}" class="category-icon relative z-10" style="color: ${colors.primary};"></iconify-icon>
+                    </div>
+                    
+                    <!-- Category name -->
+                    <div class="relative text-base sm:text-lg lg:text-xl font-black uppercase tracking-wide mb-2" style="color: ${colors.primary};">
+                        ${category.name}
+                    </div>
+                    
+                    <!-- Underline -->
+                    <div class="flex gap-1 justify-center mt-2">
+                        <div class="w-8 h-1 rounded-full" style="background: ${colors.primary};"></div>
+                        <div class="w-8 h-1 rounded-full opacity-70" style="background: ${colors.primary};"></div>
+                        <div class="w-8 h-1 rounded-full opacity-40" style="background: ${colors.primary};"></div>
+                    </div>
+                    
+                    <!-- Selection indicator -->
+                    <div class="absolute top-2 right-2 w-6 h-6 rounded-full items-center justify-center text-xs font-bold hidden selection-check bg-steam-verde text-white shadow-md">
+                        ✓
+                    </div>
                 `;
+                
+                // Add click handler with animation
+                card.addEventListener('click', () => {
+                    // Remove selection from all cards
+                    document.querySelectorAll('.category-card').forEach(c => {
+                        c.classList.remove('selected', 'scale-105');
+                        c.querySelector('.selection-check')?.classList.add('hidden');
+                        c.querySelector('.selection-check')?.classList.remove('flex');
+                    });
+                    
+                    // Add selection to clicked card
+                    card.classList.add('selected', 'scale-105');
+                    card.querySelector('.selection-check')?.classList.remove('hidden');
+                    card.querySelector('.selection-check')?.classList.add('flex');
+                    
+                    // Change background with animation
+                    setCategoryBackground(key);
+                    createBackgroundParticles(key);
+                    
+                    // Animate icon with anime.js
+                    if (anime && anime.animate) {
+                        anime.animate(card.querySelector('.category-icon'), {
+                            scale: [1, 1.3, 1],
+                            rotate: ['0deg', '360deg'],
+                            duration: 800,
+                            ease: 'inOutElastic(1, .6)'
+                        });
+                    }
+                    
+                    // Animate card
+                    if (anime && anime.animate) {
+                        anime.animate(card, {
+                            scale: [1, 1.05, 1.02],
+                            duration: 400,
+                            ease: 'outElastic(1, .8)'
+                        });
+                    }
+                    
+                    // Play selection sound
+                    playSound('join');
+                    
+                    // Send message to controllers
+                    if (airconsole) {
+                        airconsole.broadcast({ action: 'categorySelected', category: key });
+                    }
+                });
+                
                 grid.appendChild(card);
             });
-            document.querySelector('.category-card')?.classList.add('border-steam-verde', 'bg-green-50');
+            
+            // Select first category by default with animation
+            setTimeout(() => {
+                const firstCard = document.querySelector('.category-card');
+                if (firstCard) {
+                    firstCard.click();
+                }
+            }, 500);
+        }
+
+        function createStarBurst(element) {
+            // Simplified - no star burst for child-friendly design
+        }
+
+        function createBackgroundParticles(category) {
+            const container = document.getElementById('bgParticles');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            // Category-specific neon colors
+            const colorMap = {
+                general: ['#00d9ff', '#0099ff', '#00ffff'],
+                science: ['#00ff88', '#00cc66', '#00ff66'],
+                mathematics: ['#0099ff', '#0066ff', '#00ccff'],
+                robotics: ['#ff00ff', '#cc00cc', '#ff66ff'],
+                chemistry: ['#00ff66', '#00cc44', '#66ff99'],
+                technology: ['#cc00ff', '#9900cc', '#dd66ff'],
+                history: ['#ff9900', '#ff6600', '#ffaa33'],
+                geography: ['#00ffff', '#00cccc', '#66ffff']
+            };
+            
+            const iconMap = {
+                general: ['🌍', '📚', '�', '💡', '⭐'],
+                science: ['🔬', '🧪', '🔭', '⚗️', '🧬'],
+                mathematics: ['📐', '📊', '🔢', '➗', '∑'],
+                robotics: ['🤖', '⚙️', '🔧', '💻', '🎮'],
+                chemistry: ['⚗️', '🧪', '⚛️', '🔬', '💊'],
+                technology: ['💻', '📱', '⌨️', '🖥️', '🔌'],
+                history: ['📜', '🏛️', '👑', '⚔️', '🗿'],
+                geography: ['🗺️', '🌎', '🏔️', '🌊', '🧭']
+            };
+            
+            const colors = colorMap[category] || colorMap.general;
+            const icons = iconMap[category] || iconMap.general;
+            
+            // Create neon circle particles
+            for (let i = 0; i < 12; i++) {
+                const particle = document.createElement('div');
+                const size = Math.random() * 60 + 30;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                
+                particle.className = 'particle';
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.borderRadius = '50%';
+                particle.style.background = `radial-gradient(circle, ${color}, transparent)`;
+                particle.style.boxShadow = `0 0 ${size}px ${color}`;
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 5 + 's';
+                particle.style.animationDuration = (Math.random() * 15 + 15) + 's';
+                
+                container.appendChild(particle);
+            }
+            
+            // Create floating neon icons
+            for (let i = 0; i < 10; i++) {
+                const iconEl = document.createElement('div');
+                const icon = icons[Math.floor(Math.random() * icons.length)];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                
+                iconEl.className = 'particle icon-particle';
+                iconEl.textContent = icon;
+                iconEl.style.color = color;
+                iconEl.style.fontSize = (Math.random() * 40 + 30) + 'px';
+                iconEl.style.left = Math.random() * 100 + '%';
+                iconEl.style.top = Math.random() * 100 + '%';
+                iconEl.style.animationDelay = Math.random() * 5 + 's';
+                iconEl.style.animationDuration = (Math.random() * 20 + 20) + 's';
+                iconEl.style.filter = `drop-shadow(0 0 10px ${color}) drop-shadow(0 0 20px ${color})`;
+                
+                container.appendChild(iconEl);
+            }
+            
+            // Add wavy lines
+            for (let i = 0; i < 5; i++) {
+                const wave = document.createElement('div');
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                
+                wave.style.position = 'absolute';
+                wave.style.width = '200px';
+                wave.style.height = '2px';
+                wave.style.background = `linear-gradient(90deg, transparent, ${color}, transparent)`;
+                wave.style.boxShadow = `0 0 10px ${color}`;
+                wave.style.left = Math.random() * 100 + '%';
+                wave.style.top = Math.random() * 100 + '%';
+                wave.style.opacity = '0.3';
+                wave.style.animation = `floatParticle ${Math.random() * 20 + 20}s infinite ease-in-out`;
+                wave.style.animationDelay = Math.random() * 5 + 's';
+                
+                container.appendChild(wave);
+            }
+            
+            // Animate particles entrance with anime.js
+            if (anime && anime.animate && anime.stagger) {
+                anime.animate('.particle', {
+                    opacity: [0, 0.3],
+                    scale: [0, 1],
+                    duration: 1000,
+                    delay: anime.stagger(50),
+                    ease: 'outElastic(1, .8)'
+                });
+            }
         }
 
         function updatePlayersDisplay() {
             const grid = domCache.playersGrid || document.getElementById('playersGrid');
             const fragment = document.createDocumentFragment();
             
-            Object.values(players).forEach(player => {
+            const playerColors = ['#0595AE', '#73A03F', '#EB8225', '#AB3D8B'];
+            
+            Object.values(players).forEach((player, index) => {
                 const card = document.createElement('div');
-                let borderClass = 'border-gray-200';
-                let bgClass = 'bg-white';
+                const cardColor = playerColors[index % playerColors.length];
+                
+                card.className = 'bg-white rounded-2xl py-4 px-5 flex items-center gap-3 shadow-lg transition-all hover:scale-105 relative overflow-hidden';
                 
                 if (player.disconnected) {
-                    borderClass = 'border-steam-morado';
-                    bgClass = 'bg-pink-50 opacity-60';
-                } else if (player.isAdmin) {
-                    borderClass = 'border-steam-naranja';
-                    bgClass = 'bg-orange-50';
+                    card.style.background = '#f3f4f6';
+                    card.style.border = '2px solid #d1d5db';
+                    card.style.opacity = '0.6';
+                } else {
+                    card.style.border = `3px solid ${cardColor}`;
                 }
                 
-                card.className = `${bgClass} border-2 sm:border-[3px] ${borderClass} rounded-lg sm:rounded-xl lg:rounded-2xl py-2 sm:py-3 lg:py-4 px-3 sm:px-4 lg:px-6 flex items-center gap-2 sm:gap-3 shadow-lg transition-all`;
-                card.innerHTML = `
-                    <div class="player-avatar-visual" style="background-color: ${player.color};"></div>
-                    <div>
-                        <div class="text-sm sm:text-base lg:text-lg font-bold">${player.name}</div>
-                        <div class="text-xs sm:text-sm ${player.disconnected ? 'text-steam-morado' : 'text-steam-verde'}">
-                            ${player.disconnected ? 'Desconectado' : (player.isAdmin ? 'Admin' : 'Conectado')}
-                        </div>
+                // Avatar
+                const avatar = document.createElement('div');
+                avatar.className = 'w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center relative flex-shrink-0 shadow-md';
+                avatar.style.background = player.disconnected ? '#9ca3af' : player.color;
+                avatar.style.border = `3px solid ${player.disconnected ? '#6b7280' : '#fff'}`;
+                
+                if (player.isAdmin && !player.disconnected) {
+                    avatar.innerHTML = '<iconify-icon icon="mdi:crown" style="font-size: 1.5rem; color: white;"></iconify-icon>';
+                } else if (player.disconnected) {
+                    avatar.innerHTML = '<iconify-icon icon="mdi:close-circle" style="font-size: 1.5rem; color: white;"></iconify-icon>';
+                } else {
+                    avatar.innerHTML = '<iconify-icon icon="mdi:gamepad-variant" style="font-size: 1.5rem; color: white;"></iconify-icon>';
+                }
+                card.appendChild(avatar);
+                
+                // Info
+                const info = document.createElement('div');
+                info.className = 'flex-1 min-w-0';
+                info.innerHTML = `
+                    <div class="text-base sm:text-lg font-black truncate" style="color: ${player.disconnected ? '#6b7280' : '#010101'};">${player.name}</div>
+                    <div class="text-xs sm:text-sm font-bold" style="color: ${player.disconnected ? '#9ca3af' : cardColor};">
+                        ${player.disconnected ? 'Desconectado' : (player.isAdmin ? '👑 Admin' : '✓ Conectado')}
                     </div>
                 `;
+                card.appendChild(info);
+                
                 fragment.appendChild(card);
             });
             
             grid.innerHTML = '';
             grid.appendChild(fragment);
+
+            // Create waiting particles
+            createWaitingParticles();
 
             const adminHint = domCache.adminHint || document.getElementById('adminHint');
             if (adminHint && Object.keys(players).length >= 1) {
@@ -915,33 +1582,75 @@
             updatePlayersStatus();
         }
 
+        function createWaitingParticles() {
+            // Particles disabled - clean white background
+        }
+
         function updatePlayersStatus() {
-            const container = domCache.playersStatus || document.getElementById('playersStatus');
+            const container = document.getElementById('playersHeaderBar');
             if (!container) return;
             
             const fragment = document.createDocumentFragment();
-            Object.values(players).forEach(player => {
+            Object.values(players).forEach((player, index) => {
                 const hasAnswered = answers[player.id] !== undefined;
-                let borderClass = 'border-gray-200';
-                let bgClass = 'bg-white';
                 
-                if (player.disconnected) {
-                    borderClass = 'border-steam-morado';
-                    bgClass = 'bg-pink-50';
-                } else if (hasAnswered) {
-                    borderClass = 'border-steam-verde';
-                    bgClass = 'bg-green-50';
-                }
+                // Player colors for the card
+                const cardColors = ['#00ff88', '#00d9ff', '#ff00ff', '#ff9900'];
+                const cardColor = cardColors[index % cardColors.length];
                 
                 const card = document.createElement('div');
-                card.className = `flex items-center gap-1 sm:gap-2 ${bgClass} py-1 sm:py-2 px-2 sm:px-3 lg:px-4 rounded-lg sm:rounded-xl border-2 ${borderClass} transition-all`;
-                card.innerHTML = `
-                    <div class="player-avatar-visual-small" style="background-color: ${player.color};"></div>
-                    <span class="font-bold text-xs sm:text-sm">${player.name}</span>
-                    ${player.disconnected ? '<span class="text-steam-morado text-xs">X</span>' : (hasAnswered ? '<span class="text-steam-verde text-xs">✓</span>' : '<span class="text-gray-400 text-xs">...</span>')}
+                card.className = 'flex items-center gap-2 backdrop-blur-sm rounded-2xl py-2 px-3 transition-all relative overflow-hidden';
+                card.style.background = player.disconnected ? 'rgba(100, 100, 100, 0.3)' : `linear-gradient(135deg, ${cardColor}33, ${cardColor}11)`;
+                card.style.border = `2px solid ${player.disconnected ? '#666' : cardColor}`;
+                card.style.boxShadow = player.disconnected ? 'none' : `0 0 15px ${cardColor}44`;
+                card.style.minWidth = 'clamp(120px, 20vw, 180px)';
+                
+                // Glow effect for active players
+                if (!player.disconnected) {
+                    const glow = document.createElement('div');
+                    glow.className = 'absolute inset-0 opacity-20 rounded-2xl';
+                    glow.style.background = `radial-gradient(circle at 30% 30%, ${cardColor}, transparent 70%)`;
+                    card.appendChild(glow);
+                }
+                
+                // Avatar with icon
+                const avatarContainer = document.createElement('div');
+                avatarContainer.className = 'relative flex-shrink-0';
+                avatarContainer.innerHTML = `
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center relative" style="background: ${player.disconnected ? '#666' : player.color}; border: 3px solid ${player.disconnected ? '#444' : '#fff'}; box-shadow: 0 0 10px ${player.disconnected ? 'rgba(0,0,0,0.5)' : cardColor};">
+                        <span class="text-lg sm:text-xl">${player.disconnected ? '❌' : (hasAnswered ? '✓' : '🎮')}</span>
+                    </div>
                 `;
+                card.appendChild(avatarContainer);
+                
+                // Player info
+                const info = document.createElement('div');
+                info.className = 'flex-1 min-w-0';
+                info.innerHTML = `
+                    <div class="font-black text-xs sm:text-sm truncate" style="color: ${player.disconnected ? '#999' : '#fff'}; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">${player.name}</div>
+                    <div class="flex items-center gap-1 mt-0.5">
+                        <div class="text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full" style="background: ${player.disconnected ? '#444' : 'rgba(255,255,255,0.2)'}; color: ${player.disconnected ? '#666' : cardColor}; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">
+                            ${player.score} pts
+                        </div>
+                    </div>
+                `;
+                card.appendChild(info);
+                
+                // Answer status indicator
+                if (!player.disconnected) {
+                    const status = document.createElement('div');
+                    status.className = 'w-2 h-2 rounded-full flex-shrink-0';
+                    status.style.background = hasAnswered ? '#00ff88' : '#ff9900';
+                    status.style.boxShadow = hasAnswered ? '0 0 8px #00ff88' : '0 0 8px #ff9900';
+                    if (!hasAnswered) {
+                        status.style.animation = 'pulse 1s ease infinite';
+                    }
+                    card.appendChild(status);
+                }
+                
                 fragment.appendChild(card);
             });
+            
             container.innerHTML = '';
             container.appendChild(fragment);
         }
@@ -982,6 +1691,7 @@
             updatePlayersStatus();
             updateScoreboard();
             startTimer();
+            createPlayingParticles();
             
             airconsole.broadcast({
                 action: 'showQuestion',
@@ -990,22 +1700,56 @@
             });
         }
 
+        function createPlayingParticles() {
+            // Particles disabled - clean white background
+        }
+
         function displayOptions(question) {
             const container = domCache.optionsGrid || document.getElementById('optionsGrid');
             container.innerHTML = '';
             
             const letters = ['A', 'B', 'C', 'D'];
-            const colors = ['bg-steam-verde', 'bg-steam-morado', 'bg-steam-turquesa', 'bg-steam-naranja'];
+            const optionColors = [
+                { bg: '#d4a574', border: '#b8894f', shadow: 'rgba(212, 165, 116, 0.5)' },
+                { bg: '#4db8e8', border: '#3a9bc7', shadow: 'rgba(77, 184, 232, 0.5)' },
+                { bg: '#e85d8a', border: '#c74a72', shadow: 'rgba(232, 93, 138, 0.5)' },
+                { bg: '#9b6fd8', border: '#7d59b3', shadow: 'rgba(155, 111, 216, 0.5)' }
+            ];
             
             const fragment = document.createDocumentFragment();
             question.options.forEach((option, index) => {
                 const card = document.createElement('div');
-                card.className = 'option-card flex items-center bg-white rounded-lg sm:rounded-xl overflow-hidden border-2 sm:border-[3px] border-gray-200 shadow-md transition-all';
+                const colors = optionColors[index];
+                
+                card.className = 'option-card flex items-center rounded-xl sm:rounded-2xl overflow-hidden border-3 shadow-lg transition-all cursor-pointer hover:scale-105 relative';
+                card.style.background = `linear-gradient(135deg, ${colors.bg}, ${colors.border})`;
+                card.style.borderColor = colors.border;
+                card.style.boxShadow = `0 4px 15px ${colors.shadow}, 0 0 20px ${colors.shadow}`;
                 card.dataset.index = index;
-                card.innerHTML = `
-                    <div class="w-10 sm:w-14 lg:w-[70px] h-10 sm:h-14 lg:h-[70px] flex items-center justify-center text-lg sm:text-2xl lg:text-3xl font-bold text-white flex-shrink-0 ${colors[index]}">${letters[index]}</div>
-                    <div class="flex-1 p-2 sm:p-3 lg:p-4 text-sm sm:text-base lg:text-lg font-medium">${option}</div>
-                `;
+                
+                // Shine effect
+                const shine = document.createElement('div');
+                shine.className = 'absolute inset-0 opacity-20';
+                shine.style.background = 'linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%)';
+                card.appendChild(shine);
+                
+                // Letter badge
+                const badge = document.createElement('div');
+                badge.className = 'w-10 sm:w-14 lg:w-[70px] h-10 sm:h-14 lg:h-[70px] flex items-center justify-center text-lg sm:text-2xl lg:text-3xl font-black flex-shrink-0 relative z-10';
+                badge.style.background = colors.border;
+                badge.style.color = '#fff';
+                badge.style.textShadow = '0 2px 4px rgba(0,0,0,0.3)';
+                badge.textContent = letters[index];
+                card.appendChild(badge);
+                
+                // Option text
+                const text = document.createElement('div');
+                text.className = 'flex-1 p-2 sm:p-3 lg:p-4 text-sm sm:text-base lg:text-lg font-bold relative z-10';
+                text.style.color = '#fff';
+                text.style.textShadow = '0 2px 4px rgba(0,0,0,0.3)';
+                text.textContent = option;
+                card.appendChild(text);
+                
                 fragment.appendChild(card);
             });
             container.appendChild(fragment);
@@ -1032,21 +1776,23 @@
 
         function updateTimerDisplay() {
             const circle = domCache.timerCircle;
-            const barFill = domCache.timerBarFill;
-            if (!circle || !barFill) return;
+            if (!circle) return;
             
             circle.textContent = timeLeft;
-            const percentage = (timeLeft / 20) * 100;
-            barFill.style.width = `${percentage}%`;
             
-            circle.classList.remove('timer-warning', 'timer-danger', 'bg-steam-turquesa', 'bg-steam-naranja', 'bg-steam-morado');
-            
+            // Change color based on time left - no glow effects
             if (timeLeft <= 5) {
-                circle.classList.add('bg-steam-morado', 'timer-danger');
+                circle.style.background = '#ff4466';
+                circle.style.borderColor = '#fff';
+                circle.classList.add('timer-danger');
             } else if (timeLeft <= 10) {
-                circle.classList.add('bg-steam-naranja', 'timer-warning');
+                circle.style.background = '#ff9900';
+                circle.style.borderColor = '#fff';
+                circle.classList.add('timer-warning');
             } else {
-                circle.classList.add('bg-steam-turquesa');
+                circle.style.background = '#0595AE';
+                circle.style.borderColor = '#fff';
+                circle.classList.remove('timer-warning', 'timer-danger');
             }
         }
 
@@ -1094,16 +1840,41 @@
             clearInterval(timer);
             const question = gameQuestions[currentQuestion];
             
+            const optionColors = [
+                { bg: '#d4a574', border: '#b8894f' },
+                { bg: '#4db8e8', border: '#3a9bc7' },
+                { bg: '#e85d8a', border: '#c74a72' },
+                { bg: '#9b6fd8', border: '#7d59b3' }
+            ];
+            
             const options = document.querySelectorAll('.option-card');
             options.forEach((opt, index) => {
                 if (index === question.correct) {
-                    opt.classList.add('bg-steam-verde', 'border-steam-verde', 'option-correct');
-                    opt.querySelector('.flex-1').classList.add('text-white');
+                    opt.style.background = 'linear-gradient(135deg, #00ff88, #00cc66)';
+                    opt.style.borderColor = '#00ff88';
+                    opt.style.boxShadow = '0 0 30px rgba(0, 255, 136, 0.8), 0 4px 15px rgba(0, 255, 136, 0.5)';
+                    opt.classList.add('option-correct');
+                    opt.querySelector('.flex-1').style.color = '#fff';
+                    
+                    // Update badge color
+                    const badge = opt.querySelector('div:first-child');
+                    if (badge) {
+                        badge.style.background = '#00cc66';
+                    }
                 } else {
                     const wasSelected = Object.values(answers).some(a => a.option === index);
                     if (wasSelected) {
-                        opt.classList.add('bg-steam-morado', 'border-steam-morado', 'option-incorrect');
-                        opt.querySelector('.flex-1').classList.add('text-white');
+                        opt.style.background = 'linear-gradient(135deg, #ff4466, #cc3355)';
+                        opt.style.borderColor = '#ff4466';
+                        opt.style.boxShadow = '0 0 30px rgba(255, 68, 102, 0.8), 0 4px 15px rgba(255, 68, 102, 0.5)';
+                        opt.classList.add('option-incorrect');
+                        opt.querySelector('.flex-1').style.color = '#fff';
+                        
+                        // Update badge color
+                        const badge = opt.querySelector('div:first-child');
+                        if (badge) {
+                            badge.style.background = '#cc3355';
+                        }
                     }
                 }
             });
@@ -1130,25 +1901,13 @@
         }
 
         function updateScoreboard() {
-            const list = document.getElementById('scoreboardList');
-            list.innerHTML = '';
+            // Scoreboard is now integrated into the player header cards
+            // Just update the player cards with new scores
+            updatePlayersStatus();
             
             const sortedPlayers = Object.values(players)
                 .filter(p => !p.disconnected)
                 .sort((a, b) => b.score - a.score);
-            
-            sortedPlayers.forEach((player, index) => {
-                const item = document.createElement('div');
-                item.className = `flex justify-between items-center p-1 sm:p-2 rounded-lg text-xs sm:text-sm ${index === 0 ? 'bg-orange-50 border-2 border-steam-naranja' : 'bg-gray-100'}`;
-                item.innerHTML = `
-                    <div class="flex items-center gap-1 sm:gap-2">
-                        <div class="player-avatar-visual-small" style="background-color: ${player.color};"></div>
-                        <span class="truncate max-w-[60px] sm:max-w-none">${player.name}</span>
-                    </div>
-                    <span class="font-bold">${player.score}</span>
-                `;
-                list.appendChild(item);
-            });
             
             airconsole.broadcast({ action: 'leaderboardUpdate', players: sortedPlayers });
         }
