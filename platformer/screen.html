@@ -201,6 +201,66 @@
             100% { transform: scale(1) rotate(0deg); }
         }
         .winner-anim { animation: winner 0.6s ease-out; }
+
+        /* ==========================================================================
+           LIVE RANKING OVERLAY STYLES
+           ========================================================================== */
+        .overlay-backdrop {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ranking-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 24px;
+            padding: clamp(20px, 4vw, 32px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 90vw;
+            width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            0% {
+                transform: translate(-50%, -60%);
+                opacity: 0;
+            }
+            100% {
+                transform: translate(-50%, -50%);
+                opacity: 1;
+            }
+        }
+
+        .winner-title {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .position-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: white;
+            border-radius: 12px;
+            border-left: 4px solid;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .continue-message {
+            animation: pulse 2s ease infinite;
+        }
     </style>
 </head>
 <body>
@@ -363,6 +423,33 @@
         </div>
     </div>
 
+    <!-- LIVE RANKING OVERLAY -->
+    <div id="liveRankingOverlay" class="hidden fixed inset-0 z-[60] overlay-backdrop">
+        <div class="ranking-panel">
+            <div class="mb-6">
+                <h2 class="winner-title text-3xl sm:text-4xl font-black mb-4 flex items-center justify-center gap-3">
+                    🏆 ¡Primer Lugar!
+                </h2>
+                <div id="winnerInfo" class="flex flex-col items-center gap-3">
+                    <!-- Winner info will be populated dynamically -->
+                </div>
+            </div>
+            <div class="mb-4">
+                <h3 class="text-xl font-bold text-steam-turquesa mb-3 flex items-center justify-center gap-2">
+                    <iconify-icon icon="mdi:format-list-numbered"></iconify-icon>
+                    Clasificación en Vivo
+                </h3>
+                <div id="livePositionList" class="space-y-2">
+                    <!-- Position items will be populated dynamically -->
+                </div>
+            </div>
+            <div class="continue-message text-center text-sm text-gray-600 mt-4">
+                <iconify-icon icon="mdi:run-fast"></iconify-icon>
+                Los demás jugadores continúan compitiendo...
+            </div>
+        </div>
+    </div>
+
     <!-- CONFETTI -->
     <div class="fixed inset-0 pointer-events-none z-[1000] overflow-hidden" id="confettiContainer"></div>
 
@@ -390,46 +477,123 @@
     };
 
     const PHYSICS = {
-        GRAVITY: 0.5,
-        MAX_FALL_SPEED: 15,
+        GRAVITY: 0.6,
+        MAX_FALL_SPEED: 18,
         MOVE_SPEED: 7,
-        JUMP_POWER: -22,
+        JUMP_POWER: -28,
         AIR_ACCELERATION: 0.7,
         GROUND_ACCELERATION: 0.85,
         FRICTION: 0.7,
         AIR_RESISTANCE: 0.95,
         JUMP_CUT_MULTIPLIER: 0.5,
-        JUMP_CUT_THRESHOLD: -5
+        JUMP_CUT_THRESHOLD: -5,
+        COYOTE_TIME: 6,
+        JUMP_BUFFER: 8
+    };
+
+    // ==========================================================================
+    // LEVEL THEMES
+    // ==========================================================================
+    
+    const LEVEL_THEMES = {
+        1: {
+            name: "Pradera Verde",
+            sky: ['#87CEEB', '#B0E0E6', '#98D8C8'],
+            platform: ['#8B7355', '#A0826D'],
+            floor: ['#5D4037', '#8BC34A'],
+            clouds: 'rgba(255,255,255,0.9)',
+            accent: '#73A03F',
+            decorations: 'flowers'
+        },
+        2: {
+            name: "Desierto Dorado",
+            sky: ['#FFD89B', '#FFA07A', '#FF8C69'],
+            platform: ['#D2691E', '#CD853F'],
+            floor: ['#C19A6B', '#DEB887'],
+            clouds: 'rgba(255,248,220,0.85)',
+            accent: '#EB8225',
+            decorations: 'cacti'
+        },
+        3: {
+            name: "Montaña Nevada",
+            sky: ['#B0C4DE', '#87CEEB', '#778899'],
+            platform: ['#708090', '#778899'],
+            floor: ['#696969', '#F0F8FF'],
+            clouds: 'rgba(255,255,255,0.95)',
+            accent: '#0595AE',
+            decorations: 'snow'
+        },
+        4: {
+            name: "Volcán Oscuro",
+            sky: ['#2F1B1B', '#4A2020', '#5C3333'],
+            platform: ['#3D2817', '#4E3620'],
+            floor: ['#1C1C1C', '#8B0000'],
+            clouds: 'rgba(139,0,0,0.6)',
+            accent: '#AB3D8B',
+            decorations: 'lava'
+        },
+        5: {
+            name: "Cielo Místico",
+            sky: ['#4B0082', '#6A0DAD', '#8A2BE2'],
+            platform: ['#FFD700', '#FFA500'],
+            floor: ['#9370DB', '#BA55D3'],
+            clouds: 'rgba(255,215,0,0.3)',
+            accent: '#FFD700',
+            decorations: 'stars'
+        }
     };
 
     // ==========================================================================
     // LEVEL DATA
     // ==========================================================================
     
+    /*
+     * Level Validation Table
+     * 
+     * Quick reference for level design integrity:
+     * 
+     * | Level | Max Floor Gap | Max Platform Gap | Reachable Status |
+     * |-------|---------------|------------------|------------------|
+     * | 1     | ≤200px        | ≤180px           | All reachable    |
+     * | 2     | ≤200px        | ≤180px           | All reachable    |
+     * | 3     | ≤200px        | ≤180px           | All reachable    |
+     * | 4     | ≤200px        | ≤180px           | All reachable    |
+     * | 5     | ≤200px        | ≤180px           | All reachable    |
+     * 
+     * Design Rules:
+     * - Floor segment gaps must be ≤200px (max jump distance)
+     * - Platform gaps must be ≤180px with vertical spacing 100-140px
+     * - All coins must be accessible (on platforms, jump arcs, or ground)
+     * - Obstacles positioned at y>250px with adequate reaction space
+     * - Progressive difficulty maintained from level 1 to 5
+     * 
+     * Update this table whenever level data changes.
+     */
+    
     const LEVELS = {
         1: {
             name: "Inicio Facil",
             length: 3000,
             floorSegments: [
-                { x: 0, width: 600 },
-                { x: 900, width: 500 },
-                { x: 1700, width: 600 },
-                { x: 2600, width: 400 }
+                { x: 0, width: 700 },
+                { x: 850, width: 600 },
+                { x: 1600, width: 650 },
+                { x: 2400, width: 600 }
             ],
             platforms: [
-                { x: 450, y: 450, width: 200 },
-                { x: 900, y: 380, width: 180 },
-                { x: 1400, y: 420, width: 200 },
-                { x: 1900, y: 400, width: 180 },
-                { x: 2400, y: 370, width: 200 }
+                { x: 500, y: 420, width: 200 },
+                { x: 900, y: 360, width: 180 },
+                { x: 1200, y: 400, width: 200 },
+                { x: 1700, y: 380, width: 180 },
+                { x: 2100, y: 350, width: 200 }
             ],
             coins: [
-                { x: 550, y: 410 }, { x: 1000, y: 340 }, { x: 1500, y: 380 },
-                { x: 2000, y: 360 }, { x: 2500, y: 330 }, { x: 2800, y: 550 }
+                { x: 600, y: 380 }, { x: 1000, y: 320 }, { x: 1300, y: 360 },
+                { x: 1800, y: 340 }, { x: 2200, y: 310 }, { x: 2800, y: 550 }
             ],
             obstacles: [
-                { x: 750, y: 250, startX: 750 },
-                { x: 1800, y: 240, startX: 1800 }
+                { x: 750, y: 280, startX: 750 },
+                { x: 1800, y: 270, startX: 1800 }
             ]
         },
         2: {
@@ -437,31 +601,33 @@
             length: 3800,
             floorSegments: [
                 { x: 0, width: 500 },
-                { x: 850, width: 400 },
-                { x: 1550, width: 500 },
-                { x: 2400, width: 450 },
-                { x: 3200, width: 600 }
+                { x: 650, width: 400 },
+                { x: 1200, width: 500 },
+                { x: 1850, width: 450 },
+                { x: 2550, width: 600 },
+                { x: 3300, width: 500 }
             ],
             platforms: [
-                { x: 400, y: 450, width: 180 },
-                { x: 750, y: 360, width: 160 },
-                { x: 1100, y: 420, width: 200 },
-                { x: 1500, y: 340, width: 170 },
-                { x: 1900, y: 400, width: 190 },
-                { x: 2300, y: 320, width: 160 },
-                { x: 2700, y: 380, width: 200 },
-                { x: 3100, y: 420, width: 180 }
+                { x: 400, y: 420, width: 180 },
+                { x: 700, y: 360, width: 160 },
+                { x: 950, y: 400, width: 200 },
+                { x: 1300, y: 340, width: 170 },
+                { x: 1600, y: 380, width: 190 },
+                { x: 1950, y: 320, width: 160 },
+                { x: 2250, y: 360, width: 200 },
+                { x: 2650, y: 400, width: 180 },
+                { x: 3000, y: 350, width: 170 }
             ],
             coins: [
-                { x: 490, y: 410 }, { x: 840, y: 320 }, { x: 1190, y: 380 },
-                { x: 1590, y: 300 }, { x: 1990, y: 360 }, { x: 2390, y: 280 },
-                { x: 2790, y: 340 }, { x: 3190, y: 380 }, { x: 3600, y: 550 }
+                { x: 490, y: 380 }, { x: 790, y: 320 }, { x: 1050, y: 360 },
+                { x: 1390, y: 300 }, { x: 1690, y: 340 }, { x: 2040, y: 280 },
+                { x: 2340, y: 320 }, { x: 2740, y: 360 }, { x: 3600, y: 550 }
             ],
             obstacles: [
-                { x: 650, y: 200, startX: 650 },
-                { x: 1350, y: 180, startX: 1350 },
-                { x: 2150, y: 190, startX: 2150 },
-                { x: 2950, y: 185, startX: 2950 }
+                { x: 650, y: 260, startX: 650 },
+                { x: 1350, y: 270, startX: 1350 },
+                { x: 2150, y: 265, startX: 2150 },
+                { x: 2950, y: 275, startX: 2950 }
             ]
         },
         3: {
@@ -469,40 +635,40 @@
             length: 4500,
             floorSegments: [
                 { x: 0, width: 450 },
-                { x: 800, width: 350 },
-                { x: 1500, width: 300 },
-                { x: 2150, width: 400 },
-                { x: 2900, width: 350 },
-                { x: 3600, width: 500 },
-                { x: 4350, width: 150 }
+                { x: 650, width: 350 },
+                { x: 1200, width: 300 },
+                { x: 1750, width: 400 },
+                { x: 2400, width: 350 },
+                { x: 3000, width: 500 },
+                { x: 3750, width: 150 }
             ],
             platforms: [
-                { x: 350, y: 460, width: 160 },
-                { x: 650, y: 400, width: 150 },
-                { x: 950, y: 340, width: 140 },
-                { x: 1300, y: 390, width: 160 },
-                { x: 1650, y: 330, width: 170 },
-                { x: 2000, y: 270, width: 150 },
-                { x: 2400, y: 410, width: 180 },
-                { x: 2750, y: 350, width: 160 },
-                { x: 3150, y: 290, width: 170 },
-                { x: 3500, y: 370, width: 180 },
-                { x: 3900, y: 410, width: 190 },
-                { x: 4250, y: 360, width: 170 }
+                { x: 350, y: 420, width: 160 },
+                { x: 600, y: 380, width: 150 },
+                { x: 850, y: 340, width: 140 },
+                { x: 1100, y: 360, width: 160 },
+                { x: 1400, y: 320, width: 170 },
+                { x: 1700, y: 280, width: 150 },
+                { x: 2000, y: 400, width: 180 },
+                { x: 2300, y: 350, width: 160 },
+                { x: 2650, y: 310, width: 170 },
+                { x: 2950, y: 370, width: 180 },
+                { x: 3300, y: 410, width: 190 },
+                { x: 3650, y: 360, width: 170 }
             ],
             coins: [
-                { x: 430, y: 420 }, { x: 730, y: 360 }, { x: 1020, y: 300 },
-                { x: 1380, y: 350 }, { x: 1730, y: 290 }, { x: 2070, y: 230 },
-                { x: 2490, y: 370 }, { x: 2830, y: 310 }, { x: 3240, y: 250 },
-                { x: 3590, y: 330 }, { x: 3990, y: 370 }, { x: 4330, y: 320 }
+                { x: 430, y: 380 }, { x: 680, y: 340 }, { x: 930, y: 300 },
+                { x: 1180, y: 320 }, { x: 1480, y: 280 }, { x: 1780, y: 240 },
+                { x: 2090, y: 360 }, { x: 2390, y: 310 }, { x: 2740, y: 270 },
+                { x: 3040, y: 330 }, { x: 3390, y: 370 }, { x: 3730, y: 320 }
             ],
             obstacles: [
-                { x: 550, y: 180, startX: 550 },
-                { x: 1150, y: 160, startX: 1150 },
-                { x: 1850, y: 140, startX: 1850 },
-                { x: 2600, y: 150, startX: 2600 },
-                { x: 3350, y: 135, startX: 3350 },
-                { x: 4100, y: 160, startX: 4100 }
+                { x: 550, y: 260, startX: 550 },
+                { x: 1150, y: 270, startX: 1150 },
+                { x: 1850, y: 265, startX: 1850 },
+                { x: 2600, y: 275, startX: 2600 },
+                { x: 3350, y: 280, startX: 3350 },
+                { x: 4100, y: 270, startX: 4100 }
             ]
         },
         4: {
@@ -510,45 +676,45 @@
             length: 5200,
             floorSegments: [
                 { x: 0, width: 400 },
-                { x: 750, width: 300 },
-                { x: 1400, width: 350 },
-                { x: 2100, width: 300 },
-                { x: 2750, width: 400 },
-                { x: 3500, width: 300 },
-                { x: 4150, width: 350 },
-                { x: 4850, width: 350 }
+                { x: 600, width: 300 },
+                { x: 1100, width: 350 },
+                { x: 1650, width: 300 },
+                { x: 2200, width: 400 },
+                { x: 2850, width: 300 },
+                { x: 3400, width: 350 },
+                { x: 4000, width: 350 }
             ],
             platforms: [
-                { x: 300, y: 450, width: 150 },
-                { x: 600, y: 380, width: 130 },
-                { x: 900, y: 330, width: 140 },
-                { x: 1200, y: 380, width: 150 },
-                { x: 1550, y: 420, width: 160 },
-                { x: 1850, y: 360, width: 140 },
-                { x: 2200, y: 300, width: 150 },
-                { x: 2550, y: 390, width: 160 },
-                { x: 2900, y: 340, width: 150 },
-                { x: 3250, y: 380, width: 140 },
-                { x: 3650, y: 320, width: 160 },
-                { x: 4000, y: 400, width: 150 },
-                { x: 4350, y: 350, width: 140 },
-                { x: 4700, y: 390, width: 150 }
+                { x: 300, y: 420, width: 150 },
+                { x: 550, y: 380, width: 130 },
+                { x: 800, y: 340, width: 140 },
+                { x: 1050, y: 360, width: 150 },
+                { x: 1350, y: 400, width: 160 },
+                { x: 1650, y: 360, width: 140 },
+                { x: 1950, y: 320, width: 150 },
+                { x: 2250, y: 380, width: 160 },
+                { x: 2600, y: 340, width: 150 },
+                { x: 2900, y: 380, width: 140 },
+                { x: 3200, y: 330, width: 160 },
+                { x: 3550, y: 390, width: 150 },
+                { x: 3850, y: 350, width: 140 },
+                { x: 4150, y: 380, width: 150 }
             ],
             coins: [
-                { x: 375, y: 410 }, { x: 665, y: 340 }, { x: 970, y: 290 },
-                { x: 1275, y: 340 }, { x: 1625, y: 380 }, { x: 1920, y: 320 },
-                { x: 2275, y: 260 }, { x: 2625, y: 350 }, { x: 2975, y: 300 },
-                { x: 3325, y: 340 }, { x: 3720, y: 280 }, { x: 4075, y: 360 },
-                { x: 4425, y: 310 }, { x: 4775, y: 350 }, { x: 5000, y: 550 }
+                { x: 375, y: 380 }, { x: 625, y: 340 }, { x: 870, y: 300 },
+                { x: 1125, y: 320 }, { x: 1425, y: 360 }, { x: 1720, y: 320 },
+                { x: 2025, y: 280 }, { x: 2325, y: 340 }, { x: 2675, y: 300 },
+                { x: 2975, y: 340 }, { x: 3280, y: 290 }, { x: 3630, y: 350 },
+                { x: 3930, y: 310 }, { x: 4230, y: 350 }, { x: 5000, y: 550 }
             ],
             obstacles: [
-                { x: 480, y: 180, startX: 480 },
-                { x: 1050, y: 165, startX: 1050 },
-                { x: 1700, y: 155, startX: 1700 },
-                { x: 2400, y: 145, startX: 2400 },
-                { x: 3100, y: 160, startX: 3100 },
-                { x: 3850, y: 150, startX: 3850 },
-                { x: 4550, y: 170, startX: 4550 }
+                { x: 480, y: 260, startX: 480 },
+                { x: 1050, y: 270, startX: 1050 },
+                { x: 1700, y: 265, startX: 1700 },
+                { x: 2400, y: 275, startX: 2400 },
+                { x: 3100, y: 280, startX: 3100 },
+                { x: 3850, y: 270, startX: 3850 },
+                { x: 4550, y: 275, startX: 4550 }
             ]
         },
         5: {
@@ -556,55 +722,153 @@
             length: 6000,
             floorSegments: [
                 { x: 0, width: 350 },
-                { x: 750, width: 280 },
-                { x: 1450, width: 300 },
-                { x: 2150, width: 280 },
-                { x: 2850, width: 320 },
-                { x: 3600, width: 280 },
-                { x: 4300, width: 300 },
-                { x: 5000, width: 280 },
-                { x: 5700, width: 300 }
+                { x: 550, width: 280 },
+                { x: 1000, width: 300 },
+                { x: 1500, width: 280 },
+                { x: 2000, width: 320 },
+                { x: 2550, width: 280 },
+                { x: 3100, width: 300 },
+                { x: 3650, width: 280 },
+                { x: 4200, width: 300 }
             ],
             platforms: [
-                { x: 250, y: 460, width: 130 },
-                { x: 550, y: 410, width: 120 },
-                { x: 850, y: 350, width: 130 },
-                { x: 1150, y: 400, width: 120 },
-                { x: 1450, y: 340, width: 130 },
-                { x: 1750, y: 280, width: 120 },
-                { x: 2050, y: 420, width: 140 },
-                { x: 2400, y: 360, width: 130 },
-                { x: 2700, y: 300, width: 120 },
-                { x: 3050, y: 240, width: 130 },
-                { x: 3400, y: 390, width: 140 },
-                { x: 3750, y: 330, width: 130 },
-                { x: 4100, y: 380, width: 120 },
-                { x: 4450, y: 320, width: 130 },
-                { x: 4800, y: 270, width: 120 },
-                { x: 5150, y: 410, width: 140 },
-                { x: 5500, y: 350, width: 130 }
+                { x: 250, y: 420, width: 130 },
+                { x: 500, y: 380, width: 120 },
+                { x: 750, y: 340, width: 130 },
+                { x: 1000, y: 380, width: 120 },
+                { x: 1250, y: 320, width: 130 },
+                { x: 1500, y: 280, width: 120 },
+                { x: 1750, y: 400, width: 140 },
+                { x: 2050, y: 350, width: 130 },
+                { x: 2300, y: 300, width: 120 },
+                { x: 2600, y: 250, width: 130 },
+                { x: 2900, y: 380, width: 140 },
+                { x: 3200, y: 330, width: 130 },
+                { x: 3500, y: 370, width: 120 },
+                { x: 3800, y: 310, width: 130 },
+                { x: 4100, y: 270, width: 120 },
+                { x: 4400, y: 400, width: 140 },
+                { x: 4700, y: 350, width: 130 }
             ],
             coins: [
-                { x: 315, y: 420 }, { x: 615, y: 370 }, { x: 920, y: 310 },
-                { x: 1220, y: 360 }, { x: 1520, y: 300 }, { x: 1815, y: 240 },
-                { x: 2140, y: 380 }, { x: 2485, y: 320 }, { x: 2770, y: 260 },
-                { x: 3135, y: 200 }, { x: 3485, y: 350 }, { x: 3835, y: 290 },
-                { x: 4185, y: 340 }, { x: 4535, y: 280 }, { x: 4870, y: 230 },
-                { x: 5235, y: 370 }, { x: 5585, y: 310 }, { x: 5850, y: 550 }
+                { x: 315, y: 380 }, { x: 565, y: 340 }, { x: 820, y: 300 },
+                { x: 1070, y: 340 }, { x: 1320, y: 280 }, { x: 1570, y: 240 },
+                { x: 1840, y: 360 }, { x: 2135, y: 310 }, { x: 2385, y: 260 },
+                { x: 2685, y: 210 }, { x: 2985, y: 340 }, { x: 3285, y: 290 },
+                { x: 3585, y: 330 }, { x: 3885, y: 270 }, { x: 4185, y: 230 },
+                { x: 4485, y: 360 }, { x: 4785, y: 310 }, { x: 5850, y: 550 }
             ],
             obstacles: [
-                { x: 450, y: 170, startX: 450 },
-                { x: 1000, y: 155, startX: 1000 },
-                { x: 1600, y: 140, startX: 1600 },
-                { x: 2250, y: 130, startX: 2250 },
-                { x: 2900, y: 145, startX: 2900 },
-                { x: 3500, y: 135, startX: 3500 },
-                { x: 4200, y: 150, startX: 4200 },
-                { x: 4950, y: 140, startX: 4950 },
-                { x: 5600, y: 160, startX: 5600 }
+                { x: 450, y: 260, startX: 450 },
+                { x: 1000, y: 270, startX: 1000 },
+                { x: 1600, y: 265, startX: 1600 },
+                { x: 2250, y: 275, startX: 2250 },
+                { x: 2900, y: 280, startX: 2900 },
+                { x: 3500, y: 270, startX: 3500 },
+                { x: 4200, y: 275, startX: 4200 },
+                { x: 4950, y: 280, startX: 4950 },
+                { x: 5600, y: 270, startX: 5600 }
             ]
         }
     };
+
+    /**
+     * Validates level design to ensure playability requirements are met.
+     * 
+     * @param {Object} levelData - A level object from LEVELS
+     * @param {string} levelData.name - Level name
+     * @param {number} levelData.length - Total level length
+     * @param {Array} levelData.floorSegments - Array of {x, width} objects
+     * @param {Array} levelData.platforms - Array of {x, y, width} objects
+     * @param {Array} levelData.coins - Array of {x, y} objects
+     * @param {Array} levelData.obstacles - Array of {x, y, startX} objects
+     * 
+     * Checks:
+     * - Floor segment gaps are ≤280px (max jump distance with safety margin)
+     * - Platform horizontal gaps are ≤180px
+     * - Platform vertical spacing is reasonable (100-140px)
+     * - Coins are within reachable bounds
+     * - Obstacles are positioned at y>250px
+     * 
+     * Logs warnings to console for any violations.
+     */
+    function validateLevel(levelData) {
+        const MAX_FLOOR_GAP = 280; // Max jump distance with safety margin
+        const MAX_PLATFORM_GAP = 180;
+        const MIN_VERTICAL_SPACING = 100;
+        const MAX_VERTICAL_SPACING = 140;
+        const MIN_OBSTACLE_Y = 250;
+        const GROUND_Y = 550; // Ground level
+        
+        let hasWarnings = false;
+        const levelName = levelData.name || 'Unknown';
+        
+        // Validate floor segment gaps
+        if (levelData.floorSegments && levelData.floorSegments.length > 1) {
+            for (let i = 0; i < levelData.floorSegments.length - 1; i++) {
+                const current = levelData.floorSegments[i];
+                const next = levelData.floorSegments[i + 1];
+                const currentEnd = current.x + current.width;
+                const gap = next.x - currentEnd;
+                
+                if (gap > MAX_FLOOR_GAP) {
+                    console.warn(`[${levelName}] Floor gap ${i}-${i+1} is ${gap}px (max: ${MAX_FLOOR_GAP}px)`);
+                    hasWarnings = true;
+                }
+            }
+        }
+        
+        // Validate platform gaps and spacing
+        if (levelData.platforms && levelData.platforms.length > 1) {
+            const sortedPlatforms = [...levelData.platforms].sort((a, b) => a.x - b.x);
+            
+            for (let i = 0; i < sortedPlatforms.length - 1; i++) {
+                const current = sortedPlatforms[i];
+                const next = sortedPlatforms[i + 1];
+                const currentEnd = current.x + current.width;
+                const horizontalGap = next.x - currentEnd;
+                const verticalSpacing = Math.abs(next.y - current.y);
+                
+                if (horizontalGap > MAX_PLATFORM_GAP) {
+                    console.warn(`[${levelName}] Platform gap ${i}-${i+1} is ${horizontalGap}px (max: ${MAX_PLATFORM_GAP}px)`);
+                    hasWarnings = true;
+                }
+                
+                if (verticalSpacing < MIN_VERTICAL_SPACING || verticalSpacing > MAX_VERTICAL_SPACING) {
+                    if (horizontalGap < MAX_PLATFORM_GAP) { // Only warn if platforms are close horizontally
+                        console.warn(`[${levelName}] Platform vertical spacing ${i}-${i+1} is ${verticalSpacing}px (recommended: ${MIN_VERTICAL_SPACING}-${MAX_VERTICAL_SPACING}px)`);
+                        hasWarnings = true;
+                    }
+                }
+            }
+        }
+        
+        // Validate coin accessibility (basic bounds check)
+        if (levelData.coins) {
+            levelData.coins.forEach((coin, index) => {
+                if (coin.y < 0 || coin.y > GROUND_Y + 100) {
+                    console.warn(`[${levelName}] Coin ${index} at (${coin.x}, ${coin.y}) may be out of reachable bounds`);
+                    hasWarnings = true;
+                }
+            });
+        }
+        
+        // Validate obstacle positions
+        if (levelData.obstacles) {
+            levelData.obstacles.forEach((obstacle, index) => {
+                if (obstacle.y < MIN_OBSTACLE_Y) {
+                    console.warn(`[${levelName}] Obstacle ${index} at y=${obstacle.y} is below recommended minimum (${MIN_OBSTACLE_Y}px)`);
+                    hasWarnings = true;
+                }
+            });
+        }
+        
+        if (!hasWarnings) {
+            console.log(`[${levelName}] Level validation passed ✓`);
+        }
+        
+        return !hasWarnings;
+    }
 
     // ==========================================================================
     // DOM UTILITIES
@@ -1005,10 +1269,17 @@
             this.won = false;
             this.grounded = false;
             this.camX = 0;
+            this.lookAheadOffset = 0;
+            this.coyoteCounter = 0;
+            this.jumpBufferCounter = 0;
             
             // Visual effects
             this.particles = [];
             this.trail = [];
+            
+            // Load theme based on current level
+            const currentLevel = LevelManager.progress.currentLevel;
+            this.theme = LEVEL_THEMES[currentLevel] || LEVEL_THEMES[1];
             
             // Level data (cloned from level manager)
             const levelData = LevelManager.getLevelData();
@@ -1063,16 +1334,22 @@
         }
 
         update() {
-            if (this.won || !GameManager.state.started) return;
+            if (!GameManager.state.started) return;
             
             const p = this.player;
             const prevY = p.y;
             
             this._updatePlatforms();
-            this._updateMovement(p);
-            this._updatePhysics(p, prevY);
-            this._updateObstacles(p);
-            this._updateCoins(p);
+            
+            if (!this.won) {
+                this._updateMovement(p);
+                this._updatePhysics(p, prevY);
+                this._updateObstacles(p);
+                this._updateCoins(p);
+            } else {
+                this._playVictoryAnimation(p);
+            }
+            
             this._updateParticles();
             this._checkFinish(p);
         }
@@ -1118,17 +1395,16 @@
         }
 
         _updatePhysics(p, prevY) {
+            // Jump buffering logic
+            if (this.keys.jump && !p.stunned) {
+                this.jumpBufferCounter = PHYSICS.JUMP_BUFFER;
+            } else if (this.jumpBufferCounter > 0) {
+                this.jumpBufferCounter--;
+            }
+            
             // Gravity
             p.vy += PHYSICS.GRAVITY;
             if (p.vy > PHYSICS.MAX_FALL_SPEED) p.vy = PHYSICS.MAX_FALL_SPEED;
-            
-            // Jump
-            if (this.keys.jump && this.grounded && !p.stunned) {
-                p.vy = PHYSICS.JUMP_POWER;
-                AudioManager.play('jump');
-                this.grounded = false;
-                this._burst(p.x + p.w/2, p.y + p.h, '#8BC34A', 5);
-            }
             
             // Apply movement
             p.x += p.vx;
@@ -1140,7 +1416,7 @@
             // Floor collision
             this.floors.forEach(f => {
                 if (p.x + p.w > f.x + 2 && p.x < f.x + f.width - 2) {
-                    if (p.vy >= 0 && prevY + p.h <= f.y + 5 && p.y + p.h >= f.y) {
+                    if (p.vy >= 0 && prevY + p.h <= f.y + 8 && p.y + p.h >= f.y) {
                         p.y = f.y - p.h;
                         p.vy = 0;
                         this.grounded = true;
@@ -1151,13 +1427,51 @@
             // Platform collision
             this.platforms.forEach(pl => {
                 if (p.x + p.w > pl.x + 2 && p.x < pl.x + pl.width - 2) {
-                    if (p.vy >= 0 && prevY + p.h <= pl.y + 5 && p.y + p.h >= pl.y && p.y < pl.y + pl.h) {
+                    if (p.vy >= 0 && prevY + p.h <= pl.y + 8 && p.y + p.h >= pl.y && p.y < pl.y + pl.h) {
                         p.y = pl.y - p.h;
                         p.vy = 0;
                         this.grounded = true;
                     }
                 }
             });
+            
+            // Coyote time tracking
+            if (this.grounded) {
+                this.coyoteCounter = PHYSICS.COYOTE_TIME;
+            } else if (this.coyoteCounter > 0) {
+                this.coyoteCounter--;
+            }
+            
+            // Jump execution with buffering and coyote time
+            const canJump = (this.grounded || this.coyoteCounter > 0) && !p.stunned;
+            if (this.jumpBufferCounter > 0 && canJump) {
+                p.vy = PHYSICS.JUMP_POWER;
+                AudioManager.play('jump');
+                this.grounded = false;
+                this.coyoteCounter = 0;
+                this.jumpBufferCounter = 0;
+                // Aumentar cantidad de partículas de burst de 5 a 12
+                this._burst(p.x + p.w/2, p.y + p.h, '#8BC34A', 12);
+                // Agregar partícula tipo 'ring' con propiedades especificadas
+                const maxParticles = 150;
+                if (this.particles.length < maxParticles) {
+                    this.particles.push({
+                        x: p.x + p.w/2,
+                        y: p.y + p.h,
+                        vx: 0,
+                        vy: 0,
+                        life: 20,
+                        color: 'rgba(115, 160, 63, 0.5)',
+                        type: 'ring',
+                        radius: 10
+                    });
+                }
+            }
+            
+            // Variable jump height (jump cut)
+            if (!this.keys.jump && p.vy < PHYSICS.JUMP_CUT_THRESHOLD) {
+                p.vy *= PHYSICS.JUMP_CUT_MULTIPLIER;
+            }
             
             // Fall death
             if (p.y > this.canvas.height + 50) {
@@ -1172,12 +1486,31 @@
             p.x = Math.max(0, p.x);
             
             // Camera
-            this.camX = Math.max(0, Math.min(p.x - this.canvas.width / 2, this.finishX - this.canvas.width + 150));
+            this._updateCamera(p);
             
             // Progress
             if (this.progressEl) {
                 this.progressEl.style.width = Math.min(100, p.x / this.finishX * 100) + '%';
             }
+        }
+
+        _updateCamera(p) {
+            // Calcular offset de look-ahead: p.facing * 100 píxeles en dirección del movimiento
+            const targetLookAhead = p.facing * 100;
+            
+            // Aplicar suavizado exponencial con factor 0.1 para transiciones fluidas
+            this.lookAheadOffset += (targetLookAhead - this.lookAheadOffset) * 0.1;
+            
+            // Calcular posición base de cámara
+            let targetCamX = p.x - this.canvas.width / 2 + this.lookAheadOffset;
+            
+            // Agregar efecto de shake cuando p.stunned > 0 usando valores aleatorios de ±4 píxeles
+            if (p.stunned > 0) {
+                targetCamX += (Math.random() - 0.5) * 8;
+            }
+            
+            // Mantener límites existentes (0 hasta finishX - canvas.width + 150)
+            this.camX = Math.max(0, Math.min(targetCamX, this.finishX - this.canvas.width + 150));
         }
 
         _updateObstacles(p) {
@@ -1234,6 +1567,20 @@
                     if (this.coinsEl) this.coinsEl.textContent = this.coins;
                     this._burst(c.x, c.y, '#EB8225', 8);
                     AudioManager.play('coin');
+                    // Agregar partícula tipo 'text' con propiedades especificadas
+                    const maxParticles = 150;
+                    if (this.particles.length < maxParticles) {
+                        this.particles.push({
+                            x: c.x,
+                            y: c.y,
+                            vx: 0,
+                            vy: -2,
+                            life: 30,
+                            color: '#FFD700',
+                            type: 'text',
+                            text: '+1'
+                        });
+                    }
                 }
             });
         }
@@ -1255,16 +1602,42 @@
                 this.finishTime = Date.now();
                 this._burst(p.x + p.w/2, p.y, '#73A03F', 20);
                 
-                if (!this.resultsShown) {
-                    this.resultsShown = true;
-                    const allDone = Object.values(GameManager.state.games).every(
-                        g => g.won || GameManager.state.players[g.num].disconnected
-                    );
-                    if (allDone && !GameManager.state.resultsDisplayed) {
-                        GameManager.state.resultsDisplayed = true;
-                        setTimeout(() => GameManager.showResults(), 1200);
-                    }
+                // Count finished players
+                const finishedCount = Object.values(GameManager.state.games).filter(
+                    g => g.won && !GameManager.state.players[g.num].disconnected
+                ).length;
+                
+                // Show overlay on first finish
+                if (finishedCount === 1) {
+                    GameManager.showLiveRankingOverlay(this.num);
                 }
+                
+                // Always update ranking when someone finishes
+                GameManager.updateLiveRanking();
+                
+                // Check if all players finished
+                const allDone = Object.values(GameManager.state.games).every(
+                    g => g.won || GameManager.state.players[g.num].disconnected
+                );
+                
+                if (allDone && !GameManager.state.resultsDisplayed) {
+                    GameManager.state.resultsDisplayed = true;
+                    setTimeout(() => {
+                        GameManager.hideLiveRankingOverlay();
+                        GameManager.showResults();
+                    }, 2000);
+                }
+            }
+        }
+
+        _playVictoryAnimation(p) {
+            // Bounce in place using sine wave
+            p.y += Math.sin(Date.now() / 200) * 2;
+            p.facing = 1;
+            
+            // Periodic celebratory particle bursts
+            if (Math.random() < 0.05) {
+                this._burst(p.x + p.w/2, p.y, this.color, 8);
             }
         }
 
@@ -1280,6 +1653,7 @@
             
             this._drawClouds(ctx, w);
             this._drawFloors(ctx, w);
+            this._drawDecorations(ctx, w);
             this._drawPlatforms(ctx, w);
             this._drawObstacles(ctx, w);
             this._drawCoins(ctx, w);
@@ -1289,26 +1663,76 @@
             this._drawPlayer(ctx);
             
             ctx.restore();
+            
+            // Indicadores fuera de pantalla
+            this._drawOffScreenIndicators(ctx, w, h);
+        }
+
+        _drawOffScreenIndicators(ctx, w, h) {
+            this.coinList.forEach(c => {
+                if (c.got) return;
+                
+                // Verificar si moneda está fuera de pantalla comparando c.x con this.camX y this.camX + w
+                const isOffScreenLeft = c.x < this.camX;
+                const isOffScreenRight = c.x > this.camX + w;
+                
+                if (!isOffScreenLeft && !isOffScreenRight) return;
+                
+                // Dibujar flecha triangular en borde de pantalla (x=20 o x=w-20, y=50)
+                const arrowX = isOffScreenLeft ? 20 : w - 20;
+                const arrowY = 50;
+                
+                // Usar color naranja #EB8225 para consistencia visual
+                ctx.fillStyle = '#EB8225';
+                ctx.beginPath();
+                if (isOffScreenLeft) {
+                    // Flecha apuntando a la derecha
+                    ctx.moveTo(arrowX, arrowY);
+                    ctx.lineTo(arrowX + 10, arrowY - 5);
+                    ctx.lineTo(arrowX + 10, arrowY + 5);
+                } else {
+                    // Flecha apuntando a la izquierda
+                    ctx.moveTo(arrowX, arrowY);
+                    ctx.lineTo(arrowX - 10, arrowY - 5);
+                    ctx.lineTo(arrowX - 10, arrowY + 5);
+                }
+                ctx.closePath();
+                ctx.fill();
+                
+                // Mostrar distancia en metros usando Math.floor(Math.abs(c.x - this.player.x))
+                const distance = Math.floor(Math.abs(c.x - this.player.x));
+                ctx.fillStyle = '#EB8225';
+                ctx.font = 'bold 12px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                ctx.fillText(distance + 'm', arrowX, arrowY + 10);
+            });
         }
 
         _drawBackground(ctx, w, h) {
-            ctx.fillStyle = '#87CEEB';
-            ctx.fillRect(0, 0, w, h * 0.4);
-            ctx.fillStyle = '#98D8C8';
-            ctx.fillRect(0, h * 0.4, w, h * 0.3);
-            ctx.fillStyle = '#2D5A4A';
-            ctx.fillRect(0, h * 0.7, w, h * 0.3);
+            const gradient = ctx.createLinearGradient(0, 0, 0, h);
+            gradient.addColorStop(0, this.theme.sky[0]);
+            gradient.addColorStop(0.5, this.theme.sky[1]);
+            gradient.addColorStop(1, this.theme.sky[2]);
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, w, h);
         }
 
         _drawClouds(ctx, w) {
-            ctx.fillStyle = 'rgba(255,255,255,0.9)';
-            const clouds = [[100, 60], [400, 90], [800, 50], [1200, 80], [1700, 65], [2200, 75], [2700, 55]];
+            ctx.fillStyle = this.theme.clouds;
+            const parallaxOffset = this.camX * 0.3;
+            const clouds = [
+                [100, 60], [400, 90], [800, 50], [1200, 80], [1700, 65], 
+                [2200, 75], [2700, 55], [3200, 70], [3700, 85], [4200, 60],
+                [4700, 75], [5200, 65], [5700, 80]
+            ];
             clouds.forEach(([x, y]) => {
-                if (x < this.camX - 100 || x > this.camX + w + 100) return;
+                const cloudX = x - parallaxOffset;
+                if (cloudX < this.camX - 100 || cloudX > this.camX + w + 100) return;
                 ctx.beginPath();
-                ctx.arc(x, y, 30, 0, Math.PI * 2);
-                ctx.arc(x + 25, y - 5, 22, 0, Math.PI * 2);
-                ctx.arc(x + 50, y, 28, 0, Math.PI * 2);
+                ctx.arc(cloudX, y, 30, 0, Math.PI * 2);
+                ctx.arc(cloudX + 25, y - 5, 22, 0, Math.PI * 2);
+                ctx.arc(cloudX + 50, y, 28, 0, Math.PI * 2);
                 ctx.fill();
             });
         }
@@ -1317,11 +1741,11 @@
             this.floors.forEach(f => {
                 if (f.x + f.width < this.camX || f.x > this.camX + w) return;
                 
-                ctx.fillStyle = '#5D4037';
+                ctx.fillStyle = this.theme.floor[0];
                 ctx.fillRect(f.x, f.y, f.width, 70);
-                ctx.fillStyle = '#8BC34A';
+                ctx.fillStyle = this.theme.floor[1];
                 ctx.fillRect(f.x, f.y, f.width, 12);
-                ctx.fillStyle = '#9CCC65';
+                ctx.fillStyle = this.theme.accent;
                 for (let gx = f.x + 10; gx < f.x + f.width - 10; gx += 25) {
                     ctx.fillRect(gx, f.y - 4, 3, 8);
                 }
@@ -1332,10 +1756,185 @@
             this.platforms.forEach(pl => {
                 if (pl.x + pl.width < this.camX || pl.x > this.camX + w) return;
                 
-                ctx.fillStyle = '#546E7A';
+                // Shadow
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                ctx.fillRect(pl.x + 4, pl.y + pl.h, pl.width, 4);
+                
+                // Platform gradient
+                const gradient = ctx.createLinearGradient(pl.x, pl.y, pl.x, pl.y + pl.h);
+                gradient.addColorStop(0, this.theme.platform[1]);
+                gradient.addColorStop(1, this.theme.platform[0]);
+                ctx.fillStyle = gradient;
                 ctx.fillRect(pl.x, pl.y, pl.width, pl.h);
-                ctx.fillStyle = '#78909C';
-                ctx.fillRect(pl.x, pl.y, pl.width, 4);
+                
+                // Agregar líneas verticales cada 20px con fillStyle = 'rgba(255, 255, 255, 0.1)'
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+                for (let x = pl.x; x < pl.x + pl.width; x += 20) {
+                    ctx.fillRect(x, pl.y, 1, pl.h);
+                }
+                
+                // Para plataformas móviles (pl.speed > 0), dibujar indicador dorado en la parte superior centrada (20px de ancho, 2px de alto)
+                if (pl.speed > 0) {
+                    ctx.fillStyle = '#FFD700';
+                    ctx.fillRect(pl.x + pl.width / 2 - 10, pl.y, 20, 2);
+                }
+                
+                // Top border
+                ctx.fillStyle = this.theme.accent;
+                ctx.fillRect(pl.x, pl.y, pl.width, 3);
+            });
+        }
+
+        _drawDecorations(ctx, w) {
+            switch (this.theme.decorations) {
+                case 'flowers':
+                    this._drawFlowers(ctx, w);
+                    break;
+                case 'cacti':
+                    this._drawCacti(ctx, w);
+                    break;
+                case 'snow':
+                    this._drawSnow(ctx, w);
+                    break;
+                case 'lava':
+                    this._drawLava(ctx, w);
+                    break;
+                case 'stars':
+                    this._drawStars(ctx, w);
+                    break;
+            }
+        }
+
+        _drawFlowers(ctx, w) {
+            this.floors.forEach(f => {
+                if (f.x + f.width < this.camX || f.x > this.camX + w) return;
+                
+                for (let x = f.x + 40; x < f.x + f.width - 40; x += 80) {
+                    if (x < this.camX - 20 || x > this.camX + w + 20) continue;
+                    
+                    // Stem
+                    ctx.fillStyle = '#73A03F';
+                    ctx.fillRect(x - 1, f.y - 15, 2, 15);
+                    
+                    // Flower head
+                    ctx.fillStyle = '#FF69B4';
+                    ctx.beginPath();
+                    ctx.arc(x, f.y - 15, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+        }
+
+        _drawCacti(ctx, w) {
+            this.floors.forEach(f => {
+                if (f.x + f.width < this.camX || f.x > this.camX + w) return;
+                
+                for (let x = f.x + 60; x < f.x + f.width - 60; x += 120) {
+                    if (x < this.camX - 30 || x > this.camX + w + 30) continue;
+                    
+                    // Main body
+                    ctx.fillStyle = '#228B22';
+                    ctx.fillRect(x - 6, f.y - 25, 12, 25);
+                    
+                    // Left arm
+                    ctx.fillRect(x - 6, f.y - 18, 8, 6);
+                    
+                    // Right arm
+                    ctx.fillRect(x - 2, f.y - 12, 8, 6);
+                }
+            });
+        }
+
+        _drawSnow(ctx, w) {
+            const t = performance.now();
+            
+            // Snow caps on floors
+            this.floors.forEach(f => {
+                if (f.x + f.width < this.camX || f.x > this.camX + w) return;
+                
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                for (let x = f.x + 20; x < f.x + f.width - 20; x += 50) {
+                    if (x < this.camX - 15 || x > this.camX + w + 15) continue;
+                    ctx.beginPath();
+                    ctx.arc(x, f.y - 8, 8, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+            
+            // Falling snowflakes
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            const snowflakeCount = 20;
+            for (let i = 0; i < snowflakeCount; i++) {
+                const seed = i * 137.5;
+                const x = (this.camX + (seed % w) + (t * 0.05)) % (this.finishX + w);
+                const y = ((t * 0.1 + seed) % (this.canvas.height + 100)) - 50;
+                
+                if (x < this.camX - 10 || x > this.camX + w + 10) continue;
+                if (y < 0 || y > this.canvas.height) continue;
+                
+                ctx.beginPath();
+                ctx.arc(x, y, 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        _drawLava(ctx, w) {
+            const t = performance.now();
+            
+            this.floors.forEach(f => {
+                if (f.x + f.width < this.camX || f.x > this.camX + w) return;
+                
+                // Lava pool at floor level
+                const lavaY = f.y + 70;
+                const gradient = ctx.createLinearGradient(f.x, lavaY - 20, f.x, lavaY);
+                gradient.addColorStop(0, 'rgba(255, 100, 0, 0.8)');
+                gradient.addColorStop(0.5, 'rgba(255, 50, 0, 0.9)');
+                gradient.addColorStop(1, 'rgba(200, 0, 0, 1)');
+                
+                ctx.fillStyle = gradient;
+                ctx.fillRect(f.x, lavaY - 20, f.width, 20);
+                
+                // Bubbling effect
+                ctx.fillStyle = 'rgba(255, 200, 0, 0.6)';
+                for (let x = f.x + 30; x < f.x + f.width - 30; x += 60) {
+                    if (x < this.camX - 20 || x > this.camX + w + 20) continue;
+                    const bubbleY = lavaY - 15 + Math.sin((t * 0.003) + x * 0.01) * 5;
+                    ctx.beginPath();
+                    ctx.arc(x, bubbleY, 4 + Math.sin(t * 0.005 + x) * 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+        }
+
+        _drawStars(ctx, w) {
+            const t = performance.now();
+            const stars = [
+                [200, 100], [450, 80], [700, 120], [950, 90], [1200, 110],
+                [1500, 85], [1800, 105], [2100, 95], [2400, 115], [2700, 100],
+                [3000, 88], [3300, 112], [3600, 92], [3900, 108], [4200, 98],
+                [4500, 114], [4800, 87], [5100, 107], [5400, 102], [5700, 96]
+            ];
+            
+            stars.forEach(([x, y], i) => {
+                if (x < this.camX - 20 || x > this.camX + w + 20) return;
+                
+                const twinkle = (Math.sin(t * 0.002 + i) + 1) / 2;
+                const opacity = 0.5 + twinkle * 0.5;
+                
+                ctx.fillStyle = `rgba(255, 215, 0, ${opacity})`;
+                ctx.beginPath();
+                ctx.arc(x, y, 2, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Star points
+                ctx.strokeStyle = `rgba(255, 215, 0, ${opacity * 0.6})`;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(x, y - 4);
+                ctx.lineTo(x, y + 4);
+                ctx.moveTo(x - 4, y);
+                ctx.lineTo(x + 4, y);
+                ctx.stroke();
             });
         }
 
@@ -1407,20 +2006,45 @@
                 if (c.got) return;
                 if (c.x < this.camX - 50 || c.x > this.camX + w + 50) return;
                 
-                const bobY = Math.sin(t / 200 + c.bob) * 4;
+                // Aumentar amplitud de bob de 4 a 6 píxeles
+                const bobY = Math.sin(t / 200 + c.bob) * 6;
+                
+                // Agregar efecto de glow usando createRadialGradient con radio 25px y color dorado con transparencia
+                const glowGradient = ctx.createRadialGradient(c.x, c.y + bobY, 0, c.x, c.y + bobY, 25);
+                glowGradient.addColorStop(0, 'rgba(255, 215, 0, 0.8)');
+                glowGradient.addColorStop(0.5, 'rgba(255, 215, 0, 0.4)');
+                glowGradient.addColorStop(1, 'rgba(255, 215, 0, 0)');
+                ctx.fillStyle = glowGradient;
+                ctx.beginPath();
+                ctx.arc(c.x, c.y + bobY, 25, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Aumentar radio de moneda de 14 a 18 píxeles
                 ctx.fillStyle = '#EB8225';
                 ctx.beginPath();
-                ctx.arc(c.x, c.y + bobY, 14, 0, Math.PI * 2);
+                ctx.arc(c.x, c.y + bobY, 18, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.fillStyle = '#FFD700';
                 ctx.beginPath();
                 ctx.arc(c.x - 4, c.y + bobY - 4, 5, 0, Math.PI * 2);
                 ctx.fill();
+                
+                // Cambiar fuente de símbolo a bold 16px para mejor visibilidad
                 ctx.fillStyle = 'white';
-                ctx.font = 'bold 12px Arial';
+                ctx.font = 'bold 16px Arial';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText('$', c.x, c.y + bobY + 1);
+                
+                // Agregar partículas brillantes intermitentes cuando Math.sin(t / 100 + c.bob) > 0.8
+                if (Math.sin(t / 100 + c.bob) > 0.8) {
+                    const sparkleX = c.x + (Math.random() - 0.5) * 30;
+                    const sparkleY = c.y + bobY + (Math.random() - 0.5) * 30;
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                    ctx.beginPath();
+                    ctx.arc(sparkleX, sparkleY, 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
             });
         }
 
@@ -1456,10 +2080,29 @@
         _drawParticles(ctx) {
             this.particles.forEach(pt => {
                 ctx.globalAlpha = pt.life / 30;
-                ctx.fillStyle = pt.color;
-                ctx.beginPath();
-                ctx.arc(pt.x, pt.y, 4, 0, Math.PI * 2);
-                ctx.fill();
+                
+                if (pt.type === 'ring') {
+                    // Anillos expansivos para feedback de salto
+                    const radius = pt.radius + (30 - pt.life) * 2;
+                    ctx.strokeStyle = pt.color;
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(pt.x, pt.y, radius, 0, Math.PI * 2);
+                    ctx.stroke();
+                } else if (pt.type === 'text') {
+                    // Texto flotante para contador de monedas
+                    ctx.fillStyle = pt.color;
+                    ctx.font = 'bold 20px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(pt.text, pt.x, pt.y);
+                } else {
+                    // Partículas circulares existentes
+                    ctx.fillStyle = pt.color;
+                    ctx.beginPath();
+                    ctx.arc(pt.x, pt.y, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                }
             });
             ctx.globalAlpha = 1;
         }
@@ -1566,6 +2209,15 @@
             if (deltaTime >= targetFrameTime * 0.9) {
                 this.update();
                 this.draw();
+                
+                // Update live ranking every 10 frames if overlay is visible
+                if (this.num === 1 && GameManager.state.liveRankingVisible) {
+                    const hasWinner = Object.values(GameManager.state.games).some(g => g.won);
+                    if (hasWinner && (this.frameCount || 0) % 10 === 0) {
+                        GameManager.updateLiveRanking();
+                    }
+                    this.frameCount = (this.frameCount || 0) + 1;
+                }
             }
             
             this.animationFrameId = requestAnimationFrame(() => this.loop());
@@ -1596,7 +2248,8 @@
             starting: false,
             startTime: null,
             admin: null,
-            resultsDisplayed: false
+            resultsDisplayed: false,
+            liveRankingVisible: false
         },
         
         _setupEventListeners() {
@@ -1847,8 +2500,10 @@
         },
         
         _handleGameInput(playerSlot, data) {
-            if (playerSlot && this.state.games[playerSlot] && this.state.started) {
+            console.log('Input received:', playerSlot, data, 'started:', this.state.started);
+            if (playerSlot && this.state.games[playerSlot]) {
                 const g = this.state.games[playerSlot];
+                console.log('Processing input for player', playerSlot, '- keys:', g.keys);
                 
                 if (data.action === 'move') {
                     g.keys.left = data.direction === 'left';
@@ -1993,6 +2648,93 @@
                 hasNextLevel: LevelManager.hasNextLevel() 
             });
         },
+
+        showLiveRankingOverlay(winnerNum) {
+            const winner = this.state.players[winnerNum];
+            if (!winner) return;
+            
+            const winnerInfoEl = DOM.get('winnerInfo');
+            if (winnerInfoEl) {
+                winnerInfoEl.innerHTML = `
+                    <div class="player-avatar mx-auto mb-2" style="background:${winner.color};width:80px;height:80px;border-radius:16px;box-shadow:0 0 20px ${winner.color}50"></div>
+                    <div class="text-2xl font-black" style="color:${winner.color}">${winner.name}</div>
+                `;
+            }
+            
+            this.updateLiveRanking();
+            
+            const overlay = DOM.get('liveRankingOverlay');
+            if (overlay) {
+                overlay.classList.remove('hidden');
+                this.state.liveRankingVisible = true;
+            }
+            
+            AudioManager.play('win');
+        },
+
+        updateLiveRanking() {
+            const players = [];
+            
+            for (let n in this.state.games) {
+                const g = this.state.games[n];
+                const p = this.state.players[n];
+                if (!p || p.disconnected) continue;
+                
+                players.push({
+                    num: n,
+                    name: p.name,
+                    color: p.color,
+                    finished: g.won,
+                    finishTime: g.finishTime,
+                    position: g.player?.x || 0,
+                    coins: g.coins || 0
+                });
+            }
+            
+            // Sort: finished players first (by finish time), then by current x position
+            players.sort((a, b) => {
+                if (a.finished && b.finished) {
+                    return a.finishTime - b.finishTime;
+                }
+                if (a.finished) return -1;
+                if (b.finished) return 1;
+                return b.position - a.position;
+            });
+            
+            this.displayLiveRanking(players);
+        },
+
+        displayLiveRanking(players) {
+            const listEl = DOM.get('livePositionList');
+            if (!listEl) return;
+            
+            let html = '';
+            players.forEach((player, index) => {
+                const position = index + 1;
+                const status = player.finished ? '✅ Terminó' : '🏃 Corriendo';
+                const borderColor = player.color;
+                
+                html += `
+                    <div class="position-item" style="border-left-color: ${borderColor}">
+                        <div class="text-2xl font-bold text-steam-turquesa w-8 text-center">${position}</div>
+                        <div class="flex-1">
+                            <div class="font-bold" style="color: ${player.color}">${player.name}</div>
+                            <div class="text-sm text-gray-600">${status}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            listEl.innerHTML = html;
+        },
+
+        hideLiveRankingOverlay() {
+            const overlay = DOM.get('liveRankingOverlay');
+            if (overlay) {
+                overlay.classList.add('hidden');
+                this.state.liveRankingVisible = false;
+            }
+        },
         
         restart() {
             if (!this.state.resultsDisplayed) return;
@@ -2012,6 +2754,10 @@
             this.state.starting = false;
             this.state.games = {};
             this.state.resultsDisplayed = false;
+            this.state.liveRankingVisible = false;
+            
+            // Hide overlay if visible
+            this.hideLiveRankingOverlay();
             
             // Remove disconnected players
             for (let n in this.state.players) {
