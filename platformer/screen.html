@@ -2200,24 +2200,16 @@
         loop() {
             if (!this.running) return;
             
-            const now = performance.now();
-            const deltaTime = now - (this.lastFrameTime || now);
-            this.lastFrameTime = now;
+            this.update();
+            this.draw();
             
-            const targetFrameTime = 1000 / 60;
-            
-            if (deltaTime >= targetFrameTime * 0.9) {
-                this.update();
-                this.draw();
-                
-                // Update live ranking every 10 frames if overlay is visible
-                if (this.num === 1 && GameManager.state.liveRankingVisible) {
-                    const hasWinner = Object.values(GameManager.state.games).some(g => g.won);
-                    if (hasWinner && (this.frameCount || 0) % 10 === 0) {
-                        GameManager.updateLiveRanking();
-                    }
-                    this.frameCount = (this.frameCount || 0) + 1;
+            // Update live ranking every 10 frames if overlay is visible
+            if (this.num === 1 && GameManager.state.liveRankingVisible) {
+                const hasWinner = Object.values(GameManager.state.games).some(g => g.won);
+                if (hasWinner && (this.frameCount || 0) % 10 === 0) {
+                    GameManager.updateLiveRanking();
                 }
+                this.frameCount = (this.frameCount || 0) + 1;
             }
             
             this.animationFrameId = requestAnimationFrame(() => this.loop());
