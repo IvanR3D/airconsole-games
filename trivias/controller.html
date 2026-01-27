@@ -185,15 +185,35 @@
 <body class="w-screen h-screen overflow-hidden font-sans bg-white text-steam-negro">
     <div class="w-full h-full flex flex-col">
         <!-- JOIN SCREEN -->
-        <div class="screen active flex-col items-center justify-center p-4 sm:p-8 text-center gap-4 sm:gap-6" id="joinScreen">
-            <div class="flex justify-center mb-2">
-                <div class="player-avatar-visual bg-steam-turquesa bounce-anim"></div>
+        <div class="screen active flex-col items-center justify-center p-4 sm:p-8 text-center gap-4 sm:gap-6 bg-white" id="joinScreen">
+            <!-- Logo Section -->
+            <div class="mb-4">
+                <div class="text-5xl sm:text-6xl mb-3 bounce-anim">🎓</div>
+                <div class="flex justify-center mb-3">
+                    <div class="inline-flex items-center gap-1 sm:gap-2 bg-white border-3 border-purple-300 rounded-full py-2 px-4 shadow-lg">
+                        <span class="font-black text-lg sm:text-xl" style="color: #0595AE;">S</span>
+                        <span class="font-black text-lg sm:text-xl" style="color: #EB8225;">T</span>
+                        <span class="font-black text-lg sm:text-xl" style="color: #73A03F;">E</span>
+                        <span class="font-black text-lg sm:text-xl" style="color: #AB3D8B;">A</span>
+                        <span class="font-black text-lg sm:text-xl" style="color: #0595AE;">M</span>
+                    </div>
+                </div>
             </div>
-            <h1 class="text-xl sm:text-2xl font-bold text-steam-turquesa">STEAM Trivia</h1>
-            <p class="text-sm sm:text-base text-steam-negro/70 mb-2">Fundacion STEAM RD</p>
-            <p class="text-xs sm:text-sm text-gray-500 mb-4">Demuestra tus conocimientos!</p>
             
-            <button class="bg-steam-verde text-white border-none py-4 px-8 text-lg font-bold rounded-full cursor-pointer uppercase btn-3d btn-verde w-full max-w-xs" id="joinBtn">
+            <h1 class="text-2xl sm:text-3xl font-black mb-1" style="color: #AB3D8B;">TRIVIA</h1>
+            <p class="text-sm sm:text-base text-gray-600 font-semibold mb-2">Fundación STEAM RD</p>
+            <p class="text-xs sm:text-sm text-gray-500 mb-6">Demuestra tus conocimientos!</p>
+            
+            <!-- Education Icons -->
+            <div class="flex justify-center gap-3 mb-6 flex-wrap">
+                <span class="text-2xl sm:text-3xl">📐</span>
+                <span class="text-2xl sm:text-3xl">🔬</span>
+                <span class="text-2xl sm:text-3xl">⚗️</span>
+                <span class="text-2xl sm:text-3xl">🤖</span>
+                <span class="text-2xl sm:text-3xl">💻</span>
+            </div>
+            
+            <button class="bg-steam-verde text-white border-none py-4 px-8 text-lg font-black rounded-full cursor-pointer uppercase btn-3d btn-verde w-full max-w-xs shadow-xl" id="joinBtn">
                 UNIRSE AL JUEGO
             </button>
             
@@ -228,15 +248,20 @@
         </div>
 
         <!-- ADMIN CATEGORY SELECT SCREEN -->
-        <div class="screen flex-col p-3 sm:p-5 overflow-y-auto" id="categorySelectScreen">
-            <div class="text-center mb-3 sm:mb-4">
+        <div class="screen flex-col p-3 sm:p-5 overflow-y-auto bg-white" id="categorySelectScreen">
+            <!-- Admin Badge -->
+            <div class="text-center mb-4 sm:mb-5">
+                <div class="inline-flex items-center gap-2 bg-gradient-to-r from-orange-100 to-amber-100 border-3 border-steam-naranja rounded-full py-2 px-5 mb-3 shadow-lg">
+                    <span class="text-2xl">👑</span>
+                    <span class="text-steam-naranja font-black text-sm sm:text-base">ERES EL ADMIN</span>
+                </div>
                 <div class="player-avatar-visual mx-auto mb-2 sm:mb-3" id="adminAvatar"></div>
                 <div class="text-base sm:text-lg font-bold" id="adminNameDisplay"></div>
-                <div class="bg-steam-naranja text-white py-1 px-3 sm:px-4 rounded-full font-bold text-xs sm:text-sm inline-block mt-2">ADMIN</div>
             </div>
-            <h2 class="text-lg sm:text-xl font-bold text-steam-turquesa mb-3 sm:mb-4 text-center">Selecciona una Categoria</h2>
+            
+            <h2 class="text-lg sm:text-xl font-black text-center mb-4 sm:mb-5" style="color: #AB3D8B;">Selecciona una Categoría</h2>
             <div class="grid grid-cols-2 gap-2 sm:gap-3 mb-4 sm:mb-5" id="categoryGrid"></div>
-            <button class="bg-steam-turquesa text-white border-none py-3 sm:py-4 px-6 sm:px-8 text-base sm:text-lg font-bold rounded-full cursor-pointer uppercase btn-3d btn-turquesa w-full" id="startGameBtn">INICIAR JUEGO!</button>
+            <button class="bg-steam-turquesa text-white border-none py-3 sm:py-4 px-6 sm:px-8 text-base sm:text-lg font-black rounded-full cursor-pointer uppercase btn-3d btn-turquesa w-full shadow-xl" id="startGameBtn">INICIAR JUEGO!</button>
         </div>
 
         <!-- PLAYING SCREEN -->
