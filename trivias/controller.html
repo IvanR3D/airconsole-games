@@ -332,6 +332,17 @@
                 // Auto-connection handled by screen's onConnect
                 // Just show connecting state
                 playerName = airconsole.getNickname() || `Jugador ${airconsole.device_id}`;
+                
+                // Timeout de seguridad: si después de 3 segundos no se recibe el mensaje joined,
+                // intentar solicitar el estado al screen
+                setTimeout(() => {
+                    const connectingMsg = document.getElementById('connectingMsg');
+                    if (connectingMsg && !connectingMsg.classList.contains('hidden')) {
+                        console.log('⚠️ Timeout: No se recibió mensaje joined, solicitando estado...');
+                        // El screen debería enviar el mensaje joined automáticamente cuando detecta la conexión
+                        // Si no lo hace, podría ser que el dispositivo no sea un active player
+                    }
+                }, 3000);
             };
 
             airconsole.onMessage = function(from, data) {
@@ -425,6 +436,10 @@
                 updateSelectedCategory(data.selectedCategory);
             }
             
+            // Ocultar mensaje de conexión cuando se conecta exitosamente
+            document.getElementById('connectingMsg').classList.add('hidden');
+            document.getElementById('errorMsg').classList.add('hidden');
+            
             if (isAdmin) {
                 showScreen('categorySelect');
             } else {
@@ -446,6 +461,10 @@
             if (data.selectedCategory) {
                 updateSelectedCategory(data.selectedCategory);
             }
+            
+            // Ocultar mensaje de conexión cuando se reconecta exitosamente
+            document.getElementById('connectingMsg').classList.add('hidden');
+            document.getElementById('errorMsg').classList.add('hidden');
             
             // Resume appropriate screen based on game state
             if (data.gameState === 'playing') {

@@ -517,6 +517,18 @@
                             broadcastGameState();
                         } else {
                             console.log(`ℹ️ Player already connected (deviceId: ${deviceId})`);
+                            // Player already exists but controller might have reloaded
+                            // Send joined message anyway to sync state
+                            const existingPlayer = players[deviceId];
+                            airconsole.message(deviceId, {
+                                action: 'joined',
+                                color: existingPlayer.color,
+                                isAdmin: existingPlayer.isAdmin,
+                                gameState: gameState,
+                                selectedCategory: selectedCategory,
+                                score: existingPlayer.score
+                            });
+                            console.log(`🔄 Sent joined message to already connected player ${deviceId}`);
                         }
                     } else {
                         // New player - auto-assign if there's space
