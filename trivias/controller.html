@@ -187,11 +187,17 @@
         <!-- JOIN SCREEN -->
         <div class="screen active flex-col items-center justify-center p-4 sm:p-8 text-center gap-4 sm:gap-6" id="joinScreen">
             <div class="flex justify-center mb-2">
-                <div class="player-avatar-visual bg-steam-turquesa"></div>
+                <div class="player-avatar-visual bg-steam-turquesa bounce-anim"></div>
             </div>
             <h1 class="text-xl sm:text-2xl font-bold text-steam-turquesa">STEAM Trivia</h1>
-            <p class="text-sm sm:text-base text-steam-negro/70">Fundacion STEAM RD</p>
-            <div class="bg-steam-verde/10 border-2 border-steam-verde rounded-2xl py-4 px-6 pulse flex items-center gap-2" id="connectingMsg">
+            <p class="text-sm sm:text-base text-steam-negro/70 mb-2">Fundacion STEAM RD</p>
+            <p class="text-xs sm:text-sm text-gray-500 mb-4">Demuestra tus conocimientos!</p>
+            
+            <button class="bg-steam-verde text-white border-none py-4 px-8 text-lg font-bold rounded-full cursor-pointer uppercase btn-3d btn-verde w-full max-w-xs" id="joinBtn">
+                UNIRSE AL JUEGO
+            </button>
+            
+            <div class="bg-steam-verde/10 border-2 border-steam-verde rounded-2xl py-4 px-6 pulse hidden flex items-center gap-2" id="connectingMsg">
                 <div class="w-5 h-5 border-3 border-steam-verde border-t-transparent rounded-full animate-spin"></div>
                 <span class="text-steam-verde font-bold">Conectando...</span>
             </div>
@@ -297,6 +303,7 @@
         let myScore = 0;
         let myRank = 1;
         let selectedCategory = 'general';
+        let hasJoined = false; // Track if player has explicitly joined
 
         const domCache = {};
         
@@ -329,20 +336,9 @@
                 setupCategoryGrid();
                 setupAnswerButtons();
                 
-                // Auto-connection handled by screen's onConnect
-                // Just show connecting state
+                // Get player name but don't auto-join
                 playerName = airconsole.getNickname() || `Jugador ${airconsole.device_id}`;
-                
-                // Timeout de seguridad: si después de 3 segundos no se recibe el mensaje joined,
-                // intentar solicitar el estado al screen
-                setTimeout(() => {
-                    const connectingMsg = document.getElementById('connectingMsg');
-                    if (connectingMsg && !connectingMsg.classList.contains('hidden')) {
-                        console.log('⚠️ Timeout: No se recibió mensaje joined, solicitando estado...');
-                        // El screen debería enviar el mensaje joined automáticamente cuando detecta la conexión
-                        // Si no lo hace, podría ser que el dispositivo no sea un active player
-                    }
-                }, 3000);
+                console.log('Controller ready, waiting for user to join...');
             };
 
             airconsole.onMessage = function(from, data) {
@@ -390,6 +386,20 @@
                         break;
                 }
             };
+
+            // Join button handler
+            document.getElementById('joinBtn').addEventListener('click', () => {
+                if (!hasJoined) {
+                    hasJoined = true;
+                    document.getElementById('joinBtn').classList.add('hidden');
+                    document.getElementById('connectingMsg').classList.remove('hidden');
+                    document.getElementById('connectingMsg').classList.add('flex');
+                    
+                    // Send join request to screen
+                    sendMessage({ action: 'join' });
+                    console.log('Join request sent to screen');
+                }
+            });
 
             document.getElementById('startGameBtn').addEventListener('click', startGame);
             document.getElementById('playAgainBtn').addEventListener('click', playAgain);
