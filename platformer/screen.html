@@ -460,7 +460,7 @@
         GRAVITY: 0.6,
         MAX_FALL_SPEED: 18,
         MOVE_SPEED: 3,
-        JUMP_POWER: -15,
+        JUMP_POWER: -12,
         AIR_ACCELERATION: 0.7,
         GROUND_ACCELERATION: 0.85,
         FRICTION: 0.7,
@@ -1315,11 +1315,47 @@
             const ratio = this._getScalingRatio(this.canvas.height);
             this.floorY = this.canvas.height - 70;
             
+            // Get player count for platform height adjustment
+            const playerCount = Object.keys(GameManager.state.players).filter(
+                n => !GameManager.state.players[n].disconnected
+            ).length;
+            
             // Scale level elements
             this.floors.forEach(f => f.y = this.floorY);
-            this.platforms.forEach(p => p.y *= ratio);
-            this.coinList.forEach(c => c.y *= ratio);
-            this.obstacles.forEach(o => o.y *= ratio);
+            
+            // Adjust platform heights to be closer to ground for 1-2 players
+            this.platforms.forEach(p => {
+                p.y *= ratio;
+                // For 1-2 players, move platforms closer to ground
+                if (playerCount <= 2) {
+                    const distanceFromFloor = this.floorY - p.y;
+                    // Reduce the distance by 30% to bring platforms closer to ground
+                    p.y = this.floorY - (distanceFromFloor * 0.7);
+                }
+            });
+            
+            this.coinList.forEach(c => {
+                c.y *= ratio;
+                // Adjust coin positions similarly for 1-2 players
+                if (playerCount <= 2) {
+                    const distanceFromFloor = this.floorY - c.y;
+                    if (distanceFromFloor > 0) {
+                        c.y = this.floorY - (distanceFromFloor * 0.7);
+                    }
+                }
+            });
+            
+            this.obstacles.forEach(o => {
+                o.y *= ratio;
+                // Adjust obstacle positions similarly for 1-2 players
+                if (playerCount <= 2) {
+                    const distanceFromFloor = this.floorY - o.y;
+                    if (distanceFromFloor > 0) {
+                        o.y = this.floorY - (distanceFromFloor * 0.7);
+                    }
+                }
+            });
+            
             this.player.y = 300 * ratio;
             
             // Cache DOM elements
@@ -2201,10 +2237,46 @@
             
             this.floorY = newHeight - 70;
             
+            // Get player count for platform height adjustment
+            const playerCount = Object.keys(GameManager.state.players).filter(
+                n => !GameManager.state.players[n].disconnected
+            ).length;
+            
             this.floors.forEach(f => f.y = this.floorY);
-            this.platforms.forEach(p => p.y *= scaleY);
-            this.coinList.forEach(c => c.y *= scaleY);
-            this.obstacles.forEach(o => o.y *= scaleY);
+            
+            // Adjust platform heights to be closer to ground for 1-2 players
+            this.platforms.forEach(p => {
+                p.y *= scaleY;
+                // For 1-2 players, move platforms closer to ground
+                if (playerCount <= 2) {
+                    const distanceFromFloor = this.floorY - p.y;
+                    // Reduce the distance by 30% to bring platforms closer to ground
+                    p.y = this.floorY - (distanceFromFloor * 0.7);
+                }
+            });
+            
+            this.coinList.forEach(c => {
+                c.y *= scaleY;
+                // Adjust coin positions similarly for 1-2 players
+                if (playerCount <= 2) {
+                    const distanceFromFloor = this.floorY - c.y;
+                    if (distanceFromFloor > 0) {
+                        c.y = this.floorY - (distanceFromFloor * 0.7);
+                    }
+                }
+            });
+            
+            this.obstacles.forEach(o => {
+                o.y *= scaleY;
+                // Adjust obstacle positions similarly for 1-2 players
+                if (playerCount <= 2) {
+                    const distanceFromFloor = this.floorY - o.y;
+                    if (distanceFromFloor > 0) {
+                        o.y = this.floorY - (distanceFromFloor * 0.7);
+                    }
+                }
+            });
+            
             this.player.y *= scaleY;
         }
 
