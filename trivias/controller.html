@@ -597,14 +597,14 @@
             grid.innerHTML = '';
             
             const categoryColors = {
-                general: { primary: '#0595AE' },
-                science: { primary: '#73A03F' },
-                mathematics: { primary: '#0595AE' },
-                robotics: { primary: '#AB3D8B' },
-                chemistry: { primary: '#73A03F' },
-                technology: { primary: '#AB3D8B' },
-                history: { primary: '#EB8225' },
-                geography: { primary: '#0595AE' }
+                general: '#0595AE',
+                science: '#73A03F',
+                mathematics: '#0595AE',
+                robotics: '#AB3D8B',
+                chemistry: '#EB8225',
+                technology: '#AB3D8B',
+                history: '#EB8225',
+                geography: '#0595AE'
             };
             
             // Icon mapping with outline versions
@@ -620,13 +620,15 @@
             };
             
             Object.entries(categories).forEach(([key, cat]) => {
-                const colors = categoryColors[key] || categoryColors.general;
+                const btnColor = categoryColors[key] || categoryColors.general;
+                const isSelected = key === selectedCategory;
                 const btn = document.createElement('div');
-                btn.className = `category-btn bg-white border-[3px] ${key === selectedCategory ? 'border-steam-verde bg-green-50' : 'border-gray-200'} rounded-xl sm:rounded-2xl p-3 sm:p-4 text-center cursor-pointer transition-all shadow-md active:scale-95`;
+                btn.className = `category-btn border-[3px] ${isSelected ? 'border-steam-verde' : 'border-gray-200'} rounded-xl sm:rounded-2xl p-3 sm:p-4 text-center cursor-pointer transition-all shadow-md active:scale-95`;
+                btn.style.background = isSelected ? btnColor : '#FFFFFF';
                 btn.dataset.category = key;
                 btn.innerHTML = `
-                    <iconify-icon icon="${categoryIcons[key]}" class="category-icon mb-2" style="color: ${key === selectedCategory ? colors.primary : '#9E9E9E'};"></iconify-icon>
-                    <div class="text-xs sm:text-sm font-bold" style="color: ${key === selectedCategory ? colors.primary : '#757575'};">${cat.name}</div>
+                    <iconify-icon icon="${categoryIcons[key]}" class="category-icon mb-2" style="color: ${isSelected ? '#FFFFFF' : '#9E9E9E'};"></iconify-icon>
+                    <div class="text-xs sm:text-sm font-bold" style="color: ${isSelected ? '#FFFFFF' : '#757575'};">${cat.name}</div>
                 `;
                 btn.addEventListener('click', () => selectCategory(key));
                 grid.appendChild(btn);
@@ -752,33 +754,42 @@
             selectedCategory = category;
             
             const categoryColors = {
-                general: { primary: '#0595AE' },
-                science: { primary: '#73A03F' },
-                mathematics: { primary: '#0595AE' },
-                robotics: { primary: '#AB3D8B' },
-                chemistry: { primary: '#73A03F' },
-                technology: { primary: '#AB3D8B' },
-                history: { primary: '#EB8225' },
-                geography: { primary: '#0595AE' }
+                general: '#0595AE',
+                science: '#73A03F',
+                mathematics: '#0595AE',
+                robotics: '#AB3D8B',
+                chemistry: '#EB8225',
+                technology: '#AB3D8B',
+                history: '#EB8225',
+                geography: '#0595AE'
             };
             
             document.querySelectorAll('.category-btn').forEach(btn => {
                 const btnCategory = btn.dataset.category;
-                const colors = categoryColors[btnCategory] || categoryColors.general;
+                const btnColor = categoryColors[btnCategory] || categoryColors.general;
                 const isSelected = btnCategory === category;
                 
+                // Remove all border classes
                 btn.classList.remove('border-steam-verde', 'bg-green-50', 'border-gray-200');
-                btn.classList.add(isSelected ? 'border-steam-verde' : 'border-gray-200');
-                if (isSelected) btn.classList.add('bg-green-50');
-                
-                // Update icon and text colors
-                const icon = btn.querySelector('.category-icon');
-                const text = btn.querySelector('.text-xs');
-                if (icon) icon.style.color = isSelected ? colors.primary : '#9E9E9E';
-                if (text) text.style.color = isSelected ? colors.primary : '#757575';
                 
                 if (isSelected) {
-                    // Animate selected icon with scale bounce (reduced height)
+                    // Selected: fondo del color de la categoría con borde verde
+                    btn.style.background = btnColor;
+                    btn.classList.add('border-steam-verde');
+                } else {
+                    // Not selected: fondo blanco con borde gris
+                    btn.style.background = '#FFFFFF';
+                    btn.classList.add('border-gray-200');
+                }
+                
+                // Update icon and text colors - siempre blancos cuando seleccionado, grises cuando no
+                const icon = btn.querySelector('.category-icon');
+                const text = btn.querySelector('.text-xs');
+                if (icon) icon.style.color = isSelected ? '#FFFFFF' : '#9E9E9E';
+                if (text) text.style.color = isSelected ? '#FFFFFF' : '#757575';
+                
+                if (isSelected) {
+                    // Animate selected icon with scale bounce
                     if (icon && anime && anime.animate) {
                         anime.animate(icon, {
                             scale: [1, 1.2, 0.95, 1.05, 1],
@@ -901,30 +912,38 @@
             }
             
             const categoryColors = {
-                general: { primary: '#0595AE' },
-                science: { primary: '#73A03F' },
-                mathematics: { primary: '#0595AE' },
-                robotics: { primary: '#AB3D8B' },
-                chemistry: { primary: '#73A03F' },
-                technology: { primary: '#AB3D8B' },
-                history: { primary: '#EB8225' },
-                geography: { primary: '#0595AE' }
+                general: '#0595AE',
+                science: '#73A03F',
+                mathematics: '#0595AE',
+                robotics: '#AB3D8B',
+                chemistry: '#EB8225',
+                technology: '#AB3D8B',
+                history: '#EB8225',
+                geography: '#0595AE'
             };
             
             document.querySelectorAll('.category-btn').forEach(btn => {
                 const btnCategory = btn.dataset.category;
-                const colors = categoryColors[btnCategory] || categoryColors.general;
+                const btnColor = categoryColors[btnCategory] || categoryColors.general;
                 const isSelected = btnCategory === category;
                 
                 btn.classList.remove('border-steam-verde', 'bg-green-50', 'border-gray-200');
-                btn.classList.add(isSelected ? 'border-steam-verde' : 'border-gray-200');
-                if (isSelected) btn.classList.add('bg-green-50');
                 
-                // Update icon and text colors
+                if (isSelected) {
+                    // Selected: fondo del color de la categoría con borde verde
+                    btn.style.background = btnColor;
+                    btn.classList.add('border-steam-verde');
+                } else {
+                    // Not selected: fondo blanco con borde gris
+                    btn.style.background = '#FFFFFF';
+                    btn.classList.add('border-gray-200');
+                }
+                
+                // Update icon and text colors - siempre blancos cuando seleccionado, grises cuando no
                 const icon = btn.querySelector('.category-icon');
                 const text = btn.querySelector('.text-xs');
-                if (icon) icon.style.color = isSelected ? colors.primary : '#9E9E9E';
-                if (text) text.style.color = isSelected ? colors.primary : '#757575';
+                if (icon) icon.style.color = isSelected ? '#FFFFFF' : '#9E9E9E';
+                if (text) text.style.color = isSelected ? '#FFFFFF' : '#757575';
             });
             
             // Always update background particles when category changes
