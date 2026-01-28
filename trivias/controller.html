@@ -10,7 +10,6 @@
         // Import Anime.js v4 from esm.sh
         import { animate, stagger } from 'https://esm.sh/animejs';
         window.anime = { animate, stagger };
-        console.log('Anime.js v4 loaded from esm.sh');
     </script>
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <script>
@@ -463,18 +462,15 @@
             cacheDom();
 
             airconsole.onReady = function() {
-                console.log('Controller ready');
                 setupCategoryGrid();
                 setupAnswerButtons();
                 createJoinParticles();
                 
                 // Get player name but don't auto-join
                 playerName = airconsole.getNickname() || `Jugador ${airconsole.device_id}`;
-                console.log('Controller ready, waiting for user to join...');
             };
 
             airconsole.onMessage = function(from, data) {
-                console.log("Received:", data.action);
                 
                 switch(data.action) {
                     case 'joined':
@@ -485,6 +481,9 @@
                         break;
                     case 'gameFull':
                         handleGameFull();
+                        break;
+                    case 'gameInProgress':
+                        handleGameInProgress(data.message);
                         break;
                     case 'gameStateUpdate':
                         handleGameStateUpdate(data);
@@ -532,7 +531,6 @@
                     
                     // Send join request to screen
                     sendMessage({ action: 'join' });
-                    console.log('Join request sent to screen');
                 }
             });
 
@@ -720,6 +718,20 @@
         function handleGameFull() {
             document.getElementById('connectingMsg').classList.add('hidden');
             document.getElementById('errorMsg').classList.remove('hidden');
+            if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+        }
+
+        function handleGameInProgress(message) {
+            document.getElementById('connectingMsg').classList.add('hidden');
+            const errorMsg = document.getElementById('errorMsg');
+            errorMsg.classList.remove('hidden');
+            
+            // Update error message text
+            const errorText = errorMsg.querySelector('p');
+            if (errorText) {
+                errorText.textContent = message || 'El juego ya está en progreso. Espera a que termine.';
+            }
+            
             if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
         }
 

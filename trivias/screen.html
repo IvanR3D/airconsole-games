@@ -10,7 +10,6 @@
         // Import Anime.js v4 from esm.sh
         import { animate, stagger } from 'https://esm.sh/animejs';
         window.anime = { animate, stagger };
-        console.log('Anime.js v4 loaded from esm.sh');
     </script>
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <script>
@@ -65,16 +64,14 @@
             position: relative;
         }
 
-        /* Timer bar with arrow effect - Shorter */
+        /* Timer bar with arrow effect */
         .timer-bar-container {
             position: relative;
-            width: 100%;
-            height: 24px;
+            height: 28px;
             background: #E0E0E0;
-            border-radius: 12px;
+            border-radius: 14px;
             overflow: visible;
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
-            z-index: 1;
         }
         
         .timer-bar {
@@ -82,15 +79,13 @@
             left: 0;
             top: 0;
             height: 100%;
-            background: linear-gradient(90deg, #FFA726 0%, #FFD54F 50%, #AED581 100%);
-            border-radius: 12px;
+            background: linear-gradient(90deg, #EB8225 0%, #FFD54F 50%, #73A03F 100%);
+            border-radius: 14px;
             transition: width 1s linear, background 0.3s ease;
-            box-shadow: 0 2px 8px rgba(255, 167, 38, 0.4);
-            z-index: 1;
         }
         
         .timer-bar.warning {
-            background: linear-gradient(90deg, #FF7043 0%, #FFA726 100%);
+            background: linear-gradient(90deg, #EB8225 0%, #FFA726 100%);
         }
         
         .timer-bar.danger {
@@ -98,46 +93,43 @@
             animation: pulse 0.5s ease infinite;
         }
         
+        /* Flecha al final de la barra */
         .timer-arrow {
             position: absolute;
-            right: -12px;
+            right: -18px;
             top: 50%;
             transform: translateY(-50%);
             width: 0;
             height: 0;
-            border-top: 12px solid transparent;
-            border-bottom: 12px solid transparent;
-            border-left: 15px solid #AED581;
-            filter: drop-shadow(2px 0 4px rgba(0,0,0,0.2));
+            border-top: 14px solid transparent;
+            border-bottom: 14px solid transparent;
+            border-left: 20px solid #73A03F;
             transition: border-left-color 0.3s ease;
-            z-index: 1;
+            filter: drop-shadow(2px 0 2px rgba(0,0,0,0.2));
         }
         
-        .timer-bar.warning + .timer-arrow {
+        .timer-bar.warning ~ .timer-arrow {
             border-left-color: #FFA726;
         }
         
-        .timer-bar.danger + .timer-arrow {
-            border-left-color: #E53935;
+        .timer-bar.danger ~ .timer-arrow {
+            border-left-color: #FF7043;
         }
         
-        .timer-circle-header {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 45px;
-            height: 45px;
+        .timer-circle-standalone {
+            width: 55px;
+            height: 55px;
             border-radius: 50%;
             background: #0595AE;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 22px;
             font-weight: bold;
             color: white;
-            box-shadow: 0 4px 12px rgba(5, 149, 174, 0.3);
-            z-index: 10;
+            box-shadow: 0 4px 15px rgba(5, 149, 174, 0.4);
+            flex-shrink: 0;
+            border: 3px solid rgba(255, 255, 255, 0.3);
         }
         
         /* Animated background particles - Soft colored blobs */
@@ -936,11 +928,14 @@
         <div class="screen flex-col h-full" id="playingScreen" style="background: #FFFFFF;">
             <!-- Timer Bar Header -->
             <div class="relative p-4 sm:p-6" style="background: rgba(255, 255, 255, 0.95); box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
-                <div class="timer-bar-container">
-                    <div class="timer-bar" id="timerBar" style="width: 100%;">
-                        <div class="timer-arrow"></div>
+                <div class="flex items-center justify-center gap-6">
+                    <!-- Barra de tiempo con flecha -->
+                    <div class="timer-bar-container" style="width: 60%;">
+                        <div class="timer-bar" id="timerBar" style="width: 100%;"></div>
+                        <div class="timer-arrow" id="timerArrow"></div>
                     </div>
-                    <div class="timer-circle-header" id="timerCircle">20</div>
+                    <!-- Contador circular -->
+                    <div class="timer-circle-standalone" id="timerCircle">20</div>
                 </div>
             </div>
 
@@ -1070,6 +1065,7 @@
         let timeLeft = 20;
         let soundEnabled = true;
         let adminDeviceId = null;
+        let resultsShown = false; // Evita mostrar resultados múltiples veces
 
         const domCache = {};
 
@@ -1183,19 +1179,14 @@
             initParticleNetwork();
             
             function animateIntroScreen() {
-                console.log('Starting intro animations...');
-                
                 // Simple fade in for intro screen
                 const introScreen = document.getElementById('introScreen');
                 if (introScreen) {
                     introScreen.style.opacity = '1';
                 }
-                
-                console.log('Intro animation complete!');
             }
 
             airconsole.onReady = function() {
-                console.log('Screen ready');
                 setupCategories();
                 
                 // Start on intro screen, stay there until players join
@@ -1203,16 +1194,12 @@
             };
 
             airconsole.onConnect = function(deviceId) {
-                console.log("🔌 Device connected:", deviceId);
                 // Don't auto-join, wait for explicit join message
             };
 
             airconsole.onDisconnect = function(deviceId) {
-                console.log("🔌 Device disconnected:", deviceId);
-                
                 if (players[deviceId]) {
                     const player = players[deviceId];
-                    console.log(`⚠️ Player ${player.name} disconnected - marking as disconnected`);
                     
                     player.disconnected = true;
                     updatePlayersDisplay();
@@ -1222,15 +1209,12 @@
                         playerId: deviceId,
                         playerName: player.name
                     });
-                    
-                    console.log(`📊 Active players: ${Object.values(players).filter(p => !p.disconnected).length}/${Object.keys(players).length}`);
                 } else {
-                    console.log(`ℹ️ Disconnected device ${deviceId} was not in active players`);
+                    // Device was not in active players
                 }
             };
 
             airconsole.onMessage = function(deviceId, data) {
-                console.log("Received:", data.action, "from", deviceId);
                 
                 if (data.action === 'join') {
                     // Check if player already exists
@@ -1249,7 +1233,6 @@
                                 score: existingPlayer.score
                             });
                             
-                            console.log(`✨ Player ${existingPlayer.name} reconnected`);
                             updatePlayersDisplay();
                             broadcastGameState();
                         } else {
@@ -1264,7 +1247,17 @@
                             });
                         }
                     } else {
-                        // New player joining
+                        // New player trying to join
+                        
+                        // Check if game is already in progress
+                        if (gameState === 'playing' || gameState === 'gameEnd') {
+                            airconsole.message(deviceId, {
+                                action: 'gameInProgress',
+                                message: 'El juego ya está en progreso. Espera a que termine.'
+                            });
+                            return;
+                        }
+                        
                         const connectedPlayersCount = Object.keys(players).filter(
                             id => !players[id].disconnected
                         ).length;
@@ -1273,7 +1266,6 @@
                             const isAdmin = adminDeviceId === null;
                             if (isAdmin) {
                                 adminDeviceId = deviceId;
-                                console.log(`👑 Device ${deviceId} assigned as admin`);
                             }
                             
                             const playerColor = playerColors[Object.keys(players).length % playerColors.length];
@@ -1298,7 +1290,6 @@
                                 selectedCategory: selectedCategory
                             });
                             
-                            console.log(`✅ Player ${playerName} joined successfully!`);
                             updatePlayersDisplay();
                             
                             // First player joins - transition from intro to category selection
@@ -1309,7 +1300,6 @@
                             
                             broadcastGameState();
                         } else {
-                            console.log(`⚠️ Cannot join: Game is full (4/4 players)`);
                             airconsole.message(deviceId, {
                                 action: 'gameFull'
                             });
@@ -1317,16 +1307,12 @@
                     }
                     
                 } else if (data.action === 'selectCategory' && deviceId === adminDeviceId) {
-                    console.log('📱 Categoría seleccionada desde controller:', data.category);
                     selectedCategory = data.category;
                     
                     // Find and click the corresponding category card
                     const targetCard = document.querySelector(`.category-card[data-category="${data.category}"]`);
                     if (targetCard) {
-                        console.log('✅ Tarjeta encontrada, simulando click');
                         targetCard.click();
-                    } else {
-                        console.error('❌ No se encontró la tarjeta para:', data.category);
                     }
                     
                 } else if (data.action === 'startGame' && deviceId === adminDeviceId) {
@@ -1766,6 +1752,7 @@
 
         function showQuestion() {
             answers = {};
+            resultsShown = false; // Resetear para la nueva pregunta
             questionStartTime = Date.now();
             timeLeft = 20;
             
@@ -1885,7 +1872,8 @@
                     playSound('tick');
                 }
                 
-                if (timeLeft <= 0) {
+                if (timeLeft <= 0 && !resultsShown) {
+                    resultsShown = true;
                     clearInterval(timer);
                     showResults();
                 }
@@ -1894,7 +1882,7 @@
 
         function updateProgressBar() {
             const timerBar = document.getElementById('timerBar');
-            const timerArrow = timerBar?.querySelector('.timer-arrow');
+            const timerArrow = document.getElementById('timerArrow');
             
             if (timerBar) {
                 const percentage = (timeLeft / 20) * 100;
@@ -1906,8 +1894,12 @@
                 // Add appropriate class based on time
                 if (timeLeft <= 5) {
                     timerBar.classList.add('danger');
+                    if (timerArrow) timerArrow.style.borderLeftColor = '#FF7043';
                 } else if (timeLeft <= 10) {
                     timerBar.classList.add('warning');
+                    if (timerArrow) timerArrow.style.borderLeftColor = '#FFA726';
+                } else {
+                    if (timerArrow) timerArrow.style.borderLeftColor = '#73A03F';
                 }
             }
         }
@@ -1936,7 +1928,8 @@
         }
 
         function handleAnswer(playerId, optionIndex, timestamp) {
-            if (answers[playerId] || players[playerId]?.disconnected) return;
+            // Ignorar si ya se mostraron los resultados o el jugador ya respondió
+            if (resultsShown || answers[playerId] || players[playerId]?.disconnected) return;
 
             const timeElapsed = timestamp - questionStartTime;
             const isCorrect = optionIndex === gameQuestions[currentQuestion].correct;
@@ -1968,21 +1961,33 @@
 
             updatePlayersStatus();
 
+            // Verificar si todos los jugadores activos han respondido
             const activePlayers = Object.values(players).filter(p => !p.disconnected);
-            if (Object.keys(answers).length >= activePlayers.length) {
+            const answersCount = Object.keys(answers).length;
+            
+            if (answersCount >= activePlayers.length && !resultsShown) {
+                resultsShown = true;
                 clearInterval(timer);
                 setTimeout(() => showResults(), 800);
             }
         }
 
         function showResults() {
+            // Protección contra llamadas múltiples
+            if (resultsShown === false) {
+                resultsShown = true;
+            }
+            
             clearInterval(timer);
             const question = gameQuestions[currentQuestion];
             
             const options = document.querySelectorAll('.option-card');
             options.forEach((opt, index) => {
-                const textDiv = opt.querySelector('.flex-1');
                 const badge = opt.querySelector('div:first-child');
+                
+                // Limpiar cualquier indicador previo
+                const existingIndicators = opt.querySelectorAll('.answer-indicator');
+                existingIndicators.forEach(ind => ind.remove());
                 
                 if (index === question.correct) {
                     // Respuesta correcta - Verde
@@ -1991,19 +1996,19 @@
                     opt.style.boxShadow = '0 0 30px rgba(0, 204, 102, 0.6), 0 4px 15px rgba(0, 204, 102, 0.4)';
                     opt.classList.add('option-correct');
                     
-                    if (textDiv) {
-                        textDiv.style.color = '#fff';
-                        // Agregar indicador de respuesta correcta
-                        const indicator = document.createElement('div');
-                        indicator.className = 'text-xs sm:text-sm font-bold mt-1';
-                        indicator.style.color = '#fff';
-                        indicator.textContent = '✓ Respuesta correcta';
-                        textDiv.appendChild(indicator);
-                    }
-                    
                     if (badge) {
                         badge.style.background = '#009944';
                         badge.style.color = '#fff';
+                    }
+                    
+                    // Agregar indicador de respuesta correcta
+                    const textDiv = opt.querySelector('.flex-1');
+                    if (textDiv) {
+                        const indicator = document.createElement('div');
+                        indicator.className = 'answer-indicator text-xs sm:text-sm font-bold mt-2';
+                        indicator.style.color = '#fff';
+                        indicator.textContent = '✓ Respuesta correcta';
+                        textDiv.appendChild(indicator);
                     }
                 } else {
                     const wasSelected = Object.values(answers).some(a => a.option === index);
@@ -2014,29 +2019,25 @@
                         opt.style.boxShadow = '0 0 30px rgba(255, 68, 68, 0.6), 0 4px 15px rgba(255, 68, 68, 0.4)';
                         opt.classList.add('option-incorrect');
                         
-                        if (textDiv) {
-                            textDiv.style.color = '#fff';
-                            // Agregar indicador de tu respuesta
-                            const indicator = document.createElement('div');
-                            indicator.className = 'text-xs sm:text-sm font-bold mt-1';
-                            indicator.style.color = '#fff';
-                            indicator.textContent = '✗ Tu respuesta';
-                            textDiv.appendChild(indicator);
-                        }
-                        
                         if (badge) {
                             badge.style.background = '#cc3333';
                             badge.style.color = '#fff';
+                        }
+                        
+                        // Agregar indicador de tu respuesta
+                        const textDiv = opt.querySelector('.flex-1');
+                        if (textDiv) {
+                            const indicator = document.createElement('div');
+                            indicator.className = 'answer-indicator text-xs sm:text-sm font-bold mt-2';
+                            indicator.style.color = '#fff';
+                            indicator.textContent = '✗ Tu respuesta';
+                            textDiv.appendChild(indicator);
                         }
                     } else {
                         // No seleccionada - Gris
                         opt.style.background = '#9E9E9E';
                         opt.style.borderColor = '#9E9E9E';
                         opt.style.boxShadow = '0 2px 8px rgba(158, 158, 158, 0.3)';
-                        
-                        if (textDiv) {
-                            textDiv.style.color = '#fff';
-                        }
                         
                         if (badge) {
                             badge.style.background = '#757575';
@@ -2064,7 +2065,7 @@
                 } else {
                     endGame();
                 }
-            }, 2500);
+            }, 3500);
         }
 
         function updateScoreboard() {
