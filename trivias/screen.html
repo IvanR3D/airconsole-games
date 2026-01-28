@@ -1441,7 +1441,7 @@
                 card.style.background = '#9E9E9E';
                 card.style.border = `3px solid #9E9E9E`;
                 card.dataset.category = key;
-                card.dataset.color = categoryColor; // Guardar el color para cuando se seleccione
+                card.dataset.categoryColor = categoryColor; // Guardar el color en el dataset
                 
                 card.innerHTML = `
                     <!-- Icon container -->
@@ -1450,7 +1450,7 @@
                     </div>
                     
                     <!-- Category name -->
-                    <div class="relative text-base sm:text-lg lg:text-xl font-black uppercase tracking-wide mb-2" style="color: #FFFFFF;">
+                    <div class="relative text-base sm:text-lg lg:text-xl font-black uppercase tracking-wide mb-2 category-name" style="color: #FFFFFF;">
                         ${category.name}
                     </div>
                     
@@ -1477,13 +1477,13 @@
                             check.classList.add('hidden');
                             check.classList.remove('flex');
                         }
-                        // Volver a gris pero mantener iconos y texto en blanco
+                        // Volver a gris
                         c.style.background = '#9E9E9E';
                         c.style.border = '3px solid #9E9E9E';
                         
                         // Asegurar que iconos y texto permanezcan blancos
                         const icon = c.querySelector('.category-icon');
-                        const text = c.querySelector('.relative.text-base');
+                        const text = c.querySelector('.category-name');
                         if (icon) icon.style.color = '#FFFFFF';
                         if (text) text.style.color = '#FFFFFF';
                     });
@@ -1495,15 +1495,19 @@
                         check.classList.remove('hidden');
                         check.classList.add('flex');
                     }
-                    // Cambiar al color de la categoría
-                    card.style.background = categoryColor;
-                    card.style.border = `3px solid ${categoryColor}`;
+                    // Cambiar al color de la categoría usando el dataset
+                    const selectedColor = card.dataset.categoryColor;
+                    card.style.background = selectedColor;
+                    card.style.border = `3px solid ${selectedColor}`;
                     
                     // Asegurar que iconos y texto permanezcan blancos
                     const icon = card.querySelector('.category-icon');
-                    const text = card.querySelector('.relative.text-base');
+                    const text = card.querySelector('.category-name');
                     if (icon) icon.style.color = '#FFFFFF';
                     if (text) text.style.color = '#FFFFFF';
+                    
+                    // Update selected category
+                    selectedCategory = key;
                     
                     // Change background with animation
                     setCategoryBackground(key);
