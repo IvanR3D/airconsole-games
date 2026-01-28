@@ -1313,15 +1313,50 @@
                     selectedCategory = data.category;
                     setCategoryBackground(selectedCategory);
                     
+                    // Update background particles on screen
+                    createBackgroundParticles(selectedCategory);
+                    
+                    // Update visual selection on category cards
                     document.querySelectorAll('.category-card').forEach(card => {
-                        card.classList.remove('border-steam-verde', 'bg-green-50');
-                        card.classList.add('border-gray-200');
+                        const cardCategory = card.dataset.category;
+                        const categoryColors = {
+                            general: { primary: '#0595AE' },
+                            science: { primary: '#73A03F' },
+                            mathematics: { primary: '#0595AE' },
+                            robotics: { primary: '#AB3D8B' },
+                            chemistry: { primary: '#73A03F' },
+                            technology: { primary: '#AB3D8B' },
+                            history: { primary: '#EB8225' },
+                            geography: { primary: '#0595AE' }
+                        };
+                        const colors = categoryColors[cardCategory] || categoryColors.general;
+                        const isSelected = cardCategory === data.category;
+                        
+                        card.classList.remove('selected', 'scale-105');
+                        card.querySelector('.selection-check')?.classList.add('hidden');
+                        card.querySelector('.selection-check')?.classList.remove('flex');
+                        card.style.border = isSelected ? `3px solid ${colors.primary}` : '3px solid #E0E0E0';
+                        
+                        // Reset icon and text colors
+                        const icon = card.querySelector('.category-icon');
+                        const text = card.querySelector('.relative.text-base');
+                        const underlines = card.querySelectorAll('.flex.gap-1 > div');
+                        if (icon) icon.style.color = isSelected ? colors.primary : '#9E9E9E';
+                        if (text) text.style.color = isSelected ? colors.primary : '#757575';
+                        underlines.forEach((line, idx) => {
+                            if (isSelected) {
+                                line.style.background = colors.primary;
+                            } else {
+                                line.className = `w-8 h-1 rounded-full ${idx === 0 ? 'bg-gray-300' : idx === 1 ? 'bg-gray-200' : 'bg-gray-100'}`;
+                            }
+                        });
+                        
+                        if (isSelected) {
+                            card.classList.add('selected', 'scale-105');
+                            card.querySelector('.selection-check')?.classList.remove('hidden');
+                            card.querySelector('.selection-check')?.classList.add('flex');
+                        }
                     });
-                    const selected = document.querySelector(`[data-category="${data.category}"]`);
-                    if (selected) {
-                        selected.classList.remove('border-gray-200');
-                        selected.classList.add('border-steam-verde', 'bg-green-50');
-                    }
                     
                     airconsole.broadcast({ action: 'categorySelected', category: data.category });
                     
