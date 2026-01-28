@@ -49,7 +49,10 @@
         }
 
         /* Category backgrounds - Clean white with colored particles */
-        body.cat-general,
+        /* Playing screen - White background */
+        #playingScreen {
+            background: #FFFFFF !important;
+        }
         body.cat-science,
         body.cat-mathematics,
         body.cat-robotics,
@@ -62,6 +65,78 @@
             position: relative;
         }
 
+        /* Timer bar with arrow effect */
+        .timer-bar-container {
+            position: relative;
+            width: 100%;
+            height: 40px;
+            background: #E0E0E0;
+            border-radius: 20px;
+            overflow: visible;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .timer-bar {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #FFA726 0%, #FFD54F 50%, #AED581 100%);
+            border-radius: 20px;
+            transition: width 1s linear, background 0.3s ease;
+            box-shadow: 0 2px 8px rgba(255, 167, 38, 0.4);
+        }
+        
+        .timer-bar.warning {
+            background: linear-gradient(90deg, #FF7043 0%, #FFA726 100%);
+        }
+        
+        .timer-bar.danger {
+            background: linear-gradient(90deg, #E53935 0%, #FF7043 100%);
+            animation: pulse 0.5s ease infinite;
+        }
+        
+        .timer-arrow {
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-top: 20px solid transparent;
+            border-bottom: 20px solid transparent;
+            border-left: 25px solid #AED581;
+            filter: drop-shadow(2px 0 4px rgba(0,0,0,0.2));
+            transition: border-left-color 0.3s ease;
+        }
+        
+        .timer-bar.warning + .timer-arrow {
+            border-left-color: #FFA726;
+        }
+        
+        .timer-bar.danger + .timer-arrow {
+            border-left-color: #E53935;
+        }
+        
+        .timer-circle-header {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #0595AE;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 4px 12px rgba(5, 149, 174, 0.3);
+            z-index: 10;
+        }
+        
         /* Animated background particles - Soft colored blobs */
         .bg-particles {
             position: absolute;
@@ -855,20 +930,15 @@
         </div>
 
         <!-- PLAYING SCREEN -->
-        <div class="screen flex-col h-full" id="playingScreen" style="background: linear-gradient(135deg, #1a2e1a 0%, #0d1f0d 100%);">
-            <!-- Players Header Bar with Timer -->
-            <div class="flex items-center justify-between p-2 sm:p-3 lg:p-4 gap-2 sm:gap-3 relative z-10" style="background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(10px);">
-                <!-- Progress Bar -->
-                <div class="absolute top-0 left-0 right-0 h-1 bg-gray-800">
-                    <div class="h-full bg-gradient-to-r from-green-400 to-blue-500 transition-all duration-1000" id="progressBar" style="width: 100%;"></div>
+        <div class="screen flex-col h-full" id="playingScreen" style="background: #FFFFFF;">
+            <!-- Timer Bar Header -->
+            <div class="relative p-4 sm:p-6" style="background: rgba(255, 255, 255, 0.95); box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                <div class="timer-bar-container">
+                    <div class="timer-bar" id="timerBar" style="width: 100%;">
+                        <div class="timer-arrow"></div>
+                    </div>
+                    <div class="timer-circle-header" id="timerCircle">20</div>
                 </div>
-                
-                <div class="flex gap-2 sm:gap-3 flex-1 justify-center flex-wrap" id="playersHeaderBar">
-                    <!-- Players will be added here dynamically -->
-                </div>
-                
-                <!-- Timer Circle -->
-                <div class="w-12 sm:w-16 lg:w-20 h-12 sm:h-16 lg:h-20 rounded-full flex items-center justify-center text-xl sm:text-3xl lg:text-4xl font-bold text-white shadow-lg border-3 transition-all flex-shrink-0" id="timerCircle" style="background: #0595AE; border-color: #fff; box-shadow: 0 0 20px rgba(5, 149, 174, 0.6);">20</div>
             </div>
 
             <!-- Content -->
@@ -877,14 +947,14 @@
                 <div class="bg-particles" id="playingBgParticles"></div>
                 
                 <div class="flex-1 flex flex-col items-center justify-center relative z-10">
-                    <div class="text-sm sm:text-base lg:text-lg mb-2 sm:mb-3 lg:mb-4 font-bold text-green-400" id="questionNumber" style="text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);">Pregunta 1 de 5</div>
-                    <h2 class="responsive-question text-center max-w-xs sm:max-w-2xl lg:max-w-4xl leading-tight mb-4 sm:mb-6 lg:mb-10 text-white" id="questionText" style="text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);">Cual es la capital de Francia?</h2>
+                    <div class="text-sm sm:text-base lg:text-lg mb-2 sm:mb-3 lg:mb-4 font-bold text-steam-turquesa" id="questionNumber">Pregunta 1 de 5</div>
+                    <h2 class="responsive-question text-center max-w-xs sm:max-w-2xl lg:max-w-4xl leading-tight mb-4 sm:mb-6 lg:mb-10 text-gray-800" id="questionText" style="text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);">Cual es la capital de Francia?</h2>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 lg:gap-4 max-w-xs sm:max-w-2xl lg:max-w-4xl w-full" id="optionsGrid"></div>
                 </div>
             </div>
             
             <!-- Footer with Players -->
-            <div class="p-3 sm:p-4 lg:p-6 relative z-10" style="background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(10px);">
+            <div class="p-3 sm:p-4 lg:p-6 relative z-10" style="background: rgba(255, 255, 255, 0.95); box-shadow: 0 -2px 8px rgba(0,0,0,0.05);">
                 <div class="flex gap-3 sm:gap-4 justify-center flex-wrap" id="playersFooter">
                     <!-- Players will be added here dynamically -->
                 </div>
@@ -1263,6 +1333,9 @@
                     
                 } else if (data.action === 'playAgain' && deviceId === adminDeviceId) {
                     resetGame();
+                    
+                } else if (data.action === 'exitGame' && deviceId === adminDeviceId) {
+                    exitToCategories();
                 }
             };
 
@@ -1389,11 +1462,11 @@
                     setCategoryBackground(key);
                     createBackgroundParticles(key);
                     
-                    // Animate icon with anime.js
+                    // Animate icon with anime.js (reduced height)
                     if (anime && anime.animate) {
                         anime.animate(card.querySelector('.category-icon'), {
-                            scale: [1, 1.4, 0.9, 1.1, 1],
-                            duration: 800,
+                            scale: [1, 1.2, 0.95, 1.05, 1],
+                            duration: 700,
                             ease: 'easeOutElastic(1, .6)'
                         });
                     }
@@ -1596,86 +1669,60 @@
         }
 
         function updatePlayersStatus() {
-            const headerContainer = document.getElementById('playersHeaderBar');
             const footerContainer = document.getElementById('playersFooter');
-            if (!headerContainer || !footerContainer) return;
+            if (!footerContainer) return;
             
-            const headerFragment = document.createDocumentFragment();
             const footerFragment = document.createDocumentFragment();
             
             Object.values(players).forEach((player, index) => {
                 const hasAnswered = answers[player.id] !== undefined;
                 
                 // Player colors for the card
-                const cardColors = ['#00ff88', '#00d9ff', '#ff00ff', '#ff9900'];
+                const cardColors = ['#0595AE', '#73A03F', '#EB8225', '#AB3D8B'];
                 const cardColor = cardColors[index % cardColors.length];
-                
-                // Header card (compact)
-                const headerCard = document.createElement('div');
-                headerCard.className = 'flex items-center gap-2 backdrop-blur-sm rounded-xl py-2 px-3 transition-all relative overflow-hidden';
-                headerCard.style.background = player.disconnected ? 'rgba(100, 100, 100, 0.3)' : `rgba(0, 0, 0, 0.4)`;
-                headerCard.style.border = `2px solid ${player.disconnected ? '#666' : cardColor}`;
-                headerCard.style.boxShadow = player.disconnected ? 'none' : `0 0 15px ${cardColor}44`;
-                headerCard.style.minWidth = 'clamp(100px, 15vw, 140px)';
-                
-                // Avatar
-                const avatar = document.createElement('div');
-                avatar.className = 'w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center';
-                avatar.style.background = player.disconnected ? '#666' : player.color;
-                avatar.style.border = `2px solid ${player.disconnected ? '#444' : '#fff'}`;
-                avatar.style.boxShadow = player.disconnected ? 'none' : `0 0 10px ${cardColor}`;
-                avatar.innerHTML = `<span class="text-sm sm:text-base">${player.disconnected ? '❌' : (hasAnswered ? '✓' : '🎮')}</span>`;
-                headerCard.appendChild(avatar);
-                
-                // Name
-                const name = document.createElement('div');
-                name.className = 'font-bold text-xs sm:text-sm truncate flex-1';
-                name.style.color = player.disconnected ? '#999' : '#fff';
-                name.style.textShadow = '0 1px 3px rgba(0,0,0,0.5)';
-                name.textContent = player.name;
-                headerCard.appendChild(name);
-                
-                headerFragment.appendChild(headerCard);
                 
                 // Footer card (with score)
                 const footerCard = document.createElement('div');
-                footerCard.className = 'flex flex-col items-center gap-2 backdrop-blur-sm rounded-xl py-3 px-4 transition-all';
-                footerCard.style.background = player.disconnected ? 'rgba(100, 100, 100, 0.3)' : `rgba(0, 0, 0, 0.4)`;
-                footerCard.style.border = `2px solid ${player.disconnected ? '#666' : cardColor}`;
-                footerCard.style.boxShadow = player.disconnected ? 'none' : `0 0 15px ${cardColor}44`;
+                footerCard.className = 'flex flex-col items-center gap-2 bg-white rounded-xl py-3 px-4 transition-all border-3';
+                footerCard.style.borderColor = player.disconnected ? '#E0E0E0' : cardColor;
+                footerCard.style.boxShadow = player.disconnected ? 'none' : `0 2px 8px ${cardColor}33`;
                 footerCard.style.minWidth = 'clamp(80px, 12vw, 120px)';
+                footerCard.style.opacity = player.disconnected ? '0.5' : '1';
                 
                 // Avatar
                 const footerAvatar = document.createElement('div');
-                footerAvatar.className = 'w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center';
-                footerAvatar.style.background = player.disconnected ? '#666' : player.color;
-                footerAvatar.style.border = `3px solid ${player.disconnected ? '#444' : '#fff'}`;
-                footerAvatar.style.boxShadow = player.disconnected ? 'none' : `0 0 10px ${cardColor}`;
-                footerAvatar.innerHTML = `<span class="text-base sm:text-lg">${player.disconnected ? '❌' : '🎮'}</span>`;
+                footerAvatar.className = 'w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center relative';
+                footerAvatar.style.background = player.disconnected ? '#BDBDBD' : player.color;
+                footerAvatar.style.border = `3px solid ${player.disconnected ? '#9E9E9E' : '#fff'}`;
+                footerAvatar.style.boxShadow = player.disconnected ? 'none' : `0 2px 8px ${cardColor}44`;
+                
+                // Status indicator
+                if (hasAnswered) {
+                    footerAvatar.innerHTML = '<span class="text-base sm:text-lg">✓</span>';
+                } else if (player.disconnected) {
+                    footerAvatar.innerHTML = '<span class="text-base sm:text-lg">❌</span>';
+                } else {
+                    footerAvatar.innerHTML = '<span class="text-base sm:text-lg">⏳</span>';
+                }
                 footerCard.appendChild(footerAvatar);
                 
                 // Name
                 const footerName = document.createElement('div');
                 footerName.className = 'font-bold text-xs sm:text-sm truncate text-center';
-                footerName.style.color = player.disconnected ? '#999' : '#fff';
-                footerName.style.textShadow = '0 1px 3px rgba(0,0,0,0.5)';
+                footerName.style.color = player.disconnected ? '#9E9E9E' : '#424242';
                 footerName.textContent = player.name;
                 footerCard.appendChild(footerName);
                 
                 // Score
                 const score = document.createElement('div');
                 score.className = 'text-sm sm:text-base font-bold px-2 py-1 rounded-lg';
-                score.style.background = player.disconnected ? '#444' : cardColor;
+                score.style.background = player.disconnected ? '#E0E0E0' : cardColor;
                 score.style.color = '#fff';
-                score.style.textShadow = '0 1px 2px rgba(0,0,0,0.5)';
                 score.textContent = `${player.score} pts`;
                 footerCard.appendChild(score);
                 
                 footerFragment.appendChild(footerCard);
             });
-            
-            headerContainer.innerHTML = '';
-            headerContainer.appendChild(headerFragment);
             
             footerContainer.innerHTML = '';
             footerContainer.appendChild(footerFragment);
@@ -1828,42 +1875,44 @@
         }
 
         function updateProgressBar() {
-            const progressBar = document.getElementById('progressBar');
-            if (progressBar) {
+            const timerBar = document.getElementById('timerBar');
+            const timerArrow = timerBar?.querySelector('.timer-arrow');
+            
+            if (timerBar) {
                 const percentage = (timeLeft / 20) * 100;
-                progressBar.style.width = percentage + '%';
+                timerBar.style.width = percentage + '%';
                 
+                // Remove all classes first
+                timerBar.classList.remove('warning', 'danger');
+                
+                // Add appropriate class based on time
                 if (timeLeft <= 5) {
-                    progressBar.style.background = 'linear-gradient(90deg, #ff4466, #ff6688)';
+                    timerBar.classList.add('danger');
                 } else if (timeLeft <= 10) {
-                    progressBar.style.background = 'linear-gradient(90deg, #ff9900, #ffaa33)';
-                } else {
-                    progressBar.style.background = 'linear-gradient(90deg, #00ff88, #00d9ff)';
+                    timerBar.classList.add('warning');
                 }
             }
         }
 
         function updateTimerDisplay() {
-            const circle = domCache.timerCircle;
+            const circle = domCache.timerCircle || document.getElementById('timerCircle');
             if (!circle) return;
             
             circle.textContent = timeLeft;
             
-            // Change color based on time left with neon glow
+            // Change color based on time left
             if (timeLeft <= 5) {
-                circle.style.background = '#ff4466';
-                circle.style.borderColor = '#fff';
-                circle.style.boxShadow = '0 0 30px rgba(255, 68, 102, 0.8)';
+                circle.style.background = '#E53935';
+                circle.style.boxShadow = '0 4px 12px rgba(229, 57, 53, 0.4)';
                 circle.classList.add('timer-danger');
             } else if (timeLeft <= 10) {
-                circle.style.background = '#ff9900';
-                circle.style.borderColor = '#fff';
-                circle.style.boxShadow = '0 0 25px rgba(255, 153, 0, 0.7)';
+                circle.style.background = '#FFA726';
+                circle.style.boxShadow = '0 4px 12px rgba(255, 167, 38, 0.4)';
                 circle.classList.add('timer-warning');
+                circle.classList.remove('timer-danger');
             } else {
                 circle.style.background = '#0595AE';
-                circle.style.borderColor = '#fff';
-                circle.style.boxShadow = '0 0 20px rgba(5, 149, 174, 0.6)';
+                circle.style.boxShadow = '0 4px 12px rgba(5, 149, 174, 0.3)';
                 circle.classList.remove('timer-warning', 'timer-danger');
             }
         }
@@ -2046,6 +2095,24 @@
             });
             
             showScreen('category');
+            airconsole.broadcast({ action: 'reset', gameState: 'categorySelect' });
+        }
+        
+        function exitToCategories() {
+            // Stop current game and return to category selection
+            gameState = 'categorySelect';
+            currentQuestion = 0;
+            answers = {};
+            clearInterval(timer);
+            
+            // Reset scores
+            Object.keys(players).forEach(id => {
+                players[id].score = 0;
+            });
+            
+            showScreen('category');
+            
+            // Notify all players to return to appropriate screen
             airconsole.broadcast({ action: 'reset', gameState: 'categorySelect' });
         }
 
