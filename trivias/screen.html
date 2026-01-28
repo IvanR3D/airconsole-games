@@ -65,13 +65,13 @@
             position: relative;
         }
 
-        /* Timer bar with arrow effect */
+        /* Timer bar with arrow effect - Shorter */
         .timer-bar-container {
             position: relative;
             width: 100%;
-            height: 40px;
+            height: 24px;
             background: #E0E0E0;
-            border-radius: 20px;
+            border-radius: 12px;
             overflow: visible;
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
         }
@@ -82,7 +82,7 @@
             top: 0;
             height: 100%;
             background: linear-gradient(90deg, #FFA726 0%, #FFD54F 50%, #AED581 100%);
-            border-radius: 20px;
+            border-radius: 12px;
             transition: width 1s linear, background 0.3s ease;
             box-shadow: 0 2px 8px rgba(255, 167, 38, 0.4);
         }
@@ -98,14 +98,14 @@
         
         .timer-arrow {
             position: absolute;
-            right: -20px;
+            right: -12px;
             top: 50%;
             transform: translateY(-50%);
             width: 0;
             height: 0;
-            border-top: 20px solid transparent;
-            border-bottom: 20px solid transparent;
-            border-left: 25px solid #AED581;
+            border-top: 12px solid transparent;
+            border-bottom: 12px solid transparent;
+            border-left: 15px solid #AED581;
             filter: drop-shadow(2px 0 4px rgba(0,0,0,0.2));
             transition: border-left-color 0.3s ease;
         }
@@ -123,14 +123,14 @@
             right: 20px;
             top: 50%;
             transform: translateY(-50%);
-            width: 60px;
-            height: 60px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
             background: #0595AE;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 18px;
             font-weight: bold;
             color: white;
             box-shadow: 0 4px 12px rgba(5, 149, 174, 0.3);
@@ -962,12 +962,16 @@
         </div>
 
         <!-- END SCREEN -->
-        <div class="screen flex-col items-center justify-center p-4 sm:p-6 lg:p-10 overflow-y-auto" id="endScreen">
+        <div class="screen flex-col items-center justify-center p-4 sm:p-6 lg:p-10 overflow-y-auto bg-white" id="endScreen">
             <h2 class="text-xl sm:text-2xl lg:text-3xl text-steam-turquesa mb-4 sm:mb-6 lg:mb-8 font-bold">Juego Terminado!</h2>
             <div class="winner-bounce text-center mb-4 sm:mb-6 lg:mb-8" id="winnerSection"></div>
             <div class="flex flex-col gap-2 sm:gap-3 max-w-xs sm:max-w-md lg:max-w-lg w-full mb-4 sm:mb-6 lg:mb-8" id="podium"></div>
-            <div class="bg-orange-50 border-2 border-steam-naranja rounded-xl sm:rounded-2xl py-3 sm:py-4 lg:py-5 px-4 sm:px-6 lg:px-8 text-center animate-pulse">
-                <p class="text-steam-naranja text-sm sm:text-base lg:text-lg font-bold">Esperando que el Jugador 1 decida...</p>
+            
+            <!-- Footer con mensaje de espera y botón Quit Game -->
+            <div class="flex flex-col gap-4 items-center w-full max-w-xs sm:max-w-md">
+                <div class="bg-orange-50 border-2 border-steam-naranja rounded-xl sm:rounded-2xl py-3 sm:py-4 lg:py-5 px-4 sm:px-6 lg:px-8 text-center animate-pulse w-full">
+                    <p class="text-steam-naranja text-sm sm:text-base lg:text-lg font-bold">Esperando que el Jugador 1 decida...</p>
+                </div>
             </div>
         </div>
 
@@ -1402,14 +1406,14 @@
             grid.innerHTML = '';
             
             const categoryColors = {
-                general: { primary: '#0595AE', bg: '#E8F4F8' },
-                science: { primary: '#73A03F', bg: '#E8F5E9' },
-                mathematics: { primary: '#0595AE', bg: '#E3F2FD' },
-                robotics: { primary: '#AB3D8B', bg: '#F3E5F5' },
-                chemistry: { primary: '#73A03F', bg: '#E0F2F1' },
-                technology: { primary: '#AB3D8B', bg: '#FCE4EC' },
-                history: { primary: '#EB8225', bg: '#FFF3E0' },
-                geography: { primary: '#0595AE', bg: '#E0F7FA' }
+                general: '#0595AE',
+                science: '#73A03F',
+                mathematics: '#0595AE',
+                robotics: '#AB3D8B',
+                chemistry: '#EB8225',
+                technology: '#AB3D8B',
+                history: '#EB8225',
+                geography: '#73A03F'
             };
             
             // Icon mapping with outline versions
@@ -1426,33 +1430,34 @@
             
             Object.entries(categories).forEach(([key, category], index) => {
                 const card = document.createElement('div');
-                const colors = categoryColors[key] || categoryColors.general;
+                const categoryColor = categoryColors[key] || categoryColors.general;
                 
-                card.className = 'category-card bg-white rounded-3xl p-4 sm:p-5 lg:p-6 text-center cursor-pointer transition-all shadow-lg hover:shadow-xl relative overflow-hidden power-up';
+                card.className = 'category-card rounded-3xl p-4 sm:p-5 lg:p-6 text-center cursor-pointer transition-all shadow-lg hover:shadow-xl relative overflow-hidden power-up';
                 card.style.animationDelay = `${index * 0.1}s`;
-                card.style.border = `3px solid #E0E0E0`;
+                card.style.background = categoryColor;
+                card.style.border = `3px solid ${categoryColor}`;
                 card.dataset.category = key;
                 
                 card.innerHTML = `
                     <!-- Icon container -->
                     <div class="relative mb-3 sm:mb-4">
-                        <iconify-icon icon="${categoryIcons[key]}" class="category-icon relative z-10" style="color: #9E9E9E;"></iconify-icon>
+                        <iconify-icon icon="${categoryIcons[key]}" class="category-icon relative z-10" style="color: #FFFFFF;"></iconify-icon>
                     </div>
                     
                     <!-- Category name -->
-                    <div class="relative text-base sm:text-lg lg:text-xl font-black uppercase tracking-wide mb-2" style="color: #757575;">
+                    <div class="relative text-base sm:text-lg lg:text-xl font-black uppercase tracking-wide mb-2" style="color: #FFFFFF;">
                         ${category.name}
                     </div>
                     
                     <!-- Underline -->
                     <div class="flex gap-1 justify-center mt-2">
-                        <div class="w-8 h-1 rounded-full bg-gray-300"></div>
-                        <div class="w-8 h-1 rounded-full bg-gray-200"></div>
-                        <div class="w-8 h-1 rounded-full bg-gray-100"></div>
+                        <div class="w-8 h-1 rounded-full" style="background: rgba(255, 255, 255, 0.8);"></div>
+                        <div class="w-8 h-1 rounded-full" style="background: rgba(255, 255, 255, 0.6);"></div>
+                        <div class="w-8 h-1 rounded-full" style="background: rgba(255, 255, 255, 0.4);"></div>
                     </div>
                     
                     <!-- Selection indicator -->
-                    <div class="absolute top-2 right-2 w-6 h-6 rounded-full items-center justify-center text-xs font-bold hidden selection-check bg-steam-verde text-white shadow-md">
+                    <div class="absolute top-2 right-2 w-8 h-8 rounded-full items-center justify-center text-sm font-bold hidden selection-check bg-white shadow-lg" style="color: ${categoryColor};">
                         ✓
                     </div>
                 `;
@@ -1462,36 +1467,20 @@
                     // Remove selection from all cards
                     document.querySelectorAll('.category-card').forEach(c => {
                         c.classList.remove('selected', 'scale-105');
-                        c.querySelector('.selection-check')?.classList.add('hidden');
-                        c.querySelector('.selection-check')?.classList.remove('flex');
-                        c.style.border = '3px solid #E0E0E0';
-                        
-                        // Reset icon and text to gray
-                        const icon = c.querySelector('.category-icon');
-                        const text = c.querySelector('.relative.text-base');
-                        const underlines = c.querySelectorAll('.flex.gap-1 > div');
-                        if (icon) icon.style.color = '#9E9E9E';
-                        if (text) text.style.color = '#757575';
-                        underlines.forEach((line, idx) => {
-                            line.className = `w-8 h-1 rounded-full ${idx === 0 ? 'bg-gray-300' : idx === 1 ? 'bg-gray-200' : 'bg-gray-100'}`;
-                        });
+                        const check = c.querySelector('.selection-check');
+                        if (check) {
+                            check.classList.add('hidden');
+                            check.classList.remove('flex');
+                        }
                     });
                     
                     // Add selection to clicked card
                     card.classList.add('selected', 'scale-105');
-                    card.querySelector('.selection-check')?.classList.remove('hidden');
-                    card.querySelector('.selection-check')?.classList.add('flex');
-                    card.style.border = `3px solid ${colors.primary}`;
-                    
-                    // Color the icon and text with category color
-                    const icon = card.querySelector('.category-icon');
-                    const text = card.querySelector('.relative.text-base');
-                    const underlines = card.querySelectorAll('.flex.gap-1 > div');
-                    if (icon) icon.style.color = colors.primary;
-                    if (text) text.style.color = colors.primary;
-                    underlines.forEach((line) => {
-                        line.style.background = colors.primary;
-                    });
+                    const check = card.querySelector('.selection-check');
+                    if (check) {
+                        check.classList.remove('hidden');
+                        check.classList.add('flex');
+                    }
                     
                     // Change background with animation
                     setCategoryBackground(key);
@@ -1843,37 +1832,40 @@
             container.innerHTML = '';
             
             const letters = ['A', 'B', 'C', 'D'];
-            const optionColors = [
-                { bg: '#d4a574', border: '#b8894f', shadow: 'rgba(212, 165, 116, 0.5)' },
-                { bg: '#4db8e8', border: '#3a9bc7', shadow: 'rgba(77, 184, 232, 0.5)' },
-                { bg: '#e85d8a', border: '#c74a72', shadow: 'rgba(232, 93, 138, 0.5)' },
-                { bg: '#9b6fd8', border: '#7d59b3', shadow: 'rgba(155, 111, 216, 0.5)' }
-            ];
+            
+            // Get category color
+            const categoryColors = {
+                science: '#73A03F',
+                mathematics: '#0595AE',
+                robotics: '#AB3D8B',
+                chemistry: '#EB8225',
+                technology: '#0595AE',
+                history: '#EB8225',
+                geography: '#73A03F',
+                general: '#0595AE'
+            };
+            
+            const categoryColor = categoryColors[selectedCategory] || '#0595AE';
             
             const fragment = document.createDocumentFragment();
             question.options.forEach((option, index) => {
                 const card = document.createElement('div');
-                const colors = optionColors[index];
+                const letter = letters[index];
                 
                 card.className = 'option-card flex items-center rounded-xl sm:rounded-2xl overflow-hidden border-3 shadow-lg transition-all cursor-pointer hover:scale-105 relative';
-                card.style.background = `linear-gradient(135deg, ${colors.bg}, ${colors.border})`;
-                card.style.borderColor = colors.border;
-                card.style.boxShadow = `0 4px 15px ${colors.shadow}, 0 0 20px ${colors.shadow}`;
+                card.style.background = categoryColor;
+                card.style.borderColor = categoryColor;
+                card.style.boxShadow = `0 4px 15px ${categoryColor}66`;
                 card.dataset.index = index;
-                
-                // Shine effect
-                const shine = document.createElement('div');
-                shine.className = 'absolute inset-0 opacity-20';
-                shine.style.background = 'linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%)';
-                card.appendChild(shine);
                 
                 // Letter badge
                 const badge = document.createElement('div');
                 badge.className = 'w-10 sm:w-14 lg:w-[70px] h-10 sm:h-14 lg:h-[70px] flex items-center justify-center text-lg sm:text-2xl lg:text-3xl font-black flex-shrink-0 relative z-10';
-                badge.style.background = colors.border;
+                badge.style.background = categoryColor;
                 badge.style.color = '#fff';
                 badge.style.textShadow = '0 2px 4px rgba(0,0,0,0.3)';
-                badge.textContent = letters[index];
+                badge.style.filter = 'brightness(0.85)';
+                badge.textContent = letter;
                 card.appendChild(badge);
                 
                 // Option text
@@ -1996,40 +1988,68 @@
             clearInterval(timer);
             const question = gameQuestions[currentQuestion];
             
-            const optionColors = [
-                { bg: '#d4a574', border: '#b8894f' },
-                { bg: '#4db8e8', border: '#3a9bc7' },
-                { bg: '#e85d8a', border: '#c74a72' },
-                { bg: '#9b6fd8', border: '#7d59b3' }
-            ];
-            
             const options = document.querySelectorAll('.option-card');
             options.forEach((opt, index) => {
+                const textDiv = opt.querySelector('.flex-1');
+                const badge = opt.querySelector('div:first-child');
+                
                 if (index === question.correct) {
-                    opt.style.background = 'linear-gradient(135deg, #00ff88, #00cc66)';
-                    opt.style.borderColor = '#00ff88';
-                    opt.style.boxShadow = '0 0 30px rgba(0, 255, 136, 0.8), 0 4px 15px rgba(0, 255, 136, 0.5)';
+                    // Respuesta correcta - Verde
+                    opt.style.background = '#00cc66';
+                    opt.style.borderColor = '#00cc66';
+                    opt.style.boxShadow = '0 0 30px rgba(0, 204, 102, 0.6), 0 4px 15px rgba(0, 204, 102, 0.4)';
                     opt.classList.add('option-correct');
-                    opt.querySelector('.flex-1').style.color = '#fff';
                     
-                    // Update badge color
-                    const badge = opt.querySelector('div:first-child');
+                    if (textDiv) {
+                        textDiv.style.color = '#fff';
+                        // Agregar indicador de respuesta correcta
+                        const indicator = document.createElement('div');
+                        indicator.className = 'text-xs sm:text-sm font-bold mt-1';
+                        indicator.style.color = '#fff';
+                        indicator.textContent = '✓ Respuesta correcta';
+                        textDiv.appendChild(indicator);
+                    }
+                    
                     if (badge) {
-                        badge.style.background = '#00cc66';
+                        badge.style.background = '#009944';
+                        badge.style.color = '#fff';
                     }
                 } else {
                     const wasSelected = Object.values(answers).some(a => a.option === index);
                     if (wasSelected) {
-                        opt.style.background = 'linear-gradient(135deg, #ff4466, #cc3355)';
-                        opt.style.borderColor = '#ff4466';
-                        opt.style.boxShadow = '0 0 30px rgba(255, 68, 102, 0.8), 0 4px 15px rgba(255, 68, 102, 0.5)';
+                        // Tu respuesta incorrecta - Rojo
+                        opt.style.background = '#ff4444';
+                        opt.style.borderColor = '#ff4444';
+                        opt.style.boxShadow = '0 0 30px rgba(255, 68, 68, 0.6), 0 4px 15px rgba(255, 68, 68, 0.4)';
                         opt.classList.add('option-incorrect');
-                        opt.querySelector('.flex-1').style.color = '#fff';
                         
-                        // Update badge color
-                        const badge = opt.querySelector('div:first-child');
+                        if (textDiv) {
+                            textDiv.style.color = '#fff';
+                            // Agregar indicador de tu respuesta
+                            const indicator = document.createElement('div');
+                            indicator.className = 'text-xs sm:text-sm font-bold mt-1';
+                            indicator.style.color = '#fff';
+                            indicator.textContent = '✗ Tu respuesta';
+                            textDiv.appendChild(indicator);
+                        }
+                        
                         if (badge) {
-                            badge.style.background = '#cc3355';
+                            badge.style.background = '#cc3333';
+                            badge.style.color = '#fff';
+                        }
+                    } else {
+                        // No seleccionada - Gris
+                        opt.style.background = '#9E9E9E';
+                        opt.style.borderColor = '#9E9E9E';
+                        opt.style.boxShadow = '0 2px 8px rgba(158, 158, 158, 0.3)';
+                        
+                        if (textDiv) {
+                            textDiv.style.color = '#fff';
+                        }
+                        
+                        if (badge) {
+                            badge.style.background = '#757575';
+                            badge.style.color = '#fff';
                         }
                     }
                 }
