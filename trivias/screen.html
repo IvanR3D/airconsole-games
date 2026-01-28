@@ -74,6 +74,7 @@
             border-radius: 12px;
             overflow: visible;
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 1;
         }
         
         .timer-bar {
@@ -85,6 +86,7 @@
             border-radius: 12px;
             transition: width 1s linear, background 0.3s ease;
             box-shadow: 0 2px 8px rgba(255, 167, 38, 0.4);
+            z-index: 1;
         }
         
         .timer-bar.warning {
@@ -108,6 +110,7 @@
             border-left: 15px solid #AED581;
             filter: drop-shadow(2px 0 4px rgba(0,0,0,0.2));
             transition: border-left-color 0.3s ease;
+            z-index: 1;
         }
         
         .timer-bar.warning + .timer-arrow {
@@ -1434,9 +1437,11 @@
                 
                 card.className = 'category-card rounded-3xl p-4 sm:p-5 lg:p-6 text-center cursor-pointer transition-all shadow-lg hover:shadow-xl relative overflow-hidden power-up';
                 card.style.animationDelay = `${index * 0.1}s`;
-                card.style.background = categoryColor;
-                card.style.border = `3px solid ${categoryColor}`;
+                // Inicialmente gris (no seleccionado)
+                card.style.background = '#9E9E9E';
+                card.style.border = `3px solid #9E9E9E`;
                 card.dataset.category = key;
+                card.dataset.color = categoryColor; // Guardar el color para cuando se seleccione
                 
                 card.innerHTML = `
                     <!-- Icon container -->
@@ -1464,7 +1469,7 @@
                 
                 // Add click handler with animation
                 card.addEventListener('click', () => {
-                    // Remove selection from all cards
+                    // Remove selection from all cards - volver a gris pero mantener texto e iconos blancos
                     document.querySelectorAll('.category-card').forEach(c => {
                         c.classList.remove('selected', 'scale-105');
                         const check = c.querySelector('.selection-check');
@@ -1472,15 +1477,33 @@
                             check.classList.add('hidden');
                             check.classList.remove('flex');
                         }
+                        // Volver a gris pero mantener iconos y texto en blanco
+                        c.style.background = '#9E9E9E';
+                        c.style.border = '3px solid #9E9E9E';
+                        
+                        // Asegurar que iconos y texto permanezcan blancos
+                        const icon = c.querySelector('.category-icon');
+                        const text = c.querySelector('.relative.text-base');
+                        if (icon) icon.style.color = '#FFFFFF';
+                        if (text) text.style.color = '#FFFFFF';
                     });
                     
-                    // Add selection to clicked card
+                    // Add selection to clicked card - cambiar al color de la categoría
                     card.classList.add('selected', 'scale-105');
                     const check = card.querySelector('.selection-check');
                     if (check) {
                         check.classList.remove('hidden');
                         check.classList.add('flex');
                     }
+                    // Cambiar al color de la categoría
+                    card.style.background = categoryColor;
+                    card.style.border = `3px solid ${categoryColor}`;
+                    
+                    // Asegurar que iconos y texto permanezcan blancos
+                    const icon = card.querySelector('.category-icon');
+                    const text = card.querySelector('.relative.text-base');
+                    if (icon) icon.style.color = '#FFFFFF';
+                    if (text) text.style.color = '#FFFFFF';
                     
                     // Change background with animation
                     setCategoryBackground(key);
@@ -1852,25 +1875,27 @@
                 const card = document.createElement('div');
                 const letter = letters[index];
                 
-                card.className = 'option-card flex items-center rounded-xl sm:rounded-2xl overflow-hidden border-3 shadow-lg transition-all cursor-pointer hover:scale-105 relative';
+                card.className = 'option-card flex items-center rounded-2xl overflow-hidden border-3 shadow-lg transition-all cursor-pointer hover:scale-105 relative';
                 card.style.background = categoryColor;
                 card.style.borderColor = categoryColor;
                 card.style.boxShadow = `0 4px 15px ${categoryColor}66`;
                 card.dataset.index = index;
                 
-                // Letter badge
+                // Letter badge - cuadrado oscuro a la izquierda
                 const badge = document.createElement('div');
-                badge.className = 'w-10 sm:w-14 lg:w-[70px] h-10 sm:h-14 lg:h-[70px] flex items-center justify-center text-lg sm:text-2xl lg:text-3xl font-black flex-shrink-0 relative z-10';
+                badge.className = 'flex items-center justify-center text-lg sm:text-2xl lg:text-3xl font-black flex-shrink-0 relative z-10';
+                badge.style.width = 'clamp(60px, 10vw, 90px)';
+                badge.style.height = 'clamp(60px, 10vw, 90px)';
                 badge.style.background = categoryColor;
+                badge.style.filter = 'brightness(0.7)';
                 badge.style.color = '#fff';
                 badge.style.textShadow = '0 2px 4px rgba(0,0,0,0.3)';
-                badge.style.filter = 'brightness(0.85)';
                 badge.textContent = letter;
                 card.appendChild(badge);
                 
                 // Option text
                 const text = document.createElement('div');
-                text.className = 'flex-1 p-2 sm:p-3 lg:p-4 text-sm sm:text-base lg:text-lg font-bold relative z-10';
+                text.className = 'flex-1 p-3 sm:p-4 lg:p-5 text-sm sm:text-base lg:text-lg font-bold relative z-10';
                 text.style.color = '#fff';
                 text.style.textShadow = '0 2px 4px rgba(0,0,0,0.3)';
                 text.textContent = option;
