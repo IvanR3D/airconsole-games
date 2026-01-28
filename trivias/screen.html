@@ -48,45 +48,21 @@
             transition: background 0.5s ease;
         }
 
-        /* Category backgrounds - Clean white background */
-        body.cat-general { 
-            background: #FFFFFF;
-            position: relative;
-        }
-        body.cat-science { 
-            background: #FFFFFF;
-            position: relative;
-        }
-        body.cat-mathematics { 
-            background: #FFFFFF;
-            position: relative;
-        }
-        body.cat-robotics { 
-            background: #FFFFFF;
-            position: relative;
-        }
-        body.cat-chemistry { 
-            background: #FFFFFF;
-            position: relative;
-        }
-        body.cat-technology { 
-            background: #FFFFFF;
-            position: relative;
-        }
-        body.cat-history { 
-            background: #FFFFFF;
-            position: relative;
-        }
-        body.cat-geography { 
-            background: #FFFFFF;
-            position: relative;
-        }
+        /* Category backgrounds - Clean white with colored particles */
+        body.cat-general,
+        body.cat-science,
+        body.cat-mathematics,
+        body.cat-robotics,
+        body.cat-chemistry,
+        body.cat-technology,
+        body.cat-history,
+        body.cat-geography,
         body.cat-default { 
             background: #FFFFFF;
             position: relative;
         }
 
-        /* Animated background particles - Neon style */
+        /* Animated background particles - Soft colored blobs */
         .bg-particles {
             position: absolute;
             top: 0;
@@ -100,9 +76,11 @@
 
         .particle {
             position: absolute;
-            opacity: 0.5;
+            opacity: 0.15;
             animation: floatParticle 25s infinite ease-in-out;
             will-change: transform;
+            border-radius: 50%;
+            filter: blur(40px);
         }
 
         .particle.icon-particle {
@@ -112,20 +90,20 @@
 
         @keyframes floatParticle {
             0%, 100% { 
-                transform: translate(0, 0) rotate(0deg); 
-                opacity: 0.5;
+                transform: translate(0, 0) scale(1); 
+                opacity: 0.15;
             }
             25% { 
-                transform: translate(50px, -50px) rotate(45deg); 
-                opacity: 0.7;
+                transform: translate(50px, -50px) scale(1.2); 
+                opacity: 0.25;
             }
             50% { 
-                transform: translate(0, -100px) rotate(90deg); 
-                opacity: 0.5;
+                transform: translate(0, -100px) scale(1); 
+                opacity: 0.15;
             }
             75% { 
-                transform: translate(-50px, -50px) rotate(135deg); 
-                opacity: 0.7;
+                transform: translate(-50px, -50px) scale(1.2); 
+                opacity: 0.25;
             }
         }
 
@@ -836,27 +814,25 @@
 
         <!-- CATEGORY SCREEN -->
         <div class="screen flex-col p-4 sm:p-6 lg:p-8 h-screen overflow-hidden relative bg-white" id="categoryScreen">
-            <!-- Animated Grid Background -->
-            <div class="grid-bg"></div>
-            
-            <!-- Animated Background Particles -->
+            <!-- Animated Background Particles (soft colored blobs) -->
             <div class="bg-particles" id="bgParticles"></div>
             
             <!-- Content Container -->
             <div class="relative z-10 flex flex-col h-full">
                 <!-- Header -->
                 <div class="text-center mb-4 sm:mb-6 power-up">
-                    <div class="inline-flex items-center gap-3 bg-white border-3 border-steam-turquesa rounded-full py-3 px-6 mb-3 shadow-lg">
-                        <iconify-icon icon="mdi:crown" class="animate-bounce" style="font-size: clamp(1.5rem, 4vw, 2rem); color: #EB8225;"></iconify-icon>
-                        <span class="font-black text-base sm:text-lg text-steam-turquesa">JUGADOR 1: ELIGE TU DESAFÍO</span>
-                        <iconify-icon icon="mdi:gamepad-variant" class="animate-bounce" style="font-size: clamp(1.5rem, 4vw, 2rem); color: #AB3D8B; animation-delay: 0.2s;"></iconify-icon>
+                    <!-- Level indicator dots above title -->
+                    <div class="flex justify-center gap-2 mb-3">
+                        <div class="w-3 h-3 rounded-full animate-pulse bg-steam-naranja"></div>
+                        <div class="w-3 h-3 rounded-full animate-pulse bg-steam-verde" style="animation-delay: 0.2s;"></div>
+                        <div class="w-3 h-3 rounded-full animate-pulse bg-steam-morado" style="animation-delay: 0.4s;"></div>
                     </div>
                     
-                    <!-- Level indicator -->
-                    <div class="flex justify-center gap-2 mt-3">
-                        <div class="w-3 h-3 rounded-full animate-pulse bg-steam-verde"></div>
-                        <div class="w-3 h-3 rounded-full animate-pulse bg-steam-naranja" style="animation-delay: 0.2s;"></div>
-                        <div class="w-3 h-3 rounded-full animate-pulse bg-steam-morado" style="animation-delay: 0.4s;"></div>
+                    <!-- Title with crown -->
+                    <div class="inline-flex items-center gap-3 bg-white border-3 border-steam-turquesa rounded-full py-3 px-6 shadow-lg">
+                        <iconify-icon icon="mdi:crown" style="font-size: clamp(1.5rem, 4vw, 2rem); color: #EB8225;"></iconify-icon>
+                        <span class="font-black text-base sm:text-lg text-steam-turquesa">JUGADOR 1: ELIGE TU DESAFÍO</span>
+                        <iconify-icon icon="mdi:gamepad-variant" style="font-size: clamp(1.5rem, 4vw, 2rem); color: #AB3D8B;"></iconify-icon>
                     </div>
                 </div>
                 
@@ -867,27 +843,32 @@
                 
                 <!-- Footer Message -->
                 <div class="text-center mt-4 sm:mt-6 power-up" style="animation-delay: 0.3s;">
-                    <div class="inline-block bg-orange-50 border-3 border-steam-naranja rounded-2xl py-3 px-6 shadow-lg">
-                        <p class="font-black text-sm sm:text-base flex items-center gap-3 justify-center text-steam-naranja">
-                            <iconify-icon icon="mdi:timer-sand" class="animate-spin" style="font-size: 1.5rem; animation-duration: 2s;"></iconify-icon>
-                            <span>Esperando selección...</span>
-                            <iconify-icon icon="mdi:target" style="font-size: 1.5rem;"></iconify-icon>
+                    <div class="inline-flex items-center gap-3 py-2 px-4">
+                        <iconify-icon icon="mdi:clock-outline" style="font-size: 1.5rem; color: #EB8225;"></iconify-icon>
+                        <p class="font-bold text-sm sm:text-base text-steam-naranja">
+                            Esperando selección...
                         </p>
+                        <iconify-icon icon="mdi:clock-outline" style="font-size: 1.5rem; color: #EB8225;"></iconify-icon>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- PLAYING SCREEN -->
-        <div class="screen flex-col h-full bg-white" id="playingScreen">
-            <!-- Players Header Bar -->
-            <div class="flex items-center justify-between p-2 sm:p-3 lg:p-4 gap-2 sm:gap-3 relative z-10 bg-white shadow-md">
+        <div class="screen flex-col h-full" id="playingScreen" style="background: linear-gradient(135deg, #1a2e1a 0%, #0d1f0d 100%);">
+            <!-- Players Header Bar with Timer -->
+            <div class="flex items-center justify-between p-2 sm:p-3 lg:p-4 gap-2 sm:gap-3 relative z-10" style="background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(10px);">
+                <!-- Progress Bar -->
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gray-800">
+                    <div class="h-full bg-gradient-to-r from-green-400 to-blue-500 transition-all duration-1000" id="progressBar" style="width: 100%;"></div>
+                </div>
+                
                 <div class="flex gap-2 sm:gap-3 flex-1 justify-center flex-wrap" id="playersHeaderBar">
                     <!-- Players will be added here dynamically -->
                 </div>
                 
                 <!-- Timer Circle -->
-                <div class="w-12 sm:w-16 lg:w-20 h-12 sm:h-16 lg:h-20 rounded-full flex items-center justify-center text-xl sm:text-3xl lg:text-4xl font-bold text-white shadow-lg border-3 transition-all flex-shrink-0 bg-steam-turquesa" id="timerCircle" style="border-color: #fff;">20</div>
+                <div class="w-12 sm:w-16 lg:w-20 h-12 sm:h-16 lg:h-20 rounded-full flex items-center justify-center text-xl sm:text-3xl lg:text-4xl font-bold text-white shadow-lg border-3 transition-all flex-shrink-0" id="timerCircle" style="background: #0595AE; border-color: #fff; box-shadow: 0 0 20px rgba(5, 149, 174, 0.6);">20</div>
             </div>
 
             <!-- Content -->
@@ -896,9 +877,16 @@
                 <div class="bg-particles" id="playingBgParticles"></div>
                 
                 <div class="flex-1 flex flex-col items-center justify-center relative z-10">
-                    <div class="text-sm sm:text-base lg:text-lg mb-2 sm:mb-3 lg:mb-4 font-bold text-steam-turquesa" id="questionNumber">Pregunta 1 de 5</div>
-                    <h2 class="responsive-question text-center max-w-xs sm:max-w-2xl lg:max-w-4xl leading-tight mb-4 sm:mb-6 lg:mb-10 text-steam-negro" id="questionText">Cual es la capital de Francia?</h2>
+                    <div class="text-sm sm:text-base lg:text-lg mb-2 sm:mb-3 lg:mb-4 font-bold text-green-400" id="questionNumber" style="text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);">Pregunta 1 de 5</div>
+                    <h2 class="responsive-question text-center max-w-xs sm:max-w-2xl lg:max-w-4xl leading-tight mb-4 sm:mb-6 lg:mb-10 text-white" id="questionText" style="text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);">Cual es la capital de Francia?</h2>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 lg:gap-4 max-w-xs sm:max-w-2xl lg:max-w-4xl w-full" id="optionsGrid"></div>
+                </div>
+            </div>
+            
+            <!-- Footer with Players -->
+            <div class="p-3 sm:p-4 lg:p-6 relative z-10" style="background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(10px);">
+                <div class="flex gap-3 sm:gap-4 justify-center flex-wrap" id="playersFooter">
+                    <!-- Players will be added here dynamically -->
                 </div>
             </div>
         </div>
@@ -1133,15 +1121,8 @@
                 console.log('Screen ready');
                 setupCategories();
                 
-                // Animate intro screen
-                setTimeout(() => {
-                    animateIntroScreen();
-                }, 100);
-                
-                // Show intro for 4 seconds then transition to waiting screen
-                setTimeout(() => {
-                    showScreen('waiting');
-                }, 4500);
+                // Start on intro screen, stay there until players join
+                showScreen('intro');
             };
 
             airconsole.onConnect = function(deviceId) {
@@ -1243,7 +1224,8 @@
                             console.log(`✅ Player ${playerName} joined successfully!`);
                             updatePlayersDisplay();
                             
-                            if (isAdmin && gameState === 'waiting') {
+                            // First player joins - transition from intro to category selection
+                            if (isAdmin && (gameState === 'waiting' || gameState === 'intro')) {
                                 showScreen('category');
                                 gameState = 'categorySelect';
                             }
@@ -1423,94 +1405,45 @@
             
             container.innerHTML = '';
             
-            // Category-specific neon colors
+            // Soft pastel colors for background blobs
             const colorMap = {
-                general: ['#00d9ff', '#0099ff', '#00ffff'],
-                science: ['#00ff88', '#00cc66', '#00ff66'],
-                mathematics: ['#0099ff', '#0066ff', '#00ccff'],
-                robotics: ['#ff00ff', '#cc00cc', '#ff66ff'],
-                chemistry: ['#00ff66', '#00cc44', '#66ff99'],
-                technology: ['#cc00ff', '#9900cc', '#dd66ff'],
-                history: ['#ff9900', '#ff6600', '#ffaa33'],
-                geography: ['#00ffff', '#00cccc', '#66ffff']
-            };
-            
-            const iconMap = {
-                general: ['🌍', '📚', '�', '💡', '⭐'],
-                science: ['🔬', '🧪', '🔭', '⚗️', '🧬'],
-                mathematics: ['📐', '📊', '🔢', '➗', '∑'],
-                robotics: ['🤖', '⚙️', '🔧', '💻', '🎮'],
-                chemistry: ['⚗️', '🧪', '⚛️', '🔬', '💊'],
-                technology: ['💻', '📱', '⌨️', '🖥️', '🔌'],
-                history: ['📜', '🏛️', '👑', '⚔️', '🗿'],
-                geography: ['🗺️', '🌎', '🏔️', '🌊', '🧭']
+                general: ['rgba(5, 149, 174, 0.15)', 'rgba(115, 160, 63, 0.15)', 'rgba(235, 130, 37, 0.15)'],
+                science: ['rgba(115, 160, 63, 0.15)', 'rgba(5, 149, 174, 0.12)', 'rgba(171, 61, 139, 0.12)'],
+                mathematics: ['rgba(5, 149, 174, 0.15)', 'rgba(171, 61, 139, 0.12)', 'rgba(115, 160, 63, 0.12)'],
+                robotics: ['rgba(171, 61, 139, 0.15)', 'rgba(235, 130, 37, 0.12)', 'rgba(5, 149, 174, 0.12)'],
+                chemistry: ['rgba(115, 160, 63, 0.15)', 'rgba(235, 130, 37, 0.12)', 'rgba(5, 149, 174, 0.12)'],
+                technology: ['rgba(171, 61, 139, 0.15)', 'rgba(5, 149, 174, 0.12)', 'rgba(235, 130, 37, 0.12)'],
+                history: ['rgba(235, 130, 37, 0.15)', 'rgba(171, 61, 139, 0.12)', 'rgba(115, 160, 63, 0.12)'],
+                geography: ['rgba(5, 149, 174, 0.15)', 'rgba(115, 160, 63, 0.12)', 'rgba(235, 130, 37, 0.12)']
             };
             
             const colors = colorMap[category] || colorMap.general;
-            const icons = iconMap[category] || iconMap.general;
             
-            // Create neon circle particles
-            for (let i = 0; i < 12; i++) {
+            // Create soft colored blob particles
+            for (let i = 0; i < 15; i++) {
                 const particle = document.createElement('div');
-                const size = Math.random() * 60 + 30;
+                const size = Math.random() * 200 + 100;
                 const color = colors[Math.floor(Math.random() * colors.length)];
                 
                 particle.className = 'particle';
                 particle.style.width = size + 'px';
                 particle.style.height = size + 'px';
                 particle.style.borderRadius = '50%';
-                particle.style.background = `radial-gradient(circle, ${color}, transparent)`;
-                particle.style.boxShadow = `0 0 ${size}px ${color}`;
+                particle.style.background = color;
                 particle.style.left = Math.random() * 100 + '%';
                 particle.style.top = Math.random() * 100 + '%';
                 particle.style.animationDelay = Math.random() * 5 + 's';
-                particle.style.animationDuration = (Math.random() * 15 + 15) + 's';
+                particle.style.animationDuration = (Math.random() * 20 + 20) + 's';
+                particle.style.filter = 'blur(40px)';
+                particle.style.opacity = '0.15';
                 
                 container.appendChild(particle);
-            }
-            
-            // Create floating neon icons
-            for (let i = 0; i < 10; i++) {
-                const iconEl = document.createElement('div');
-                const icon = icons[Math.floor(Math.random() * icons.length)];
-                const color = colors[Math.floor(Math.random() * colors.length)];
-                
-                iconEl.className = 'particle icon-particle';
-                iconEl.textContent = icon;
-                iconEl.style.color = color;
-                iconEl.style.fontSize = (Math.random() * 40 + 30) + 'px';
-                iconEl.style.left = Math.random() * 100 + '%';
-                iconEl.style.top = Math.random() * 100 + '%';
-                iconEl.style.animationDelay = Math.random() * 5 + 's';
-                iconEl.style.animationDuration = (Math.random() * 20 + 20) + 's';
-                iconEl.style.filter = `drop-shadow(0 0 10px ${color}) drop-shadow(0 0 20px ${color})`;
-                
-                container.appendChild(iconEl);
-            }
-            
-            // Add wavy lines
-            for (let i = 0; i < 5; i++) {
-                const wave = document.createElement('div');
-                const color = colors[Math.floor(Math.random() * colors.length)];
-                
-                wave.style.position = 'absolute';
-                wave.style.width = '200px';
-                wave.style.height = '2px';
-                wave.style.background = `linear-gradient(90deg, transparent, ${color}, transparent)`;
-                wave.style.boxShadow = `0 0 10px ${color}`;
-                wave.style.left = Math.random() * 100 + '%';
-                wave.style.top = Math.random() * 100 + '%';
-                wave.style.opacity = '0.3';
-                wave.style.animation = `floatParticle ${Math.random() * 20 + 20}s infinite ease-in-out`;
-                wave.style.animationDelay = Math.random() * 5 + 's';
-                
-                container.appendChild(wave);
             }
             
             // Animate particles entrance with anime.js
             if (anime && anime.animate && anime.stagger) {
                 anime.animate('.particle', {
-                    opacity: [0, 0.3],
+                    opacity: [0, 0.15],
                     scale: [0, 1],
                     duration: 1000,
                     delay: anime.stagger(50),
@@ -1587,10 +1520,13 @@
         }
 
         function updatePlayersStatus() {
-            const container = document.getElementById('playersHeaderBar');
-            if (!container) return;
+            const headerContainer = document.getElementById('playersHeaderBar');
+            const footerContainer = document.getElementById('playersFooter');
+            if (!headerContainer || !footerContainer) return;
             
-            const fragment = document.createDocumentFragment();
+            const headerFragment = document.createDocumentFragment();
+            const footerFragment = document.createDocumentFragment();
+            
             Object.values(players).forEach((player, index) => {
                 const hasAnswered = answers[player.id] !== undefined;
                 
@@ -1598,61 +1534,75 @@
                 const cardColors = ['#00ff88', '#00d9ff', '#ff00ff', '#ff9900'];
                 const cardColor = cardColors[index % cardColors.length];
                 
-                const card = document.createElement('div');
-                card.className = 'flex items-center gap-2 backdrop-blur-sm rounded-2xl py-2 px-3 transition-all relative overflow-hidden';
-                card.style.background = player.disconnected ? 'rgba(100, 100, 100, 0.3)' : `linear-gradient(135deg, ${cardColor}33, ${cardColor}11)`;
-                card.style.border = `2px solid ${player.disconnected ? '#666' : cardColor}`;
-                card.style.boxShadow = player.disconnected ? 'none' : `0 0 15px ${cardColor}44`;
-                card.style.minWidth = 'clamp(120px, 20vw, 180px)';
+                // Header card (compact)
+                const headerCard = document.createElement('div');
+                headerCard.className = 'flex items-center gap-2 backdrop-blur-sm rounded-xl py-2 px-3 transition-all relative overflow-hidden';
+                headerCard.style.background = player.disconnected ? 'rgba(100, 100, 100, 0.3)' : `rgba(0, 0, 0, 0.4)`;
+                headerCard.style.border = `2px solid ${player.disconnected ? '#666' : cardColor}`;
+                headerCard.style.boxShadow = player.disconnected ? 'none' : `0 0 15px ${cardColor}44`;
+                headerCard.style.minWidth = 'clamp(100px, 15vw, 140px)';
                 
-                // Glow effect for active players
-                if (!player.disconnected) {
-                    const glow = document.createElement('div');
-                    glow.className = 'absolute inset-0 opacity-20 rounded-2xl';
-                    glow.style.background = `radial-gradient(circle at 30% 30%, ${cardColor}, transparent 70%)`;
-                    card.appendChild(glow);
-                }
+                // Avatar
+                const avatar = document.createElement('div');
+                avatar.className = 'w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center';
+                avatar.style.background = player.disconnected ? '#666' : player.color;
+                avatar.style.border = `2px solid ${player.disconnected ? '#444' : '#fff'}`;
+                avatar.style.boxShadow = player.disconnected ? 'none' : `0 0 10px ${cardColor}`;
+                avatar.innerHTML = `<span class="text-sm sm:text-base">${player.disconnected ? '❌' : (hasAnswered ? '✓' : '🎮')}</span>`;
+                headerCard.appendChild(avatar);
                 
-                // Avatar with icon
-                const avatarContainer = document.createElement('div');
-                avatarContainer.className = 'relative flex-shrink-0';
-                avatarContainer.innerHTML = `
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center relative" style="background: ${player.disconnected ? '#666' : player.color}; border: 3px solid ${player.disconnected ? '#444' : '#fff'}; box-shadow: 0 0 10px ${player.disconnected ? 'rgba(0,0,0,0.5)' : cardColor};">
-                        <span class="text-lg sm:text-xl">${player.disconnected ? '❌' : (hasAnswered ? '✓' : '🎮')}</span>
-                    </div>
-                `;
-                card.appendChild(avatarContainer);
+                // Name
+                const name = document.createElement('div');
+                name.className = 'font-bold text-xs sm:text-sm truncate flex-1';
+                name.style.color = player.disconnected ? '#999' : '#fff';
+                name.style.textShadow = '0 1px 3px rgba(0,0,0,0.5)';
+                name.textContent = player.name;
+                headerCard.appendChild(name);
                 
-                // Player info
-                const info = document.createElement('div');
-                info.className = 'flex-1 min-w-0';
-                info.innerHTML = `
-                    <div class="font-black text-xs sm:text-sm truncate" style="color: ${player.disconnected ? '#999' : '#fff'}; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">${player.name}</div>
-                    <div class="flex items-center gap-1 mt-0.5">
-                        <div class="text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full" style="background: ${player.disconnected ? '#444' : 'rgba(255,255,255,0.2)'}; color: ${player.disconnected ? '#666' : cardColor}; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">
-                            ${player.score} pts
-                        </div>
-                    </div>
-                `;
-                card.appendChild(info);
+                headerFragment.appendChild(headerCard);
                 
-                // Answer status indicator
-                if (!player.disconnected) {
-                    const status = document.createElement('div');
-                    status.className = 'w-2 h-2 rounded-full flex-shrink-0';
-                    status.style.background = hasAnswered ? '#00ff88' : '#ff9900';
-                    status.style.boxShadow = hasAnswered ? '0 0 8px #00ff88' : '0 0 8px #ff9900';
-                    if (!hasAnswered) {
-                        status.style.animation = 'pulse 1s ease infinite';
-                    }
-                    card.appendChild(status);
-                }
+                // Footer card (with score)
+                const footerCard = document.createElement('div');
+                footerCard.className = 'flex flex-col items-center gap-2 backdrop-blur-sm rounded-xl py-3 px-4 transition-all';
+                footerCard.style.background = player.disconnected ? 'rgba(100, 100, 100, 0.3)' : `rgba(0, 0, 0, 0.4)`;
+                footerCard.style.border = `2px solid ${player.disconnected ? '#666' : cardColor}`;
+                footerCard.style.boxShadow = player.disconnected ? 'none' : `0 0 15px ${cardColor}44`;
+                footerCard.style.minWidth = 'clamp(80px, 12vw, 120px)';
                 
-                fragment.appendChild(card);
+                // Avatar
+                const footerAvatar = document.createElement('div');
+                footerAvatar.className = 'w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center';
+                footerAvatar.style.background = player.disconnected ? '#666' : player.color;
+                footerAvatar.style.border = `3px solid ${player.disconnected ? '#444' : '#fff'}`;
+                footerAvatar.style.boxShadow = player.disconnected ? 'none' : `0 0 10px ${cardColor}`;
+                footerAvatar.innerHTML = `<span class="text-base sm:text-lg">${player.disconnected ? '❌' : '🎮'}</span>`;
+                footerCard.appendChild(footerAvatar);
+                
+                // Name
+                const footerName = document.createElement('div');
+                footerName.className = 'font-bold text-xs sm:text-sm truncate text-center';
+                footerName.style.color = player.disconnected ? '#999' : '#fff';
+                footerName.style.textShadow = '0 1px 3px rgba(0,0,0,0.5)';
+                footerName.textContent = player.name;
+                footerCard.appendChild(footerName);
+                
+                // Score
+                const score = document.createElement('div');
+                score.className = 'text-sm sm:text-base font-bold px-2 py-1 rounded-lg';
+                score.style.background = player.disconnected ? '#444' : cardColor;
+                score.style.color = '#fff';
+                score.style.textShadow = '0 1px 2px rgba(0,0,0,0.5)';
+                score.textContent = `${player.score} pts`;
+                footerCard.appendChild(score);
+                
+                footerFragment.appendChild(footerCard);
             });
             
-            container.innerHTML = '';
-            container.appendChild(fragment);
+            headerContainer.innerHTML = '';
+            headerContainer.appendChild(headerFragment);
+            
+            footerContainer.innerHTML = '';
+            footerContainer.appendChild(footerFragment);
         }
 
         function startGame() {
@@ -1701,7 +1651,33 @@
         }
 
         function createPlayingParticles() {
-            // Particles disabled - clean white background
+            const container = document.getElementById('playingBgParticles');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            const colors = ['rgba(0, 255, 136, 0.1)', 'rgba(0, 217, 255, 0.1)', 'rgba(255, 153, 0, 0.1)'];
+            
+            // Create subtle floating particles
+            for (let i = 0; i < 8; i++) {
+                const particle = document.createElement('div');
+                const size = Math.random() * 40 + 20;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                
+                particle.className = 'particle';
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.borderRadius = '50%';
+                particle.style.background = `radial-gradient(circle, ${color}, transparent)`;
+                particle.style.boxShadow = `0 0 ${size}px ${color}`;
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 5 + 's';
+                particle.style.animationDuration = (Math.random() * 15 + 15) + 's';
+                particle.style.opacity = '0.3';
+                
+                container.appendChild(particle);
+            }
         }
 
         function displayOptions(question) {
@@ -1762,6 +1738,7 @@
             timer = setInterval(() => {
                 timeLeft--;
                 updateTimerDisplay();
+                updateProgressBar();
                 
                 if (timeLeft <= 5) {
                     playSound('tick');
@@ -1774,24 +1751,43 @@
             }, 1000);
         }
 
+        function updateProgressBar() {
+            const progressBar = document.getElementById('progressBar');
+            if (progressBar) {
+                const percentage = (timeLeft / 20) * 100;
+                progressBar.style.width = percentage + '%';
+                
+                if (timeLeft <= 5) {
+                    progressBar.style.background = 'linear-gradient(90deg, #ff4466, #ff6688)';
+                } else if (timeLeft <= 10) {
+                    progressBar.style.background = 'linear-gradient(90deg, #ff9900, #ffaa33)';
+                } else {
+                    progressBar.style.background = 'linear-gradient(90deg, #00ff88, #00d9ff)';
+                }
+            }
+        }
+
         function updateTimerDisplay() {
             const circle = domCache.timerCircle;
             if (!circle) return;
             
             circle.textContent = timeLeft;
             
-            // Change color based on time left - no glow effects
+            // Change color based on time left with neon glow
             if (timeLeft <= 5) {
                 circle.style.background = '#ff4466';
                 circle.style.borderColor = '#fff';
+                circle.style.boxShadow = '0 0 30px rgba(255, 68, 102, 0.8)';
                 circle.classList.add('timer-danger');
             } else if (timeLeft <= 10) {
                 circle.style.background = '#ff9900';
                 circle.style.borderColor = '#fff';
+                circle.style.boxShadow = '0 0 25px rgba(255, 153, 0, 0.7)';
                 circle.classList.add('timer-warning');
             } else {
                 circle.style.background = '#0595AE';
                 circle.style.borderColor = '#fff';
+                circle.style.boxShadow = '0 0 20px rgba(5, 149, 174, 0.6)';
                 circle.classList.remove('timer-warning', 'timer-danger');
             }
         }
