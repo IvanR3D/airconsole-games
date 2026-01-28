@@ -584,13 +584,37 @@
             const grid = document.getElementById('categoryGrid');
             grid.innerHTML = '';
             
+            const categoryColors = {
+                general: { primary: '#0595AE' },
+                science: { primary: '#73A03F' },
+                mathematics: { primary: '#0595AE' },
+                robotics: { primary: '#AB3D8B' },
+                chemistry: { primary: '#73A03F' },
+                technology: { primary: '#AB3D8B' },
+                history: { primary: '#EB8225' },
+                geography: { primary: '#0595AE' }
+            };
+            
+            // Icon mapping with outline versions
+            const categoryIcons = {
+                general: 'mdi:earth',
+                science: 'mdi:microscope',
+                mathematics: 'mdi:math-compass',
+                robotics: 'mdi:robot-outline',
+                chemistry: 'mdi:flask-outline',
+                technology: 'mdi:laptop',
+                history: 'mdi:book-open-page-variant',
+                geography: 'mdi:map-outline'
+            };
+            
             Object.entries(categories).forEach(([key, cat]) => {
+                const colors = categoryColors[key] || categoryColors.general;
                 const btn = document.createElement('div');
                 btn.className = `category-btn bg-white border-[3px] ${key === selectedCategory ? 'border-steam-verde bg-green-50' : 'border-gray-200'} rounded-xl sm:rounded-2xl p-3 sm:p-4 text-center cursor-pointer transition-all shadow-md active:scale-95`;
                 btn.dataset.category = key;
                 btn.innerHTML = `
-                    <iconify-icon icon="${cat.icon}" class="category-icon mb-2"></iconify-icon>
-                    <div class="text-xs sm:text-sm font-bold">${cat.name}</div>
+                    <iconify-icon icon="${categoryIcons[key]}" class="category-icon mb-2" style="color: ${key === selectedCategory ? colors.primary : '#9E9E9E'};"></iconify-icon>
+                    <div class="text-xs sm:text-sm font-bold" style="color: ${key === selectedCategory ? colors.primary : '#757575'};">${cat.name}</div>
                 `;
                 btn.addEventListener('click', () => selectCategory(key));
                 grid.appendChild(btn);
@@ -717,21 +741,39 @@
         function selectCategory(category) {
             selectedCategory = category;
             
+            const categoryColors = {
+                general: { primary: '#0595AE' },
+                science: { primary: '#73A03F' },
+                mathematics: { primary: '#0595AE' },
+                robotics: { primary: '#AB3D8B' },
+                chemistry: { primary: '#73A03F' },
+                technology: { primary: '#AB3D8B' },
+                history: { primary: '#EB8225' },
+                geography: { primary: '#0595AE' }
+            };
+            
             document.querySelectorAll('.category-btn').forEach(btn => {
-                btn.classList.remove('border-steam-verde', 'bg-green-50');
-                btn.classList.add('border-gray-200');
-                if (btn.dataset.category === category) {
-                    btn.classList.remove('border-gray-200');
-                    btn.classList.add('border-steam-verde', 'bg-green-50');
-                    
-                    // Animate selected icon
-                    const icon = btn.querySelector('.category-icon');
+                const btnCategory = btn.dataset.category;
+                const colors = categoryColors[btnCategory] || categoryColors.general;
+                const isSelected = btnCategory === category;
+                
+                btn.classList.remove('border-steam-verde', 'bg-green-50', 'border-gray-200');
+                btn.classList.add(isSelected ? 'border-steam-verde' : 'border-gray-200');
+                if (isSelected) btn.classList.add('bg-green-50');
+                
+                // Update icon and text colors
+                const icon = btn.querySelector('.category-icon');
+                const text = btn.querySelector('.text-xs');
+                if (icon) icon.style.color = isSelected ? colors.primary : '#9E9E9E';
+                if (text) text.style.color = isSelected ? colors.primary : '#757575';
+                
+                if (isSelected) {
+                    // Animate selected icon with scale bounce
                     if (icon && anime && anime.animate) {
                         anime.animate(icon, {
-                            scale: [1, 1.3, 1],
-                            rotate: ['0deg', '360deg'],
-                            duration: 600,
-                            ease: 'inOutQuad'
+                            scale: [1, 1.4, 0.9, 1.1, 1],
+                            duration: 800,
+                            ease: 'easeOutElastic(1, .6)'
                         });
                     }
                 }
@@ -749,55 +791,86 @@
             
             container.innerHTML = '';
             
+            // STEAM colors for each category
             const colorMap = {
-                general: ['#0595AE', '#73A03F', '#EB8225'],
-                science: ['#4CAF50', '#8BC34A', '#CDDC39'],
-                mathematics: ['#2196F3', '#03A9F4', '#00BCD4'],
-                robotics: ['#E91E63', '#F06292', '#F48FB1'],
-                chemistry: ['#4CAF50', '#66BB6A', '#81C784'],
-                technology: ['#9C27B0', '#BA68C8', '#CE93D8'],
-                history: ['#FF9800', '#FFB74D', '#FFCC80'],
-                geography: ['#00BCD4', '#4DD0E1', '#80DEEA']
+                general: ['#0595AE', '#73A03F', '#EB8225', '#AB3D8B'],
+                science: ['#73A03F', '#0595AE', '#EB8225'],
+                mathematics: ['#0595AE', '#AB3D8B', '#73A03F'],
+                robotics: ['#AB3D8B', '#EB8225', '#0595AE'],
+                chemistry: ['#73A03F', '#EB8225', '#0595AE'],
+                technology: ['#AB3D8B', '#0595AE', '#EB8225'],
+                history: ['#EB8225', '#AB3D8B', '#73A03F'],
+                geography: ['#0595AE', '#73A03F', '#EB8225']
+            };
+            
+            // Outline icons for each category
+            const iconMap = {
+                general: ['mdi:earth', 'mdi:lightbulb-outline', 'mdi:star-outline', 'mdi:book-outline', 'mdi:school-outline'],
+                science: ['mdi:microscope', 'mdi:test-tube', 'mdi:dna', 'mdi:atom-variant', 'mdi:leaf-outline', 'mdi:bacteria-outline'],
+                mathematics: ['mdi:math-compass', 'mdi:calculator-variant-outline', 'mdi:chart-line', 'mdi:function-variant', 'mdi:pi', 'mdi:sigma'],
+                robotics: ['mdi:robot-outline', 'mdi:cog-outline', 'mdi:chip', 'mdi:memory', 'mdi:robot-industrial-outline', 'mdi:robot-happy-outline'],
+                chemistry: ['mdi:flask-outline', 'mdi:beaker-outline', 'mdi:molecule', 'mdi:atom', 'mdi:water-outline', 'mdi:fire-circle'],
+                technology: ['mdi:laptop', 'mdi:cellphone', 'mdi:code-tags', 'mdi:wifi', 'mdi:cloud-outline', 'mdi:lan'],
+                history: ['mdi:book-open-page-variant', 'mdi:castle', 'mdi:crown-outline', 'mdi:sword', 'mdi:scroll-text', 'mdi:pyramid'],
+                geography: ['mdi:map-outline', 'mdi:compass-outline', 'mdi:mountain', 'mdi:waves', 'mdi:island', 'mdi:pine-tree']
             };
             
             const colors = colorMap[category] || colorMap.general;
-            const icon = categories[category]?.emoji || '🌍';
+            const icons = iconMap[category] || iconMap.general;
             
-            for (let i = 0; i < 10; i++) {
+            // Icon sizes: small, medium, large, extra-large
+            const sizes = [
+                { min: 20, max: 30, opacity: 0.12 },   // small
+                { min: 35, max: 50, opacity: 0.15 },   // medium
+                { min: 55, max: 75, opacity: 0.18 },   // large
+                { min: 80, max: 110, opacity: 0.20 }   // extra-large
+            ];
+            
+            // Create soft colored blob particles
+            for (let i = 0; i < 8; i++) {
                 const particle = document.createElement('div');
-                const size = Math.random() * 40 + 20;
+                const size = Math.random() * 100 + 60;
                 const color = colors[Math.floor(Math.random() * colors.length)];
                 
                 particle.className = 'particle';
                 particle.style.width = size + 'px';
                 particle.style.height = size + 'px';
-                particle.style.backgroundColor = color;
+                particle.style.backgroundColor = `${color}15`;
                 particle.style.left = Math.random() * 100 + '%';
                 particle.style.top = Math.random() * 100 + '%';
                 particle.style.animationDelay = Math.random() * 5 + 's';
-                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                particle.style.animationDuration = (Math.random() * 15 + 15) + 's';
+                particle.style.filter = 'blur(30px)';
+                particle.style.opacity = '0.15';
                 
                 container.appendChild(particle);
             }
             
-            // Add floating icons
-            for (let i = 0; i < 5; i++) {
-                const iconEl = document.createElement('div');
+            // Create floating outline icons with varied sizes
+            for (let i = 0; i < 15; i++) {
+                const iconEl = document.createElement('iconify-icon');
+                const icon = icons[Math.floor(Math.random() * icons.length)];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const sizeConfig = sizes[Math.floor(Math.random() * sizes.length)];
+                const iconSize = Math.random() * (sizeConfig.max - sizeConfig.min) + sizeConfig.min;
+                
+                iconEl.setAttribute('icon', icon);
                 iconEl.className = 'particle';
-                iconEl.textContent = icon;
-                iconEl.style.fontSize = (Math.random() * 20 + 15) + 'px';
+                iconEl.style.color = `${color}40`;
+                iconEl.style.fontSize = iconSize + 'px';
                 iconEl.style.left = Math.random() * 100 + '%';
                 iconEl.style.top = Math.random() * 100 + '%';
                 iconEl.style.animationDelay = Math.random() * 5 + 's';
-                iconEl.style.animationDuration = (Math.random() * 15 + 15) + 's';
-                iconEl.style.backgroundColor = 'transparent';
+                iconEl.style.animationDuration = (Math.random() * 20 + 20) + 's';
+                iconEl.style.opacity = sizeConfig.opacity.toString();
+                iconEl.style.position = 'absolute';
                 
                 container.appendChild(iconEl);
             }
             
             if (typeof anime !== 'undefined' && anime.animate && anime.stagger) {
                 anime.animate('.particle', {
-                    opacity: [0, 0.2],
+                    opacity: [0, 0.15],
                     scale: [0, 1],
                     duration: 800,
                     delay: anime.stagger(40),

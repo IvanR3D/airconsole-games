@@ -1304,31 +1304,43 @@
                 geography: { primary: '#0595AE', bg: '#E0F7FA' }
             };
             
+            // Icon mapping with outline versions
+            const categoryIcons = {
+                general: 'mdi:earth',
+                science: 'mdi:microscope',
+                mathematics: 'mdi:math-compass',
+                robotics: 'mdi:robot-outline',
+                chemistry: 'mdi:flask-outline',
+                technology: 'mdi:laptop',
+                history: 'mdi:book-open-page-variant',
+                geography: 'mdi:map-outline'
+            };
+            
             Object.entries(categories).forEach(([key, category], index) => {
                 const card = document.createElement('div');
                 const colors = categoryColors[key] || categoryColors.general;
                 
                 card.className = 'category-card bg-white rounded-3xl p-4 sm:p-5 lg:p-6 text-center cursor-pointer transition-all shadow-lg hover:shadow-xl relative overflow-hidden power-up';
                 card.style.animationDelay = `${index * 0.1}s`;
-                card.style.border = `3px solid ${colors.primary}`;
+                card.style.border = `3px solid #E0E0E0`;
                 card.dataset.category = key;
                 
                 card.innerHTML = `
                     <!-- Icon container -->
                     <div class="relative mb-3 sm:mb-4">
-                        <iconify-icon icon="${category.icon}" class="category-icon relative z-10" style="color: ${colors.primary};"></iconify-icon>
+                        <iconify-icon icon="${categoryIcons[key]}" class="category-icon relative z-10" style="color: #9E9E9E;"></iconify-icon>
                     </div>
                     
                     <!-- Category name -->
-                    <div class="relative text-base sm:text-lg lg:text-xl font-black uppercase tracking-wide mb-2" style="color: ${colors.primary};">
+                    <div class="relative text-base sm:text-lg lg:text-xl font-black uppercase tracking-wide mb-2" style="color: #757575;">
                         ${category.name}
                     </div>
                     
                     <!-- Underline -->
                     <div class="flex gap-1 justify-center mt-2">
-                        <div class="w-8 h-1 rounded-full" style="background: ${colors.primary};"></div>
-                        <div class="w-8 h-1 rounded-full opacity-70" style="background: ${colors.primary};"></div>
-                        <div class="w-8 h-1 rounded-full opacity-40" style="background: ${colors.primary};"></div>
+                        <div class="w-8 h-1 rounded-full bg-gray-300"></div>
+                        <div class="w-8 h-1 rounded-full bg-gray-200"></div>
+                        <div class="w-8 h-1 rounded-full bg-gray-100"></div>
                     </div>
                     
                     <!-- Selection indicator -->
@@ -1344,12 +1356,34 @@
                         c.classList.remove('selected', 'scale-105');
                         c.querySelector('.selection-check')?.classList.add('hidden');
                         c.querySelector('.selection-check')?.classList.remove('flex');
+                        c.style.border = '3px solid #E0E0E0';
+                        
+                        // Reset icon and text to gray
+                        const icon = c.querySelector('.category-icon');
+                        const text = c.querySelector('.relative.text-base');
+                        const underlines = c.querySelectorAll('.flex.gap-1 > div');
+                        if (icon) icon.style.color = '#9E9E9E';
+                        if (text) text.style.color = '#757575';
+                        underlines.forEach((line, idx) => {
+                            line.className = `w-8 h-1 rounded-full ${idx === 0 ? 'bg-gray-300' : idx === 1 ? 'bg-gray-200' : 'bg-gray-100'}`;
+                        });
                     });
                     
                     // Add selection to clicked card
                     card.classList.add('selected', 'scale-105');
                     card.querySelector('.selection-check')?.classList.remove('hidden');
                     card.querySelector('.selection-check')?.classList.add('flex');
+                    card.style.border = `3px solid ${colors.primary}`;
+                    
+                    // Color the icon and text with category color
+                    const icon = card.querySelector('.category-icon');
+                    const text = card.querySelector('.relative.text-base');
+                    const underlines = card.querySelectorAll('.flex.gap-1 > div');
+                    if (icon) icon.style.color = colors.primary;
+                    if (text) text.style.color = colors.primary;
+                    underlines.forEach((line) => {
+                        line.style.background = colors.primary;
+                    });
                     
                     // Change background with animation
                     setCategoryBackground(key);
@@ -1358,10 +1392,9 @@
                     // Animate icon with anime.js
                     if (anime && anime.animate) {
                         anime.animate(card.querySelector('.category-icon'), {
-                            scale: [1, 1.3, 1],
-                            rotate: ['0deg', '360deg'],
+                            scale: [1, 1.4, 0.9, 1.1, 1],
                             duration: 800,
-                            ease: 'inOutElastic(1, .6)'
+                            ease: 'easeOutElastic(1, .6)'
                         });
                     }
                     
@@ -1405,31 +1438,52 @@
             
             container.innerHTML = '';
             
-            // Soft pastel colors for background blobs
+            // STEAM colors for each category
             const colorMap = {
-                general: ['rgba(5, 149, 174, 0.15)', 'rgba(115, 160, 63, 0.15)', 'rgba(235, 130, 37, 0.15)'],
-                science: ['rgba(115, 160, 63, 0.15)', 'rgba(5, 149, 174, 0.12)', 'rgba(171, 61, 139, 0.12)'],
-                mathematics: ['rgba(5, 149, 174, 0.15)', 'rgba(171, 61, 139, 0.12)', 'rgba(115, 160, 63, 0.12)'],
-                robotics: ['rgba(171, 61, 139, 0.15)', 'rgba(235, 130, 37, 0.12)', 'rgba(5, 149, 174, 0.12)'],
-                chemistry: ['rgba(115, 160, 63, 0.15)', 'rgba(235, 130, 37, 0.12)', 'rgba(5, 149, 174, 0.12)'],
-                technology: ['rgba(171, 61, 139, 0.15)', 'rgba(5, 149, 174, 0.12)', 'rgba(235, 130, 37, 0.12)'],
-                history: ['rgba(235, 130, 37, 0.15)', 'rgba(171, 61, 139, 0.12)', 'rgba(115, 160, 63, 0.12)'],
-                geography: ['rgba(5, 149, 174, 0.15)', 'rgba(115, 160, 63, 0.12)', 'rgba(235, 130, 37, 0.12)']
+                general: ['#0595AE', '#73A03F', '#EB8225', '#AB3D8B'],
+                science: ['#73A03F', '#0595AE', '#EB8225'],
+                mathematics: ['#0595AE', '#AB3D8B', '#73A03F'],
+                robotics: ['#AB3D8B', '#EB8225', '#0595AE'],
+                chemistry: ['#73A03F', '#EB8225', '#0595AE'],
+                technology: ['#AB3D8B', '#0595AE', '#EB8225'],
+                history: ['#EB8225', '#AB3D8B', '#73A03F'],
+                geography: ['#0595AE', '#73A03F', '#EB8225']
+            };
+            
+            // Outline icons for each category
+            const iconMap = {
+                general: ['mdi:earth', 'mdi:lightbulb-outline', 'mdi:star-outline', 'mdi:book-outline', 'mdi:school-outline'],
+                science: ['mdi:microscope', 'mdi:test-tube', 'mdi:dna', 'mdi:atom-variant', 'mdi:leaf-outline', 'mdi:bacteria-outline'],
+                mathematics: ['mdi:math-compass', 'mdi:calculator-variant-outline', 'mdi:chart-line', 'mdi:function-variant', 'mdi:pi', 'mdi:sigma'],
+                robotics: ['mdi:robot-outline', 'mdi:cog-outline', 'mdi:chip', 'mdi:memory', 'mdi:robot-industrial-outline', 'mdi:robot-happy-outline'],
+                chemistry: ['mdi:flask-outline', 'mdi:beaker-outline', 'mdi:molecule', 'mdi:atom', 'mdi:water-outline', 'mdi:fire-circle'],
+                technology: ['mdi:laptop', 'mdi:cellphone', 'mdi:code-tags', 'mdi:wifi', 'mdi:cloud-outline', 'mdi:lan'],
+                history: ['mdi:book-open-page-variant', 'mdi:castle', 'mdi:crown-outline', 'mdi:sword', 'mdi:scroll-text', 'mdi:pyramid'],
+                geography: ['mdi:map-outline', 'mdi:compass-outline', 'mdi:mountain', 'mdi:waves', 'mdi:island', 'mdi:pine-tree']
             };
             
             const colors = colorMap[category] || colorMap.general;
+            const icons = iconMap[category] || iconMap.general;
             
-            // Create soft colored blob particles
-            for (let i = 0; i < 15; i++) {
+            // Icon sizes: small, medium, large, extra-large
+            const sizes = [
+                { min: 30, max: 45, opacity: 0.15 },   // small
+                { min: 50, max: 70, opacity: 0.18 },   // medium
+                { min: 75, max: 100, opacity: 0.22 },  // large
+                { min: 110, max: 150, opacity: 0.25 }  // extra-large
+            ];
+            
+            // Create soft colored blob particles (background)
+            for (let i = 0; i < 12; i++) {
                 const particle = document.createElement('div');
-                const size = Math.random() * 200 + 100;
+                const size = Math.random() * 150 + 80;
                 const color = colors[Math.floor(Math.random() * colors.length)];
                 
                 particle.className = 'particle';
                 particle.style.width = size + 'px';
                 particle.style.height = size + 'px';
                 particle.style.borderRadius = '50%';
-                particle.style.background = color;
+                particle.style.background = `${color}15`; // 15 = ~8% opacity in hex
                 particle.style.left = Math.random() * 100 + '%';
                 particle.style.top = Math.random() * 100 + '%';
                 particle.style.animationDelay = Math.random() * 5 + 's';
@@ -1440,13 +1494,35 @@
                 container.appendChild(particle);
             }
             
+            // Create floating outline icons with varied sizes
+            for (let i = 0; i < 25; i++) {
+                const iconEl = document.createElement('iconify-icon');
+                const icon = icons[Math.floor(Math.random() * icons.length)];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const sizeConfig = sizes[Math.floor(Math.random() * sizes.length)];
+                const iconSize = Math.random() * (sizeConfig.max - sizeConfig.min) + sizeConfig.min;
+                
+                iconEl.setAttribute('icon', icon);
+                iconEl.className = 'particle icon-particle';
+                iconEl.style.color = `${color}40`; // 40 = ~25% opacity in hex
+                iconEl.style.fontSize = iconSize + 'px';
+                iconEl.style.left = Math.random() * 100 + '%';
+                iconEl.style.top = Math.random() * 100 + '%';
+                iconEl.style.animationDelay = Math.random() * 5 + 's';
+                iconEl.style.animationDuration = (Math.random() * 25 + 25) + 's';
+                iconEl.style.opacity = sizeConfig.opacity.toString();
+                iconEl.style.position = 'absolute';
+                
+                container.appendChild(iconEl);
+            }
+            
             // Animate particles entrance with anime.js
             if (anime && anime.animate && anime.stagger) {
                 anime.animate('.particle', {
                     opacity: [0, 0.15],
                     scale: [0, 1],
                     duration: 1000,
-                    delay: anime.stagger(50),
+                    delay: anime.stagger(30),
                     ease: 'outElastic(1, .8)'
                 });
             }
