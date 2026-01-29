@@ -55,6 +55,7 @@ let airconsole;
 let players = {};
 let currentCompound = null;
 let selectedElements = [];
+let playerSelections = {}; // Track cada jugador si ya seleccionó
 let gameTimer = 45;
 let timerInterval = null;
 let roundNumber = 0;
@@ -115,61 +116,68 @@ function init() {
 function renderIntroScreen() {
     const app = document.getElementById('app');
     app.innerHTML = `
-        <div class="screen active flex-col items-center justify-center p-8 min-h-screen relative" id="introScreen">
-            <div class="lab-bg"></div>
+        <div class="screen active flex-col items-center justify-center p-4 sm:p-6 lg:p-8 min-h-screen relative" id="introScreen">
+            <div class="lab-bg">
+                <div class="blob-green"></div>
+                <div class="waves-container">
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                </div>
+            </div>
             <div id="floatingMolecules" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
             
-            <div class="relative z-10 text-center max-w-5xl">
-                <img src="../LogoSteamRD-Color.webp" alt="STEAM RD" class="w-32 h-32 mx-auto mb-6 float-element" style="filter: drop-shadow(0 0 20px rgba(255,255,255,0.3));">
+            <div class="relative z-10 text-center max-w-5xl w-full px-2">
+                <img src="../LogoSteamRD-Color.webp" alt="STEAM RD" class="w-20 h-20 sm:w-28 sm:h-28 lg:w-32 lg:h-32 mx-auto mb-4 sm:mb-6 float-element" style="filter: drop-shadow(0 4px 12px rgba(0,0,0,0.1));">
                 
-                <h1 class="intro-title mb-2">LABORATORIO</h1>
-                <h2 class="subtitle mb-8">QUÍMICO</h2>
+                <h1 class="intro-title mb-1 sm:mb-2">LABORATORIO</h1>
+                <h2 class="subtitle mb-4 sm:mb-6 lg:mb-8">QUÍMICO</h2>
                 
-                <div class="flex justify-center items-center gap-4 mb-10" id="formulaDemo">
-                    <div class="element-card element-nonmetal" style="transform: scale(0.9);">
+                <div class="flex flex-wrap justify-center items-center gap-2 sm:gap-3 lg:gap-4 mb-6 sm:mb-8 lg:mb-10" id="formulaDemo">
+                    <div class="element-card element-nonmetal" style="transform: scale(0.8);">
                         <span class="atomic-number">1</span>
                         <span class="symbol">H</span>
                         <span class="name">Hidrógeno</span>
                     </div>
-                    <iconify-icon icon="mdi:plus" class="text-4xl text-white/60"></iconify-icon>
-                    <div class="element-card element-nonmetal" style="transform: scale(0.9);">
+                    <iconify-icon icon="mdi:plus" class="text-2xl sm:text-3xl lg:text-4xl" style="color: var(--color-text-light);"></iconify-icon>
+                    <div class="element-card element-nonmetal" style="transform: scale(0.8);">
                         <span class="atomic-number">8</span>
                         <span class="symbol">O</span>
                         <span class="name">Oxígeno</span>
                     </div>
-                    <iconify-icon icon="mdi:arrow-right" class="text-4xl text-white/60"></iconify-icon>
-                    <div class="compound-result bg-gradient-to-r from-lab-accent to-lab-primary text-white" style="padding: 15px 30px; font-size: 32px;">
-                        <iconify-icon icon="mdi:water" class="mr-2"></iconify-icon>
+                    <iconify-icon icon="mdi:arrow-right" class="text-2xl sm:text-3xl lg:text-4xl" style="color: var(--color-text-light);"></iconify-icon>
+                    <div class="compound-result bg-gradient-to-r from-cyan-500 to-blue-500 text-white">
+                        <iconify-icon icon="mdi:water" class="mr-1 sm:mr-2"></iconify-icon>
                         H₂O
                     </div>
                 </div>
                 
-                <p class="text-xl text-white/70 mb-8">
-                    <iconify-icon icon="mdi:flask" class="mr-2 glow-green"></iconify-icon>
+                <p class="text-base sm:text-lg lg:text-xl mb-4 sm:mb-6 lg:mb-8" style="color: var(--color-text-light);">
+                    <iconify-icon icon="mdi:flask" class="mr-2" style="color: var(--color-accent);"></iconify-icon>
                     Combina elementos y crea compuestos químicos
                 </p>
                 
-                <p class="text-lg text-lab-accent mb-4 waiting-dots">Esperando científicos</p>
+                <p class="text-base sm:text-lg mb-3 sm:mb-4 waiting-dots" style="color: var(--color-primary);">Esperando científicos</p>
                 
-                <div class="flex justify-center gap-4 mb-8" id="playerSlots">
+                <div class="flex justify-center gap-2 sm:gap-3 lg:gap-4 mb-4 sm:mb-6 lg:mb-8" id="playerSlots">
                     ${[0,1,2,3].map(i => `
                         <div class="player-slot" data-slot="${i}">
-                            <iconify-icon icon="mdi:account-plus" style="font-size: 2rem; color: rgba(255,255,255,0.3);"></iconify-icon>
+                            <iconify-icon icon="mdi:account-plus"></iconify-icon>
                         </div>
                     `).join('')}
                 </div>
                 
-                <div class="flex justify-center gap-6 text-sm text-white/50">
-                    <div class="flex items-center gap-2">
-                        <iconify-icon icon="mdi:account-group" class="text-xl"></iconify-icon>
+                <div class="flex flex-wrap justify-center gap-3 sm:gap-4 lg:gap-6 text-xs sm:text-sm" style="color: var(--color-text-light);">
+                    <div class="flex items-center gap-1 sm:gap-2">
+                        <iconify-icon icon="mdi:account-group" class="text-base sm:text-lg lg:text-xl" style="color: var(--color-primary);"></iconify-icon>
                         <span>2-4 jugadores</span>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <iconify-icon icon="mdi:timer" class="text-xl"></iconify-icon>
+                    <div class="flex items-center gap-1 sm:gap-2">
+                        <iconify-icon icon="mdi:timer" class="text-base sm:text-lg lg:text-xl" style="color: var(--color-warning);"></iconify-icon>
                         <span>${MAX_ROUNDS} rondas</span>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <iconify-icon icon="mdi:trophy" class="text-xl"></iconify-icon>
+                    <div class="flex items-center gap-1 sm:gap-2">
+                        <iconify-icon icon="mdi:trophy" class="text-base sm:text-lg lg:text-xl" style="color: var(--color-warning);"></iconify-icon>
                         <span>Gana puntos</span>
                     </div>
                 </div>
@@ -202,16 +210,23 @@ function renderIntroScreen() {
 function renderPlayingScreen() {
     const app = document.getElementById('app');
     app.innerHTML = `
-        <div class="screen active flex-col p-6 min-h-screen relative" id="playingScreen">
-            <div class="lab-bg"></div>
+        <div class="screen active flex-col p-3 sm:p-4 lg:p-6 min-h-screen relative" id="playingScreen">
+            <div class="lab-bg">
+                <div class="blob-green"></div>
+                <div class="waves-container">
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                </div>
+            </div>
             
-            <!-- Header -->
-            <div class="relative z-10 flex justify-between items-center mb-4">
-                <div class="flex items-center gap-4">
-                    <iconify-icon icon="mdi:flask-round-bottom" class="text-4xl text-lab-success glow-green"></iconify-icon>
+            <!-- Header - Responsive -->
+            <div class="relative z-10 flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+                <div class="flex items-center gap-2 sm:gap-4">
+                    <iconify-icon icon="mdi:flask-round-bottom" class="text-2xl sm:text-3xl lg:text-4xl" style="color: var(--color-accent);"></iconify-icon>
                     <div>
-                        <h1 class="text-2xl font-bold">Laboratorio Químico</h1>
-                        <div class="round-indicator mt-2" id="roundIndicator">
+                        <h1 class="text-lg sm:text-xl lg:text-2xl font-bold" style="color: var(--color-text);">Laboratorio Químico</h1>
+                        <div class="round-indicator mt-1 sm:mt-2" id="roundIndicator">
                             ${Array(MAX_ROUNDS).fill(0).map((_, i) => `<div class="round-dot" data-round="${i+1}"></div>`).join('')}
                         </div>
                     </div>
@@ -222,42 +237,50 @@ function renderPlayingScreen() {
                 </div>
             </div>
             
-            <!-- Target Compound -->
-            <div class="relative z-10 target-display text-center mb-6" id="targetDisplay">
-                <p class="text-lg text-white/70 mb-2">
-                    <iconify-icon icon="mdi:target" class="mr-2"></iconify-icon>
+            <!-- Target Compound - Responsive -->
+            <div class="relative z-10 target-display text-center mb-3 sm:mb-4 lg:mb-6" id="targetDisplay">
+                <p class="text-sm sm:text-base lg:text-lg mb-1 sm:mb-2" style="color: var(--color-text-light);">
+                    <iconify-icon icon="mdi:target" class="mr-1 sm:mr-2"></iconify-icon>
                     Sintetiza el compuesto:
                 </p>
                 <div class="target-formula" id="targetFormula">H₂O</div>
-                <p class="text-2xl font-semibold text-lab-accent mt-2" id="targetName">Agua</p>
-                <p class="text-sm text-white/50 mt-2" id="targetHint">
+                <p class="text-lg sm:text-xl lg:text-2xl font-semibold mt-1 sm:mt-2" style="color: var(--color-primary);" id="targetName">Agua</p>
+                <p class="text-xs sm:text-sm mt-1 sm:mt-2" style="color: var(--color-text-light);" id="targetHint">
                     <iconify-icon icon="mdi:lightbulb-outline" class="mr-1"></iconify-icon>
                     <span>Esencial para la vida</span>
                 </p>
             </div>
             
-            <!-- Mixing Zone -->
-            <div class="relative z-10 flex-1 flex flex-col">
-                <div class="mixing-zone flex items-center justify-center p-8 relative" id="mixingZone">
-                    <div id="bubblesContainer" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
-                    
-                    <div class="text-center" id="mixingContent">
-                        <iconify-icon icon="mdi:beaker-question" class="text-6xl text-white/30 mb-4"></iconify-icon>
-                        <p class="text-white/50 text-lg">Los científicos están seleccionando elementos...</p>
-                    </div>
-                    
-                    <div class="hidden flex-wrap justify-center gap-4" id="selectedElements"></div>
-                </div>
-                
-                <!-- Required elements hint -->
-                <div class="mt-4 text-center" id="requiredHint">
-                    <p class="text-sm text-white/50 mb-2">Elementos necesarios:</p>
-                    <div class="flex justify-center gap-2 flex-wrap" id="requiredElements"></div>
+            <!-- Status indicator -->
+            <div class="relative z-10 text-center mb-3">
+                <div class="status-indicator waiting inline-flex" id="statusIndicator">
+                    <iconify-icon icon="mdi:timer-sand" class="animate-pulse"></iconify-icon>
+                    <span>Esperando que todos seleccionen...</span>
                 </div>
             </div>
             
-            <!-- Players Area -->
-            <div class="relative z-10 grid grid-cols-4 gap-4 mt-6" id="playersArea"></div>
+            <!-- Mixing Zone - Responsive -->
+            <div class="relative z-10 flex-1 flex flex-col min-h-0">
+                <div class="mixing-zone flex items-center justify-center p-4 sm:p-6 lg:p-8 relative flex-1" id="mixingZone">
+                    <div id="bubblesContainer" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+                    
+                    <div class="text-center" id="mixingContent">
+                        <iconify-icon icon="mdi:beaker-question" class="text-4xl sm:text-5xl lg:text-6xl mb-2 sm:mb-4" style="color: var(--color-text-light); opacity: 0.4;"></iconify-icon>
+                        <p class="text-sm sm:text-base lg:text-lg" style="color: var(--color-text-light);">Los científicos están seleccionando elementos...</p>
+                    </div>
+                    
+                    <div class="hidden flex-wrap justify-center gap-2 sm:gap-3 lg:gap-4" id="selectedElements"></div>
+                </div>
+                
+                <!-- Required elements hint -->
+                <div class="mt-2 sm:mt-3 lg:mt-4 text-center" id="requiredHint">
+                    <p class="text-xs sm:text-sm mb-1 sm:mb-2" style="color: var(--color-text-light);">Elementos necesarios:</p>
+                    <div class="flex justify-center gap-1 sm:gap-2 flex-wrap" id="requiredElements"></div>
+                </div>
+            </div>
+            
+            <!-- Players Area - Responsive grid -->
+            <div class="relative z-10 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 lg:gap-4 mt-3 sm:mt-4 lg:mt-6" id="playersArea"></div>
         </div>
         
         <!-- Result Overlay -->
@@ -270,48 +293,48 @@ function renderPlayingScreen() {
 function renderEndScreen(winner, sortedPlayers) {
     const app = document.getElementById('app');
     app.innerHTML = `
-        <div class="screen active flex-col items-center justify-center p-8 min-h-screen relative" id="endScreen">
+        <div class="screen active flex-col items-center justify-center p-4 sm:p-6 lg:p-8 min-h-screen relative" id="endScreen">
             <div class="lab-bg"></div>
             <div id="confettiContainer" class="fixed inset-0 pointer-events-none z-50"></div>
             
-            <div class="relative z-10 text-center max-w-3xl w-full">
-                <iconify-icon icon="mdi:trophy" class="text-8xl text-yellow-400 glow-orange mb-6 result-icon"></iconify-icon>
+            <div class="relative z-10 text-center max-w-3xl w-full px-2">
+                <iconify-icon icon="mdi:trophy" class="text-5xl sm:text-6xl lg:text-8xl text-yellow-400 glow-orange mb-4 sm:mb-6 result-icon"></iconify-icon>
                 
-                <h1 class="text-5xl font-black mb-2 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                <h1 class="text-2xl sm:text-4xl lg:text-5xl font-black mb-1 sm:mb-2 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
                     ¡Experimento Completado!
                 </h1>
-                <p class="text-xl text-white/70 mb-8">El mejor científico del laboratorio es...</p>
+                <p class="text-base sm:text-lg lg:text-xl text-white/70 mb-4 sm:mb-6 lg:mb-8">El mejor científico del laboratorio es...</p>
                 
                 <!-- Winner Card -->
-                <div class="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border-2 border-yellow-500 rounded-3xl p-8 mb-8 winner-card">
-                    <div class="flex items-center justify-center gap-6">
-                        <div class="player-avatar text-4xl" style="background: ${winner.color}; width: 100px; height: 100px;">
+                <div class="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border-2 border-yellow-500 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 mb-4 sm:mb-6 lg:mb-8 winner-card">
+                    <div class="flex items-center justify-center gap-3 sm:gap-4 lg:gap-6">
+                        <div class="player-avatar text-2xl sm:text-3xl lg:text-4xl" style="background: ${winner.color}; width: clamp(60px, 12vw, 100px); height: clamp(60px, 12vw, 100px);">
                             <iconify-icon icon="mdi:crown" class="text-yellow-300"></iconify-icon>
                         </div>
                         <div class="text-left">
-                            <p class="text-3xl font-black">${winner.name}</p>
-                            <p class="text-4xl font-black text-yellow-400">${winner.score} pts</p>
+                            <p class="text-xl sm:text-2xl lg:text-3xl font-black">${winner.name}</p>
+                            <p class="text-2xl sm:text-3xl lg:text-4xl font-black text-yellow-400">${winner.score} pts</p>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Leaderboard -->
-                <div class="space-y-3 mb-8" id="leaderboard">
+                <div class="space-y-2 sm:space-y-3 mb-4 sm:mb-6 lg:mb-8" id="leaderboard">
                     ${sortedPlayers.map((player, i) => `
                         <div class="leaderboard-item ${i === 0 ? 'first' : i === 1 ? 'second' : i === 2 ? 'third' : ''}">
                             <div class="rank-badge ${i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : 'bg-white/10'}">${i + 1}</div>
-                            <div class="player-avatar" style="background: ${player.color}; width: 50px; height: 50px;">
-                                <iconify-icon icon="mdi:flask" class="text-xl"></iconify-icon>
+                            <div class="player-avatar" style="background: ${player.color};">
+                                <iconify-icon icon="mdi:flask" class="text-base sm:text-lg lg:text-xl"></iconify-icon>
                             </div>
-                            <div class="flex-1 text-left">
-                                <p class="font-bold text-lg">${player.name}</p>
+                            <div class="flex-1 text-left min-w-0">
+                                <p class="font-bold text-sm sm:text-base lg:text-lg truncate">${player.name}</p>
                             </div>
                             <div class="score-badge">${player.score} pts</div>
                         </div>
                     `).join('')}
                 </div>
                 
-                <p class="text-white/50 text-sm">
+                <p class="text-white/50 text-xs sm:text-sm">
                     <iconify-icon icon="mdi:information" class="mr-1"></iconify-icon>
                     El Jugador 1 puede iniciar una nueva partida
                 </p>
@@ -444,6 +467,12 @@ function nextRound() {
     }
     
     selectedElements = [];
+    playerSelections = {}; // Reset selecciones de jugadores
+    
+    // Inicializar estado de cada jugador
+    Object.keys(players).forEach(pid => {
+        playerSelections[pid] = { hasSelected: false, element: null };
+    });
     
     // Seleccionar compuesto no usado
     const availableCompounds = compounds.filter(c => !usedCompounds.includes(c.formula));
@@ -546,6 +575,14 @@ function updateTimerDisplay() {
 
 function handleElementSelection(device_id, element) {
     if (!currentCompound) return;
+    if (!playerSelections[device_id]) return;
+    
+    // Si el jugador ya seleccionó, ignorar
+    if (playerSelections[device_id].hasSelected) return;
+    
+    // Marcar que este jugador ya seleccionó
+    playerSelections[device_id].hasSelected = true;
+    playerSelections[device_id].element = element;
     
     selectedElements.push({ element, player: device_id });
     
@@ -581,11 +618,21 @@ function handleElementSelection(device_id, element) {
     // Crear burbujas
     createBubbles();
     
-    // Marcar jugador como activo
+    // Actualizar UI de jugadores (mostrar quién ya seleccionó)
     updatePlayersArea(device_id);
     
-    // Verificar si tenemos suficientes elementos
-    if (selectedElements.length >= currentCompound.elements.length) {
+    // Notificar al jugador que su selección fue recibida
+    airconsole.message(device_id, { 
+        action: 'selectionConfirmed', 
+        element: element 
+    });
+    
+    // Verificar si TODOS los jugadores han seleccionado
+    const totalPlayers = Object.keys(players).length;
+    const playersWhoSelected = Object.values(playerSelections).filter(p => p.hasSelected).length;
+    
+    if (playersWhoSelected >= totalPlayers) {
+        // Todos seleccionaron, verificar resultado
         clearInterval(timerInterval);
         zone.classList.add('reacting');
         
@@ -640,14 +687,14 @@ function showResult(isCorrect) {
     
     if (isCorrect) {
         content.innerHTML = `
-            <iconify-icon icon="mdi:check-circle" class="result-icon text-lab-success glow-green"></iconify-icon>
-            <h2 class="text-4xl font-black text-lab-success mb-4">¡Síntesis Exitosa!</h2>
-            <div class="compound-result bg-gradient-to-r from-lab-success to-emerald-400 text-white inline-block mb-4">
-                <iconify-icon icon="${currentCompound.icon}" class="mr-3"></iconify-icon>
+            <iconify-icon icon="mdi:check-circle" class="result-icon" style="color: var(--color-success);"></iconify-icon>
+            <h2 class="text-3xl sm:text-4xl font-black mb-4" style="color: var(--color-success);">¡Síntesis Exitosa!</h2>
+            <div class="compound-result bg-gradient-to-r from-emerald-500 to-teal-500 text-white inline-block mb-4">
+                <iconify-icon icon="${currentCompound.icon}" class="mr-2 sm:mr-3"></iconify-icon>
                 ${currentCompound.formula}
             </div>
-            <p class="text-2xl text-white/80">${currentCompound.name}</p>
-            <p class="text-xl text-lab-success mt-4">
+            <p class="text-xl sm:text-2xl" style="color: var(--color-text);">${currentCompound.name}</p>
+            <p class="text-lg sm:text-xl mt-4" style="color: var(--color-success);">
                 <iconify-icon icon="mdi:star" class="mr-2"></iconify-icon>
                 +${currentCompound.points} pts + ${Math.floor(gameTimer * 2)} bonus tiempo
             </p>
@@ -655,14 +702,14 @@ function showResult(isCorrect) {
         createConfetti();
     } else {
         content.innerHTML = `
-            <iconify-icon icon="mdi:close-circle" class="result-icon text-lab-danger" style="filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.6));"></iconify-icon>
-            <h2 class="text-4xl font-black text-lab-danger mb-4">Reacción Fallida</h2>
-            <div class="compound-result bg-gradient-to-r from-lab-danger to-red-400 text-white inline-block mb-4">
-                <iconify-icon icon="mdi:flask-empty-off" class="mr-3"></iconify-icon>
+            <iconify-icon icon="mdi:close-circle" class="result-icon" style="color: var(--color-danger);"></iconify-icon>
+            <h2 class="text-3xl sm:text-4xl font-black mb-4" style="color: var(--color-danger);">Reacción Fallida</h2>
+            <div class="compound-result bg-gradient-to-r from-red-500 to-orange-500 text-white inline-block mb-4">
+                <iconify-icon icon="mdi:flask-empty-off" class="mr-2 sm:mr-3"></iconify-icon>
                 ???
             </div>
-            <p class="text-xl text-white/60 mt-4">La combinación no fue correcta</p>
-            <p class="text-lg text-white/40 mt-2">Se necesitaba: ${currentCompound.elements.join(' + ')}</p>
+            <p class="text-lg sm:text-xl mt-4" style="color: var(--color-text-light);">La combinación no fue correcta</p>
+            <p class="text-base sm:text-lg mt-2" style="color: var(--color-text-light); opacity: 0.7;">Se necesitaba: ${currentCompound.elements.join(' + ')}</p>
         `;
     }
     
@@ -694,20 +741,27 @@ function updatePlayersArea(activePlayer = null) {
     const area = document.getElementById('playersArea');
     if (!area) return;
     
-    area.innerHTML = Object.values(players).map(player => `
-        <div class="player-card ${activePlayer === player.id ? 'selecting' : ''}" style="--player-color: ${player.color};">
-            <div class="flex items-center gap-3">
-                <div class="player-avatar" style="background: ${player.color};">
-                    <iconify-icon icon="${player.icon}"></iconify-icon>
+    area.innerHTML = Object.values(players).map(player => {
+        const hasSelected = playerSelections[player.id]?.hasSelected || false;
+        const selectedElement = playerSelections[player.id]?.element || null;
+        
+        return `
+            <div class="player-card ${hasSelected ? 'ready' : 'waiting'}" style="--player-color: ${player.color};">
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <div class="player-avatar" style="background: ${player.color};">
+                        <iconify-icon icon="${player.icon}" style="color: white;"></iconify-icon>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="font-bold truncate text-sm sm:text-base">${player.name}</p>
+                        <p class="text-xs sm:text-sm" style="color: ${hasSelected ? 'var(--color-success)' : 'var(--color-text-light)'};">
+                            ${hasSelected ? `✓ ${selectedElement || 'Listo'}` : '⏳ Seleccionando...'}
+                        </p>
+                    </div>
+                    <div class="score-badge">${player.score}</div>
                 </div>
-                <div class="flex-1 min-w-0">
-                    <p class="font-bold truncate">${player.name}</p>
-                    <p class="text-sm text-white/60">${player.isAdmin ? '👑 Admin' : 'Científico'}</p>
-                </div>
-                <div class="score-badge">${player.score}</div>
             </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 

@@ -29,6 +29,8 @@ let currentCompound = null;
 let myScore = 0;
 let currentRound = 0;
 let maxRounds = 8;
+let hasSelectedThisRound = false; // Track si ya seleccionó en esta ronda
+let selectedElement = null;
 
 // ============================================
 // INICIALIZACIÓN
@@ -51,6 +53,7 @@ function init() {
             case 'gameFull': handleGameFull(); break;
             case 'gameStateUpdate': handleGameStateUpdate(data); break;
             case 'newRound': handleNewRound(data); break;
+            case 'selectionConfirmed': handleSelectionConfirmed(data); break;
             case 'roundResult': handleRoundResult(data); break;
             case 'gameEnd': handleGameEnd(data); break;
         }
@@ -127,8 +130,9 @@ function renderJoinScreen() {
 function renderWaitingScreen() {
     const app = document.getElementById('app');
     app.innerHTML = `
-        <div class="screen active flex-col items-center justify-center p-5 text-center" id="waitingScreen">
-            <div class="w-full max-w-sm">
+        <div class="screen active flex-col items-center justify-center p-5 text-center relative" id="waitingScreen">
+            <div class="controller-bg"></div>
+            <div class="relative z-10 w-full max-w-sm">
                 <div class="player-avatar mx-auto mb-4" id="playerAvatar" style="background: ${playerData.color};">
                     <iconify-icon icon="${playerData.icon}" style="color: white;"></iconify-icon>
                 </div>
@@ -136,18 +140,18 @@ function renderWaitingScreen() {
                 <p class="text-2xl font-black mb-2" style="color: ${playerData.color};">${playerData.name}</p>
                 
                 ${isAdmin ? `
-                    <div class="bg-lab-warning/20 border-2 border-lab-warning rounded-2xl py-3 px-5 mb-6 inline-flex items-center gap-2">
-                        <iconify-icon icon="mdi:crown" class="text-2xl text-lab-warning"></iconify-icon>
-                        <span class="font-bold text-lab-warning">ERES EL ADMIN</span>
+                    <div class="bg-orange-50 border-2 border-orange-400 rounded-2xl py-3 px-5 mb-6 inline-flex items-center gap-2">
+                        <iconify-icon icon="mdi:crown" class="text-2xl" style="color: var(--color-warning);"></iconify-icon>
+                        <span class="font-bold" style="color: var(--color-warning);">ERES EL ADMIN</span>
                     </div>
                 ` : ''}
                 
                 <div class="mb-8">
-                    <iconify-icon icon="mdi:flask" class="text-6xl bounce" style="color: #10b981;"></iconify-icon>
+                    <iconify-icon icon="mdi:flask" class="text-6xl bounce" style="color: var(--color-accent);"></iconify-icon>
                 </div>
                 
-                <div class="bg-lab-success/20 border-2 border-lab-success rounded-2xl py-4 px-6 mb-6">
-                    <p class="text-lg font-bold text-lab-success">
+                <div class="bg-green-50 border-2 border-green-400 rounded-2xl py-4 px-6 mb-6">
+                    <p class="text-lg font-bold" style="color: var(--color-success);">
                         <iconify-icon icon="mdi:check-circle" class="mr-2"></iconify-icon>
                         ¡Conectado al laboratorio!
                     </p>
@@ -159,7 +163,7 @@ function renderWaitingScreen() {
                         ¡INICIAR EXPERIMENTO!
                     </button>
                 ` : `
-                    <p class="text-white/50">
+                    <p style="color: var(--color-text-light);">
                         <iconify-icon icon="mdi:timer-sand" class="mr-2"></iconify-icon>
                         Esperando que el admin inicie...
                     </p>
@@ -185,15 +189,17 @@ function renderPlayingScreen() {
     }
     
     app.innerHTML = `
-        <div class="screen active flex-col p-4" id="playingScreen">
+        <div class="screen active flex-col p-4 relative" id="playingScreen">
+            <div class="controller-bg"></div>
+            
             <!-- Header -->
-            <div class="text-center mb-3">
-                <p class="text-xs text-white/50 mb-1">Ronda ${currentRound} de ${maxRounds}</p>
-                <p class="text-sm text-white/70 mb-2">Sintetiza:</p>
+            <div class="relative z-10 text-center mb-3">
+                <p class="text-xs mb-1" style="color: var(--color-text-light);">Ronda ${currentRound} de ${maxRounds}</p>
+                <p class="text-sm mb-2" style="color: var(--color-text-light);">Sintetiza:</p>
                 
                 <div class="target-card mb-3">
                     <div class="target-formula">${currentCompound?.formula || '???'}</div>
-                    <p class="text-lab-accent font-semibold mt-1">${currentCompound?.name || ''}</p>
+                    <p class="font-semibold mt-1" style="color: var(--color-primary);">${currentCompound?.name || ''}</p>
                 </div>
                 
                 <div class="flex flex-wrap justify-center gap-2 mb-2" id="requiredElements">
@@ -203,18 +209,25 @@ function renderPlayingScreen() {
                 </div>
             </div>
             
-            <!-- Elements Grid -->
-            <p class="text-xs text-center text-white/50 mb-2">Toca un elemento para añadirlo:</p>
-            <div class="grid grid-cols-4 gap-2 justify-items-center flex-1 overflow-y-auto pb-4" id="elementsGrid"></div>
+            <!-- Selection status -->
+            <div class="relative z-10 text-center mb-3" id="selectionStatus">
+                <p class="text-sm" style="color: var(--color-text-light);">
+                    <iconify-icon icon="mdi:hand-pointing-up" class="mr-1"></iconify-icon>
+                    Selecciona un elemento
+                </p>
+            </div>
+            
+            <!-- Elements Grid - Responsive -->
+            <div class="relative z-10 grid grid-cols-4 xs:grid-cols-4 sm:grid-cols-5 gap-1.5 sm:gap-2 justify-items-center flex-1 overflow-y-auto pb-4" id="elementsGrid"></div>
             
             <!-- Player Info -->
-            <div class="mini-player mt-3">
+            <div class="relative z-10 mini-player mt-3">
                 <div class="mini-avatar" style="background: ${playerData?.color || '#6366f1'};">
-                    <iconify-icon icon="${playerData?.icon || 'mdi:flask'}"></iconify-icon>
+                    <iconify-icon icon="${playerData?.icon || 'mdi:flask'}" style="color: white;"></iconify-icon>
                 </div>
                 <div class="flex-1">
-                    <p class="font-bold text-sm">${playerData?.name || 'Científico'}</p>
-                    <p class="text-xs text-white/50">${isAdmin ? '👑 Admin' : 'Científico'}</p>
+                    <p class="font-bold text-sm" style="color: var(--color-text);">${playerData?.name || 'Científico'}</p>
+                    <p class="text-xs" style="color: var(--color-text-light);">${isAdmin ? '👑 Admin' : 'Científico'}</p>
                 </div>
                 <div class="score-display" id="scoreDisplay">${myScore}</div>
             </div>
@@ -238,12 +251,19 @@ function setupElementsGrid() {
     Object.entries(elements).forEach(([key, el]) => {
         const btn = document.createElement('button');
         btn.className = `element-btn element-${el.group}`;
+        btn.dataset.element = key;
         btn.innerHTML = `
             <span class="atomic-number">${el.number}</span>
             <span class="symbol">${el.symbol}</span>
             <span class="name">${el.name}</span>
         `;
         btn.addEventListener('click', () => selectElement(key, btn));
+        
+        // Si ya seleccionó, deshabilitar
+        if (hasSelectedThisRound) {
+            btn.disabled = true;
+        }
+        
         grid.appendChild(btn);
     });
     
@@ -260,17 +280,47 @@ function setupElementsGrid() {
 }
 
 function selectElement(element, btn) {
+    // Si ya seleccionó, ignorar
+    if (hasSelectedThisRound) return;
+    
+    hasSelectedThisRound = true;
+    selectedElement = element;
+    
     sendMessage({ action: 'selectElement', element: element });
     
-    // Feedback visual
+    // Deshabilitar todos los botones
+    document.querySelectorAll('.element-btn').forEach(b => {
+        b.disabled = true;
+        if (b !== btn) {
+            b.style.opacity = '0.3';
+        }
+    });
+    
+    // Marcar el seleccionado
+    btn.classList.add('selected');
     btn.classList.add('pop-in');
     
-    // Vibración si está disponible
-    if (navigator.vibrate) {
-        navigator.vibrate(50);
+    // Actualizar status
+    const status = document.getElementById('selectionStatus');
+    if (status) {
+        status.innerHTML = `
+            <div class="selection-confirmed">
+                <iconify-icon icon="mdi:check-circle" class="text-3xl" style="color: var(--color-success);"></iconify-icon>
+                <p class="font-bold mt-2" style="color: var(--color-success);">¡Seleccionaste ${element}!</p>
+                <p class="text-sm mt-1" style="color: var(--color-text-light);">Esperando a los demás...</p>
+            </div>
+        `;
     }
     
-    setTimeout(() => btn.classList.remove('pop-in'), 400);
+    // Vibración
+    if (navigator.vibrate) {
+        navigator.vibrate([50, 30, 50]);
+    }
+}
+
+function handleSelectionConfirmed(data) {
+    // El servidor confirmó la selección
+    console.log('Selección confirmada:', data.element);
 }
 
 
@@ -387,6 +437,10 @@ function handleNewRound(data) {
     currentRound = data.round;
     maxRounds = data.maxRounds;
     
+    // Reset estado de selección para nueva ronda
+    hasSelectedThisRound = false;
+    selectedElement = null;
+    
     renderPlayingScreen();
 }
 
@@ -403,25 +457,25 @@ function handleRoundResult(data) {
     
     if (data.correct) {
         content.innerHTML = `
-            <iconify-icon icon="mdi:check-circle" class="text-7xl text-lab-success mb-4" style="filter: drop-shadow(0 0 20px rgba(16, 185, 129, 0.6));"></iconify-icon>
-            <h2 class="text-3xl font-black text-lab-success mb-2">¡Síntesis Exitosa!</h2>
-            <p class="text-xl text-white/80 mb-4">${data.compound.formula} - ${data.compound.name}</p>
-            <div class="bg-lab-success/20 rounded-2xl py-3 px-6 inline-block">
-                <p class="text-2xl font-bold text-lab-success">
+            <iconify-icon icon="mdi:check-circle" class="text-7xl mb-4" style="color: var(--color-success);"></iconify-icon>
+            <h2 class="text-3xl font-black mb-2" style="color: var(--color-success);">¡Síntesis Exitosa!</h2>
+            <p class="text-xl mb-4" style="color: var(--color-text);">${data.compound.formula} - ${data.compound.name}</p>
+            <div class="bg-green-50 border-2 border-green-400 rounded-2xl py-3 px-6 inline-block">
+                <p class="text-2xl font-bold" style="color: var(--color-success);">
                     <iconify-icon icon="mdi:star" class="mr-2"></iconify-icon>
                     +${data.compound.points} pts
                 </p>
-                ${data.timeBonus > 0 ? `<p class="text-sm text-lab-accent">+${data.timeBonus} bonus tiempo</p>` : ''}
+                ${data.timeBonus > 0 ? `<p class="text-sm" style="color: var(--color-primary);">+${data.timeBonus} bonus tiempo</p>` : ''}
             </div>
         `;
         
         if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
     } else {
         content.innerHTML = `
-            <iconify-icon icon="mdi:close-circle" class="text-7xl text-lab-danger mb-4" style="filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.6));"></iconify-icon>
-            <h2 class="text-3xl font-black text-lab-danger mb-2">Reacción Fallida</h2>
-            <p class="text-lg text-white/60 mb-4">La combinación no fue correcta</p>
-            <p class="text-sm text-white/40">Se necesitaba: ${data.compound.elements.join(' + ')}</p>
+            <iconify-icon icon="mdi:close-circle" class="text-7xl mb-4" style="color: var(--color-danger);"></iconify-icon>
+            <h2 class="text-3xl font-black mb-2" style="color: var(--color-danger);">Reacción Fallida</h2>
+            <p class="text-lg mb-4" style="color: var(--color-text-light);">La combinación no fue correcta</p>
+            <p class="text-sm" style="color: var(--color-text-light); opacity: 0.7;">Se necesitaba: ${data.compound.elements.join(' + ')}</p>
         `;
         
         if (navigator.vibrate) navigator.vibrate(300);

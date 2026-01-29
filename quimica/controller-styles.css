@@ -1,19 +1,94 @@
+/* ============================================
+   LABORATORIO QUÍMICO - CONTROLLER STYLES
+   Tema claro con manchas de colores
+   ============================================ */
+
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { width: 100%; height: 100%; overflow: hidden; }
 
 body {
-    background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 50%, #0d1b2a 100%);
+    background: #ffffff;
     touch-action: manipulation;
+    font-size: 16px;
+    color: #1a1a2e;
+}
+
+:root {
+    --color-primary: #0595AE;
+    --color-secondary: #AB3D8B;
+    --color-accent: #73A03F;
+    --color-warning: #EB8225;
+    --color-success: #10b981;
+    --color-danger: #ef4444;
+    --color-text: #1a1a2e;
+    --color-text-light: #64748b;
+    --color-bg: #ffffff;
+    --color-bg-soft: #f8fafc;
+    
+    --element-size: clamp(55px, 18vw, 70px);
+    --element-height: clamp(65px, 21vw, 80px);
+    --avatar-size: clamp(50px, 18vw, 70px);
+    
+    --font-xs: clamp(0.625rem, 2.5vw, 0.75rem);
+    --font-sm: clamp(0.75rem, 3vw, 0.875rem);
+    --font-base: clamp(0.875rem, 3.5vw, 1rem);
+    --font-lg: clamp(1rem, 4vw, 1.25rem);
+    --font-xl: clamp(1.25rem, 5vw, 1.5rem);
+    --font-2xl: clamp(1.5rem, 6vw, 2rem);
+    --font-3xl: clamp(2rem, 8vw, 3rem);
 }
 
 .screen { display: none; opacity: 0; transition: opacity 0.3s ease; }
-.screen.active { display: flex; opacity: 1; height: 100vh; padding-top: 50px; overflow-y: auto; }
+.screen.active { 
+    display: flex; 
+    opacity: 1; 
+    height: 100vh; 
+    height: 100dvh;
+    padding-top: 50px; 
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
 
-/* Elemento botón */
+/* Fondo con manchas */
+.controller-bg {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    overflow: hidden;
+    z-index: 0;
+    background: #ffffff;
+}
+
+.controller-bg::before {
+    content: '';
+    position: absolute;
+    top: -30%;
+    right: -20%;
+    width: 70%;
+    height: 70%;
+    background: radial-gradient(circle, rgba(5, 149, 174, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+.controller-bg::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -20%;
+    width: 60%;
+    height: 60%;
+    background: radial-gradient(circle, rgba(171, 61, 139, 0.08) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+
+/* ============================================
+   ELEMENTO BOTÓN
+   ============================================ */
+
 .element-btn {
-    width: 65px;
-    height: 75px;
-    border-radius: 12px;
+    width: var(--element-size);
+    height: var(--element-height);
+    border-radius: clamp(8px, 3vw, 12px);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -23,7 +98,8 @@ body {
     cursor: pointer;
     position: relative;
     transition: all 0.15s ease;
-    box-shadow: 0 4px 0 rgba(0,0,0,0.4), 0 6px 20px rgba(0,0,0,0.3);
+    box-shadow: 0 clamp(3px, 1vw, 4px) 0 rgba(0,0,0,0.2), 
+                0 clamp(4px, 1.5vw, 6px) clamp(12px, 4vw, 16px) rgba(0,0,0,0.1);
 }
 
 .element-btn::before {
@@ -31,14 +107,17 @@ body {
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 35%;
-    background: linear-gradient(180deg, rgba(255,255,255,0.25) 0%, transparent 100%);
-    border-radius: 12px 12px 0 0;
+    background: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, transparent 100%);
+    border-radius: inherit;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
     pointer-events: none;
 }
 
 .element-btn:active:not(:disabled) {
-    transform: translateY(4px);
-    box-shadow: 0 0 0 rgba(0,0,0,0.4), 0 2px 10px rgba(0,0,0,0.3);
+    transform: translateY(clamp(3px, 1vw, 4px));
+    box-shadow: 0 0 0 rgba(0,0,0,0.2), 
+                0 clamp(1px, 0.5vw, 2px) clamp(6px, 2vw, 8px) rgba(0,0,0,0.1);
 }
 
 .element-btn:disabled {
@@ -47,83 +126,85 @@ body {
     filter: grayscale(0.5);
 }
 
+.element-btn.selected {
+    transform: scale(0.95);
+    opacity: 0.6;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.2);
+}
+
 .element-btn .atomic-number {
     position: absolute;
-    top: 4px; left: 6px;
-    font-size: 9px;
-    opacity: 0.8;
-}
-
-.element-btn .symbol {
-    font-size: 22px;
-    line-height: 1;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-}
-
-.element-btn .name {
-    font-size: 7px;
-    margin-top: 2px;
+    top: clamp(2px, 1vw, 4px);
+    left: clamp(4px, 1.5vw, 6px);
+    font-size: var(--font-xs);
     opacity: 0.9;
 }
 
+.element-btn .symbol {
+    font-size: clamp(18px, 6vw, 24px);
+    line-height: 1;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.element-btn .name {
+    font-size: clamp(6px, 2vw, 8px);
+    margin-top: clamp(1px, 0.5vw, 2px);
+    opacity: 0.9;
+}
 
 /* Colores por grupo */
 .element-nonmetal { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; }
-.element-metal { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; }
-.element-noble { background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); color: white; }
-.element-halogen { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; }
-.element-alkaline { background: linear-gradient(135deg, #ec4899 0%, #be185d 100%); color: white; }
+.element-metal { background: linear-gradient(135deg, #0595AE 0%, #0284c7 100%); color: white; }
+.element-noble { background: linear-gradient(135deg, #AB3D8B 0%, #9333ea 100%); color: white; }
+.element-halogen { background: linear-gradient(135deg, #EB8225 0%, #ea580c 100%); color: white; }
+.element-alkaline { background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); color: white; }
 
-/* Player avatar */
+/* ============================================
+   PLAYER AVATAR
+   ============================================ */
+
 .player-avatar {
-    width: 70px;
-    height: 70px;
-    border-radius: 18px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    width: var(--avatar-size);
+    height: var(--avatar-size);
+    border-radius: clamp(12px, 4vw, 18px);
+    box-shadow: 0 clamp(4px, 2vw, 8px) clamp(12px, 5vw, 20px) rgba(0,0,0,0.15);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 32px;
+    font-size: clamp(24px, 8vw, 32px);
     position: relative;
+    flex-shrink: 0;
 }
 
 .player-avatar::after {
     content: '';
     position: absolute;
-    top: 5px; left: 5px; right: 5px;
+    top: clamp(3px, 1vw, 5px);
+    left: clamp(3px, 1vw, 5px);
+    right: clamp(3px, 1vw, 5px);
     height: 25%;
-    background: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, transparent 100%);
-    border-radius: 14px 14px 0 0;
+    background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, transparent 100%);
+    border-radius: clamp(10px, 3vw, 14px) clamp(10px, 3vw, 14px) 0 0;
 }
 
-/* Target display */
+
+/* ============================================
+   TARGET DISPLAY
+   ============================================ */
+
 .target-card {
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(6, 182, 212, 0.3) 100%);
-    border: 2px solid rgba(139, 92, 246, 0.5);
-    border-radius: 20px;
-    padding: 16px;
+    background: linear-gradient(135deg, rgba(171, 61, 139, 0.1) 0%, rgba(5, 149, 174, 0.1) 100%);
+    border: 2px solid rgba(171, 61, 139, 0.2);
+    border-radius: clamp(14px, 4vw, 20px);
+    padding: clamp(12px, 4vw, 16px);
     position: relative;
     overflow: hidden;
 }
 
-.target-card::before {
-    content: '';
-    position: absolute;
-    top: -50%; left: -50%;
-    width: 200%; height: 200%;
-    background: linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.1) 50%, transparent 60%);
-    animation: shine 3s linear infinite;
-}
-
-@keyframes shine {
-    0% { transform: translateX(-100%) rotate(45deg); }
-    100% { transform: translateX(100%) rotate(45deg); }
-}
-
 .target-formula {
-    font-size: 36px;
+    font-size: var(--font-3xl);
     font-weight: 900;
-    background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+    background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-primary) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -131,45 +212,58 @@ body {
 
 /* Required elements */
 .required-badge {
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.2);
+    background: var(--color-bg-soft);
+    border: 1px solid #e2e8f0;
     border-radius: 20px;
-    padding: 6px 12px;
-    font-size: 12px;
+    padding: clamp(4px, 1.5vw, 6px) clamp(8px, 3vw, 12px);
+    font-size: var(--font-xs);
     font-weight: 600;
+    color: var(--color-text);
 }
 
 .required-badge.found {
-    background: rgba(16, 185, 129, 0.3);
-    border-color: #10b981;
-    color: #10b981;
+    background: rgba(16, 185, 129, 0.1);
+    border-color: var(--color-success);
+    color: var(--color-success);
 }
 
-/* Score display */
+/* ============================================
+   SCORE DISPLAY
+   ============================================ */
+
 .score-display {
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    padding: 10px 20px;
+    background: linear-gradient(135deg, var(--color-warning) 0%, #ea580c 100%);
+    padding: clamp(8px, 2.5vw, 10px) clamp(14px, 4vw, 20px);
     border-radius: 30px;
     font-weight: bold;
-    font-size: 18px;
-    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+    font-size: var(--font-lg);
+    color: white;
+    box-shadow: 0 clamp(2px, 1vw, 4px) clamp(8px, 3vw, 12px) rgba(235, 130, 37, 0.3);
+    white-space: nowrap;
 }
 
-/* Result overlay */
+/* ============================================
+   RESULT OVERLAY
+   ============================================ */
+
 .result-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.9);
+    background: rgba(255,255,255,0.95);
     backdrop-filter: blur(10px);
     display: none;
     align-items: center;
     justify-content: center;
     z-index: 100;
+    padding: 1rem;
 }
 
 .result-overlay.active { display: flex; }
 
-/* Animations */
+/* ============================================
+   ANIMACIONES
+   ============================================ */
+
 @keyframes pulse {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.05); }
@@ -179,7 +273,7 @@ body {
 
 @keyframes bounce {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-15px); }
+    50% { transform: translateY(clamp(-10px, -3vw, -15px)); }
 }
 
 .bounce { animation: bounce 1s ease infinite; }
@@ -194,73 +288,155 @@ body {
 
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-8px); }
-    75% { transform: translateX(8px); }
+    25% { transform: translateX(clamp(-5px, -2vw, -8px)); }
+    75% { transform: translateX(clamp(5px, 2vw, 8px)); }
 }
 
 .shake { animation: shake 0.4s ease; }
 
-/* Button styles */
+
+/* ============================================
+   BOTONES
+   ============================================ */
+
 .btn-primary {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    background: linear-gradient(135deg, var(--color-accent) 0%, #059669 100%);
     color: white;
     border: none;
-    padding: 16px 32px;
+    padding: clamp(12px, 4vw, 16px) clamp(24px, 8vw, 32px);
     border-radius: 50px;
     font-weight: bold;
-    font-size: 18px;
+    font-size: var(--font-lg);
     cursor: pointer;
-    box-shadow: 0 4px 0 #047857, 0 6px 20px rgba(16, 185, 129, 0.4);
+    box-shadow: 0 clamp(3px, 1vw, 4px) 0 #047857, 
+                0 clamp(4px, 1.5vw, 6px) clamp(12px, 4vw, 16px) rgba(16, 185, 129, 0.3);
     transition: all 0.15s ease;
+    width: 100%;
+    max-width: 320px;
 }
 
 .btn-primary:active {
-    transform: translateY(4px);
-    box-shadow: 0 0 0 #047857, 0 2px 10px rgba(16, 185, 129, 0.4);
+    transform: translateY(clamp(3px, 1vw, 4px));
+    box-shadow: 0 0 0 #047857, 
+                0 clamp(1px, 0.5vw, 2px) clamp(6px, 2vw, 8px) rgba(16, 185, 129, 0.3);
 }
 
 .btn-secondary {
-    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-    box-shadow: 0 4px 0 #4338ca, 0 6px 20px rgba(99, 102, 241, 0.4);
+    background: linear-gradient(135deg, var(--color-primary) 0%, #0284c7 100%);
+    box-shadow: 0 clamp(3px, 1vw, 4px) 0 #0369a1, 
+                0 clamp(4px, 1.5vw, 6px) clamp(12px, 4vw, 16px) rgba(5, 149, 174, 0.3);
 }
 
 .btn-secondary:active {
-    box-shadow: 0 0 0 #4338ca, 0 2px 10px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 0 0 #0369a1, 
+                0 clamp(1px, 0.5vw, 2px) clamp(6px, 2vw, 8px) rgba(5, 149, 174, 0.3);
 }
 
-/* Info cards */
+/* ============================================
+   INFO CARDS
+   ============================================ */
+
 .info-card {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 16px;
-    padding: 14px;
+    background: var(--color-bg-soft);
+    border: 1px solid #e2e8f0;
+    border-radius: clamp(12px, 4vw, 16px);
+    padding: clamp(10px, 3vw, 14px);
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: clamp(8px, 3vw, 12px);
 }
 
 .info-card iconify-icon {
-    font-size: 28px;
+    font-size: clamp(22px, 7vw, 28px);
     flex-shrink: 0;
 }
 
-/* Mini player info */
+/* ============================================
+   MINI PLAYER INFO
+   ============================================ */
+
 .mini-player {
-    background: rgba(255,255,255,0.05);
-    border-radius: 16px;
-    padding: 12px 16px;
+    background: var(--color-bg-soft);
+    border-radius: clamp(12px, 4vw, 16px);
+    padding: clamp(10px, 3vw, 12px) clamp(12px, 4vw, 16px);
     display: flex;
     align-items: center;
-    gap: 12px;
-    border: 1px solid rgba(255,255,255,0.1);
+    gap: clamp(8px, 3vw, 12px);
+    border: 1px solid #e2e8f0;
 }
 
 .mini-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
+    width: clamp(32px, 10vw, 40px);
+    height: clamp(32px, 10vw, 40px);
+    border-radius: clamp(8px, 2.5vw, 10px);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
+    font-size: clamp(16px, 5vw, 20px);
+    flex-shrink: 0;
+}
+
+/* Selection confirmed state */
+.selection-confirmed {
+    background: rgba(16, 185, 129, 0.1);
+    border: 2px solid var(--color-success);
+    border-radius: 16px;
+    padding: 16px;
+    text-align: center;
+}
+
+/* ============================================
+   MEDIA QUERIES
+   ============================================ */
+
+@media (max-width: 350px) {
+    :root {
+        --element-size: 50px;
+        --element-height: 58px;
+        --avatar-size: 45px;
+    }
+    .screen.active { padding-top: 45px; }
+}
+
+@media (min-width: 481px) and (max-width: 600px) {
+    :root {
+        --element-size: 70px;
+        --element-height: 82px;
+        --avatar-size: 65px;
+    }
+}
+
+@media (min-width: 601px) {
+    :root {
+        --element-size: 80px;
+        --element-height: 95px;
+        --avatar-size: 75px;
+    }
+    .btn-primary { max-width: 400px; }
+}
+
+@media (max-height: 450px) and (orientation: landscape) {
+    :root {
+        --element-size: 48px;
+        --element-height: 56px;
+        --avatar-size: 40px;
+    }
+    .screen.active { padding-top: 40px; }
+    .target-card { padding: 8px 12px; }
+}
+
+@supports (padding-top: env(safe-area-inset-top)) {
+    .screen.active {
+        padding-top: calc(50px + env(safe-area-inset-top));
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
 }
