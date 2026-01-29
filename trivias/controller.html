@@ -365,7 +365,7 @@
         </div>
 
         <!-- PLAYING SCREEN -->
-        <div class="screen flex-col p-3 sm:p-4 h-full" id="playingScreen">
+        <div class="screen flex-col p-3 sm:p-4 h-full bg-white" id="playingScreen">
             <!-- Exit button for admin -->
             <div class="text-center mb-2" id="adminExitContainer" style="display: none;">
                 <button class="bg-red-500 text-white border-none py-2 px-4 text-sm font-bold rounded-full cursor-pointer uppercase shadow-md transition-all active:scale-95 flex items-center justify-center gap-2 mx-auto" id="exitGameBtn">
@@ -397,7 +397,7 @@
         </div>
 
         <!-- END SCREEN -->
-        <div class="screen flex-col items-center justify-center p-4 sm:p-6 text-center gap-3 sm:gap-4" id="endScreen">
+        <div class="screen flex-col items-center justify-center p-4 sm:p-6 text-center gap-3 sm:gap-4 bg-white" id="endScreen">
             <div class="text-4xl sm:text-5xl" id="finalRank">1ro</div>
             <div class="player-avatar-visual mx-auto" id="resultAvatar"></div>
             <p class="text-lg sm:text-xl font-bold text-steam-turquesa" id="finalMessage">Felicidades!</p>
@@ -610,7 +610,7 @@
             
             // Icon mapping with outline versions
             const categoryIcons = {
-                general: 'mdi:earth-outline',
+                general: 'mdi:earth',
                 science: 'mdi:microscope',
                 mathematics: 'mdi:compass-outline',
                 robotics: 'mdi:robot-outline',
@@ -841,7 +841,7 @@
             
             // Outline icons for each category
             const iconMap = {
-                general: ['mdi:earth-outline', 'mdi:lightbulb-outline', 'mdi:star-outline', 'mdi:book-outline', 'mdi:school-outline'],
+                general: ['mdi:earth', 'mdi:lightbulb-outline', 'mdi:star-outline', 'mdi:book-outline', 'mdi:school-outline'],
                 science: ['mdi:microscope', 'mdi:test-tube-outline', 'mdi:dna', 'mdi:atom-variant', 'mdi:leaf-outline', 'mdi:bacteria-outline'],
                 mathematics: ['mdi:compass-outline', 'mdi:calculator-variant-outline', 'mdi:chart-line', 'mdi:function-variant', 'mdi:pi', 'mdi:sigma'],
                 robotics: ['mdi:robot-outline', 'mdi:cog-outline', 'mdi:chip', 'mdi:memory', 'mdi:robot-industrial-outline', 'mdi:robot-happy-outline'],
