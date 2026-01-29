@@ -48,6 +48,8 @@
         body {
             touch-action: manipulation;
             background: white;
+            /* Espacio para el botón de AirConsole */
+            padding-top: 50px;
         }
 
         .screen {
@@ -59,6 +61,8 @@
         .screen.active {
             display: flex;
             opacity: 1;
+            height: calc(100vh - 50px); /* Restar el espacio del botón AirConsole */
+            overflow-y: auto;
         }
 
         /* Player avatar visual - responsive */
@@ -229,8 +233,8 @@
         }
     </style>
 </head>
-<body class="w-screen h-screen overflow-hidden font-sans bg-white text-steam-negro">
-    <div class="w-full h-full flex flex-col">
+<body class="w-screen overflow-hidden font-sans bg-white text-steam-negro">
+    <div class="w-full flex flex-col" style="height: calc(100vh - 50px);">
         <!-- JOIN SCREEN -->
         <div class="screen active flex-col items-center justify-center p-4 sm:p-8 text-center gap-4 sm:gap-6 relative overflow-hidden bg-white" id="joinScreen">
             <!-- Animated background removed -->
