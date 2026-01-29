@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorio Químico - STEAM RD</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.airconsole.com/api/airconsole-1.8.0.js"></script>
+    <script type="module">
+        import { animate, stagger, createSpring } from 'https://esm.sh/animejs';
+        window.anime = { animate, stagger, createSpring };
+    </script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        steam: {
+                            turquesa: '#0595AE',
+                            morado: '#AB3D8B',
+                            naranja: '#EB8225',
+                            verde: '#73A03F',
+                            negro: '#010101',
+                            blanco: '#FFFFFF'
+                        },
+                        lab: {
+                            primary: '#6366f1',
+                            secondary: '#8b5cf6',
+                            accent: '#06b6d4',
+                            success: '#10b981',
+                            warning: '#f59e0b',
+                            danger: '#ef4444'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="screen-styles.css">
+</head>
+<body class="font-sans overflow-hidden">
+    <div class="w-screen h-screen flex flex-col relative" id="app"></div>
+    <script src="screen-app.js"></script>
+</body>
+</html>

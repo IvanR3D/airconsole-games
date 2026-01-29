@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Laboratorio Químico - Control</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.airconsole.com/api/airconsole-1.8.0.js"></script>
+    <script type="module">
+        import { animate, stagger } from 'https://esm.sh/animejs';
+        window.anime = { animate, stagger };
+    </script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        steam: { turquesa: '#0595AE', morado: '#AB3D8B', naranja: '#EB8225', verde: '#73A03F' },
+                        lab: { primary: '#6366f1', secondary: '#8b5cf6', accent: '#06b6d4', success: '#10b981', warning: '#f59e0b', danger: '#ef4444' }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="controller-styles.css">
+</head>
+<body class="font-sans text-white overflow-hidden">
+    <div class="w-full flex flex-col" style="height: 100vh;" id="app"></div>
+    <script src="controller-app.js"></script>
+</body>
+</html>
