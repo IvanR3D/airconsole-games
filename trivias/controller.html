@@ -42,14 +42,12 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background: white;
+            background: transparent;
         }
 
         body {
             touch-action: manipulation;
-            background: white;
-            /* Espacio para el botón de AirConsole */
-            padding-top: 50px;
+            background: transparent;
         }
 
         .screen {
@@ -61,7 +59,8 @@
         .screen.active {
             display: flex;
             opacity: 1;
-            height: calc(100vh - 50px); /* Restar el espacio del botón AirConsole */
+            height: 100vh;
+            padding-top: 50px; /* Espacio para el botón de AirConsole */
             overflow-y: auto;
         }
 
@@ -233,8 +232,8 @@
         }
     </style>
 </head>
-<body class="w-screen overflow-hidden font-sans bg-white text-steam-negro">
-    <div class="w-full flex flex-col" style="height: calc(100vh - 50px);">
+<body class="w-screen overflow-hidden font-sans text-steam-negro">
+    <div class="w-full flex flex-col" style="height: 100vh;">
         <!-- JOIN SCREEN -->
         <div class="screen active flex-col items-center justify-center p-4 sm:p-8 text-center gap-4 sm:gap-6 relative overflow-hidden bg-white" id="joinScreen">
             <!-- Animated background removed -->
@@ -611,13 +610,13 @@
             
             // Icon mapping with outline versions
             const categoryIcons = {
-                general: 'mdi:earth',
+                general: 'mdi:earth-outline',
                 science: 'mdi:microscope',
-                mathematics: 'mdi:math-compass',
+                mathematics: 'mdi:compass-outline',
                 robotics: 'mdi:robot-outline',
                 chemistry: 'mdi:flask-outline',
                 technology: 'mdi:laptop',
-                history: 'mdi:book-open-page-variant',
+                history: 'mdi:book-open-outline',
                 geography: 'mdi:map-outline'
             };
             
@@ -842,13 +841,13 @@
             
             // Outline icons for each category
             const iconMap = {
-                general: ['mdi:earth', 'mdi:lightbulb-outline', 'mdi:star-outline', 'mdi:book-outline', 'mdi:school-outline'],
-                science: ['mdi:microscope', 'mdi:test-tube', 'mdi:dna', 'mdi:atom-variant', 'mdi:leaf-outline', 'mdi:bacteria-outline'],
-                mathematics: ['mdi:math-compass', 'mdi:calculator-variant-outline', 'mdi:chart-line', 'mdi:function-variant', 'mdi:pi', 'mdi:sigma'],
+                general: ['mdi:earth-outline', 'mdi:lightbulb-outline', 'mdi:star-outline', 'mdi:book-outline', 'mdi:school-outline'],
+                science: ['mdi:microscope', 'mdi:test-tube-outline', 'mdi:dna', 'mdi:atom-variant', 'mdi:leaf-outline', 'mdi:bacteria-outline'],
+                mathematics: ['mdi:compass-outline', 'mdi:calculator-variant-outline', 'mdi:chart-line', 'mdi:function-variant', 'mdi:pi', 'mdi:sigma'],
                 robotics: ['mdi:robot-outline', 'mdi:cog-outline', 'mdi:chip', 'mdi:memory', 'mdi:robot-industrial-outline', 'mdi:robot-happy-outline'],
-                chemistry: ['mdi:flask-outline', 'mdi:beaker-outline', 'mdi:molecule', 'mdi:atom', 'mdi:water-outline', 'mdi:fire-circle'],
+                chemistry: ['mdi:flask-outline', 'mdi:beaker-outline', 'mdi:molecule', 'mdi:atom', 'mdi:water-outline', 'mdi:fire'],
                 technology: ['mdi:laptop', 'mdi:cellphone', 'mdi:code-tags', 'mdi:wifi', 'mdi:cloud-outline', 'mdi:lan'],
-                history: ['mdi:book-open-page-variant', 'mdi:castle', 'mdi:crown-outline', 'mdi:sword', 'mdi:scroll-text', 'mdi:pyramid'],
+                history: ['mdi:book-open-outline', 'mdi:castle', 'mdi:crown-outline', 'mdi:sword', 'mdi:scroll-text-outline', 'mdi:pyramid'],
                 geography: ['mdi:map-outline', 'mdi:compass-outline', 'mdi:mountain', 'mdi:waves', 'mdi:island', 'mdi:pine-tree']
             };
             
