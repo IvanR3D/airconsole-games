@@ -160,7 +160,7 @@ function renderJoinScreen() {
     const app = document.getElementById('app');
     app.innerHTML = `
         <div class="screen active flex-col items-center justify-center p-5 text-center" id="joinScreen">
-            <div class="w-full max-w-sm">
+            <div class="w-full max-w-sm mx-auto">
                 <img src="../LogoSteamRD-Color.webp" alt="STEAM RD" class="w-20 h-20 mx-auto mb-4" style="filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));">
                 
                 <h1 class="text-3xl font-black mb-1" style="color: #10b981;">LABORATORIO</h1>
@@ -448,12 +448,12 @@ function renderPlayingScreen() {
         <!-- Exit Confirmation Modal -->
         <div class="exit-modal" id="exitModal">
             <div class="exit-modal-content">
-                <iconify-icon icon="mdi:alert-circle" class="text-4xl mb-3" style="color: var(--color-warning);"></iconify-icon>
-                <h3 class="text-lg font-bold mb-2" style="color: var(--color-text);">¿Salir del juego?</h3>
-                <p class="text-sm mb-4" style="color: var(--color-text-light);">Perderás tu progreso actual</p>
+                <iconify-icon icon="${isAdmin ? 'mdi:alert-octagon' : 'mdi:alert-circle'}" class="text-4xl mb-3" style="color: ${isAdmin ? 'var(--color-danger)' : 'var(--color-warning)'};"></iconify-icon>
+                <h3 class="text-lg font-bold mb-2" style="color: var(--color-text);">${isAdmin ? '¿Terminar el juego?' : '¿Salir del juego?'}</h3>
+                <p class="text-sm mb-4" style="color: var(--color-text-light);">${isAdmin ? 'Esto terminará el juego para TODOS los jugadores' : 'Perderás tu progreso actual'}</p>
                 <div class="flex gap-3">
                     <button class="exit-modal-btn cancel" id="exitCancelBtn">Cancelar</button>
-                    <button class="exit-modal-btn confirm" id="exitConfirmBtn">Salir</button>
+                    <button class="exit-modal-btn confirm" id="exitConfirmBtn" style="${isAdmin ? 'background: var(--color-danger);' : ''}">${isAdmin ? 'Terminar' : 'Salir'}</button>
                 </div>
             </div>
         </div>

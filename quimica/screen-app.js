@@ -239,14 +239,17 @@ function setDifficulty(difficulty) {
 function handlePlayerExit(device_id) {
     // El jugador decidió salir durante el juego
     if (players[device_id]) {
-        delete players[device_id];
+        const wasAdmin = players[device_id].isAdmin;
         
-        // Si no quedan jugadores suficientes, terminar el juego
-        if (Object.keys(players).length < 1) {
+        // Si el admin sale, terminar el juego para todos
+        if (wasAdmin) {
             if (timerInterval) clearInterval(timerInterval);
             resetGame();
             return;
         }
+        
+        // Si no es admin, solo remover al jugador
+        delete players[device_id];
         
         // Limpiar selección del jugador que salió
         if (playerSelections[device_id]) {
@@ -255,6 +258,13 @@ function handlePlayerExit(device_id) {
         
         // Remover elementos seleccionados por este jugador
         selectedElements = selectedElements.filter(e => e.player !== device_id);
+        
+        // Si no quedan suficientes jugadores (mínimo 2), terminar el juego
+        if (Object.keys(players).length < 2) {
+            if (timerInterval) clearInterval(timerInterval);
+            resetGame();
+            return;
+        }
         
         // Actualizar UI
         updatePlayerSlots();
@@ -291,7 +301,7 @@ function handlePlayerLeave(device_id) {
 function renderIntroScreen() {
     const app = document.getElementById('app');
     app.innerHTML = `
-        <div class="screen active flex-col items-center justify-center p-4 sm:p-6 lg:p-8 min-h-screen relative" id="introScreen">
+        <div class="screen active intro-screen relative" id="introScreen">
             <div class="lab-bg">
                 <div class="blob-green"></div>
                 <div class="waves-container">
@@ -302,54 +312,54 @@ function renderIntroScreen() {
             </div>
             <div id="floatingMolecules" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
             
-            <div class="relative z-10 text-center max-w-5xl w-full px-2">
-                <img src="../LogoSteamRD-Color.webp" alt="STEAM RD" class="w-20 h-20 sm:w-28 sm:h-28 lg:w-32 lg:h-32 mx-auto mb-4 sm:mb-6 float-element" style="filter: drop-shadow(0 4px 12px rgba(0,0,0,0.1));">
+            <div class="relative z-10 text-center w-full intro-content">
+                <img src="../LogoSteamRD-Color.webp" alt="STEAM RD" class="intro-logo mx-auto float-element" style="filter: drop-shadow(0 4px 12px rgba(0,0,0,0.1));">
                 
-                <h1 class="intro-title mb-1 sm:mb-2">LABORATORIO</h1>
-                <h2 class="subtitle mb-4 sm:mb-6 lg:mb-8">QUÍMICO</h2>
+                <h1 class="intro-title">LABORATORIO</h1>
+                <h2 class="subtitle">QUÍMICO</h2>
                 
-                <div class="flex flex-wrap justify-center items-center gap-2 sm:gap-3 lg:gap-4 mb-6 sm:mb-8 lg:mb-10" id="formulaDemo">
-                    <div class="element-card element-nonmetal" style="transform: scale(0.8);">
+                <div class="formula-demo" id="formulaDemo">
+                    <div class="element-card element-nonmetal intro-element">
                         <span class="atomic-number">1</span>
                         <span class="symbol">H</span>
                         <span class="name">Hidrógeno</span>
                     </div>
-                    <iconify-icon icon="mdi:plus" class="text-2xl sm:text-3xl lg:text-4xl" style="color: var(--color-text-light);"></iconify-icon>
-                    <div class="element-card element-nonmetal" style="transform: scale(0.8);">
+                    <iconify-icon icon="mdi:plus" class="formula-operator" style="color: var(--color-text-light);"></iconify-icon>
+                    <div class="element-card element-nonmetal intro-element">
                         <span class="atomic-number">8</span>
                         <span class="symbol">O</span>
                         <span class="name">Oxígeno</span>
                     </div>
-                    <iconify-icon icon="mdi:arrow-right" class="text-2xl sm:text-3xl lg:text-4xl" style="color: var(--color-text-light);"></iconify-icon>
-                    <div class="compound-result bg-gradient-to-r from-cyan-500 to-blue-500 text-white">
-                        <iconify-icon icon="mdi:water" class="mr-1 sm:mr-2"></iconify-icon>
+                    <iconify-icon icon="mdi:arrow-right" class="formula-operator" style="color: var(--color-text-light);"></iconify-icon>
+                    <div class="compound-result bg-gradient-to-r from-cyan-500 to-blue-500 text-white intro-compound">
+                        <iconify-icon icon="mdi:water"></iconify-icon>
                         H₂O
                     </div>
                 </div>
                 
-                <p class="text-base sm:text-lg lg:text-xl mb-4 sm:mb-6 lg:mb-8" style="color: var(--color-text-light);">
-                    <iconify-icon icon="mdi:flask" class="mr-2" style="color: var(--color-accent);"></iconify-icon>
+                <p class="intro-description" style="color: var(--color-text-light);">
+                    <iconify-icon icon="mdi:flask" style="color: var(--color-accent);"></iconify-icon>
                     Combina elementos y crea compuestos químicos
                 </p>
                 
                 <!-- Selector de Dificultad -->
-                <div class="difficulty-selector mb-6" id="difficultySelector">
-                    <p class="text-sm mb-3" style="color: var(--color-text-light);">
-                        <iconify-icon icon="mdi:speedometer" class="mr-1"></iconify-icon>
+                <div class="difficulty-selector-compact" id="difficultySelector">
+                    <p class="difficulty-label" style="color: var(--color-text-light);">
+                        <iconify-icon icon="mdi:speedometer"></iconify-icon>
                         Dificultad seleccionada:
                     </p>
                     <div class="difficulty-display" id="difficultyDisplay">
                         <iconify-icon icon="${DIFFICULTY_CONFIG.easy.icon}" style="color: ${DIFFICULTY_CONFIG.easy.color};"></iconify-icon>
                         <span style="color: ${DIFFICULTY_CONFIG.easy.color};">${DIFFICULTY_CONFIG.easy.name}</span>
                     </div>
-                    <p class="text-xs mt-2" style="color: var(--color-text-light); opacity: 0.7;">
+                    <p class="difficulty-hint" style="color: var(--color-text-light);">
                         El admin puede cambiar la dificultad desde su control
                     </p>
                 </div>
                 
-                <p class="text-base sm:text-lg mb-3 sm:mb-4 waiting-dots" style="color: var(--color-primary);">Esperando científicos</p>
+                <p class="waiting-text waiting-dots" style="color: var(--color-primary);">Esperando científicos</p>
                 
-                <div class="flex justify-center gap-2 sm:gap-3 lg:gap-4 mb-4 sm:mb-6 lg:mb-8" id="playerSlots">
+                <div class="player-slots-row" id="playerSlots">
                     ${[0,1,2,3].map(i => `
                         <div class="player-slot" data-slot="${i}">
                             <iconify-icon icon="mdi:account-plus"></iconify-icon>
@@ -357,17 +367,17 @@ function renderIntroScreen() {
                     `).join('')}
                 </div>
                 
-                <div class="flex flex-wrap justify-center gap-3 sm:gap-4 lg:gap-6 text-xs sm:text-sm" style="color: var(--color-text-light);">
-                    <div class="flex items-center gap-1 sm:gap-2">
-                        <iconify-icon icon="mdi:account-group" class="text-base sm:text-lg lg:text-xl" style="color: var(--color-primary);"></iconify-icon>
+                <div class="intro-footer" style="color: var(--color-text-light);">
+                    <div class="footer-item">
+                        <iconify-icon icon="mdi:account-group" style="color: var(--color-primary);"></iconify-icon>
                         <span>2-4 jugadores</span>
                     </div>
-                    <div class="flex items-center gap-1 sm:gap-2">
-                        <iconify-icon icon="mdi:timer" class="text-base sm:text-lg lg:text-xl" style="color: var(--color-warning);"></iconify-icon>
+                    <div class="footer-item">
+                        <iconify-icon icon="mdi:timer" style="color: var(--color-warning);"></iconify-icon>
                         <span id="roundsInfo">${DIFFICULTY_CONFIG.easy.maxRounds} rondas</span>
                     </div>
-                    <div class="flex items-center gap-1 sm:gap-2">
-                        <iconify-icon icon="mdi:trophy" class="text-base sm:text-lg lg:text-xl" style="color: var(--color-warning);"></iconify-icon>
+                    <div class="footer-item">
+                        <iconify-icon icon="mdi:trophy" style="color: var(--color-warning);"></iconify-icon>
                         <span>Gana puntos</span>
                     </div>
                 </div>
