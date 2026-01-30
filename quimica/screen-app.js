@@ -220,6 +220,12 @@ function init() {
             case 'playAgain':
                 resetGame();
                 break;
+            case 'playerExit':
+                handlePlayerExit(from);
+                break;
+            case 'playerLeave':
+                handlePlayerLeave(from);
+                break;
         }
     };
 }
@@ -228,6 +234,29 @@ function setDifficulty(difficulty) {
     currentDifficulty = difficulty;
     difficultyConfig = DIFFICULTY_CONFIG[difficulty] || DIFFICULTY_CONFIG.easy;
     console.log('🎮 Dificultad establecida:', difficultyConfig.name);
+}
+
+function handlePlayerExit(device_id) {
+    // El jugador decidió salir durante el juego
+    // Simplemente lo marcamos como que no ha seleccionado en esta ronda
+    if (playerSelections[device_id]) {
+        playerSelections[device_id].hasSelected = false;
+        playerSelections[device_id].elements = [];
+    }
+    
+    // Actualizar UI
+    updatePlayersArea();
+    broadcastGameState();
+}
+
+function handlePlayerLeave(device_id) {
+    // El jugador abandonó completamente el juego
+    if (players[device_id]) {
+        delete players[device_id];
+        updatePlayerSlots();
+        updatePlayersArea();
+        broadcastGameState();
+    }
 }
 
 // ============================================
@@ -1256,6 +1285,17 @@ function endGame() {
 function resetGame() {
     Object.values(players).forEach(p => p.score = 0);
     usedCompounds = [];
+    roundNumber = 0;
+    currentCompound = null;
+    playerSelections = {};
+    
+    // Notificar a todos los controllers que vuelvan a la pantalla de espera/dificultad
+    airconsole.broadcast({
+        action: 'gameReset',
+        difficulty: currentDifficulty,
+        difficultyConfig: difficultyConfig
+    });
+    
     renderIntroScreen();
     updatePlayerSlots();
     broadcastGameState();

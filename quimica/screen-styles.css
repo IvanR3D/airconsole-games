@@ -301,25 +301,52 @@ body {
     opacity: 0.9;
 }
 
-/* Colores por grupo - Vibrantes sobre fondo blanco */
+/* Colores por grupo - Basados en la tabla periódica estándar */
+/* No metales (H, C, N, O, P, S, Se) - Verde */
 .element-nonmetal { 
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
+    background: linear-gradient(135deg, #4a9c5d 0%, #3d8b4f 100%); 
     color: white;
 }
+
+/* Metales post-transición (Al, Ga, In, Sn, Tl, Pb, Bi) - Azul grisáceo */
 .element-metal { 
-    background: linear-gradient(135deg, #0595AE 0%, #0284c7 100%); 
+    background: linear-gradient(135deg, #5a7d9a 0%, #4a6d8a 100%); 
     color: white;
 }
+
+/* Gases nobles (He, Ne, Ar, Kr, Xe, Rn) - Púrpura/Morado */
 .element-noble { 
-    background: linear-gradient(135deg, #AB3D8B 0%, #9333ea 100%); 
+    background: linear-gradient(135deg, #7b5e9a 0%, #6a4d89 100%); 
     color: white;
 }
+
+/* Halógenos (F, Cl, Br, I, At) - Cian/Turquesa */
 .element-halogen { 
-    background: linear-gradient(135deg, #EB8225 0%, #ea580c 100%); 
+    background: linear-gradient(135deg, #2a9d8f 0%, #238b7e 100%); 
     color: white;
 }
+
+/* Metales alcalinos (Li, Na, K, Rb, Cs, Fr) - Rosa/Magenta */
 .element-alkaline {
-    background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+    background: linear-gradient(135deg, #9b4d7c 0%, #8a3c6b 100%);
+    color: white;
+}
+
+/* Metales alcalinotérreos (Be, Mg, Ca, Sr, Ba, Ra) - Morado oscuro */
+.element-alkaline-earth {
+    background: linear-gradient(135deg, #6b5b7a 0%, #5a4a69 100%);
+    color: white;
+}
+
+/* Metales de transición (Fe, Cu, Zn, Ag, Au, etc.) - Marrón/Café */
+.element-transition {
+    background: linear-gradient(135deg, #8b6d5c 0%, #7a5c4b 100%);
+    color: white;
+}
+
+/* Metaloides (B, Si, Ge, As, Sb, Te) - Beige/Arena */
+.element-metalloid {
+    background: linear-gradient(135deg, #9a8a6a 0%, #897959 100%);
     color: white;
 }
 

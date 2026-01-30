@@ -143,6 +143,7 @@ function init() {
             case 'selectionConfirmed': handleSelectionConfirmed(data); break;
             case 'roundResult': handleRoundResult(data); break;
             case 'gameEnd': handleGameEnd(data); break;
+            case 'gameReset': handleGameReset(data); break;
         }
     };
 }
@@ -218,6 +219,12 @@ function renderWaitingScreen() {
     app.innerHTML = `
         <div class="screen active flex-col items-center justify-center p-5 text-center relative" id="waitingScreen">
             <div class="controller-bg"></div>
+            
+            <!-- Botón salir en esquina superior -->
+            <button class="exit-btn-corner" id="exitWaitingBtn" title="Salir del laboratorio">
+                <iconify-icon icon="mdi:exit-to-app"></iconify-icon>
+            </button>
+            
             <div class="relative z-10 w-full max-w-sm">
                 <div class="player-avatar mx-auto mb-4" id="playerAvatar" style="background: ${playerData.color};">
                     <iconify-icon icon="${playerData.icon}" style="color: white;"></iconify-icon>
@@ -285,6 +292,17 @@ function renderWaitingScreen() {
         </div>
     `;
     
+    // Event listener para botón de salir
+    document.getElementById('exitWaitingBtn')?.addEventListener('click', () => {
+        if (confirm('¿Seguro que quieres salir del laboratorio?')) {
+            sendMessage({ action: 'playerLeave' });
+            hasJoined = false;
+            playerData = null;
+            isAdmin = false;
+            renderJoinScreen();
+        }
+    });
+    
     if (isAdmin) {
         // Event listeners para selector de dificultad
         document.querySelectorAll('.difficulty-option').forEach(btn => {
@@ -350,16 +368,22 @@ function renderPlayingScreen() {
         <div class="screen active flex-col p-3 relative" id="playingScreen">
             <div class="controller-bg"></div>
             
-            <!-- Header compacto -->
+            <!-- Header compacto con botón salir -->
             <div class="relative z-10 text-center mb-2">
-                <div class="flex items-center justify-center gap-2 mb-2">
-                    <img src="../LogoSteamRD-Color.webp" alt="STEAM RD" class="w-8 h-8">
-                    <span class="text-xs px-2 py-1 rounded-full" style="background: var(--color-bg-soft); color: var(--color-text-light);">
-                        Ronda ${currentRound}/${maxRounds}
-                    </span>
-                    <span class="difficulty-badge-sm" style="background: ${difficultyConfig.color}20; color: ${difficultyConfig.color};">
-                        <iconify-icon icon="${difficultyConfig.icon}"></iconify-icon>
-                    </span>
+                <div class="flex items-center justify-between gap-2 mb-2">
+                    <button class="exit-btn" id="exitGameBtn" title="Salir del juego">
+                        <iconify-icon icon="mdi:exit-to-app"></iconify-icon>
+                    </button>
+                    <div class="flex items-center gap-2">
+                        <img src="../LogoSteamRD-Color.webp" alt="STEAM RD" class="w-8 h-8">
+                        <span class="text-xs px-2 py-1 rounded-full" style="background: var(--color-bg-soft); color: var(--color-text-light);">
+                            Ronda ${currentRound}/${maxRounds}
+                        </span>
+                        <span class="difficulty-badge-sm" style="background: ${difficultyConfig.color}20; color: ${difficultyConfig.color};">
+                            <iconify-icon icon="${difficultyConfig.icon}"></iconify-icon>
+                        </span>
+                    </div>
+                    <div style="width: 32px;"></div>
                 </div>
                 
                 <p class="text-xs mb-1" style="color: var(--color-text-light);">Sintetiza:</p>
@@ -420,12 +444,56 @@ function renderPlayingScreen() {
         <div class="result-overlay" id="resultOverlay">
             <div class="text-center p-6" id="resultContent"></div>
         </div>
+        
+        <!-- Exit Confirmation Modal -->
+        <div class="exit-modal" id="exitModal">
+            <div class="exit-modal-content">
+                <iconify-icon icon="mdi:alert-circle" class="text-4xl mb-3" style="color: var(--color-warning);"></iconify-icon>
+                <h3 class="text-lg font-bold mb-2" style="color: var(--color-text);">¿Salir del juego?</h3>
+                <p class="text-sm mb-4" style="color: var(--color-text-light);">Perderás tu progreso actual</p>
+                <div class="flex gap-3">
+                    <button class="exit-modal-btn cancel" id="exitCancelBtn">Cancelar</button>
+                    <button class="exit-modal-btn confirm" id="exitConfirmBtn">Salir</button>
+                </div>
+            </div>
+        </div>
     `;
     
     setupElementsGrid();
+    setupExitButton();
 }
 
 window.confirmSelection = confirmSelection;
+
+function setupExitButton() {
+    const exitBtn = document.getElementById('exitGameBtn');
+    const exitModal = document.getElementById('exitModal');
+    const cancelBtn = document.getElementById('exitCancelBtn');
+    const confirmBtn = document.getElementById('exitConfirmBtn');
+    
+    if (exitBtn) {
+        exitBtn.addEventListener('click', () => {
+            exitModal.classList.add('active');
+            if (navigator.vibrate) navigator.vibrate(30);
+        });
+    }
+    
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+            exitModal.classList.remove('active');
+        });
+    }
+    
+    if (confirmBtn) {
+        confirmBtn.addEventListener('click', () => {
+            exitModal.classList.remove('active');
+            // Enviar mensaje de salida al screen
+            sendMessage({ action: 'playerExit' });
+            // Volver a la pantalla de espera
+            renderWaitingScreen();
+        });
+    }
+}
 
 function setupElementsGrid() {
     const grid = document.getElementById('elementsGrid');
@@ -981,6 +1049,24 @@ function handleGameEnd(data) {
         difficultyConfig = DIFFICULTY_CONFIG[data.difficulty] || DIFFICULTY_CONFIG.easy;
     }
     renderEndScreen(data);
+}
+
+function handleGameReset(data) {
+    // Actualizar dificultad si viene del servidor
+    if (data.difficulty) {
+        currentDifficulty = data.difficulty;
+        difficultyConfig = DIFFICULTY_CONFIG[data.difficulty] || DIFFICULTY_CONFIG.easy;
+    }
+    
+    // Resetear estado local
+    myScore = 0;
+    currentRound = 0;
+    currentCompound = null;
+    hasSelectedThisRound = false;
+    clearSelection();
+    
+    // Volver a la pantalla de espera/selección de dificultad
+    renderWaitingScreen();
 }
 
 // ============================================
