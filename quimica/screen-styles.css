@@ -55,7 +55,7 @@ body {
 .screen.active { display: flex; opacity: 1; }
 
 /* ============================================
-   PLAYING SCREEN - Layout Responsivo
+   PLAYING SCREEN - Layout Responsivo Mejorado
    ============================================ */
 
 .playing-screen {
@@ -68,7 +68,16 @@ body {
     overflow: hidden;
     box-sizing: border-box;
     padding: clamp(8px, 1.5vw, 16px);
-    gap: clamp(8px, 1.5vw, 16px);
+    gap: clamp(6px, 1vw, 12px);
+}
+
+/* Header row */
+.header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
 }
 
 /* Main content area with proper constraints */
@@ -78,23 +87,44 @@ body {
     flex: 1;
     min-height: 0;
     overflow: hidden;
-    gap: clamp(8px, 1.5vw, 16px);
+    gap: clamp(6px, 1vw, 12px);
+}
+
+/* Target column */
+.target-column {
+    flex-shrink: 0;
+}
+
+/* Mixing column */
+.mixing-column {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Responsive layout for playing screen sections */
-@media (min-width: 1024px) {
+@media (min-width: 900px) {
     .playing-content {
         flex-direction: row;
+        align-items: stretch;
     }
     
-    .playing-content > .mixing-zone {
+    .target-column {
+        flex: 0 0 280px;
+        max-width: 320px;
+    }
+    
+    .mixing-column {
         flex: 1;
         min-width: 0;
     }
-    
-    .playing-content > .players-area {
-        flex: 0 0 auto;
-        max-width: 40%;
+}
+
+@media (min-width: 1200px) {
+    .target-column {
+        flex: 0 0 350px;
+        max-width: 400px;
     }
 }
 
@@ -294,19 +324,19 @@ body {
 }
 
 /* ============================================
-   PLAYER AREA - Grid Responsivo
+   PLAYER AREA - Grid Responsivo Compacto
    ============================================ */
 
 .players-area {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: clamp(8px, 2vw, 16px);
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: clamp(6px, 1.5vw, 12px);
     width: 100%;
     max-width: 100%;
-    padding: clamp(8px, 1.5vw, 16px);
-    /* Prevent overflow */
+    padding: clamp(4px, 1vw, 8px);
     overflow: hidden;
     box-sizing: border-box;
+    flex-shrink: 0;
 }
 
 /* Ensure player cards don't exceed container */
@@ -318,15 +348,15 @@ body {
 /* Responsive adjustments for player area */
 @media (max-width: 480px) {
     .players-area {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 8px;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 6px;
     }
 }
 
-@media (min-width: 1441px) {
+@media (min-width: 1200px) {
     .players-area {
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 12px;
     }
 }
 
@@ -336,23 +366,21 @@ body {
    ============================================ */
 
 .mixing-zone {
-    min-height: clamp(120px, 20vh, 300px);
-    max-height: 40vh;
-    border-radius: clamp(20px, 3vw, 30px) clamp(20px, 3vw, 30px) clamp(60px, 10vw, 100px) clamp(60px, 10vw, 100px);
+    min-height: clamp(100px, 15vh, 200px);
+    max-height: 35vh;
+    flex: 1;
+    border-radius: clamp(16px, 2.5vw, 24px) clamp(16px, 2.5vw, 24px) clamp(40px, 7vw, 70px) clamp(40px, 7vw, 70px);
     background: linear-gradient(180deg, rgba(5, 149, 174, 0.05) 0%, rgba(5, 149, 174, 0.15) 100%);
-    border: clamp(2px, 0.4vw, 4px) solid rgba(5, 149, 174, 0.3);
+    border: clamp(2px, 0.3vw, 3px) solid rgba(5, 149, 174, 0.3);
     position: relative;
     overflow: hidden;
     transition: all 0.5s ease;
-    /* Ensure content doesn't overflow */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
-    /* Container for container queries */
-    container-type: inline-size;
-    container-name: mixing-zone;
+    padding: clamp(8px, 1.5vw, 16px);
 }
 
 /* Ensure mixing zone elements scale properly */
@@ -365,39 +393,23 @@ body {
     content: '';
     position: absolute;
     top: 0; left: 10%; right: 10%;
-    height: clamp(10px, 2vw, 20px);
+    height: clamp(8px, 1.5vw, 16px);
     background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
     border-radius: 0 0 50% 50%;
 }
 
-/* Container queries for Mixing Zone contextual adaptation */
-@container mixing-zone (max-width: 400px) {
-    .mixing-elements {
-        gap: 4px;
-        padding: 8px;
-    }
-    
-    .element-card {
-        transform: scale(0.8);
-    }
+.mixing-elements {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: clamp(4px, 1vw, 12px);
+    padding: clamp(4px, 1vw, 12px);
 }
 
-@container mixing-zone (min-width: 401px) and (max-width: 600px) {
-    .mixing-elements {
-        gap: 8px;
-        padding: 12px;
-    }
-    
-    .element-card {
-        transform: scale(0.9);
-    }
-}
-
-@container mixing-zone (min-width: 601px) {
-    .mixing-elements {
-        gap: 16px;
-        padding: 20px;
-    }
+/* Elementos más pequeños en la zona de mezcla */
+.mixing-elements .element-card {
+    width: clamp(50px, 6vw, 80px);
+    height: clamp(60px, 7vw, 95px);
 }
 
 .mixing-zone.active {
@@ -462,25 +474,25 @@ body {
 }
 
 /* ============================================
-   PLAYER CARDS
+   PLAYER CARDS - Compacto
    ============================================ */
 
 .player-card {
     background: white;
-    border-radius: clamp(12px, 2vw, 20px);
-    padding: clamp(12px, 2vw, 20px);
+    border-radius: clamp(10px, 1.5vw, 16px);
+    padding: clamp(8px, 1.5vw, 14px);
     border: 2px solid #e2e8f0;
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .player-card::before {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0;
-    height: clamp(3px, 0.4vw, 4px);
+    height: 3px;
     background: var(--player-color, var(--color-primary));
 }
 
@@ -524,14 +536,14 @@ body {
 }
 
 .player-avatar {
-    width: var(--avatar-size);
-    height: var(--avatar-size);
-    border-radius: clamp(10px, 1.5vw, 16px);
-    box-shadow: 0 clamp(4px, 1vw, 8px) clamp(12px, 2vw, 24px) rgba(0,0,0,0.15);
+    width: clamp(32px, 5vw, 50px);
+    height: clamp(32px, 5vw, 50px);
+    border-radius: clamp(8px, 1.2vw, 12px);
+    box-shadow: 0 clamp(2px, 0.5vw, 4px) clamp(8px, 1.5vw, 16px) rgba(0,0,0,0.15);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: clamp(18px, 3vw, 36px);
+    font-size: clamp(14px, 2.5vw, 24px);
     position: relative;
     flex-shrink: 0;
 }
@@ -547,26 +559,26 @@ body {
     border-radius: clamp(8px, 1.2vw, 12px) clamp(8px, 1.2vw, 12px) 0 0;
 }
 
-/* Score badge */
+/* Score badge - compacto */
 .score-badge {
     background: linear-gradient(135deg, var(--color-warning) 0%, #ea580c 100%);
-    padding: clamp(6px, 1vw, 8px) clamp(12px, 2vw, 16px);
-    border-radius: 30px;
+    padding: clamp(4px, 0.8vw, 6px) clamp(10px, 1.5vw, 14px);
+    border-radius: 20px;
     font-weight: bold;
-    font-size: var(--font-sm);
+    font-size: clamp(11px, 1.8vw, 14px);
     color: white;
-    box-shadow: 0 clamp(2px, 0.5vw, 4px) clamp(8px, 1.5vw, 12px) rgba(235, 130, 37, 0.3);
+    box-shadow: 0 2px 8px rgba(235, 130, 37, 0.3);
     white-space: nowrap;
 }
 
 
 /* ============================================
-   TIMER CIRCULAR
+   TIMER CIRCULAR - Compacto
    ============================================ */
 
 .timer-ring {
-    width: var(--timer-size);
-    height: var(--timer-size);
+    width: clamp(50px, 8vw, 90px);
+    height: clamp(50px, 8vw, 90px);
     border-radius: 50%;
     background: conic-gradient(var(--color-primary) var(--progress, 100%), #e2e8f0 0%);
     display: flex;
@@ -580,7 +592,7 @@ body {
 .timer-ring::before {
     content: '';
     position: absolute;
-    inset: clamp(4px, 0.8vw, 8px);
+    inset: clamp(3px, 0.6vw, 6px);
     background: white;
     border-radius: 50%;
 }
@@ -588,7 +600,7 @@ body {
 .timer-ring .time {
     position: relative;
     z-index: 1;
-    font-size: clamp(18px, 3vw, 40px);
+    font-size: clamp(16px, 2.5vw, 32px);
     font-weight: 900;
     color: var(--color-text);
 }
@@ -608,53 +620,64 @@ body {
 }
 
 /* ============================================
-   TARGET DISPLAY
+   TARGET DISPLAY - Responsivo mejorado
    ============================================ */
 
 .target-display {
     background: linear-gradient(135deg, rgba(171, 61, 139, 0.08) 0%, rgba(5, 149, 174, 0.08) 100%);
     border: clamp(2px, 0.3vw, 3px) solid rgba(171, 61, 139, 0.2);
-    border-radius: clamp(16px, 2.5vw, 24px);
-    padding: clamp(16px, 3vw, 40px);
+    border-radius: clamp(12px, 2vw, 20px);
+    padding: clamp(12px, 2vw, 24px);
     position: relative;
     overflow: hidden;
-    /* Container for container queries */
-    container-type: inline-size;
-    container-name: target-display;
-    /* Prevent overflow */
     max-width: 100%;
     box-sizing: border-box;
 }
 
-/* Container queries for target display contextual adaptation */
-@container target-display (max-width: 300px) {
-    .target-formula {
-        font-size: 1.5rem;
+/* Responsive target display */
+@media (max-width: 600px) {
+    .target-display {
+        padding: 10px 12px;
     }
 }
 
-@container target-display (min-width: 301px) and (max-width: 600px) {
-    .target-formula {
-        font-size: 2rem;
-    }
-}
-
-/* Fallback for browsers without container queries */
-@supports not (container-type: inline-size) {
-    .target-display { padding: 16px; }
-    
-    @media (max-width: 600px) {
-        .target-formula { font-size: 2rem; }
+@media (min-width: 1024px) {
+    .target-display {
+        max-width: 400px;
+        margin: 0 auto;
     }
 }
 
 .target-formula {
-    font-size: var(--font-5xl);
+    font-size: clamp(2rem, 6vw, 4rem);
     font-weight: 900;
     background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-primary) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    line-height: 1.2;
+}
+
+/* Status indicator - compacto */
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: var(--font-xs);
+    white-space: nowrap;
+}
+
+.status-indicator.waiting {
+    background: rgba(5, 149, 174, 0.1);
+    color: var(--color-primary);
+}
+
+.status-indicator.ready {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--color-success);
 }
 
 /* ============================================
@@ -707,22 +730,22 @@ body {
 
 
 /* ============================================
-   ROUND INDICATOR
+   ROUND INDICATOR - Compacto
    ============================================ */
 
 .round-indicator {
     background: #f1f5f9;
-    border-radius: 50px;
-    padding: clamp(8px, 1.2vw, 12px) clamp(16px, 2.5vw, 30px);
+    border-radius: 30px;
+    padding: clamp(4px, 0.8vw, 8px) clamp(8px, 1.5vw, 16px);
     display: inline-flex;
     align-items: center;
-    gap: clamp(6px, 1vw, 12px);
-    border: 2px solid #e2e8f0;
+    gap: clamp(4px, 0.6vw, 8px);
+    border: 1px solid #e2e8f0;
 }
 
 .round-dot {
-    width: clamp(8px, 1.2vw, 12px);
-    height: clamp(8px, 1.2vw, 12px);
+    width: clamp(6px, 1vw, 10px);
+    height: clamp(6px, 1vw, 10px);
     border-radius: 50%;
     background: #cbd5e1;
     transition: all 0.3s ease;
@@ -730,12 +753,12 @@ body {
 
 .round-dot.completed { 
     background: var(--color-success); 
-    box-shadow: 0 0 clamp(5px, 1vw, 10px) rgba(16, 185, 129, 0.5); 
+    box-shadow: 0 0 clamp(4px, 0.8vw, 8px) rgba(16, 185, 129, 0.5); 
 }
 
 .round-dot.current { 
     background: var(--color-primary); 
-    box-shadow: 0 0 clamp(8px, 1.5vw, 15px) rgba(5, 149, 174, 0.5); 
+    box-shadow: 0 0 clamp(6px, 1vw, 10px) rgba(5, 149, 174, 0.5); 
     animation: currentPulse 1s ease infinite; 
 }
 
@@ -793,7 +816,7 @@ body {
 .rank-badge.bronze { background: linear-gradient(135deg, #b45309, #92400e); }
 
 /* ============================================
-   RESULT OVERLAY
+   RESULT OVERLAY - Mejorado
    ============================================ */
 
 .result-overlay {
@@ -812,13 +835,127 @@ body {
 
 .result-content {
     text-align: center;
-    padding: clamp(30px, 5vw, 60px);
+    padding: clamp(20px, 4vw, 40px);
     max-width: 90vw;
 }
 
 .result-icon {
-    font-size: clamp(60px, 15vw, 150px);
+    font-size: clamp(60px, 15vw, 120px);
     margin-bottom: clamp(12px, 2vw, 20px);
+    display: block;
+}
+
+/* Success animations */
+.success-container {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 16px;
+}
+
+.success-icon-wrapper {
+    position: relative;
+    z-index: 1;
+}
+
+.success-glow {
+    filter: drop-shadow(0 0 20px rgba(16, 185, 129, 0.5));
+    animation: successPulse 1s ease-in-out infinite;
+}
+
+@keyframes successPulse {
+    0%, 100% { filter: drop-shadow(0 0 20px rgba(16, 185, 129, 0.5)); }
+    50% { filter: drop-shadow(0 0 40px rgba(16, 185, 129, 0.8)); }
+}
+
+.confetti-burst-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 200px;
+    height: 200px;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.star-spin {
+    display: inline-block;
+    color: #fbbf24;
+}
+
+.points-display {
+    display: inline-flex;
+    align-items: center;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.05) 100%);
+    border: 2px solid var(--color-success);
+    border-radius: 50px;
+    padding: 12px 24px;
+    gap: 8px;
+}
+
+.points-value {
+    font-size: clamp(1.25rem, 4vw, 1.75rem);
+    font-weight: 900;
+    color: var(--color-success);
+}
+
+.points-label {
+    font-size: clamp(0.875rem, 2.5vw, 1rem);
+    color: var(--color-success);
+    opacity: 0.8;
+}
+
+.bonus-points {
+    font-size: clamp(0.75rem, 2vw, 0.875rem);
+    color: var(--color-primary);
+    margin-left: 8px;
+    padding-left: 8px;
+    border-left: 1px solid rgba(5, 149, 174, 0.3);
+}
+
+/* Error animations */
+.error-container {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 16px;
+}
+
+.error-icon-wrapper {
+    position: relative;
+    z-index: 1;
+}
+
+.error-pulse {
+    animation: errorShake 0.5s ease;
+}
+
+@keyframes errorShake {
+    0%, 100% { transform: translateX(0) rotate(0); }
+    20% { transform: translateX(-15px) rotate(-10deg); }
+    40% { transform: translateX(15px) rotate(10deg); }
+    60% { transform: translateX(-10px) rotate(-5deg); }
+    80% { transform: translateX(10px) rotate(5deg); }
+}
+
+.shake-screen {
+    animation: screenShake 0.4s ease;
+}
+
+@keyframes screenShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.error-particles-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 200px;
+    height: 200px;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 0;
 }
 
 /* ============================================
@@ -970,5 +1107,111 @@ body {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
+    }
+}
+
+
+/* ============================================
+   DIFFICULTY SYSTEM STYLES
+   ============================================ */
+
+/* Difficulty selector on intro screen */
+.difficulty-selector {
+    background: var(--color-bg-soft);
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 16px 24px;
+    display: inline-block;
+}
+
+.difficulty-display {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 20px;
+    border-radius: 30px;
+    font-size: 1.25rem;
+    font-weight: bold;
+    background: white;
+    border: 2px solid currentColor;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.difficulty-display iconify-icon {
+    font-size: 1.5rem;
+}
+
+/* Difficulty badge in header */
+.difficulty-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: var(--font-xs);
+    font-weight: 600;
+}
+
+/* Difficulty completed display */
+.difficulty-completed {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: var(--font-base);
+    font-weight: 600;
+}
+
+/* Mystery formula for hard mode */
+.mystery-formula {
+    color: var(--color-danger) !important;
+    -webkit-text-fill-color: var(--color-danger) !important;
+    animation: mysteryPulse 2s ease-in-out infinite;
+}
+
+.prominent-name {
+    font-size: var(--font-2xl) !important;
+    color: var(--color-danger) !important;
+}
+
+@keyframes mysteryPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.02); }
+}
+
+/* Bonus points with difficulty */
+.bonus-points {
+    font-size: clamp(0.75rem, 2vw, 0.875rem);
+    color: var(--color-primary);
+    margin-left: 8px;
+    padding-left: 8px;
+    border-left: 1px solid rgba(5, 149, 174, 0.3);
+}
+
+.bonus-points.difficulty-bonus {
+    color: var(--color-secondary);
+    border-left-color: rgba(171, 61, 139, 0.3);
+}
+
+/* Required hint container visibility */
+.required-hint-container {
+    transition: all 0.3s ease;
+}
+
+/* Hint text styling */
+.hint-text {
+    transition: all 0.3s ease;
+}
+
+/* Glow effect for winner */
+.glow-orange {
+    filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.5));
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    .mystery-formula,
+    .prominent-name {
+        animation: none;
     }
 }
