@@ -12,8 +12,8 @@ const DIFFICULTY_CONFIG = {
         name: 'Fácil',
         icon: 'mdi:flask-outline',
         color: '#10b981',
-        description: 'Elementos básicos con cantidades',
-        showQuantities: true,
+        description: 'Fórmula y elementos visibles',
+        showFormula: true,
         showRequiredElements: true,
         showHint: true
     },
@@ -21,21 +21,26 @@ const DIFFICULTY_CONFIG = {
         name: 'Intermedio',
         icon: 'mdi:flask',
         color: '#f59e0b',
-        description: 'Más elementos, sin cantidades',
-        showQuantities: false,
-        showRequiredElements: true,
+        description: 'Solo nombre, con pista',
+        showFormula: false,
+        showRequiredElements: false,
         showHint: true
     },
     hard: {
         name: 'Difícil',
         icon: 'mdi:flask-round-bottom',
         color: '#ef4444',
-        description: 'Solo el nombre, tabla completa',
-        showQuantities: false,
+        description: 'Solo nombre, sin pistas',
+        showFormula: false,
         showRequiredElements: false,
         showHint: false
     }
 };
+
+const ROUNDS_OPTIONS = [4, 6, 8, 10, 12, 15];
+
+// Rondas personalizadas seleccionadas por el admin
+let selectedRounds = null; // null = usar defaultRounds de la dificultad
 
 // ============================================
 // ELEMENTOS EXPANDIDOS
@@ -144,8 +149,22 @@ function init() {
             case 'roundResult': handleRoundResult(data); break;
             case 'gameEnd': handleGameEnd(data); break;
             case 'gameReset': handleGameReset(data); break;
+            case 'gameError': handleGameError(data); break;
+            case 'roundsChanged': handleRoundsChanged(data); break;
         }
     };
+}
+
+function handleRoundsChanged(data) {
+    if (data.rounds) {
+        selectedRounds = data.rounds;
+        maxRounds = data.rounds;
+        // Actualizar UI si estamos en la pantalla de espera
+        const roundsDisplay = document.getElementById('roundsDisplay');
+        if (roundsDisplay) {
+            roundsDisplay.textContent = `${data.rounds} rondas`;
+        }
+    }
 }
 
 function sendMessage(msg) {
@@ -239,7 +258,7 @@ function renderWaitingScreen() {
                     </div>
                     
                     <!-- Selector de Dificultad para Admin -->
-                    <div class="difficulty-selector-admin mb-6">
+                    <div class="difficulty-selector-admin mb-4">
                         <p class="text-sm mb-3" style="color: var(--color-text-light);">
                             <iconify-icon icon="mdi:speedometer" class="mr-1"></iconify-icon>
                             Selecciona la dificultad:
@@ -256,6 +275,25 @@ function renderWaitingScreen() {
                             `).join('')}
                         </div>
                     </div>
+                    
+                    <!-- Selector de Rondas para Admin -->
+                    <div class="rounds-selector-admin mb-6">
+                        <p class="text-sm mb-2" style="color: var(--color-text-light);">
+                            <iconify-icon icon="mdi:counter" class="mr-1"></iconify-icon>
+                            Número de rondas:
+                        </p>
+                        <div class="rounds-options" id="roundsOptions">
+                            ${ROUNDS_OPTIONS.map(rounds => `
+                                <button class="rounds-option ${(selectedRounds || difficultyConfig.defaultRounds) === rounds ? 'selected' : ''}" 
+                                        data-rounds="${rounds}">
+                                    ${rounds}
+                                </button>
+                            `).join('')}
+                        </div>
+                        <p class="text-xs mt-2" style="color: var(--color-text-light); opacity: 0.7;">
+                            Por defecto: ${difficultyConfig.defaultRounds} rondas
+                        </p>
+                    </div>
                 ` : `
                     <div class="current-difficulty mb-4">
                         <p class="text-sm mb-2" style="color: var(--color-text-light);">Dificultad:</p>
@@ -263,6 +301,9 @@ function renderWaitingScreen() {
                             <iconify-icon icon="${difficultyConfig.icon}"></iconify-icon>
                             ${difficultyConfig.name}
                         </div>
+                        <p class="text-xs mt-2" style="color: var(--color-text-light);" id="roundsDisplay">
+                            ${selectedRounds || difficultyConfig.defaultRounds} rondas
+                        </p>
                     </div>
                 `}
                 
@@ -312,8 +353,20 @@ function renderWaitingScreen() {
             });
         });
         
+        // Event listeners para selector de rondas
+        document.querySelectorAll('.rounds-option').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const rounds = parseInt(btn.dataset.rounds);
+                selectRounds(rounds);
+            });
+        });
+        
         document.getElementById('startGameBtn').addEventListener('click', () => {
-            sendMessage({ action: 'startGame', difficulty: currentDifficulty });
+            sendMessage({ 
+                action: 'startGame', 
+                difficulty: currentDifficulty,
+                customRounds: selectedRounds
+            });
         });
     }
 }
@@ -327,6 +380,38 @@ function selectDifficulty(difficulty) {
         btn.classList.toggle('selected', btn.dataset.difficulty === difficulty);
     });
     
+    // Actualizar el texto de rondas por defecto
+    const defaultRoundsText = document.querySelector('.rounds-selector-admin .text-xs');
+    if (defaultRoundsText) {
+        defaultRoundsText.textContent = `Por defecto: ${difficultyConfig.defaultRounds} rondas`;
+    }
+    
+    // Si no hay rondas personalizadas, actualizar la selección visual
+    if (!selectedRounds) {
+        document.querySelectorAll('.rounds-option').forEach(btn => {
+            btn.classList.toggle('selected', parseInt(btn.dataset.rounds) === difficultyConfig.defaultRounds);
+        });
+    }
+    
+    // Vibración de feedback
+    if (navigator.vibrate) {
+        navigator.vibrate(30);
+    }
+    
+    playSound('select');
+}
+
+function selectRounds(rounds) {
+    selectedRounds = rounds;
+    
+    // Actualizar UI
+    document.querySelectorAll('.rounds-option').forEach(btn => {
+        btn.classList.toggle('selected', parseInt(btn.dataset.rounds) === rounds);
+    });
+    
+    // Notificar al screen del cambio
+    sendMessage({ action: 'setRounds', rounds: rounds });
+    
     // Vibración de feedback
     if (navigator.vibrate) {
         navigator.vibrate(30);
@@ -338,30 +423,6 @@ function selectDifficulty(difficulty) {
 function renderPlayingScreen() {
     const app = document.getElementById('app');
     
-    // Contar elementos necesarios según dificultad
-    let requiredHtml = '';
-    
-    if (currentCompound) {
-        if (difficultyConfig.showRequiredElements) {
-            const counts = {};
-            if (currentCompound.elements) {
-                currentCompound.elements.forEach(el => counts[el] = (counts[el] || 0) + 1);
-            } else if (currentCompound.elementsUnique) {
-                currentCompound.elementsUnique.forEach(el => counts[el] = 1);
-            }
-            
-            if (difficultyConfig.showQuantities) {
-                requiredHtml = Object.entries(counts).map(([el, count]) => `
-                    <span class="required-badge-sm">${el}${count > 1 ? '×' + count : ''}</span>
-                `).join('');
-            } else {
-                requiredHtml = Object.keys(counts).map(el => `
-                    <span class="required-badge-sm">${el}</span>
-                `).join('');
-            }
-        }
-    }
-    
     maxSelections = currentCompound?.elements?.length || 5;
     
     app.innerHTML = `
@@ -371,8 +432,9 @@ function renderPlayingScreen() {
             <!-- Header compacto con botón salir -->
             <div class="relative z-10 text-center mb-2">
                 <div class="flex items-center justify-between gap-2 mb-2">
-                    <button class="exit-btn" id="exitGameBtn" title="Salir del juego">
+                    <button class="exit-btn-text" id="exitGameBtn" title="Salir del juego">
                         <iconify-icon icon="mdi:exit-to-app"></iconify-icon>
+                        <span>Salir</span>
                     </button>
                     <div class="flex items-center gap-2">
                         <img src="../LogoSteamRD-Color.webp" alt="STEAM RD" class="w-8 h-8">
@@ -383,27 +445,36 @@ function renderPlayingScreen() {
                             <iconify-icon icon="${difficultyConfig.icon}"></iconify-icon>
                         </span>
                     </div>
-                    <div style="width: 32px;"></div>
+                    <div style="width: 60px;"></div>
                 </div>
                 
                 <p class="text-xs mb-1" style="color: var(--color-text-light);">Sintetiza:</p>
                 
                 <div class="target-card-compact mb-2">
-                    ${currentDifficulty === 'hard' ? `
-                        <div class="target-formula-compact mystery">???</div>
-                        <p class="text-base font-bold" style="color: var(--color-danger);">${currentCompound?.name || ''}</p>
-                        <p class="text-xs mt-1" style="color: var(--color-text-light);">¡Descubre la fórmula!</p>
-                    ` : `
+                    ${difficultyConfig.showFormula ? `
                         <div class="target-formula-compact">${currentCompound?.formula || '???'}</div>
                         <p class="text-sm font-semibold" style="color: var(--color-primary);">${currentCompound?.name || ''}</p>
+                        ${difficultyConfig.showRequiredElements && currentCompound?.elements ? `
+                            <div class="required-elements-row mt-2">
+                                ${[...new Set(currentCompound.elements)].map(el => {
+                                    const count = currentCompound.elements.filter(e => e === el).length;
+                                    return `<span class="required-badge-sm">${count > 1 ? count + '×' : ''}${el}</span>`;
+                                }).join('')}
+                            </div>
+                        ` : ''}
+                    ` : `
+                        <div class="target-formula-compact mystery">???</div>
+                        <p class="text-base font-bold" style="color: var(--color-secondary);">${currentCompound?.name || ''}</p>
+                        <p class="text-xs mt-1" style="color: var(--color-text-light);">¡Descubre la fórmula!</p>
                     `}
                 </div>
                 
-                ${requiredHtml ? `
-                    <div class="flex flex-wrap justify-center gap-1 mb-2" id="requiredElements">
-                        ${requiredHtml}
-                    </div>
-                ` : (currentDifficulty === 'hard' ? `
+                ${difficultyConfig.showHint && currentCompound?.hint ? `
+                    <p class="text-xs mb-2" style="color: var(--color-text-light);">
+                        <iconify-icon icon="mdi:lightbulb" class="mr-1" style="color: var(--color-warning);"></iconify-icon>
+                        ${currentCompound.hint}
+                    </p>
+                ` : (!difficultyConfig.showHint ? `
                     <p class="text-xs mb-2" style="color: var(--color-text-light); opacity: 0.7;">
                         <iconify-icon icon="mdi:help-circle" class="mr-1"></iconify-icon>
                         Sin pistas - ¡Buena suerte!
@@ -501,19 +572,37 @@ function setupElementsGrid() {
     
     grid.innerHTML = '';
     
+    // Obtener elementos requeridos para el compuesto actual (modo fácil)
+    const requiredElements = new Set();
+    if (difficultyConfig.showRequiredElements && currentCompound?.elements) {
+        currentCompound.elements.forEach(el => requiredElements.add(el));
+    }
+    
     // Usar solo los elementos disponibles para esta dificultad
     availableElementKeys.forEach(key => {
         const el = allElements[key];
         if (!el) return;
         
+        const isRequired = requiredElements.has(key);
         const btn = document.createElement('button');
         btn.className = `element-btn element-${el.group}`;
+        
+        // En modo fácil, resaltar elementos requeridos
+        if (difficultyConfig.showRequiredElements) {
+            if (isRequired) {
+                btn.classList.add('highlighted-element');
+            } else {
+                btn.classList.add('dimmed-element');
+            }
+        }
+        
         btn.dataset.element = key;
         btn.innerHTML = `
             <span class="atomic-number">${el.number}</span>
             <span class="symbol">${el.symbol}</span>
             <span class="name">${el.name}</span>
             <span class="selection-count" id="count-${key}"></span>
+            ${isRequired && difficultyConfig.showRequiredElements ? '<iconify-icon icon="mdi:star-four-points" class="highlight-star"></iconify-icon>' : ''}
         `;
         btn.addEventListener('click', () => handleElementClick(key, btn));
         
@@ -937,6 +1026,17 @@ function handleRoundResult(data) {
                 ${timeBonus > 0 ? `<span class="bonus">+${timeBonus} tiempo</span>` : ''}
                 ${difficultyBonus > 0 ? `<span class="bonus diff-bonus">+${difficultyBonus} ${difficultyConfig.name}</span>` : ''}
             </div>
+            ${isAdmin ? `
+                <button class="btn-primary mt-4" id="nextRoundBtn">
+                    <iconify-icon icon="mdi:arrow-right" class="mr-2"></iconify-icon>
+                    Siguiente Ronda
+                </button>
+            ` : `
+                <p class="text-sm mt-4" style="color: var(--color-text-light);">
+                    <iconify-icon icon="mdi:timer-sand" class="mr-1"></iconify-icon>
+                    Esperando al admin...
+                </p>
+            `}
         `;
         
         createMiniConfetti();
@@ -958,6 +1058,17 @@ function handleRoundResult(data) {
                 Se necesitaba: ${data.compound.formula}<br>
                 (${data.compound.elements.join(' + ')})
             </p>
+            ${isAdmin ? `
+                <button class="btn-primary mt-4" id="nextRoundBtn">
+                    <iconify-icon icon="mdi:arrow-right" class="mr-2"></iconify-icon>
+                    Siguiente Ronda
+                </button>
+            ` : `
+                <p class="text-sm mt-4" style="color: var(--color-text-light);">
+                    <iconify-icon icon="mdi:timer-sand" class="mr-1"></iconify-icon>
+                    Esperando al admin...
+                </p>
+            `}
         `;
         
         createErrorBurst();
@@ -975,7 +1086,18 @@ function handleRoundResult(data) {
         });
     }
     
-    setTimeout(() => overlay.classList.remove('active'), 3000);
+    // Configurar botón de siguiente para el admin
+    if (isAdmin) {
+        setTimeout(() => {
+            const nextBtn = document.getElementById('nextRoundBtn');
+            if (nextBtn) {
+                nextBtn.addEventListener('click', () => {
+                    overlay.classList.remove('active');
+                    sendMessage({ action: 'adminNextRound' });
+                });
+            }
+        }, 100);
+    }
 }
 
 function createMiniConfetti() {
@@ -1067,6 +1189,21 @@ function handleGameReset(data) {
     
     // Volver a la pantalla de espera/selección de dificultad
     renderWaitingScreen();
+}
+
+function handleGameError(data) {
+    // Mostrar mensaje de error
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'fixed top-20 left-4 right-4 bg-red-100 border-2 border-red-400 text-red-700 px-4 py-3 rounded-xl z-50 text-center';
+    errorDiv.innerHTML = `
+        <iconify-icon icon="mdi:alert-circle" class="mr-2"></iconify-icon>
+        ${data.message}
+    `;
+    document.body.appendChild(errorDiv);
+    
+    if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+    
+    setTimeout(() => errorDiv.remove(), 3000);
 }
 
 // ============================================

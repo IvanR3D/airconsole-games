@@ -10,6 +10,76 @@ body {
     background: #ffffff;
     color: #1a1a2e;
     font-size: 16px;
+    position: relative;
+}
+
+/* ============================================
+   FONDO GLOBAL (en el body)
+   ============================================ */
+
+.global-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.global-blob-1 {
+    position: absolute;
+    top: -20%;
+    right: -10%;
+    width: 60%;
+    height: 60%;
+    background: radial-gradient(circle, rgba(5, 149, 174, 0.12) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: floatBlob1 20s ease-in-out infinite;
+}
+
+.global-blob-2 {
+    position: absolute;
+    bottom: 20%;
+    left: -10%;
+    width: 50%;
+    height: 50%;
+    background: radial-gradient(circle, rgba(171, 61, 139, 0.08) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: floatBlob2 25s ease-in-out infinite;
+}
+
+.global-waves {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 180px;
+    overflow: hidden;
+}
+
+.global-waves .wave {
+    position: absolute;
+    bottom: 0;
+    left: -5%;
+    width: 110%;
+    height: 100%;
+}
+
+.global-waves .wave:nth-child(1) {
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%230595AE' fill-opacity='0.08' d='M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,138.7C672,128,768,160,864,181.3C960,203,1056,213,1152,197.3C1248,181,1344,139,1392,117.3L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E") repeat-x bottom;
+    background-size: 100% 100%;
+}
+
+.global-waves .wave:nth-child(2) {
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23AB3D8B' fill-opacity='0.06' d='M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,218.7C672,235,768,245,864,234.7C960,224,1056,192,1152,181.3C1248,171,1344,181,1392,186.7L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E") repeat-x bottom;
+    background-size: 100% 100%;
+}
+
+.global-waves .wave:nth-child(3) {
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%2373A03F' fill-opacity='0.05' d='M0,96L48,112C96,128,192,160,288,165.3C384,171,480,149,576,149.3C672,149,768,171,864,165.3C960,160,1056,128,1152,122.7C1248,117,1344,139,1392,149.3L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E") repeat-x bottom;
+    background-size: 100% 100%;
 }
 
 /* ============================================
@@ -130,7 +200,7 @@ body {
 
 
 /* ============================================
-   FONDO CON MANCHAS Y OLAS
+   FONDO LOCAL (dentro de pantallas) - Solo manchas adicionales
    ============================================ */
 
 .lab-bg {
@@ -138,32 +208,20 @@ body {
     top: 0; left: 0; right: 0; bottom: 0;
     overflow: hidden;
     z-index: 0;
-    background: #ffffff;
+    pointer-events: none;
 }
 
-/* Manchas de colores suaves */
-.lab-bg::before {
-    content: '';
+/* Mancha adicional verde */
+.blob-green {
     position: absolute;
-    top: -20%;
-    right: -10%;
-    width: 60%;
-    height: 60%;
-    background: radial-gradient(circle, rgba(5, 149, 174, 0.15) 0%, transparent 70%);
+    top: 40%;
+    left: 50%;
+    width: 40%;
+    height: 40%;
+    background: radial-gradient(circle, rgba(115, 160, 63, 0.08) 0%, transparent 70%);
     border-radius: 50%;
-    animation: floatBlob1 20s ease-in-out infinite;
-}
-
-.lab-bg::after {
-    content: '';
-    position: absolute;
-    bottom: -20%;
-    left: -10%;
-    width: 50%;
-    height: 50%;
-    background: radial-gradient(circle, rgba(171, 61, 139, 0.12) 0%, transparent 70%);
-    border-radius: 50%;
-    animation: floatBlob2 25s ease-in-out infinite;
+    animation: floatBlob3 18s ease-in-out infinite;
+    pointer-events: none;
 }
 
 @keyframes floatBlob1 {
@@ -177,58 +235,10 @@ body {
     50% { transform: translate(40px, -30px) scale(1.15); }
 }
 
-/* Mancha adicional verde */
-.blob-green {
-    position: absolute;
-    top: 40%;
-    left: 50%;
-    width: 40%;
-    height: 40%;
-    background: radial-gradient(circle, rgba(115, 160, 63, 0.1) 0%, transparent 70%);
-    border-radius: 50%;
-    animation: floatBlob3 18s ease-in-out infinite;
-    pointer-events: none;
-}
-
 @keyframes floatBlob3 {
     0%, 100% { transform: translate(-50%, -50%) scale(1); }
     50% { transform: translate(-40%, -60%) scale(1.2); }
 }
-
-/* Olas en la parte inferior */
-.waves-container {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 150px;
-    overflow: hidden;
-    pointer-events: none;
-    z-index: 0;
-}
-
-.wave {
-    position: absolute;
-    bottom: 0;
-    left: -5%;
-    width: 110%;
-    height: 100%;
-    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%230595AE' fill-opacity='0.08' d='M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,138.7C672,128,768,160,864,181.3C960,203,1056,213,1152,197.3C1248,181,1344,139,1392,117.3L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E") repeat-x bottom;
-    background-size: 100% 100%;
-}
-
-.wave:nth-child(2) {
-    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23AB3D8B' fill-opacity='0.06' d='M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,218.7C672,235,768,245,864,234.7C960,224,1056,192,1152,181.3C1248,171,1344,181,1392,186.7L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E") repeat-x bottom;
-    background-size: 100% 100%;
-}
-
-.wave:nth-child(3) {
-    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%2373A03F' fill-opacity='0.05' d='M0,96L48,112C96,128,192,160,288,165.3C384,171,480,149,576,149.3C672,149,768,171,864,165.3C960,160,1056,128,1152,122.7C1248,117,1344,139,1392,149.3L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E") repeat-x bottom;
-    background-size: 100% 100%;
-}
-
-/* Animaciones de olas removidas para evitar cortes visibles */
-
 
 /* ============================================
    ELEMENTO DE TABLA PERIÓDICA
@@ -583,6 +593,34 @@ body {
     white-space: nowrap;
 }
 
+
+/* ============================================
+   BOTÓN DE MÚSICA
+   ============================================ */
+
+.music-toggle-btn {
+    width: clamp(36px, 5vw, 50px);
+    height: clamp(36px, 5vw, 50px);
+    border-radius: 50%;
+    background: var(--color-bg-soft);
+    border: 2px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--color-text-light);
+}
+
+.music-toggle-btn:hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: white;
+}
+
+.music-toggle-btn iconify-icon {
+    font-size: clamp(18px, 3vw, 24px);
+}
 
 /* ============================================
    TIMER CIRCULAR - Compacto
@@ -1110,7 +1148,6 @@ body {
     
     .mixing-zone { min-height: 100px; }
     .target-display { padding: 12px; }
-    .waves-container { height: 80px; }
 }
 
 /* Preferencia de movimiento reducido */
@@ -1443,5 +1480,37 @@ body {
     .mystery-formula,
     .prominent-name {
         animation: none;
+    }
+}
+
+
+/* ============================================
+   LAB ANIMATION WRAPPER
+   ============================================ */
+
+.lab-animation-wrapper {
+    width: 100%;
+    max-width: 600px;
+    height: 350px;
+    margin: 0 auto 20px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+
+.lab-result-info {
+    text-align: center;
+}
+
+@media (max-width: 600px) {
+    .lab-animation-wrapper {
+        height: 280px;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 400px) {
+    .lab-animation-wrapper {
+        height: 240px;
     }
 }

@@ -47,7 +47,7 @@ body {
     opacity: 1; 
     height: 100vh; 
     height: 100dvh;
-    padding: 50px 16px 16px 16px;
+    padding: 60px 16px 16px 16px;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
 }
@@ -178,6 +178,53 @@ body {
 .element-transition { background: linear-gradient(135deg, #8b6d5c 0%, #7a5c4b 100%); color: white; }
 
 /* Metaloides (B, Si, Ge, As, Sb, Te) - Beige/Arena */
+.element-metalloid { background: linear-gradient(135deg, #9a8a6a 0%, #897959 100%); color: white; }
+
+/* ============================================
+   ELEMENTOS RESALTADOS (Modo Fácil)
+   ============================================ */
+
+.element-btn.highlighted-element {
+    animation: highlightPulse 1.5s ease-in-out infinite;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.5),
+                0 clamp(3px, 1vw, 4px) 0 rgba(0,0,0,0.2), 
+                0 clamp(4px, 1.5vw, 6px) clamp(12px, 4vw, 16px) rgba(0,0,0,0.1);
+    transform: scale(1.05);
+    z-index: 10;
+}
+
+.element-btn.dimmed-element {
+    opacity: 0.4;
+    filter: grayscale(0.3);
+}
+
+.element-btn .highlight-star {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    font-size: 16px;
+    color: #fbbf24;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
+    animation: starSpin 2s linear infinite;
+}
+
+@keyframes highlightPulse {
+    0%, 100% { 
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.5),
+                    0 clamp(3px, 1vw, 4px) 0 rgba(0,0,0,0.2), 
+                    0 clamp(4px, 1.5vw, 6px) clamp(12px, 4vw, 16px) rgba(0,0,0,0.1);
+    }
+    50% { 
+        box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.3),
+                    0 clamp(3px, 1vw, 4px) 0 rgba(0,0,0,0.2), 
+                    0 clamp(6px, 2vw, 10px) clamp(16px, 5vw, 24px) rgba(16, 185, 129, 0.2);
+    }
+}
+
+@keyframes starSpin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 .element-metalloid { background: linear-gradient(135deg, #9a8a6a 0%, #897959 100%); color: white; }
 
 /* ============================================
@@ -820,7 +867,7 @@ body {
         --element-height: 56px;
         --avatar-size: 42px;
     }
-    .screen.active { padding: 45px 10px 10px 10px; }
+    .screen.active { padding: 55px 10px 10px 10px; }
     
     .elements-grid {
         grid-template-columns: repeat(4, 1fr);
@@ -850,7 +897,7 @@ body {
         --avatar-size: 48px;
     }
     
-    .screen.active { padding: 50px 12px 12px 12px; }
+    .screen.active { padding: 60px 12px 12px 12px; }
     
     .elements-grid {
         grid-template-columns: repeat(4, 1fr);
@@ -868,7 +915,7 @@ body {
         --avatar-size: 52px;
     }
     
-    .screen.active { padding: 50px 16px 16px 16px; }
+    .screen.active { padding: 60px 16px 16px 16px; }
     
     .elements-grid {
         grid-template-columns: repeat(4, 1fr);
@@ -883,7 +930,7 @@ body {
         --avatar-size: 65px;
     }
     
-    .screen.active { padding: 50px 20px 20px 20px; }
+    .screen.active { padding: 60px 20px 20px 20px; }
     
     .elements-grid {
         grid-template-columns: repeat(5, 1fr);
@@ -898,7 +945,7 @@ body {
         --avatar-size: 75px;
     }
     
-    .screen.active { padding: 50px 24px 24px 24px; }
+    .screen.active { padding: 60px 24px 24px 24px; }
     .btn-primary, .btn-admin { max-width: 400px; }
     
     .elements-grid {
@@ -914,7 +961,7 @@ body {
         --element-height: 52px;
         --avatar-size: 36px;
     }
-    .screen.active { padding: 35px 12px 12px 12px; }
+    .screen.active { padding: 40px 12px 12px 12px; }
     .target-card { padding: 6px 10px; }
     .target-card-compact { padding: 4px 8px; }
     .target-formula-compact { font-size: 1.1rem; }
@@ -931,7 +978,7 @@ body {
 
 @supports (padding-top: env(safe-area-inset-top)) {
     .screen.active {
-        padding-top: calc(50px + env(safe-area-inset-top));
+        padding-top: calc(60px + env(safe-area-inset-top));
         padding-left: calc(16px + env(safe-area-inset-left));
         padding-right: calc(16px + env(safe-area-inset-right));
         padding-bottom: calc(16px + env(safe-area-inset-bottom));
@@ -1100,6 +1147,34 @@ body {
     font-size: 18px;
 }
 
+/* Botón salir con texto */
+.exit-btn-text {
+    padding: 6px 12px;
+    border-radius: 8px;
+    background: var(--color-bg-soft);
+    border: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--color-text-light);
+    flex-shrink: 0;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.exit-btn-text:active {
+    transform: scale(0.95);
+    background: #fee2e2;
+    border-color: var(--color-danger);
+    color: var(--color-danger);
+}
+
+.exit-btn-text iconify-icon {
+    font-size: 16px;
+}
+
 .exit-modal {
     position: fixed;
     inset: 0;
@@ -1193,4 +1268,66 @@ body {
 
 .exit-btn-corner iconify-icon {
     font-size: 20px;
+}
+
+/* ============================================
+   ROUNDS SELECTOR (Admin)
+   ============================================ */
+
+.rounds-selector-admin {
+    background: var(--color-bg-soft);
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.rounds-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+.rounds-option {
+    min-width: 44px;
+    height: 36px;
+    padding: 0 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 18px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: bold;
+    font-size: 14px;
+    color: var(--color-text);
+}
+
+.rounds-option:active {
+    transform: scale(0.95);
+}
+
+.rounds-option.selected {
+    border-color: var(--color-primary);
+    background: linear-gradient(135deg, rgba(5, 149, 174, 0.1) 0%, rgba(5, 149, 174, 0.05) 100%);
+    color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(5, 149, 174, 0.15);
+}
+
+.rounds-option.selected::after {
+    content: none;
+}
+
+
+/* Required elements row in target card */
+.required-elements-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: center;
+}
+
+.required-elements-row .required-badge-sm {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid var(--color-success);
+    color: var(--color-success);
 }

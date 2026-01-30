@@ -1,0 +1,46 @@
+/* ============================================
+   LAB ANIMATION - Schema Animation
+   Adapted for Quimica Game
+   ============================================ */
+
+:root {
+  --main-color: #0595AE;
+  --bg-color: #030912;
+}
+
+.lab-animation-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.schema-anim {
+  position: relative;
+  height: 400px;
+  width: 500px;
+  z-index: 1;
+}
+
+.schema-anim #canvas_line_back,
+.schema-anim #canvas_line1,
+.schema-anim #canvas_container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 400px;
+  width: 500px;
+}
+
+#svg_line {
+  width: 100%;
+  height: 100%;
+  visibility: hidden;
+}

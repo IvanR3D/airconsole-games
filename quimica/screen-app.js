@@ -18,42 +18,45 @@ const DIFFICULTY_CONFIG = {
         name: 'Fácil',
         icon: 'mdi:flask-outline',
         color: '#10b981',
-        description: 'Elementos básicos con cantidades',
-        showQuantities: true,
-        showRequiredElements: true,
-        showHint: true,
+        description: 'Fórmula y elementos visibles',
+        showFormula: true,          // Muestra la fórmula (H₂O)
+        showRequiredElements: true, // Muestra qué elementos necesitas
+        showHint: true,             // Muestra pista
         timerSeconds: 60,
         pointsMultiplier: 1,
-        availableElements: ['H', 'O', 'C', 'N', 'Na', 'Cl', 'S', 'Ca', 'K', 'Mg', 'Fe', 'P'],
-        maxRounds: 8
+        availableElements: ['H', 'O', 'C', 'N', 'Na', 'Cl', 'S', 'Ca'],
+        defaultRounds: 6
     },
     medium: {
         name: 'Intermedio',
         icon: 'mdi:flask',
         color: '#f59e0b',
-        description: 'Más elementos, sin cantidades',
-        showQuantities: false,
-        showRequiredElements: true,
-        showHint: true,
+        description: 'Solo nombre, con pista',
+        showFormula: false,         // NO muestra la fórmula (???)
+        showRequiredElements: false,// NO muestra elementos
+        showHint: true,             // Muestra pista
         timerSeconds: 50,
         pointsMultiplier: 1.5,
-        availableElements: ['H', 'O', 'C', 'N', 'Na', 'Cl', 'S', 'Ca', 'K', 'Mg', 'Fe', 'P', 'He', 'Ne', 'Al', 'Si', 'Ar', 'Cu', 'Zn', 'Br', 'I'],
-        maxRounds: 10
+        availableElements: ['H', 'O', 'C', 'N', 'Na', 'Cl', 'S', 'Ca', 'K', 'Mg', 'Fe', 'P'],
+        defaultRounds: 8
     },
     hard: {
         name: 'Difícil',
         icon: 'mdi:flask-round-bottom',
         color: '#ef4444',
-        description: 'Solo el nombre, tabla completa',
-        showQuantities: false,
+        description: 'Solo nombre, sin pistas',
+        showFormula: false,         // NO muestra la fórmula
         showRequiredElements: false,
-        showHint: false,
-        timerSeconds: 45,
+        showHint: false,            // SIN pistas
+        timerSeconds: 40,
         pointsMultiplier: 2.5,
-        availableElements: 'all',
-        maxRounds: 12
+        availableElements: ['H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne', 'Na', 'Mg', 'Al', 'Si', 'P', 'S', 'Cl', 'Ar', 'K', 'Ca', 'Fe', 'Cu', 'Zn', 'Br', 'Kr', 'Ag', 'I', 'Au', 'Hg', 'Pb'],
+        defaultRounds: 10
     }
 };
+
+// Configuración personalizada del admin
+let customRounds = null; // null = usar defaultRounds de la dificultad
 
 // ============================================
 // DATOS DEL JUEGO - ELEMENTOS EXPANDIDOS
@@ -98,11 +101,27 @@ const elements = {
     Pb: { symbol: 'Pb', name: 'Plomo', number: 82, group: 'metal', icon: 'mdi:weight' }
 };
 
+// Exponer elementos para la animación del laboratorio
+window.labElements = elements;
+
 // ============================================
 // COMPUESTOS POR DIFICULTAD
 // ============================================
 
+// Compuestos FÁCIL: Solo usan H, O, C, N, Na, Cl
 const compoundsEasy = [
+    { formula: 'H₂O', name: 'Agua', elements: ['H', 'H', 'O'], points: 80, hint: 'Esencial para la vida', icon: 'mdi:water' },
+    { formula: 'NaCl', name: 'Sal de mesa', elements: ['Na', 'Cl'], points: 80, hint: 'Sazona tu comida', icon: 'mdi:shaker-outline' },
+    { formula: 'CO₂', name: 'Dióxido de carbono', elements: ['C', 'O', 'O'], points: 100, hint: 'Lo exhalas al respirar', icon: 'mdi:molecule-co2' },
+    { formula: 'NH₃', name: 'Amoníaco', elements: ['N', 'H', 'H', 'H'], points: 120, hint: 'Olor fuerte característico', icon: 'mdi:spray' },
+    { formula: 'CH₄', name: 'Metano', elements: ['C', 'H', 'H', 'H', 'H'], points: 150, hint: 'Gas natural', icon: 'mdi:gas-burner' },
+    { formula: 'HCl', name: 'Ácido clorhídrico', elements: ['H', 'Cl'], points: 80, hint: 'Ácido del estómago', icon: 'mdi:flask' },
+    { formula: 'N₂O', name: 'Óxido nitroso', elements: ['N', 'N', 'O'], points: 100, hint: 'Gas de la risa', icon: 'mdi:emoticon-happy' },
+    { formula: 'CO', name: 'Monóxido de carbono', elements: ['C', 'O'], points: 80, hint: 'Gas tóxico', icon: 'mdi:skull' }
+];
+
+// Compuestos INTERMEDIO: Usan los 12 elementos básicos
+const compoundsMedium = [
     { formula: 'H₂O', name: 'Agua', elements: ['H', 'H', 'O'], points: 100, hint: 'Esencial para la vida', icon: 'mdi:water' },
     { formula: 'NaCl', name: 'Sal de mesa', elements: ['Na', 'Cl'], points: 100, hint: 'Sazona tu comida', icon: 'mdi:shaker-outline' },
     { formula: 'CO₂', name: 'Dióxido de carbono', elements: ['C', 'O', 'O'], points: 150, hint: 'Lo exhalas al respirar', icon: 'mdi:molecule-co2' },
@@ -112,21 +131,12 @@ const compoundsEasy = [
     { formula: 'KCl', name: 'Cloruro de potasio', elements: ['K', 'Cl'], points: 100, hint: 'Sustituto de sal', icon: 'mdi:shaker' },
     { formula: 'MgO', name: 'Óxido de magnesio', elements: ['Mg', 'O'], points: 120, hint: 'Antiácido estomacal', icon: 'mdi:pill' },
     { formula: 'CaO', name: 'Cal viva', elements: ['Ca', 'O'], points: 120, hint: 'Usado en construcción', icon: 'mdi:wall' },
-    { formula: 'HCl', name: 'Ácido clorhídrico', elements: ['H', 'Cl'], points: 100, hint: 'Ácido del estómago', icon: 'mdi:flask' }
-];
-
-const compoundsMedium = [
-    ...compoundsEasy,
-    { formula: 'CaCO₃', name: 'Carbonato de calcio', elements: ['Ca', 'C', 'O', 'O', 'O'], points: 250, hint: 'En conchas y huesos', icon: 'mdi:bone' },
-    { formula: 'SiO₂', name: 'Dióxido de silicio', elements: ['Si', 'O', 'O'], points: 150, hint: 'Arena y vidrio', icon: 'mdi:beach' },
-    { formula: 'Fe₂O₃', name: 'Óxido de hierro', elements: ['Fe', 'Fe', 'O', 'O', 'O'], points: 250, hint: 'Herrumbre/Óxido', icon: 'mdi:iron' },
-    { formula: 'Al₂O₃', name: 'Óxido de aluminio', elements: ['Al', 'Al', 'O', 'O', 'O'], points: 250, hint: 'Corindón/Rubí', icon: 'mdi:diamond' },
+    { formula: 'HCl', name: 'Ácido clorhídrico', elements: ['H', 'Cl'], points: 100, hint: 'Ácido del estómago', icon: 'mdi:flask' },
     { formula: 'H₂S', name: 'Sulfuro de hidrógeno', elements: ['H', 'H', 'S'], points: 150, hint: 'Olor a huevo podrido', icon: 'mdi:egg-off' },
     { formula: 'SO₂', name: 'Dióxido de azufre', elements: ['S', 'O', 'O'], points: 150, hint: 'Conservante de vinos', icon: 'mdi:glass-wine' },
-    { formula: 'CuO', name: 'Óxido de cobre', elements: ['Cu', 'O'], points: 120, hint: 'Color negro/marrón', icon: 'mdi:circle' },
-    { formula: 'ZnO', name: 'Óxido de zinc', elements: ['Zn', 'O'], points: 120, hint: 'Protector solar', icon: 'mdi:white-balance-sunny' },
-    { formula: 'NaOH', name: 'Hidróxido de sodio', elements: ['Na', 'O', 'H'], points: 180, hint: 'Sosa cáustica', icon: 'mdi:flask-outline' },
-    { formula: 'HBr', name: 'Ácido bromhídrico', elements: ['H', 'Br'], points: 120, hint: 'Ácido fuerte', icon: 'mdi:flask' }
+    { formula: 'CaCO₃', name: 'Carbonato de calcio', elements: ['Ca', 'C', 'O', 'O', 'O'], points: 250, hint: 'En conchas y huesos', icon: 'mdi:bone' },
+    { formula: 'Fe₂O₃', name: 'Óxido de hierro', elements: ['Fe', 'Fe', 'O', 'O', 'O'], points: 250, hint: 'Herrumbre/Óxido', icon: 'mdi:iron' },
+    { formula: 'NaOH', name: 'Hidróxido de sodio', elements: ['Na', 'O', 'H'], points: 180, hint: 'Sosa cáustica', icon: 'mdi:flask-outline' }
 ];
 
 const compoundsHard = [
@@ -172,11 +182,72 @@ let currentDifficulty = 'easy';
 let difficultyConfig = DIFFICULTY_CONFIG.easy;
 
 // ============================================
+// SISTEMA DE AUDIO
+// ============================================
+
+let bgMusic = null;
+let isMusicPlaying = false;
+
+function initBackgroundMusic() {
+    // Crear elemento de audio para música de fondo
+    bgMusic = new Audio();
+    bgMusic.loop = true;
+    bgMusic.volume = 0.3;
+    // Usar una URL de música libre de derechos o un data URI
+    // Por ahora usamos un placeholder - se puede cambiar por una URL real
+    bgMusic.src = 'https://assets.mixkit.co/music/preview/mixkit-games-worldbeat-466.mp3';
+    bgMusic.preload = 'auto';
+}
+
+function playBackgroundMusic() {
+    if (!bgMusic) initBackgroundMusic();
+    if (!isMusicPlaying && bgMusic) {
+        bgMusic.play().catch(e => console.log('Audio autoplay blocked:', e));
+        isMusicPlaying = true;
+    }
+}
+
+function stopBackgroundMusic() {
+    if (bgMusic && isMusicPlaying) {
+        bgMusic.pause();
+        bgMusic.currentTime = 0;
+        isMusicPlaying = false;
+    }
+}
+
+function toggleBackgroundMusic() {
+    if (isMusicPlaying) {
+        stopBackgroundMusic();
+    } else {
+        playBackgroundMusic();
+    }
+    return isMusicPlaying;
+}
+
+// Función para obtener el número de rondas (personalizado o por defecto)
+function getMaxRounds() {
+    return customRounds || difficultyConfig.defaultRounds;
+}
+
+// Función para establecer rondas personalizadas
+function setCustomRounds(rounds) {
+    customRounds = rounds;
+    console.log('🎮 Rondas personalizadas:', rounds);
+    
+    // Actualizar UI en la pantalla de intro si está visible
+    const roundsInfo = document.getElementById('roundsInfo');
+    if (roundsInfo) {
+        roundsInfo.textContent = `${rounds} rondas`;
+    }
+}
+
+// ============================================
 // INICIALIZACIÓN
 // ============================================
 
 function init() {
     renderIntroScreen();
+    initBackgroundMusic();
     
     airconsole = new AirConsole();
     
@@ -215,7 +286,29 @@ function init() {
                 if (data.difficulty) {
                     setDifficulty(data.difficulty);
                 }
+                if (data.customRounds) {
+                    setCustomRounds(data.customRounds);
+                }
                 startGame();
+                break;
+            case 'setRounds':
+                // Solo el admin puede cambiar las rondas
+                if (players[from]?.isAdmin && data.rounds) {
+                    setCustomRounds(data.rounds);
+                    // Notificar a todos del cambio
+                    airconsole.broadcast({
+                        action: 'roundsChanged',
+                        rounds: data.rounds
+                    });
+                }
+                break;
+            case 'adminNextRound':
+                // Solo el admin puede avanzar a la siguiente ronda
+                if (players[from]?.isAdmin) {
+                    const overlay = document.getElementById('resultOverlay');
+                    if (overlay) overlay.classList.remove('active');
+                    nextRound();
+                }
                 break;
             case 'playAgain':
                 resetGame();
@@ -304,11 +397,6 @@ function renderIntroScreen() {
         <div class="screen active intro-screen relative" id="introScreen">
             <div class="lab-bg">
                 <div class="blob-green"></div>
-                <div class="waves-container">
-                    <div class="wave"></div>
-                    <div class="wave"></div>
-                    <div class="wave"></div>
-                </div>
             </div>
             <div id="floatingMolecules" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
             
@@ -374,7 +462,7 @@ function renderIntroScreen() {
                     </div>
                     <div class="footer-item">
                         <iconify-icon icon="mdi:timer" style="color: var(--color-warning);"></iconify-icon>
-                        <span id="roundsInfo">${DIFFICULTY_CONFIG.easy.maxRounds} rondas</span>
+                        <span id="roundsInfo">${DIFFICULTY_CONFIG.easy.defaultRounds} rondas</span>
                     </div>
                     <div class="footer-item">
                         <iconify-icon icon="mdi:trophy" style="color: var(--color-warning);"></iconify-icon>
@@ -426,23 +514,18 @@ function updateDifficultyDisplay(difficulty) {
     }
     
     if (roundsInfo) {
-        roundsInfo.textContent = `${config.maxRounds} rondas`;
+        roundsInfo.textContent = `${customRounds || config.defaultRounds} rondas`;
     }
 }
 
 function renderPlayingScreen() {
     const app = document.getElementById('app');
-    const maxRounds = difficultyConfig.maxRounds;
+    const maxRounds = getMaxRounds();
     
     app.innerHTML = `
         <div class="screen active playing-screen relative" id="playingScreen">
             <div class="lab-bg">
                 <div class="blob-green"></div>
-                <div class="waves-container">
-                    <div class="wave"></div>
-                    <div class="wave"></div>
-                    <div class="wave"></div>
-                </div>
             </div>
             
             <!-- Header -->
@@ -463,8 +546,13 @@ function renderPlayingScreen() {
                     </div>
                 </div>
                 
-                <div class="timer-ring" id="timerRing">
-                    <span class="time" id="timerDisplay">${difficultyConfig.timerSeconds}</span>
+                <div class="flex items-center gap-3">
+                    <button class="music-toggle-btn" id="musicToggle" onclick="toggleBackgroundMusic(); this.querySelector('iconify-icon').setAttribute('icon', isMusicPlaying ? 'mdi:volume-high' : 'mdi:volume-off');">
+                        <iconify-icon icon="mdi:volume-high"></iconify-icon>
+                    </button>
+                    <div class="timer-ring" id="timerRing">
+                        <span class="time" id="timerDisplay">${difficultyConfig.timerSeconds}</span>
+                    </div>
                 </div>
             </div>
             
@@ -681,9 +769,10 @@ function handlePlayerJoin(device_id) {
 
 function getAvailableElements() {
     if (difficultyConfig.availableElements === 'all') {
+        // En modo difícil, devolver TODOS los elementos
         return Object.keys(elements);
     }
-    return difficultyConfig.availableElements;
+    return difficultyConfig.availableElements || Object.keys(elements);
 }
 
 function updatePlayerSlots() {
@@ -712,13 +801,25 @@ function broadcastGameState() {
         currentCompound: currentCompound,
         selectedElements: selectedElements,
         round: roundNumber,
-        maxRounds: difficultyConfig.maxRounds,
+        maxRounds: getMaxRounds(),
         difficulty: currentDifficulty,
         difficultyConfig: difficultyConfig
     });
 }
 
 function startGame() {
+    // Permitir de 1 a 4 jugadores
+    if (Object.keys(players).length < 1) {
+        airconsole.broadcast({
+            action: 'gameError',
+            message: 'Se necesita al menos 1 jugador para iniciar'
+        });
+        return;
+    }
+    
+    // Iniciar música de fondo
+    playBackgroundMusic();
+    
     renderPlayingScreen();
     roundNumber = 0;
     usedCompounds = [];
@@ -739,7 +840,7 @@ function startGame() {
 function nextRound() {
     roundNumber++;
     
-    if (roundNumber > difficultyConfig.maxRounds) {
+    if (roundNumber > getMaxRounds()) {
         endGame();
         return;
     }
@@ -781,7 +882,7 @@ function nextRound() {
     const broadcastData = {
         action: 'newRound',
         round: roundNumber,
-        maxRounds: difficultyConfig.maxRounds,
+        maxRounds: getMaxRounds(),
         elements: getAvailableElements(),
         difficulty: currentDifficulty,
         maxSelections: currentCompound.elements.length
@@ -1039,13 +1140,82 @@ function checkCompound() {
         difficultyMultiplier: difficultyConfig.pointsMultiplier
     });
     
-    setTimeout(nextRound, 3500);
+    // Esperar a que el admin presione "Siguiente"
+    // No avanzar automáticamente
 }
 
 function showResult(isCorrect) {
     const overlay = document.getElementById('resultOverlay');
     const content = document.getElementById('resultContent');
     
+    // Usar la animación de laboratorio elaborada
+    if (window.LabAnimation) {
+        showLabAnimationResult(isCorrect, overlay, content);
+    } else {
+        // Fallback a la animación simple si no está disponible
+        showSimpleResult(isCorrect, overlay, content);
+    }
+}
+
+// Animación de laboratorio elaborada
+function showLabAnimationResult(isCorrect, overlay, content) {
+    const basePoints = currentCompound.points;
+    const timeBonus = Math.floor(gameTimer * 2);
+    const difficultyBonus = Math.floor((basePoints + timeBonus) * (difficultyConfig.pointsMultiplier - 1));
+    
+    // Crear contenedor para la animación
+    content.innerHTML = `
+        <div class="lab-animation-wrapper" id="labAnimationWrapper"></div>
+        <div class="lab-result-info" id="labResultInfo" style="display: none;">
+            <div class="points-display mt-4">
+                <iconify-icon icon="mdi:star" class="mr-2 star-spin"></iconify-icon>
+                <span class="points-value">+${basePoints}</span>
+                <span class="points-label">pts</span>
+                ${timeBonus > 0 ? `<span class="bonus-points">+${timeBonus} tiempo</span>` : ''}
+                ${difficultyBonus > 0 ? `<span class="bonus-points difficulty-bonus">+${difficultyBonus} ${difficultyConfig.name}</span>` : ''}
+            </div>
+        </div>
+    `;
+    
+    overlay.classList.add('active');
+    
+    // Inicializar y ejecutar la animación
+    const wrapper = document.getElementById('labAnimationWrapper');
+    const labAnim = new window.LabAnimation(wrapper);
+    labAnim.init();
+    
+    // Ejecutar la animación con los elementos seleccionados
+    labAnim.playAnimation(selectedElements, currentCompound, isCorrect, () => {
+        // Mostrar puntos después de la animación
+        const resultInfo = document.getElementById('labResultInfo');
+        if (resultInfo && isCorrect) {
+            resultInfo.style.display = 'block';
+            if (window.anime) {
+                window.anime.animate(resultInfo, {
+                    translateY: [20, 0],
+                    opacity: [0, 1],
+                    duration: 400,
+                    easing: 'easeOutCubic'
+                });
+                window.anime.animate('.star-spin', {
+                    rotate: [0, 360],
+                    duration: 1000,
+                    easing: 'easeOutCubic'
+                });
+            }
+        }
+        
+        // Reproducir sonido
+        if (isCorrect) {
+            playSuccessSound();
+        } else {
+            playErrorSound();
+        }
+    });
+}
+
+// Animación simple (fallback)
+function showSimpleResult(isCorrect, overlay, content) {
     if (isCorrect) {
         playSuccessSound();
         
@@ -1303,6 +1473,7 @@ function updatePlayersArea(activePlayer = null) {
 
 function endGame() {
     if (timerInterval) clearInterval(timerInterval);
+    stopBackgroundMusic();
     
     const sorted = Object.values(players).sort((a, b) => b.score - a.score);
     const winner = sorted[0];
@@ -1323,6 +1494,7 @@ function resetGame() {
     roundNumber = 0;
     currentCompound = null;
     playerSelections = {};
+    stopBackgroundMusic();
     
     // Notificar a todos los controllers que vuelvan a la pantalla de espera/dificultad
     airconsole.broadcast({
