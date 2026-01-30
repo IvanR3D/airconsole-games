@@ -238,19 +238,44 @@ function setDifficulty(difficulty) {
 
 function handlePlayerExit(device_id) {
     // El jugador decidió salir durante el juego
-    // Simplemente lo marcamos como que no ha seleccionado en esta ronda
-    if (playerSelections[device_id]) {
-        playerSelections[device_id].hasSelected = false;
-        playerSelections[device_id].elements = [];
+    if (players[device_id]) {
+        delete players[device_id];
+        
+        // Si no quedan jugadores suficientes, terminar el juego
+        if (Object.keys(players).length < 1) {
+            if (timerInterval) clearInterval(timerInterval);
+            resetGame();
+            return;
+        }
+        
+        // Limpiar selección del jugador que salió
+        if (playerSelections[device_id]) {
+            delete playerSelections[device_id];
+        }
+        
+        // Remover elementos seleccionados por este jugador
+        selectedElements = selectedElements.filter(e => e.player !== device_id);
+        
+        // Actualizar UI
+        updatePlayerSlots();
+        updatePlayersArea();
+        broadcastGameState();
+        
+        // Verificar si todos los jugadores restantes ya seleccionaron
+        const totalPlayers = Object.keys(players).length;
+        const playersWhoSelected = Object.values(playerSelections).filter(p => p && p.hasSelected).length;
+        
+        if (playersWhoSelected >= totalPlayers && totalPlayers > 0) {
+            clearInterval(timerInterval);
+            const zone = document.getElementById('mixingZone');
+            if (zone) zone.classList.add('reacting');
+            setTimeout(() => checkCompound(), 1000);
+        }
     }
-    
-    // Actualizar UI
-    updatePlayersArea();
-    broadcastGameState();
 }
 
 function handlePlayerLeave(device_id) {
-    // El jugador abandonó completamente el juego
+    // El jugador abandonó desde la pantalla de espera
     if (players[device_id]) {
         delete players[device_id];
         updatePlayerSlots();
