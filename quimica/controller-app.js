@@ -33,6 +33,58 @@ let hasSelectedThisRound = false; // Track si ya seleccionó en esta ronda
 let selectedElement = null;
 
 // ============================================
+// MULTI-ELEMENT SELECTION STATE
+// ============================================
+
+let selectedElements = [];  // Array de elementos seleccionados ['H', 'H', 'O']
+let maxSelections = 5;      // Máximo permitido por ronda
+
+/**
+ * Selects an element and adds it to the selectedElements array.
+ * Validates: Requirements 5.1 - allows selecting required quantity of elements
+ * @param {string} element - The element symbol to select (e.g., 'H', 'O')
+ * @returns {boolean} - True if element was added, false if max reached
+ */
+function selectElement(element) {
+    if (selectedElements.length >= maxSelections) {
+        return false;
+    }
+    selectedElements.push(element);
+    return true;
+}
+
+/**
+ * Deselects an element at the specified index from the selectedElements array.
+ * Validates: Requirements 5.4 - allows deselection of previously selected elements
+ * @param {number} index - The index of the element to remove
+ * @returns {boolean} - True if element was removed, false if index invalid
+ */
+function deselectElement(index) {
+    if (index < 0 || index >= selectedElements.length) {
+        return false;
+    }
+    selectedElements.splice(index, 1);
+    return true;
+}
+
+/**
+ * Gets the count of a specific element in the current selection.
+ * @param {string} element - The element symbol to count (e.g., 'H', 'O')
+ * @returns {number} - The number of times this element appears in selectedElements
+ */
+function getSelectionCount(element) {
+    return selectedElements.filter(el => el === element).length;
+}
+
+/**
+ * Clears all selected elements and resets the selection state.
+ * @returns {void}
+ */
+function clearSelection() {
+    selectedElements = [];
+}
+
+// ============================================
 // INICIALIZACIÓN
 // ============================================
 
@@ -82,24 +134,24 @@ function renderJoinScreen() {
                     <div class="info-card">
                         <iconify-icon icon="mdi:flask" style="color: #10b981;"></iconify-icon>
                         <div class="text-left">
-                            <p class="font-bold text-sm">Sintetiza compuestos</p>
-                            <p class="text-xs text-white/60">Combina elementos químicos</p>
+                            <p class="info-title">Sintetiza compuestos</p>
+                            <p class="info-description">Combina elementos químicos</p>
                         </div>
                     </div>
                     
                     <div class="info-card">
                         <iconify-icon icon="mdi:account-group" style="color: #3b82f6;"></iconify-icon>
                         <div class="text-left">
-                            <p class="font-bold text-sm">Trabaja en equipo</p>
-                            <p class="text-xs text-white/60">Colabora con otros científicos</p>
+                            <p class="info-title">Trabaja en equipo</p>
+                            <p class="info-description">Colabora con otros científicos</p>
                         </div>
                     </div>
                     
                     <div class="info-card">
                         <iconify-icon icon="mdi:timer" style="color: #f59e0b;"></iconify-icon>
                         <div class="text-left">
-                            <p class="font-bold text-sm">Contra el tiempo</p>
-                            <p class="text-xs text-white/60">Más rápido = más puntos</p>
+                            <p class="info-title">Contra el tiempo</p>
+                            <p class="info-description">Más rápido = más puntos</p>
                         </div>
                     </div>
                 </div>
@@ -158,7 +210,7 @@ function renderWaitingScreen() {
                 </div>
                 
                 ${isAdmin ? `
-                    <button class="btn-secondary w-full flex items-center justify-center gap-3" id="startGameBtn">
+                    <button class="btn-admin w-full flex items-center justify-center gap-3" id="startGameBtn">
                         <iconify-icon icon="mdi:rocket-launch" style="font-size: 24px;"></iconify-icon>
                         ¡INICIAR EXPERIMENTO!
                     </button>
@@ -227,7 +279,7 @@ function renderPlayingScreen() {
                 </div>
                 <div class="flex-1">
                     <p class="font-bold text-sm" style="color: var(--color-text);">${playerData?.name || 'Científico'}</p>
-                    <p class="text-xs" style="color: var(--color-text-light);">${isAdmin ? '👑 Admin' : 'Científico'}</p>
+                    <p class="text-xs" style="color: var(--color-text-light);">${isAdmin ? '<iconify-icon icon="mdi:crown" style="color: #fbbf24;"></iconify-icon> Admin' : 'Científico'}</p>
                 </div>
                 <div class="score-display" id="scoreDisplay">${myScore}</div>
             </div>
@@ -328,7 +380,8 @@ function renderEndScreen(data) {
     const myRank = data.players.findIndex(p => p.id === playerData.id) + 1;
     const myFinalScore = data.players.find(p => p.id === playerData.id)?.score || 0;
     
-    const rankEmojis = ['🥇', '🥈', '🥉', '🏅'];
+    const rankIcons = ['mdi:medal-outline', 'mdi:medal-outline', 'mdi:medal-outline', 'mdi:medal-outline'];
+    const rankColors = ['#fbbf24', '#9ca3af', '#b45309', '#6b7280'];
     const rankMessages = [
         '¡Eres el mejor científico!',
         '¡Excelente trabajo!',
@@ -340,7 +393,7 @@ function renderEndScreen(data) {
     app.innerHTML = `
         <div class="screen active flex-col items-center justify-center p-5 text-center" id="endScreen">
             <div class="w-full max-w-sm">
-                <div class="text-6xl mb-4">${rankEmojis[myRank - 1] || '🧪'}</div>
+                <div class="text-6xl mb-4"><iconify-icon icon="${rankIcons[myRank - 1] || 'mdi:flask'}" style="color: ${rankColors[myRank - 1] || '#6b7280'};"></iconify-icon></div>
                 
                 <div class="text-5xl font-black mb-2" style="color: ${myRank === 1 ? '#f59e0b' : myRank === 2 ? '#9ca3af' : '#b45309'};">
                     ${myRank}°
@@ -440,6 +493,7 @@ function handleNewRound(data) {
     // Reset estado de selección para nueva ronda
     hasSelectedThisRound = false;
     selectedElement = null;
+    clearSelection();  // Reset multi-element selection state
     
     renderPlayingScreen();
 }

@@ -210,7 +210,7 @@ function renderIntroScreen() {
 function renderPlayingScreen() {
     const app = document.getElementById('app');
     app.innerHTML = `
-        <div class="screen active flex-col p-3 sm:p-4 lg:p-6 min-h-screen relative" id="playingScreen">
+        <div class="screen active playing-screen relative" id="playingScreen">
             <div class="lab-bg">
                 <div class="blob-green"></div>
                 <div class="waves-container">
@@ -221,7 +221,7 @@ function renderPlayingScreen() {
             </div>
             
             <!-- Header - Responsive -->
-            <div class="relative z-10 flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+            <div class="relative z-10 flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
                 <div class="flex items-center gap-2 sm:gap-4">
                     <iconify-icon icon="mdi:flask-round-bottom" class="text-2xl sm:text-3xl lg:text-4xl" style="color: var(--color-accent);"></iconify-icon>
                     <div>
@@ -237,50 +237,53 @@ function renderPlayingScreen() {
                 </div>
             </div>
             
-            <!-- Target Compound - Responsive -->
-            <div class="relative z-10 target-display text-center mb-3 sm:mb-4 lg:mb-6" id="targetDisplay">
-                <p class="text-sm sm:text-base lg:text-lg mb-1 sm:mb-2" style="color: var(--color-text-light);">
-                    <iconify-icon icon="mdi:target" class="mr-1 sm:mr-2"></iconify-icon>
-                    Sintetiza el compuesto:
-                </p>
-                <div class="target-formula" id="targetFormula">H₂O</div>
-                <p class="text-lg sm:text-xl lg:text-2xl font-semibold mt-1 sm:mt-2" style="color: var(--color-primary);" id="targetName">Agua</p>
-                <p class="text-xs sm:text-sm mt-1 sm:mt-2" style="color: var(--color-text-light);" id="targetHint">
-                    <iconify-icon icon="mdi:lightbulb-outline" class="mr-1"></iconify-icon>
-                    <span>Esencial para la vida</span>
-                </p>
-            </div>
-            
-            <!-- Status indicator -->
-            <div class="relative z-10 text-center mb-3">
-                <div class="status-indicator waiting inline-flex" id="statusIndicator">
-                    <iconify-icon icon="mdi:timer-sand" class="animate-pulse"></iconify-icon>
-                    <span>Esperando que todos seleccionen...</span>
-                </div>
-            </div>
-            
-            <!-- Mixing Zone - Responsive -->
-            <div class="relative z-10 flex-1 flex flex-col min-h-0">
-                <div class="mixing-zone flex items-center justify-center p-4 sm:p-6 lg:p-8 relative flex-1" id="mixingZone">
-                    <div id="bubblesContainer" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
-                    
-                    <div class="text-center" id="mixingContent">
-                        <iconify-icon icon="mdi:beaker-question" class="text-4xl sm:text-5xl lg:text-6xl mb-2 sm:mb-4" style="color: var(--color-text-light); opacity: 0.4;"></iconify-icon>
-                        <p class="text-sm sm:text-base lg:text-lg" style="color: var(--color-text-light);">Los científicos están seleccionando elementos...</p>
-                    </div>
-                    
-                    <div class="hidden flex-wrap justify-center gap-2 sm:gap-3 lg:gap-4" id="selectedElements"></div>
+            <!-- Main content area with responsive layout -->
+            <div class="playing-content relative z-10">
+                <!-- Target Compound - Responsive -->
+                <div class="target-display text-center" id="targetDisplay">
+                    <p class="text-sm sm:text-base lg:text-lg mb-1 sm:mb-2" style="color: var(--color-text-light);">
+                        <iconify-icon icon="mdi:target" class="mr-1 sm:mr-2"></iconify-icon>
+                        Sintetiza el compuesto:
+                    </p>
+                    <div class="target-formula" id="targetFormula">H₂O</div>
+                    <p class="text-lg sm:text-xl lg:text-2xl font-semibold mt-1 sm:mt-2" style="color: var(--color-primary);" id="targetName">Agua</p>
+                    <p class="text-xs sm:text-sm mt-1 sm:mt-2" style="color: var(--color-text-light);" id="targetHint">
+                        <iconify-icon icon="mdi:lightbulb-outline" class="mr-1"></iconify-icon>
+                        <span>Esencial para la vida</span>
+                    </p>
                 </div>
                 
-                <!-- Required elements hint -->
-                <div class="mt-2 sm:mt-3 lg:mt-4 text-center" id="requiredHint">
-                    <p class="text-xs sm:text-sm mb-1 sm:mb-2" style="color: var(--color-text-light);">Elementos necesarios:</p>
-                    <div class="flex justify-center gap-1 sm:gap-2 flex-wrap" id="requiredElements"></div>
+                <!-- Status indicator -->
+                <div class="text-center">
+                    <div class="status-indicator waiting inline-flex" id="statusIndicator">
+                        <iconify-icon icon="mdi:timer-sand" class="animate-pulse"></iconify-icon>
+                        <span>Esperando que todos seleccionen...</span>
+                    </div>
+                </div>
+                
+                <!-- Mixing Zone - Responsive with proper containment -->
+                <div class="flex-1 flex flex-col min-h-0">
+                    <div class="mixing-zone" id="mixingZone">
+                        <div id="bubblesContainer" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+                        
+                        <div class="text-center" id="mixingContent">
+                            <iconify-icon icon="mdi:beaker-question" class="text-4xl sm:text-5xl lg:text-6xl mb-2 sm:mb-4" style="color: var(--color-text-light); opacity: 0.4;"></iconify-icon>
+                            <p class="text-sm sm:text-base lg:text-lg" style="color: var(--color-text-light);">Los científicos están seleccionando elementos...</p>
+                        </div>
+                        
+                        <div class="hidden mixing-elements flex-wrap justify-center gap-2 sm:gap-3 lg:gap-4" id="selectedElements"></div>
+                    </div>
+                    
+                    <!-- Required elements hint -->
+                    <div class="mt-2 sm:mt-3 lg:mt-4 text-center" id="requiredHint">
+                        <p class="text-xs sm:text-sm mb-1 sm:mb-2" style="color: var(--color-text-light);">Elementos necesarios:</p>
+                        <div class="flex justify-center gap-1 sm:gap-2 flex-wrap" id="requiredElements"></div>
+                    </div>
                 </div>
             </div>
             
-            <!-- Players Area - Responsive grid -->
-            <div class="relative z-10 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 lg:gap-4 mt-3 sm:mt-4 lg:mt-6" id="playersArea"></div>
+            <!-- Players Area - Responsive grid with proper CSS class -->
+            <div class="players-area relative z-10" id="playersArea"></div>
         </div>
         
         <!-- Result Overlay -->
@@ -288,6 +291,45 @@ function renderPlayingScreen() {
             <div class="result-content" id="resultContent"></div>
         </div>
     `;
+    
+    // Setup resize handler for responsive grid recalculation
+    setupResizeHandler();
+}
+
+// Resize handler for responsive grid recalculation
+let resizeTimeout = null;
+
+function setupResizeHandler() {
+    // Remove any existing resize listener to avoid duplicates
+    window.removeEventListener('resize', handleScreenResize);
+    
+    // Add resize listener
+    window.addEventListener('resize', handleScreenResize);
+}
+
+function handleScreenResize() {
+    // Debounce resize events for performance
+    if (resizeTimeout) {
+        clearTimeout(resizeTimeout);
+    }
+    
+    resizeTimeout = setTimeout(() => {
+        recalculatePlayersGrid();
+    }, 150);
+}
+
+function recalculatePlayersGrid() {
+    const playersArea = document.getElementById('playersArea');
+    if (!playersArea) return;
+    
+    // Force layout recalculation by triggering reflow
+    playersArea.style.display = 'none';
+    // eslint-disable-next-line no-unused-expressions
+    playersArea.offsetHeight; // Trigger reflow
+    playersArea.style.display = '';
+    
+    // Update players area to ensure proper grid layout
+    updatePlayersArea();
 }
 
 function renderEndScreen(winner, sortedPlayers) {
@@ -754,7 +796,7 @@ function updatePlayersArea(activePlayer = null) {
                     <div class="flex-1 min-w-0">
                         <p class="font-bold truncate text-sm sm:text-base">${player.name}</p>
                         <p class="text-xs sm:text-sm" style="color: ${hasSelected ? 'var(--color-success)' : 'var(--color-text-light)'};">
-                            ${hasSelected ? `✓ ${selectedElement || 'Listo'}` : '⏳ Seleccionando...'}
+                            ${hasSelected ? `<iconify-icon icon="mdi:check-circle" style="color: var(--color-success);"></iconify-icon> ${selectedElement || 'Listo'}` : '<iconify-icon icon="mdi:timer-sand" class="animate-pulse"></iconify-icon> Seleccionando...'}
                         </p>
                     </div>
                     <div class="score-badge">${player.score}</div>

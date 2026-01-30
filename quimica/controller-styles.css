@@ -333,6 +333,113 @@ body {
 }
 
 /* ============================================
+   ADMIN BUTTON - Botón de inicio prominente
+   ============================================ */
+
+.btn-admin {
+    background: linear-gradient(135deg, var(--color-accent) 0%, #047857 100%);
+    color: white;
+    border: none;
+    padding: clamp(14px, 4.5vw, 18px) clamp(28px, 9vw, 40px);
+    border-radius: 50px;
+    font-weight: bold;
+    font-size: var(--font-xl);
+    cursor: pointer;
+    position: relative;
+    width: 100%;
+    max-width: 320px;
+    
+    /* Efecto 3D prominente */
+    box-shadow: 
+        0 clamp(4px, 1.5vw, 6px) 0 #065f46,
+        0 clamp(6px, 2vw, 10px) clamp(20px, 6vw, 30px) rgba(16, 185, 129, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    
+    /* Transiciones suaves */
+    transition: 
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+    
+    /* Animación pulse sutil para llamar atención */
+    animation: adminPulse 2.5s ease-in-out infinite;
+}
+
+/* Brillo superior para efecto 3D */
+.btn-admin::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.25) 0%, transparent 100%);
+    border-radius: 50px 50px 0 0;
+    pointer-events: none;
+}
+
+/* Estado hover */
+.btn-admin:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 
+        0 clamp(6px, 2vw, 8px) 0 #065f46,
+        0 clamp(10px, 3vw, 16px) clamp(30px, 8vw, 40px) rgba(16, 185, 129, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        0 0 clamp(15px, 4vw, 25px) rgba(16, 185, 129, 0.4);
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+/* Estado focus */
+.btn-admin:focus {
+    outline: none;
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 
+        0 clamp(6px, 2vw, 8px) 0 #065f46,
+        0 clamp(10px, 3vw, 16px) clamp(30px, 8vw, 40px) rgba(16, 185, 129, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        0 0 0 3px rgba(16, 185, 129, 0.5),
+        0 0 clamp(20px, 5vw, 30px) rgba(16, 185, 129, 0.5);
+}
+
+/* Estado activo/presionado - feedback táctil */
+.btn-admin:active {
+    transform: translateY(clamp(4px, 1.5vw, 6px)) scale(0.98);
+    box-shadow: 
+        0 0 0 #065f46,
+        0 clamp(2px, 0.5vw, 4px) clamp(8px, 2vw, 12px) rgba(16, 185, 129, 0.3),
+        inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    animation: none;
+}
+
+/* Animación pulse sutil */
+@keyframes adminPulse {
+    0%, 100% {
+        box-shadow: 
+            0 clamp(4px, 1.5vw, 6px) 0 #065f46,
+            0 clamp(6px, 2vw, 10px) clamp(20px, 6vw, 30px) rgba(16, 185, 129, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+    50% {
+        box-shadow: 
+            0 clamp(4px, 1.5vw, 6px) 0 #065f46,
+            0 clamp(8px, 2.5vw, 14px) clamp(25px, 7vw, 35px) rgba(16, 185, 129, 0.55),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2),
+            0 0 clamp(12px, 3vw, 20px) rgba(16, 185, 129, 0.3);
+    }
+}
+
+/* Respetar preferencias de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+    .btn-admin {
+        animation: none;
+    }
+    .btn-admin:hover,
+    .btn-admin:focus {
+        transform: none;
+    }
+}
+
+/* ============================================
    INFO CARDS
    ============================================ */
 
@@ -344,6 +451,17 @@ body {
     display: flex;
     align-items: center;
     gap: clamp(8px, 3vw, 12px);
+}
+
+.info-card .info-title {
+    font-weight: bold;
+    font-size: var(--font-sm);
+    color: var(--color-text);
+}
+
+.info-card .info-description {
+    font-size: var(--font-xs);
+    color: var(--color-text-light);
 }
 
 .info-card iconify-icon {
