@@ -681,8 +681,8 @@ function renderPlayingScreen() {
                     <div class="mixing-zone" id="mixingZone">
                         <div id="bubblesContainer" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
                         
-                        <!-- Lab Animation Container (se muestra cuando los jugadores contestan) -->
-                        <div class="lab-animation-container hidden" id="labAnimationZone">
+                        <!-- Lab Animation Container (siempre visible, animación inicia al responder) -->
+                        <div class="lab-animation-container" id="labAnimationZone">
                             <div class="schema-anim">
                                 <div id="canvas_line_back"></div>
                                 <div id="canvas_line1">
@@ -721,12 +721,10 @@ function renderPlayingScreen() {
                             </div>
                         </div>
                         
-                        <div class="text-center" id="mixingContent">
-                            <iconify-icon icon="mdi:beaker-question" class="text-3xl sm:text-4xl lg:text-5xl mb-2" style="color: var(--color-text-light); opacity: 0.4;"></iconify-icon>
-                            <p class="text-xs sm:text-sm" style="color: var(--color-text-light);">Cada científico sintetiza individualmente...</p>
+                        <!-- Texto de espera (se oculta cuando inicia animación) -->
+                        <div class="lab-waiting-text" id="labWaitingText">
+                            <p class="text-xs sm:text-sm" style="color: var(--color-text-light);">Esperando respuestas...</p>
                         </div>
-                        
-                        <div class="hidden mixing-elements flex-wrap justify-center gap-2" id="selectedElements"></div>
                     </div>
                 </div>
             </div>
@@ -949,6 +947,15 @@ function handlePlayerJoin(device_id) {
     console.log(`🧪 Jugador ${players[device_id].name} se unió (${modeText})`);
 }
 
+// Validar si los elementos seleccionados son correctos
+// El orden exacto importa: H₂O debe ser H,H,O (no H,O,H)
+function validateElementSelection(playerElements, requiredElements) {
+    if (playerElements.length !== requiredElements.length) return false;
+    
+    // Comparar elemento por elemento en el mismo orden
+    return playerElements.every((el, i) => el === requiredElements[i]);
+}
+
 function getAvailableElements() {
     if (difficultyConfig.availableElements === 'all') {
         // En modo difícil, devolver TODOS los elementos
@@ -1160,6 +1167,11 @@ function startGame() {
     usedCompounds = [];
     Object.values(players).forEach(p => p.score = 0);
     
+    // Inicializar el laboratorio estático después de renderizar
+    setTimeout(() => {
+        initStaticLab();
+    }, 200);
+    
     // Broadcast elementos disponibles para esta dificultad
     const availableElements = getAvailableElements();
     airconsole.broadcast({
@@ -1332,20 +1344,30 @@ function resetMixingZone() {
     const zone = document.getElementById('mixingZone');
     zone.classList.remove('active', 'reacting', 'success', 'error');
     
-    document.getElementById('mixingContent').classList.remove('hidden');
-    document.getElementById('selectedElements').classList.add('hidden');
-    document.getElementById('selectedElements').innerHTML = '';
+    // Mostrar texto de espera
+    const labWaitingText = document.getElementById('labWaitingText');
+    if (labWaitingText) labWaitingText.classList.remove('hidden');
     
-    // Ocultar la animación del laboratorio
+    // Inicializar el laboratorio estático (sin animación activa)
+    initStaticLab();
+}
+
+// Inicializar el laboratorio de forma estática (sin animaciones activas)
+function initStaticLab() {
     const labAnimationZone = document.getElementById('labAnimationZone');
-    if (labAnimationZone) {
-        labAnimationZone.classList.add('hidden');
+    if (!labAnimationZone) return;
+    
+    // Resetear la animación si existe
+    if (window.labAnimation) {
+        window.labAnimation.reset();
     }
     
-    // Pausar la animación
-    if (window.labAnimation) {
-        window.labAnimation.pause();
-    }
+    // Inicializar el laboratorio pero pausado
+    setTimeout(() => {
+        if (window.labAnimation) {
+            window.labAnimation.initStatic();
+        }
+    }, 100);
 }
 
 function updateTimerDisplay() {
@@ -1373,10 +1395,8 @@ function handleElementSelection(device_id, elementsArray) {
     playerSelections[device_id].elements = elementsArray;
     
     // Verificar si la respuesta individual es correcta
-    const playerSelected = [...elementsArray].sort();
-    const required = [...currentCompound.elements].sort();
-    const isCorrect = playerSelected.length === required.length && 
-                     playerSelected.every((el, i) => el === required[i]);
+    // Comparamos contando la cantidad de cada elemento (el orden no importa en química)
+    const isCorrect = validateElementSelection(elementsArray, currentCompound.elements);
     
     playerSelections[device_id].isCorrect = isCorrect;
     
@@ -1688,11 +1708,10 @@ function showTeamResults(team1Correct, team2Correct, roundWinner, pointsAwarded)
     }
 }
 
-// Mostrar la animación del laboratorio en la mixing-zone
+// Mostrar la animación del laboratorio en la mixing-zone (cuando los jugadores responden)
 function showLabAnimationInMixingZone(isCorrect) {
     const labAnimationZone = document.getElementById('labAnimationZone');
-    const mixingContent = document.getElementById('mixingContent');
-    const selectedElementsContainer = document.getElementById('selectedElements');
+    const labWaitingText = document.getElementById('labWaitingText');
     const mixingZone = document.getElementById('mixingZone');
     
     if (!labAnimationZone) {
@@ -1700,12 +1719,8 @@ function showLabAnimationInMixingZone(isCorrect) {
         return;
     }
     
-    // Ocultar el contenido de mezcla y mostrar la animación
-    if (mixingContent) mixingContent.classList.add('hidden');
-    if (selectedElementsContainer) selectedElementsContainer.classList.add('hidden');
-    
-    // Mostrar el contenedor de la animación
-    labAnimationZone.classList.remove('hidden');
+    // Ocultar texto de espera
+    if (labWaitingText) labWaitingText.classList.add('hidden');
     
     // Agregar clase de éxito o error para efectos visuales
     if (mixingZone) {
@@ -1713,16 +1728,10 @@ function showLabAnimationInMixingZone(isCorrect) {
         mixingZone.classList.add(isCorrect ? 'success' : 'error');
     }
     
-    // Reiniciar y ejecutar la animación del laboratorio
+    // Iniciar la animación del laboratorio
     if (window.labAnimation) {
-        window.labAnimation.reset();
-        // Dar tiempo para que el DOM se actualice antes de inicializar
-        setTimeout(() => {
-            if (window.labAnimation) {
-                window.labAnimation.init();
-                console.log('Lab animation initialized');
-            }
-        }, 150);
+        window.labAnimation.startAnimation();
+        console.log('Lab animation started');
     } else {
         console.log('Lab animation not available');
     }
@@ -1730,25 +1739,18 @@ function showLabAnimationInMixingZone(isCorrect) {
 
 // Ocultar la animación del laboratorio y resetear la mixing-zone
 function hideLabAnimationInMixingZone() {
-    const labAnimationZone = document.getElementById('labAnimationZone');
-    const mixingContent = document.getElementById('mixingContent');
-    const selectedElementsContainer = document.getElementById('selectedElements');
+    const labWaitingText = document.getElementById('labWaitingText');
     const mixingZone = document.getElementById('mixingZone');
     
-    if (labAnimationZone) labAnimationZone.classList.add('hidden');
-    if (mixingContent) mixingContent.classList.remove('hidden');
-    if (selectedElementsContainer) {
-        selectedElementsContainer.classList.add('hidden');
-        selectedElementsContainer.innerHTML = '';
-    }
+    // Mostrar texto de espera
+    if (labWaitingText) labWaitingText.classList.remove('hidden');
+    
     if (mixingZone) {
         mixingZone.classList.remove('success', 'error', 'active', 'reacting');
     }
     
-    // Pausar la animación
-    if (window.labAnimation) {
-        window.labAnimation.pause();
-    }
+    // Reinicializar el laboratorio estático
+    initStaticLab();
 }
 
 function showResult(isCorrect) {

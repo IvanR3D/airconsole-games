@@ -122,23 +122,23 @@
         </div>
 
         <!-- ADMIN SETUP SCREEN - STEP BY STEP -->
-        <div class="screen flex-col p-3 pt-2 relative bg-white overflow-hidden" id="categorySelectScreen">
+        <div class="screen flex-col p-2 relative bg-white" id="categorySelectScreen">
             <div class="bg-particles pointer-events-none" id="controllerBgParticles"></div>
             
-            <div class="relative z-10 flex flex-col h-full overflow-hidden">
+            <div class="relative z-10 flex flex-col flex-1 min-h-0">
                 <!-- Admin Badge - Compacto -->
-                <div class="text-center mb-2 flex-shrink-0">
+                <div class="text-center mb-1 flex-shrink-0">
                     <div class="inline-flex items-center gap-2 bg-orange-50 border-2 border-steam-naranja rounded-full py-1 px-3 shadow-md">
                         <iconify-icon icon="mdi:crown" style="font-size: 1rem; color: #EB8225;"></iconify-icon>
                         <span class="font-black text-xs text-steam-naranja">ADMIN</span>
-                        <div class="w-8 h-8 rounded-full flex items-center justify-center border-2 border-white shadow-sm" id="adminAvatar">
-                            <iconify-icon icon="mdi:crown" style="font-size: 1rem; color: white;"></iconify-icon>
+                        <div class="w-6 h-6 rounded-full flex items-center justify-center border-2 border-white shadow-sm" id="adminAvatar">
+                            <iconify-icon icon="mdi:crown" style="font-size: 0.8rem; color: white;"></iconify-icon>
                         </div>
                     </div>
                 </div>
 
-                <!-- Step Indicators - Más compacto -->
-                <div class="flex items-center justify-center gap-1 mb-2 flex-shrink-0">
+                <!-- Step Indicators -->
+                <div class="flex items-center justify-center gap-1 mb-1 flex-shrink-0">
                     <div class="step-indicator active" data-step="1">
                         <span class="step-number">1</span>
                         <span class="step-label">Categoría</span>
@@ -156,86 +156,85 @@
                 </div>
 
                 <!-- STEP 1: Category Selection -->
-                <div class="step-content active flex-1 flex flex-col overflow-hidden" id="step1">
-                    <h2 class="text-base font-black text-center mb-2 text-steam-turquesa flex-shrink-0">Elige una Categoría</h2>
+                <div class="step-content active flex-1 flex flex-col min-h-0" id="step1">
+                    <h2 class="text-sm font-black text-center mb-1 text-steam-turquesa flex-shrink-0">Elige una Categoría</h2>
                     <div class="flex-1 overflow-y-auto min-h-0" id="categoryScrollContainer">
                         <div class="grid grid-cols-2 gap-2 pb-2" id="categoryGrid"></div>
                     </div>
-                    <div class="pt-2 flex-shrink-0">
-                        <button class="bg-steam-turquesa text-white border-none py-2.5 px-5 text-sm font-black rounded-full cursor-pointer uppercase w-full shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2" id="nextStep1Btn">
+                    <div class="pt-1 flex-shrink-0">
+                        <button class="bg-steam-turquesa text-white border-none py-2 px-4 text-sm font-black rounded-full cursor-pointer uppercase w-full shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2" id="nextStep1Btn">
                             Siguiente
-                            <iconify-icon icon="mdi:arrow-right" style="font-size: 1.1rem;"></iconify-icon>
+                            <iconify-icon icon="mdi:arrow-right" style="font-size: 1rem;"></iconify-icon>
                         </button>
                     </div>
                 </div>
 
                 <!-- STEP 2: Question Count -->
-                <div class="step-content flex-1 flex flex-col justify-center" id="step2">
-                    <h2 class="text-lg font-black text-center mb-4 text-steam-turquesa">¿Cuántas Preguntas?</h2>
+                <div class="step-content flex-1 flex flex-col justify-center min-h-0" id="step2">
+                    <h2 class="text-base font-black text-center mb-3 text-steam-turquesa">¿Cuántas Preguntas?</h2>
                     
-                    <div class="bg-gray-50 rounded-2xl p-6 mb-6 border-2 border-gray-200">
-                        <div class="flex items-center justify-center gap-4 mb-4">
-                            <button class="w-14 h-14 rounded-full bg-steam-morado text-white font-bold text-2xl flex items-center justify-center shadow-md active:scale-95 transition-all" id="decreaseQuestions">-</button>
-                            <div class="bg-white rounded-xl px-8 py-4 border-2 border-steam-turquesa min-w-[120px] text-center">
-                                <span class="text-4xl font-black text-steam-turquesa" id="questionCountValue">10</span>
+                    <div class="bg-gray-50 rounded-xl p-4 mb-4 border-2 border-gray-200">
+                        <div class="flex items-center justify-center gap-3 mb-3">
+                            <button class="w-11 h-11 rounded-full bg-steam-morado text-white font-bold text-xl flex items-center justify-center shadow-md active:scale-95 transition-all" id="decreaseQuestions">-</button>
+                            <div class="bg-white rounded-lg px-6 py-3 border-2 border-steam-turquesa min-w-[90px] text-center">
+                                <span class="text-3xl font-black text-steam-turquesa" id="questionCountValue">10</span>
                             </div>
-                            <button class="w-14 h-14 rounded-full bg-steam-verde text-white font-bold text-2xl flex items-center justify-center shadow-md active:scale-95 transition-all" id="increaseQuestions">+</button>
+                            <button class="w-11 h-11 rounded-full bg-steam-verde text-white font-bold text-xl flex items-center justify-center shadow-md active:scale-95 transition-all" id="increaseQuestions">+</button>
                         </div>
                         <div class="text-center">
-                            <span class="text-sm text-gray-500">Mínimo 5 - Máximo 50</span>
+                            <span class="text-xs text-gray-500">Mínimo 5 - Máximo 50</span>
                         </div>
                     </div>
 
-                    <!-- Selected category preview -->
-                    <div class="bg-blue-50 rounded-xl p-3 mb-4 border-2 border-steam-turquesa flex items-center gap-3">
-                        <iconify-icon id="selectedCatIcon" icon="mdi:earth" style="font-size: 2rem; color: #0595AE;"></iconify-icon>
+                    <div class="bg-blue-50 rounded-lg p-2 mb-3 border-2 border-steam-turquesa flex items-center gap-2">
+                        <iconify-icon id="selectedCatIcon" icon="mdi:earth" style="font-size: 1.5rem; color: #0595AE;"></iconify-icon>
                         <div>
-                            <div class="text-xs text-gray-500">Categoría seleccionada</div>
-                            <div class="font-bold text-steam-turquesa" id="selectedCatName">General</div>
+                            <div class="text-[10px] text-gray-500">Categoría</div>
+                            <div class="font-bold text-sm text-steam-turquesa" id="selectedCatName">General</div>
                         </div>
                     </div>
                     
-                    <div class="flex gap-3">
-                        <button class="flex-1 bg-gray-200 text-gray-700 border-none py-3 px-4 text-base font-bold rounded-full cursor-pointer uppercase shadow-md transition-all active:scale-95 flex items-center justify-center gap-2" id="prevStep2Btn">
-                            <iconify-icon icon="mdi:arrow-left" style="font-size: 1.2rem;"></iconify-icon>
+                    <div class="flex gap-2">
+                        <button class="flex-1 bg-gray-200 text-gray-700 border-none py-2 px-3 text-sm font-bold rounded-full cursor-pointer uppercase shadow-md transition-all active:scale-95 flex items-center justify-center gap-1" id="prevStep2Btn">
+                            <iconify-icon icon="mdi:arrow-left" style="font-size: 1rem;"></iconify-icon>
                             Atrás
                         </button>
-                        <button class="flex-1 bg-steam-turquesa text-white border-none py-3 px-4 text-base font-black rounded-full cursor-pointer uppercase shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2" id="nextStep2Btn">
+                        <button class="flex-1 bg-steam-turquesa text-white border-none py-2 px-3 text-sm font-black rounded-full cursor-pointer uppercase shadow-lg transition-all active:scale-95 flex items-center justify-center gap-1" id="nextStep2Btn">
                             Siguiente
-                            <iconify-icon icon="mdi:arrow-right" style="font-size: 1.2rem;"></iconify-icon>
+                            <iconify-icon icon="mdi:arrow-right" style="font-size: 1rem;"></iconify-icon>
                         </button>
                     </div>
                 </div>
 
                 <!-- STEP 3: Ready to Start -->
-                <div class="step-content flex-1 flex flex-col justify-center" id="step3">
-                    <h2 class="text-lg font-black text-center mb-4 text-steam-turquesa">¡Todo Listo!</h2>
+                <div class="step-content flex-1 flex flex-col justify-center min-h-0" id="step3">
+                    <h2 class="text-base font-black text-center mb-3 text-steam-turquesa">¡Todo Listo!</h2>
                     
-                    <div class="bg-gradient-to-br from-blue-50 to-green-50 rounded-2xl p-5 mb-6 border-2 border-steam-verde">
-                        <div class="text-center mb-4">
-                            <iconify-icon id="finalCatIcon" icon="mdi:earth" style="font-size: 3.5rem; color: #0595AE;"></iconify-icon>
+                    <div class="bg-gradient-to-br from-blue-50 to-green-50 rounded-xl p-4 mb-4 border-2 border-steam-verde">
+                        <div class="text-center mb-3">
+                            <iconify-icon id="finalCatIcon" icon="mdi:earth" style="font-size: 2.5rem; color: #0595AE;"></iconify-icon>
                         </div>
-                        <div class="space-y-3">
-                            <div class="flex justify-between items-center bg-white rounded-xl p-3">
-                                <span class="text-gray-600 text-sm">Categoría</span>
-                                <span class="font-bold text-steam-turquesa" id="finalCatName">General</span>
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center bg-white rounded-lg p-2">
+                                <span class="text-gray-600 text-xs">Categoría</span>
+                                <span class="font-bold text-sm text-steam-turquesa" id="finalCatName">General</span>
                             </div>
-                            <div class="flex justify-between items-center bg-white rounded-xl p-3">
-                                <span class="text-gray-600 text-sm">Preguntas</span>
-                                <span class="font-bold text-steam-naranja" id="finalQuestionCount">10</span>
+                            <div class="flex justify-between items-center bg-white rounded-lg p-2">
+                                <span class="text-gray-600 text-xs">Preguntas</span>
+                                <span class="font-bold text-sm text-steam-naranja" id="finalQuestionCount">10</span>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="flex gap-3 mb-4">
-                        <button class="flex-1 bg-gray-200 text-gray-700 border-none py-3 px-4 text-base font-bold rounded-full cursor-pointer uppercase shadow-md transition-all active:scale-95 flex items-center justify-center gap-2" id="prevStep3Btn">
-                            <iconify-icon icon="mdi:arrow-left" style="font-size: 1.2rem;"></iconify-icon>
+                    <div class="flex gap-2 mb-3">
+                        <button class="flex-1 bg-gray-200 text-gray-700 border-none py-2 px-3 text-sm font-bold rounded-full cursor-pointer uppercase shadow-md transition-all active:scale-95 flex items-center justify-center gap-1" id="prevStep3Btn">
+                            <iconify-icon icon="mdi:arrow-left" style="font-size: 1rem;"></iconify-icon>
                             Atrás
                         </button>
                     </div>
                     
-                    <button class="bg-steam-verde text-white border-none py-4 px-6 text-lg font-black rounded-full cursor-pointer uppercase w-full shadow-lg transition-all active:scale-95 flex items-center justify-center gap-3 btn-3d btn-verde" id="startGameBtn">
-                        <iconify-icon icon="mdi:rocket-launch" style="font-size: 1.5rem;"></iconify-icon>
+                    <button class="bg-steam-verde text-white border-none py-3 px-4 text-base font-black rounded-full cursor-pointer uppercase w-full shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 btn-3d btn-verde" id="startGameBtn">
+                        <iconify-icon icon="mdi:rocket-launch" style="font-size: 1.3rem;"></iconify-icon>
                         INICIAR JUEGO!
                     </button>
                 </div>

@@ -191,15 +191,21 @@ function setupCategoryGrid() {
         const btnColor = categoryColors[key] || categoryColors.general;
         const isSelected = key === selectedCategory;
         const btn = document.createElement('div');
-        btn.className = 'category-btn rounded-xl sm:rounded-2xl p-3 sm:p-4 text-center cursor-pointer transition-all active:scale-95';
-        btn.style.background = '#f0f9ff';
-        btn.style.border = '2px solid ' + (isSelected ? btnColor : '#BFDBFE');
+        btn.className = 'category-btn rounded-xl p-2 text-center cursor-pointer transition-all active:scale-95';
         btn.dataset.category = key;
         btn.dataset.color = btnColor;
         
+        if (isSelected) {
+            btn.style.background = btnColor;
+            btn.style.border = '2px solid ' + btnColor;
+        } else {
+            btn.style.background = '#F9FAFB';
+            btn.style.border = '2px solid #E5E7EB';
+        }
+        
         btn.innerHTML = `
-            <iconify-icon icon="${categoryIcons[key]}" class="category-icon mb-2" style="color: ${btnColor};"></iconify-icon>
-            <div class="category-name text-xs sm:text-sm font-bold" style="color: #0595AE;">${cat.name}</div>
+            <iconify-icon icon="${categoryIcons[key]}" class="category-icon mb-1" style="color: ${isSelected ? '#FFFFFF' : '#9CA3AF'};"></iconify-icon>
+            <div class="category-name text-xs font-bold" style="color: ${isSelected ? '#FFFFFF' : '#6B7280'};">${cat.name}</div>
         `;
         btn.addEventListener('click', () => selectCategory(key));
         grid.appendChild(btn);
@@ -419,14 +425,14 @@ function selectCategory(category) {
             btn.style.background = btnColor;
             btn.style.borderColor = btnColor;
         } else {
-            btn.style.background = '#f0f9ff';
-            btn.style.borderColor = '#BFDBFE';
+            btn.style.background = '#F9FAFB';
+            btn.style.borderColor = '#E5E7EB';
         }
         
         const icon = btn.querySelector('.category-icon');
         const text = btn.querySelector('.category-name');
-        if (icon) icon.style.color = isSelected ? '#FFFFFF' : btnColor;
-        if (text) text.style.color = isSelected ? '#FFFFFF' : '#0595AE';
+        if (icon) icon.style.color = isSelected ? '#FFFFFF' : '#9CA3AF';
+        if (text) text.style.color = isSelected ? '#FFFFFF' : '#6B7280';
         
         if (isSelected && icon && anime && anime.animate) {
             anime.animate(icon, {
@@ -559,14 +565,14 @@ function updateSelectedCategory(category) {
             btn.style.background = btnColor;
             btn.style.borderColor = btnColor;
         } else {
-            btn.style.background = '#f0f9ff';
-            btn.style.borderColor = '#BFDBFE';
+            btn.style.background = '#F9FAFB';
+            btn.style.borderColor = '#E5E7EB';
         }
         
         const icon = btn.querySelector('.category-icon');
         const text = btn.querySelector('.category-name');
-        if (icon) icon.style.color = isSelected ? '#FFFFFF' : btnColor;
-        if (text) text.style.color = isSelected ? '#FFFFFF' : '#0595AE';
+        if (icon) icon.style.color = isSelected ? '#FFFFFF' : '#9CA3AF';
+        if (text) text.style.color = isSelected ? '#FFFFFF' : '#6B7280';
     });
     
     // Update background particles (admin and waiting screens)

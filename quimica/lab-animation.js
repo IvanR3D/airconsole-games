@@ -425,6 +425,175 @@ function resumeLabAnimation() {
   goutte_anim_stop = true;
 }
 
+// Inicializar el laboratorio de forma estática (solo dibujo, sin animaciones)
+function initStaticLabAnimation() {
+  if (typeof Raphael === 'undefined') {
+    console.log('Lab animation: waiting for Raphael...');
+    return;
+  }
+  
+  const container = document.getElementById('canvas_container');
+  const lineBack = document.getElementById('canvas_line_back');
+  const svgLine = document.getElementById('svg_line');
+  
+  if (!container || !lineBack || !svgLine) {
+    console.log('Lab animation: waiting for containers...');
+    return;
+  }
+  
+  // Limpiar instancias anteriores
+  if (S) {
+    try { S.clear(); S.remove(); } catch (e) {}
+    S = null;
+  }
+  if (S2) {
+    try { S2.clear(); S2.remove(); } catch (e) {}
+    S2 = null;
+  }
+  
+  container.innerHTML = '';
+  lineBack.innerHTML = '';
+  
+  // Resetear flags - todo pausado
+  labAnimationInitialized = false;
+  labAnimationRunning = false;
+  circleFumeeLoop_stop = false;
+  gradient_anim_pause = false;
+  ballon_anim_stop = false;
+  bocal_anim_stop = false;
+  flamme_anim_stop = false;
+  goutte_anim_stop = false;
+  gradient_anim_level = 0;
+  nbrCircle = 0;
+  goCircle = false;
+  circleFumee = [];
+  
+  svgLine.style.visibility = 'visible';
+  
+  // Inicializar líneas SVG
+  const lines = [
+    { id: 'line1', animId: 'a1' },
+    { id: 'line2', animId: 'a2' },
+    { id: 'line3', animId: 'a3' },
+    { id: 'line4', animId: 'a4' },
+    { id: 'line5', animId: 'a5' },
+    { id: 'line6', animId: 'a6' }
+  ];
+  
+  lines.forEach(({ id, animId }) => {
+    const path = document.getElementById(id);
+    const anim = document.getElementById(animId);
+    if (path && anim) {
+      const length = Math.round(path.getTotalLength());
+      path.setAttribute('stroke-dasharray', `${length},${length}`);
+      path.setAttribute('stroke-dashoffset', length.toString());
+      anim.setAttribute('from', length.toString());
+    }
+  });
+  
+  // Crear elementos de Raphael (estáticos)
+  S = new Raphael(container, 500, 600);
+  S2 = new Raphael(lineBack, 500, 400);
+  
+  // Líneas de fondo
+  S2.path('M80.193,227.11v-48.02c0-2.209,1.869-4,4.176-4h18.648c2.306,0,4.176,1.791,4.176,4v14.625v24.54h0.068c0,3.927,3.184,7.111,7.111,7.111s7.111-3.184,7.111-7.111l-0.097-38.442c0-3.928,3.185-7.112,7.112-7.112c3.927,0,7.111,3.184,7.111,7.112l-0.142,38.442c0,3.927,3.185,7.111,7.112,7.111c3.927,0,7.111-3.184,7.111-7.111l-0.029-38.442c0-3.928,3.185-7.112,7.112-7.112c3.927,0,7.111,3.184,7.111,7.112l-0.142,38.442c0,3.927,3.185,7.111,7.112,7.111c3.927,0,7.111-3.184,7.111-7.111v-38.442c0-3.928,3.184-7.112,7.112-7.112c3.927,0,7.111,3.184,7.111,7.112l-0.141,38.442c0,3.927,3.184,7.111,7.112,7.111c3.927,0,7.111-3.184,7.111-7.111v-38.165v-1.125c0-2.209,1.87-4,4.176-4h18.648c2.306,0,4.176,1.791,4.176,4v14.625v112.188').attr({fill: 'none', stroke: colorStr, 'stroke-width': 3, 'stroke-linecap': 'round', 'stroke-linejoin': 'round'});
+  S2.path('M259.73,317.604L300.209,277.125L300.304,277.061L314.467,277.125L315.262,277.125L331.936,293.8').attr({fill: 'none', stroke: colorStr, 'stroke-width': 3, 'stroke-linecap': 'round', 'stroke-linejoin': 'round'});
+  S2.path('M364.125,266.366L364.125,46.667L371.729,39.062L463,54L463,66.667').attr({fill: 'none', stroke: colorStr, 'stroke-width': 3, 'stroke-linecap': 'round', 'stroke-linejoin': 'round'});
+
+  // Fiola 1
+  S.path('M87.257,262.388v-29.317H75.132v29.317c-11.991,2.752-20.938,13.482-20.938,26.308c0,14.912,12.088,27,27,27s27-12.088,27-27C108.195,275.87,99.248,265.14,87.257,262.388z').attr({fill: 'none', stroke: colorStr, 'stroke-width': 3, 'stroke-linecap': 'round'});
+  S.path('M69.82 233.071L92.57 233.071').attr({fill: 'none', stroke: colorStr, 'stroke-width': 3, 'stroke-linecap': 'round'});
+  S.circle(28.445, 243.489, 4.313).attr({fill: colorGd, stroke: colorStr, 'stroke-width': 3});
+  S.circle(14.093, 257.792, 4.313).attr({fill: colorGd, stroke: colorStr, 'stroke-width': 3});
+  S.path('M17.143 254.792L25.396 246.539').attr({fill: 'none', stroke: colorStr, 'stroke-width': 3, 'stroke-linecap': 'round'});
+  S.path('M32.757 243.491L92.57 243.491').attr({fill: 'none', stroke: colorStr, 'stroke-width': 3, 'stroke-linecap': 'round'});
+  S.path('M14.078 262.153L14.078 382.696').attr({fill: 'none', stroke: colorStr, 'stroke-width': 3, 'stroke-linecap': 'round'});
+  S.path('M6.58 382.696L119.414 382.696').attr({fill: 'none', stroke: colorStr, 'stroke-width': 3, 'stroke-linecap': 'round'});
+  S.path('M89.017 382.849L103.368 368.497').attr({fill: 'none', stroke: colorStr, 'stroke-width': 3, 'stroke-linecap': 'round'});
+  S.path('M66.997 382.849L52.646 368.497').attr({fill: 'none', stroke: colorStr, 'stroke-width': 3, 'stroke-linecap': 'round'});
+  S.path('M88.382,232.071c0,0.552-0.448,1-1,1H75.007c-0.552,0-1-0.448-1-1v-6.812c0-0.552,0.448-1,1-1h12.375c0.552,0,1,0.448,1,1V232.071z').attr({fill: colorGd, stroke: colorStr, 'stroke-width': 3});
+
+  // Fiola 2
+  S.path('M276.131,370.712L276,370.548l-25.169-38.505l10.379-10.379c0.854-0.853,0.854-2.236,0-3.089l-3.089-3.089c-0.854-0.853-2.236-0.853-3.089,0l-7.479,7.48v-24.939h4.411c1.206,0,2.185-0.979,2.185-2.184v-5.43c0-1.206-0.979-2.184-2.185-2.184H215.38c-1.206,0-2.185,0.978-2.185,2.184v5.43c0,1.206,0.979,2.184,2.185,2.184h3.7v29l-28.447,43.521l-0.131,0.164c-2.217,2.902-1.999,7.068,0.654,9.721c1.529,1.529,3.562,2.25,5.566,2.16l0.115,0.008h72.958l0.114-0.008c2.004,0.09,4.037-0.631,5.567-2.16C278.131,377.78,278.348,373.614,276.131,370.712z').attr({fill: '#ffffff', stroke: colorStr, 'stroke-width': 3, 'stroke-linecap': 'round', 'stroke-linejoin': 'round'});
+  S.path('M244.198,288.229L251.115,275.335L217.018,275.335L223.691,288.229').attr({fill: colorGd, stroke: colorStr, 'stroke-width': 3, 'stroke-linecap': 'round', 'stroke-linejoin': 'round'});
+  S.path('M243.393,242.639c0,1.205-1.344,2.182-3,2.182h-14.625c-1.656,0-3-0.978-3-2.182v-10.636c0-1.206,1.344-2.182,3-2.182h14.625c1.656,0,3,0.977,3,2.182V242.639z').attr({fill: colorGd, stroke: colorStr, 'stroke-width': 3, 'stroke-linecap': 'round', 'stroke-linejoin': 'round'});
+  S.circle(227.039, 281.782, 0.125).attr({fill: 'none', stroke: colorStr, 'stroke-width': 3});
+  S.circle(235.746, 277.363, 0.125).attr({fill: 'none', stroke: colorStr, 'stroke-width': 3});
+  S.circle(237.79, 284.534, 0.125).attr({fill: 'none', stroke: colorStr, 'stroke-width': 3});
+  S.path('M242.021,292.96L242.021,300.332L225.367,300.332L225.367,292.96').attr({fill: 'none', stroke: colorStr, 'stroke-width': 3, 'stroke-linecap': 'round', 'stroke-linejoin': 'round'});
+
+  // Fiola 3
+  S.path('M396.723 382.601L411.408 382.601').attr({fill: 'none', stroke: colorStr, 'stroke-width': 3, 'stroke-linecap': 'round'});
+  S.path('M370.613,275.229L375.33,266.437L352.08,266.437L356.631,275.229').attr({fill: colorGd, stroke: colorStr, 'stroke-width': 3, 'stroke-linecap': 'round', 'stroke-linejoin': 'round'});
+  S.path('M369.59,288.19v-12.855h-12.125v12.855c-5.926,1.36-11.102,4.672-14.827,9.218l-5.45-5.451c-1.172-1.171-3.072-1.171-4.243,0l-2.829,2.829c-1.171,1.171-1.171,3.071,0,4.243l7.602,7.601c-0.76,2.492-1.189,5.127-1.189,7.868c0,14.912,12.088,27,27,27c14.911,0,27-12.088,27-27C390.527,301.672,381.58,290.943,369.59,288.19z').attr({fill: '#ffffff', stroke: colorStr, 'stroke-width': 3, 'stroke-linecap': 'round', 'stroke-linejoin': 'round'});
+  S.path('M315.83 382.601L330.516 382.601').attr({fill: 'none', stroke: colorStr, 'stroke-width': 3, 'stroke-linecap': 'round'});
+  S.path('M390.179 318.883L403.283 382.601').attr({fill: 'none', stroke: colorStr, 'stroke-width': 3, 'stroke-linecap': 'round'});
+  S.path('M337.065 319.883L323.973 382.601').attr({fill: 'none', stroke: colorStr, 'stroke-width': 3, 'stroke-linecap': 'round'});
+
+  // Fiola 4
+  S.path('M469.018,111.649L472.952,104.314L453.556,104.314L457.353,111.649').attr({fill: colorGd, stroke: colorStr, 'stroke-width': 3, 'stroke-linecap': 'round', 'stroke-linejoin': 'round'});
+  S.path('M457.045,93.902v9.836h12.416v-9.835c4.424-2.262,7.459-6.854,7.459-12.165c0-7.548-6.119-13.667-13.666-13.667c-7.548,0-13.667,6.119-13.667,13.667C449.587,87.048,452.621,91.64,457.045,93.902z').attr({fill: 'none', stroke: colorStr, 'stroke-width': 3, 'stroke-linecap': 'round', 'stroke-linejoin': 'round'});
+  S.circle(451.451, 284.533, 4.312).attr({fill: colorGd, stroke: colorStr, 'stroke-width': 3});
+  S.path('M493.42,156.981c0-13.743-9.193-25.331-21.763-28.971v-15.695h-16.806v15.695c-12.57,3.64-21.764,15.228-21.764,28.971c0,14.011,9.553,25.788,22.5,29.18v77.82c0,3.365,2.171,6.216,5.187,7.248h-0.001l2.48,27.043l2.479-27.043c3.015-1.032,5.187-3.883,5.187-7.248v-77.819h-0.003C483.865,182.771,493.42,170.993,493.42,156.981z').attr({fill: 'none', stroke: colorStr, 'stroke-width': 3, 'stroke-linecap': 'round', 'stroke-linejoin': 'round'});
+  S.path('M456.598 284.533L471.283 284.533').attr({fill: 'none', stroke: colorStr, 'stroke-width': 3, 'stroke-linecap': 'round'});
+  S.path('M455.74 205.294L462.58 205.294').attr({fill: 'none', stroke: colorStr, 'stroke-width': 3, 'stroke-linecap': 'round'});
+  S.path('M455.74 214.238L462.58 214.238').attr({fill: 'none', stroke: colorStr, 'stroke-width': 3, 'stroke-linecap': 'round'});
+  S.path('M455.74 223.181L462.58 223.181').attr({fill: 'none', stroke: colorStr, 'stroke-width': 3, 'stroke-linecap': 'round'});
+  S.path('M455.74 232.125L462.58 232.125').attr({fill: 'none', stroke: colorStr, 'stroke-width': 3, 'stroke-linecap': 'round'});
+  S.path('M455.74 241.068L462.58 241.068').attr({fill: 'none', stroke: colorStr, 'stroke-width': 3, 'stroke-linecap': 'round'});
+  S.path('M455.74 250.011L462.58 250.011').attr({fill: 'none', stroke: colorStr, 'stroke-width': 3, 'stroke-linecap': 'round'});
+  S.path('M472.472,315.291v15.5l16,45.834c0,0,3.167,7-5,7s-19.667,0-19.667,0h0.271c0,0-11.5,0-19.667,0s-5-7-5-7l16-45.834v-15.5l-4.542-6.874h25.25L472.472,315.291z').attr({fill: 'none', stroke: colorStr, 'stroke-width': 3, 'stroke-linecap': 'round'});
+
+  // Elementos estáticos (sin animación) - líquidos en los matraces
+  S.path('M41.833,9.837c0-2.741-0.527-5.357-1.484-7.755c0,0-0.072,1.122-6.592,1.668C28.3,4.207,25.048,4.267,21.339,3.28c-4.438-0.662-4.914-2.184-10.216-2.807c-4.18-0.491-9.639,1.609-9.639,1.609C0.526,4.479,0,7.096,0,9.837c0,11.552,9.365,20.917,20.917,20.917S41.833,21.389,41.833,9.837c0-2.458-0.424-4.816-1.203-7.007').attr({fill: colorGr, stroke: 'none', transform: 't60,280'});
+  S.path('M41.833,9.837c0-2.741-0.527-5.357-1.484-7.755c0,0-0.072,1.122-6.592,1.668C28.3,4.207,25.048,4.267,21.339,3.28c-4.438-0.662-4.914-2.184-10.216-2.807c-4.18-0.491-9.639,1.609-9.639,1.609C0.526,4.479,0,7.096,0,9.837c0,11.552,9.365,20.917,20.917,20.917S41.833,21.389,41.833,9.837c0-2.458-0.424-4.816-1.203-7.007').attr({fill: colorDv, stroke: 'none', transform: 't343,305'});
+  S.path('M43.67,6.488c0-2.051-0.284-4.035-0.812-5.917c-0.209-0.743-5.432-0.002-10.465,0.066c-4.731,0.064-6.154,0.26-10.559,0.26s-4.231-0.169-10.559-0.26C6.544,0.57,1.714-0.167,0.949,0.101C0.461,1.915,0,4.52,0,6.488c0,12.059,9.776,21.835,21.834,21.835C33.894,28.323,43.67,18.547,43.67,6.488').attr({fill: colorGd, stroke: 'none', transform: 't441,151s1.1'});
+  
+  // Fiolas con líquido estático
+  S.path('M254.438,349.984l10.767,16.471l0.096,0.121c1.635,2.139,1.474,5.211-0.482,7.167c-1.128,1.127-2.626,1.659-4.104,1.593l-0.084,0.006h-53.787l-0.084-0.006c-1.478,0.066-2.976-0.465-4.104-1.593c-1.956-1.956-2.117-5.028-0.482-7.167l0.096-0.121l10.76-16.459L254.438,349.984z').attr({fill: colorGr, stroke: 'none'});
+
+  // Elementos adicionales
+  S.path('M331.516 319.883L396.08 319.883').attr({fill: 'none', stroke: colorStr, 'stroke-width': 3, 'stroke-linecap': 'round', 'stroke-linejoin': 'round'});
+  S.rect(229.6, 300.332, 8.19, 59.335).attr({fill: 'none', stroke: colorStr, 'stroke-width': 3, 'stroke-linecap': 'round', 'stroke-linejoin': 'round'});
+  
+  // Llama estática
+  S.path('M18.999,22.168c-0.269,5.197-4.323,9.032-9.711,8.754c-5.389-0.279-9.612-4.724-9.269-9.917C0.783,9.476,11.247-4.142,10.438,1.193C8.973,10.873,19.269,16.969,18.999,22.168z').attr({fill: colorGd, stroke: 'none', transform: 't68,342'});
+  S.path('M18.999,22.168c-0.269,5.197-4.323,9.032-9.711,8.754c-5.389-0.279-9.612-4.724-9.269-9.917C0.783,9.476,11.247-4.142,10.438,1.193C8.973,10.873,19.269,16.969,18.999,22.168z').attr({fill: colorGd, stroke: 'none', transform: 't72,342s0.5,0.5'});
+  
+  labAnimationInitialized = true;
+  console.log('Lab animation initialized (static)');
+}
+
+// Iniciar las animaciones del laboratorio
+function startLabAnimations() {
+  if (!labAnimationInitialized || !S) {
+    console.log('Lab not initialized, cannot start animations');
+    return;
+  }
+  
+  labAnimationRunning = true;
+  circleFumeeLoop_stop = true;
+  bocal_anim_stop = true;
+  flamme_anim_stop = true;
+  ballon_anim_stop = true;
+  goutte_anim_stop = true;
+  
+  // Limpiar y recrear con animaciones
+  const container = document.getElementById('canvas_container');
+  const lineBack = document.getElementById('canvas_line_back');
+  
+  if (S) { try { S.clear(); S.remove(); } catch (e) {} S = null; }
+  if (S2) { try { S2.clear(); S2.remove(); } catch (e) {} S2 = null; }
+  
+  container.innerHTML = '';
+  lineBack.innerHTML = '';
+  
+  // Reinicializar con animaciones activas
+  initRaphaelElements();
+  
+  console.log('Lab animations started');
+}
+
 function resetLabAnimation() {
   // Pausar todas las animaciones
   pauseLabAnimation();
@@ -479,6 +648,8 @@ function resetLabAnimation() {
 // Export para integración con el juego
 window.labAnimation = {
   init: initLabAnimation,
+  initStatic: initStaticLabAnimation,
+  startAnimation: startLabAnimations,
   pause: pauseLabAnimation,
   resume: resumeLabAnimation,
   reset: resetLabAnimation
