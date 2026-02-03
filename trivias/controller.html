@@ -95,7 +95,7 @@
 
         <!-- WAITING SCREEN (Non-admin) -->
         <div class="screen flex-col items-center justify-center p-4 text-center relative bg-white" id="waitingScreen">
-            <div class="bg-particles" id="waitingControllerBgParticles"></div>
+            <div class="bg-particles pointer-events-none" id="waitingControllerBgParticles"></div>
             
             <div class="relative z-10 w-full max-w-md">
                 <div class="mb-6">
@@ -122,11 +122,10 @@
         </div>
 
         <!-- ADMIN SETUP SCREEN - STEP BY STEP -->
-        <div class="screen flex-col p-4 relative bg-white" id="categorySelectScreen" style="max-height: 100vh; max-height: 100dvh;">
-            <div class="bg-particles" id="controllerBgParticles"></div>
-            <div class="grid-bg"></div>
+        <div class="screen flex-col p-4 pt-14 relative bg-white" id="categorySelectScreen">
+            <div class="bg-particles pointer-events-none" id="controllerBgParticles"></div>
             
-            <div class="relative z-10 flex flex-col h-full min-h-0">
+            <div class="relative z-10 flex flex-col flex-1">
                 <!-- Admin Badge -->
                 <div class="text-center mb-3 flex-shrink-0">
                     <div class="inline-flex items-center gap-2 bg-orange-50 border-3 border-steam-naranja rounded-full py-2 px-4 mb-2 shadow-lg">
@@ -158,12 +157,12 @@
                 </div>
 
                 <!-- STEP 1: Category Selection -->
-                <div class="step-content active flex-1 flex flex-col min-h-0" id="step1">
-                    <h2 class="text-lg font-black text-center mb-3 text-steam-turquesa flex-shrink-0">Elige una Categoría</h2>
-                    <div class="flex-1 overflow-y-auto min-h-0 pb-2" id="categoryScrollContainer">
-                        <div class="grid grid-cols-2 gap-3" id="categoryGrid"></div>
+                <div class="step-content active flex-1 flex flex-col" id="step1">
+                    <h2 class="text-lg font-black text-center mb-3 text-steam-turquesa">Elige una Categoría</h2>
+                    <div class="flex-1 overflow-y-auto" id="categoryScrollContainer">
+                        <div class="grid grid-cols-2 gap-3 pb-3" id="categoryGrid"></div>
                     </div>
-                    <div class="flex-shrink-0 bg-white pt-3 pb-2">
+                    <div class="pt-3">
                         <button class="bg-steam-turquesa text-white border-none py-3 px-6 text-base font-black rounded-full cursor-pointer uppercase w-full shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2" id="nextStep1Btn">
                             Siguiente
                             <iconify-icon icon="mdi:arrow-right" style="font-size: 1.2rem;"></iconify-icon>

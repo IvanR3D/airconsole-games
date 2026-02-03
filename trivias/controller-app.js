@@ -234,9 +234,18 @@ function setupCategoryGrid() {
         const btnColor = categoryColors[key] || categoryColors.general;
         const isSelected = key === selectedCategory;
         const btn = document.createElement('div');
-        btn.className = `category-btn border-[3px] ${isSelected ? 'border-steam-verde' : 'border-gray-200'} rounded-xl sm:rounded-2xl p-3 sm:p-4 text-center cursor-pointer transition-all shadow-md active:scale-95`;
-        btn.style.background = isSelected ? btnColor : '#FFFFFF';
+        btn.className = `category-btn border-[3px] rounded-xl sm:rounded-2xl p-3 sm:p-4 text-center cursor-pointer transition-all shadow-md active:scale-95`;
         btn.dataset.category = key;
+        btn.dataset.color = btnColor;
+        
+        if (isSelected) {
+            btn.style.background = btnColor;
+            btn.style.borderColor = btnColor;
+        } else {
+            btn.style.background = '#FFFFFF';
+            btn.style.borderColor = '#E5E7EB';
+        }
+        
         btn.innerHTML = `
             <iconify-icon icon="${categoryIcons[key]}" class="category-icon mb-2" style="color: ${isSelected ? '#FFFFFF' : '#9E9E9E'};"></iconify-icon>
             <div class="text-xs sm:text-sm font-bold" style="color: ${isSelected ? '#FFFFFF' : '#757575'};">${cat.name}</div>
@@ -257,6 +266,73 @@ function setupAnswerButtons() {
             }
         });
     });
+}
+
+function setupStepNavigation() {
+    // Step 1 -> Step 2
+    document.getElementById('nextStep1Btn').addEventListener('click', () => {
+        goToStep(2);
+    });
+    
+    // Step 2 -> Step 1
+    document.getElementById('prevStep2Btn').addEventListener('click', () => {
+        goToStep(1);
+    });
+    
+    // Step 2 -> Step 3
+    document.getElementById('nextStep2Btn').addEventListener('click', () => {
+        goToStep(3);
+    });
+    
+    // Step 3 -> Step 2
+    document.getElementById('prevStep3Btn').addEventListener('click', () => {
+        goToStep(2);
+    });
+}
+
+function goToStep(step) {
+    currentStep = step;
+    
+    // Update step indicators
+    document.querySelectorAll('.step-indicator').forEach((indicator, index) => {
+        const stepNum = index + 1;
+        indicator.classList.remove('active', 'completed');
+        if (stepNum < step) {
+            indicator.classList.add('completed');
+        } else if (stepNum === step) {
+            indicator.classList.add('active');
+        }
+    });
+    
+    // Update step lines
+    document.querySelectorAll('.step-line').forEach((line, index) => {
+        if (index < step - 1) {
+            line.classList.add('completed');
+        } else {
+            line.classList.remove('completed');
+        }
+    });
+    
+    // Show correct step content
+    document.querySelectorAll('.step-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    document.getElementById('step' + step).classList.add('active');
+    
+    // Update step 2 preview
+    if (step === 2) {
+        const cat = categories[selectedCategory];
+        document.getElementById('selectedCatIcon').setAttribute('icon', cat.icon);
+        document.getElementById('selectedCatName').textContent = cat.name;
+    }
+    
+    // Update step 3 summary
+    if (step === 3) {
+        const cat = categories[selectedCategory];
+        document.getElementById('finalCatIcon').setAttribute('icon', cat.icon);
+        document.getElementById('finalCatName').textContent = cat.name;
+        document.getElementById('finalQuestionCount').textContent = selectedQuestionCount;
+    }
 }
 
 function handleJoined(data) {
@@ -378,50 +454,33 @@ function handleGameStateUpdate(data) {
 function selectCategory(category) {
     selectedCategory = category;
     
-    const categoryColors = {
-        general: '#0595AE',
-        science: '#73A03F',
-        mathematics: '#0595AE',
-        robotics: '#AB3D8B',
-        chemistry: '#EB8225',
-        technology: '#AB3D8B',
-        history: '#EB8225',
-        geography: '#0595AE'
-    };
-    
     document.querySelectorAll('.category-btn').forEach(btn => {
         const btnCategory = btn.dataset.category;
-        const btnColor = categoryColors[btnCategory] || categoryColors.general;
+        const btnColor = btn.dataset.color;
         const isSelected = btnCategory === category;
         
-        // Remove all border classes
-        btn.classList.remove('border-steam-verde', 'bg-green-50', 'border-gray-200');
-        
         if (isSelected) {
-            // Selected: fondo del color de la categoría con borde verde
+            // Selected: fondo y borde del color de la categoría
             btn.style.background = btnColor;
-            btn.classList.add('border-steam-verde');
+            btn.style.borderColor = btnColor;
         } else {
             // Not selected: fondo blanco con borde gris
             btn.style.background = '#FFFFFF';
-            btn.classList.add('border-gray-200');
+            btn.style.borderColor = '#E5E7EB';
         }
         
-        // Update icon and text colors - siempre blancos cuando seleccionado, grises cuando no
+        // Update icon and text colors
         const icon = btn.querySelector('.category-icon');
         const text = btn.querySelector('.text-xs');
         if (icon) icon.style.color = isSelected ? '#FFFFFF' : '#9E9E9E';
         if (text) text.style.color = isSelected ? '#FFFFFF' : '#757575';
         
-        if (isSelected) {
-            // Animate selected icon with scale bounce
-            if (icon && anime && anime.animate) {
-                anime.animate(icon, {
-                    scale: [1, 1.2, 0.95, 1.05, 1],
-                    duration: 700,
-                    ease: 'easeOutElastic(1, .6)'
-                });
-            }
+        if (isSelected && icon && anime && anime.animate) {
+            anime.animate(icon, {
+                scale: [1, 1.2, 0.95, 1.05, 1],
+                duration: 700,
+                ease: 'easeOutElastic(1, .6)'
+            });
         }
     });
     
@@ -529,13 +588,6 @@ function updateSelectedCategory(category) {
     selectedCategory = category;
     
     const cat = categories[category];
-    if (cat) {
-        const emojiEl = document.getElementById('selectedCategoryEmoji');
-        emojiEl.innerHTML = `<iconify-icon icon="${cat.icon}" style="font-size: clamp(3rem, 10vw, 4rem); color: #0595AE;"></iconify-icon>`;
-        document.getElementById('selectedCategoryName').textContent = cat.name;
-        document.getElementById('selectedCategoryDisplay').classList.remove('hidden');
-    }
-    
     const categoryColors = {
         general: '#0595AE',
         science: '#73A03F',
@@ -546,25 +598,28 @@ function updateSelectedCategory(category) {
         history: '#EB8225',
         geography: '#0595AE'
     };
+    const catColor = categoryColors[category] || '#0595AE';
+    
+    if (cat) {
+        const emojiEl = document.getElementById('selectedCategoryEmoji');
+        emojiEl.innerHTML = `<iconify-icon icon="${cat.icon}" style="font-size: clamp(3rem, 10vw, 4rem); color: ${catColor};"></iconify-icon>`;
+        document.getElementById('selectedCategoryName').textContent = cat.name;
+        document.getElementById('selectedCategoryDisplay').classList.remove('hidden');
+    }
     
     document.querySelectorAll('.category-btn').forEach(btn => {
         const btnCategory = btn.dataset.category;
-        const btnColor = categoryColors[btnCategory] || categoryColors.general;
+        const btnColor = btn.dataset.color;
         const isSelected = btnCategory === category;
         
-        btn.classList.remove('border-steam-verde', 'bg-green-50', 'border-gray-200');
-        
         if (isSelected) {
-            // Selected: fondo del color de la categoría con borde verde
             btn.style.background = btnColor;
-            btn.classList.add('border-steam-verde');
+            btn.style.borderColor = btnColor;
         } else {
-            // Not selected: fondo blanco con borde gris
             btn.style.background = '#FFFFFF';
-            btn.classList.add('border-gray-200');
+            btn.style.borderColor = '#E5E7EB';
         }
         
-        // Update icon and text colors - siempre blancos cuando seleccionado, grises cuando no
         const icon = btn.querySelector('.category-icon');
         const text = btn.querySelector('.text-xs');
         if (icon) icon.style.color = isSelected ? '#FFFFFF' : '#9E9E9E';
