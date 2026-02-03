@@ -105,17 +105,34 @@ body {
     background: #73A03F;
 }
 
-/* Step content */
+/* Contenedor de steps - asegura que solo un step sea visible a la vez */
+#categorySelectScreen .relative.z-10 {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* Step content - cada step en su propio contenedor sin superposición */
 .step-content {
     display: none;
     opacity: 0;
     transition: opacity 0.3s ease;
+    position: relative;
+    width: 100%;
 }
 
 .step-content.active {
     display: flex;
     flex-direction: column;
     opacity: 1;
+}
+
+/* Ocultar completamente los steps inactivos */
+.step-content:not(.active) {
+    visibility: hidden;
+    height: 0;
+    overflow: hidden;
+    pointer-events: none;
 }
 
 /* Player avatar visual - responsive */
