@@ -354,6 +354,8 @@ function handleJoined(data) {
     document.getElementById('errorMsg').classList.add('hidden');
     
     if (isAdmin) {
+        currentStep = 1;
+        goToStep(1);
         showScreen('categorySelect');
     } else {
         createWaitingControllerParticles();
@@ -790,6 +792,7 @@ function handleReset(data) {
     hasAnswered = false;
     myScore = 0;
     myRank = 1;
+    currentStep = 1;
     if (domCache.miniScore) domCache.miniScore.textContent = '0';
     if (domCache.miniRank) domCache.miniRank.textContent = 'Rank 1';
     
@@ -800,7 +803,9 @@ function handleReset(data) {
     document.getElementById('connectingMsg').classList.remove('hidden');
     document.getElementById('errorMsg').classList.add('hidden');
     
+    // Reset to step 1 for admin
     if (isAdmin) {
+        goToStep(1);
         showScreen('categorySelect');
     } else {
         showScreen('waiting');
