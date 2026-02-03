@@ -201,9 +201,11 @@
                     </div>
                 </div>
                 
-                <!-- Categories Grid with Game Cards -->
-                <div class="flex-1 flex items-center justify-center px-2">
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6 max-w-6xl w-full" id="categoryGrid"></div>
+                <!-- Categories Grid with Game Cards - scrollable (touch + mouse) -->
+                <div class="flex-1 min-h-0 flex flex-col px-2 overflow-hidden">
+                    <div class="category-scroll-container flex-1 overflow-y-auto overflow-x-hidden flex items-start justify-center" id="categoryScrollContainer">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6 max-w-6xl w-full pb-4" id="categoryGrid"></div>
+                    </div>
                 </div>
                 
                 <!-- Footer Message -->

@@ -377,16 +377,16 @@ function setupCategories() {
         
         card.className = 'category-card rounded-2xl sm:rounded-3xl p-4 sm:p-5 lg:p-6 text-center cursor-pointer transition-all relative power-up';
         card.style.animationDelay = `${index * 0.1}s`;
-        card.style.background = '#f0f9ff';
-        card.style.border = '2px solid #BFDBFE';
+        card.style.background = '#F9FAFB';
+        card.style.borderColor = '#E5E7EB';
         card.dataset.category = key;
         card.dataset.categoryColor = categoryColor;
         
         card.innerHTML = `
             <div class="mb-3 sm:mb-4">
-                <iconify-icon icon="${categoryIcons[key]}" class="category-icon" style="color: ${categoryColor};"></iconify-icon>
+                <iconify-icon icon="${categoryIcons[key]}" class="category-icon" style="color: #9CA3AF;"></iconify-icon>
             </div>
-            <div class="text-base sm:text-lg lg:text-xl font-bold category-name" style="color: #0595AE;">
+            <div class="text-base sm:text-lg lg:text-xl font-bold category-name" style="color: #6B7280;">
                 ${category.name}
             </div>
             <div class="selection-check absolute top-2 right-2 w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 bg-white/90 hidden items-center justify-center text-sm font-bold" style="border-color: ${categoryColor}; color: ${categoryColor};">
@@ -404,13 +404,12 @@ function setupCategories() {
                     check.classList.add('hidden');
                     check.classList.remove('flex');
                 }
-                const catColor = c.dataset.categoryColor;
-                c.style.background = '#f0f9ff';
-                c.style.borderColor = '#BFDBFE';
+                c.style.background = '#F9FAFB';
+                c.style.borderColor = '#E5E7EB';
                 const icon = c.querySelector('.category-icon');
                 const text = c.querySelector('.category-name');
-                if (icon) icon.style.color = catColor;
-                if (text) text.style.color = '#0595AE';
+                if (icon) icon.style.color = '#9CA3AF';
+                if (text) text.style.color = '#6B7280';
             });
             
             // Add selection to clicked card - fondo del color de la categoría

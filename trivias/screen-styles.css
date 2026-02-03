@@ -174,19 +174,20 @@ body.cat-default {
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
 }
 
+/* Unselected: gris como en el controller (#F9FAFB, #E5E7EB, icon/text gris) */
 .category-card {
     position: relative;
     overflow: hidden;
-    background: #f0f9ff;
-    border: 2px solid #BFDBFE;
+    background: #F9FAFB;
+    border: 2px solid #E5E7EB;
 }
 
-.category-card:hover {
+.category-card:not(.selected):hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(5, 149, 174, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-.category-card:hover .category-icon {
+.category-card:not(.selected):hover .category-icon {
     transform: scale(1.08);
 }
 
@@ -201,6 +202,27 @@ body.cat-default {
 @keyframes iconFloat {
     0%, 100% { transform: translateY(0px); }
     50% { transform: translateY(-4px); }
+}
+
+/* Category grid scroll - touch + mouse */
+.category-scroll-container {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    scrollbar-width: thin;
+}
+.category-scroll-container::-webkit-scrollbar {
+    width: 8px;
+}
+.category-scroll-container::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+}
+.category-scroll-container::-webkit-scrollbar-thumb {
+    background: rgba(5, 149, 174, 0.4);
+    border-radius: 4px;
+}
+.category-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(5, 149, 174, 0.6);
 }
 
 /* Glow effect */
