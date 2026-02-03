@@ -299,6 +299,12 @@ body {
     justify-content: center;
 }
 
+/* Category scroll container */
+#categoryScrollContainer {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+}
+
 /* Smooth scrolling */
 .overflow-y-auto {
     -webkit-overflow-scrolling: touch;

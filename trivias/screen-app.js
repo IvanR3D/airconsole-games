@@ -833,18 +833,19 @@ function displayOptions(question) {
 
 function startTimer() {
     clearInterval(timer);
+    timeLeft = 20;
     
-    // Resetear la barra al 100% sin animación
+    // Resetear la barra al 100% instantáneamente (sin transición)
     const timerBar = document.getElementById('timerBar');
     if (timerBar) {
         timerBar.classList.remove('animating', 'warning', 'danger');
+        timerBar.style.transition = 'none';
         timerBar.style.width = '100%';
         // Forzar reflow para aplicar el cambio inmediatamente
         timerBar.offsetHeight;
-        // Activar la animación después de un pequeño delay
-        setTimeout(() => {
-            timerBar.classList.add('animating');
-        }, 50);
+        // Restaurar la transición después de que la barra esté al 100%
+        timerBar.style.transition = '';
+        timerBar.classList.add('animating');
     }
     
     updateTimerDisplay();
@@ -868,7 +869,6 @@ function startTimer() {
 
 function updateProgressBar() {
     const timerBar = document.getElementById('timerBar');
-    const timerArrow = document.getElementById('timerArrow');
     
     if (timerBar) {
         const percentage = (timeLeft / 20) * 100;
@@ -880,12 +880,8 @@ function updateProgressBar() {
         // Add appropriate class based on time
         if (timeLeft <= 5) {
             timerBar.classList.add('danger');
-            if (timerArrow) timerArrow.style.borderLeftColor = '#FF7043';
         } else if (timeLeft <= 10) {
             timerBar.classList.add('warning');
-            if (timerArrow) timerArrow.style.borderLeftColor = '#FFA726';
-        } else {
-            if (timerArrow) timerArrow.style.borderLeftColor = '#73A03F';
         }
     }
 }
