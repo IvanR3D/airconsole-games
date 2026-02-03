@@ -4,6 +4,29 @@
 // ============================================
 
 // ============================================
+// CONFIGURACIÓN DE MODOS DE JUEGO
+// ============================================
+
+const GAME_MODES = {
+    teams: {
+        id: 'teams',
+        name: 'Equipos',
+        icon: 'mdi:account-group',
+        color: '#3b82f6',
+        description: '2 equipos compiten entre sí'
+    },
+    individual: {
+        id: 'individual',
+        name: 'Individual',
+        icon: 'mdi:account',
+        color: '#8b5cf6',
+        description: 'Todos contra todos'
+    }
+};
+
+let currentGameMode = 'teams';
+
+// ============================================
 // CONFIGURACIÓN DE DIFICULTADES
 // ============================================
 
@@ -257,6 +280,24 @@ function renderWaitingScreen() {
                         <span class="font-bold" style="color: var(--color-warning);">ERES EL ADMIN</span>
                     </div>
                     
+                    <!-- Selector de Modo de Juego para Admin -->
+                    <div class="mode-selector-admin mb-4">
+                        <p class="text-sm mb-3" style="color: var(--color-text-light);">
+                            <iconify-icon icon="mdi:gamepad-variant" class="mr-1"></iconify-icon>
+                            Modo de juego:
+                        </p>
+                        <div class="mode-options" id="modeOptions">
+                            ${Object.entries(GAME_MODES).map(([key, config]) => `
+                                <button class="mode-option ${key === currentGameMode ? 'selected' : ''}" 
+                                        data-mode="${key}"
+                                        style="--mode-color: ${config.color};">
+                                    <iconify-icon icon="${config.icon}"></iconify-icon>
+                                    <span class="mode-name">${config.name}</span>
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
                     <!-- Selector de Dificultad para Admin -->
                     <div class="difficulty-selector-admin mb-4">
                         <p class="text-sm mb-3" style="color: var(--color-text-light);">
@@ -345,6 +386,14 @@ function renderWaitingScreen() {
     });
     
     if (isAdmin) {
+        // Event listeners para selector de modo de juego
+        document.querySelectorAll('.mode-option').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const mode = btn.dataset.mode;
+                selectGameMode(mode);
+            });
+        });
+        
         // Event listeners para selector de dificultad
         document.querySelectorAll('.difficulty-option').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -365,9 +414,27 @@ function renderWaitingScreen() {
             sendMessage({ 
                 action: 'startGame', 
                 difficulty: currentDifficulty,
-                customRounds: selectedRounds
+                customRounds: selectedRounds,
+                gameMode: currentGameMode
             });
         });
+    }
+}
+
+function selectGameMode(mode) {
+    currentGameMode = mode;
+    
+    // Actualizar UI
+    document.querySelectorAll('.mode-option').forEach(btn => {
+        btn.classList.toggle('selected', btn.dataset.mode === mode);
+    });
+    
+    // Notificar a la pantalla del cambio de modo
+    sendMessage({ action: 'setGameMode', mode: mode });
+    
+    // Vibración de feedback
+    if (navigator.vibrate) {
+        navigator.vibrate(30);
     }
 }
 
@@ -1210,4 +1277,9 @@ function handleGameError(data) {
 // INICIAR
 // ============================================
 
-init();
+// Esperar a que el DOM esté listo antes de inicializar
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}

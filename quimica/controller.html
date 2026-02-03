@@ -6,10 +6,6 @@
     <title>Laboratorio Químico - Control</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.airconsole.com/api/airconsole-1.8.0.js"></script>
-    <script type="module">
-        import { animate, stagger } from 'https://esm.sh/animejs';
-        window.anime = { animate, stagger };
-    </script>
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <script>
         tailwind.config = {
@@ -27,6 +23,16 @@
 </head>
 <body class="font-sans text-white overflow-hidden">
     <div class="w-full flex flex-col" style="height: 100vh;" id="app"></div>
-    <script src="controller-app.js"></script>
+    
+    <!-- Cargar anime.js y luego controller-app.js -->
+    <script type="module">
+        import { animate, stagger } from 'https://esm.sh/animejs';
+        window.anime = { animate, stagger };
+        
+        // Cargar controller-app.js después de que anime.js esté listo
+        const script = document.createElement('script');
+        script.src = 'controller-app.js';
+        document.body.appendChild(script);
+    </script>
 </body>
 </html>

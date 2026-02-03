@@ -1,0 +1,199 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: transparent;
+}
+
+body {
+    touch-action: manipulation;
+    background: transparent;
+}
+
+.screen {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.screen.active {
+    display: flex;
+    opacity: 1;
+    height: 100vh;
+    padding-top: 50px; /* Espacio para el botón de AirConsole */
+    overflow-y: auto;
+}
+
+/* Player avatar visual - responsive */
+.player-avatar-visual {
+    width: clamp(50px, 15vw, 70px);
+    height: clamp(50px, 15vw, 70px);
+    border-radius: clamp(10px, 3vw, 14px);
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+}
+
+.player-avatar-visual::before {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    height: clamp(10px, 3vw, 14px);
+    background: rgba(255,255,255,0.35);
+    border-radius: 9px 9px 0 0;
+}
+
+.player-avatar-visual-small {
+    width: clamp(28px, 8vw, 40px);
+    height: clamp(28px, 8vw, 40px);
+    border-radius: clamp(6px, 1.5vw, 9px);
+}
+
+.player-avatar-visual-small::before {
+    height: clamp(6px, 1.5vw, 9px);
+    top: 3px;
+    left: 3px;
+    right: 3px;
+    border-radius: 5px 5px 0 0;
+}
+
+/* Button 3D effect */
+.btn-3d {
+    transition: all 0.08s ease;
+}
+
+.btn-3d:active:not(:disabled) {
+    transform: translateY(4px);
+}
+
+.btn-verde { box-shadow: 0 6px 0 #5a8030; }
+.btn-verde:active:not(:disabled) { box-shadow: 0 2px 0 #5a8030; }
+
+.btn-morado { box-shadow: 0 6px 0 #8a3070; }
+.btn-morado:active:not(:disabled) { box-shadow: 0 2px 0 #8a3070; }
+
+.btn-turquesa { box-shadow: 0 6px 0 #047a91; }
+.btn-turquesa:active:not(:disabled) { box-shadow: 0 2px 0 #047a91; }
+
+.btn-naranja { box-shadow: 0 6px 0 #c46d1d; }
+.btn-naranja:active:not(:disabled) { box-shadow: 0 2px 0 #c46d1d; }
+
+/* Answer button shine */
+.answer-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 100%);
+    border-radius: 15px 15px 0 0;
+    pointer-events: none;
+}
+
+.answer-btn.selected {
+    transform: translateY(4px);
+}
+
+.answer-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+@keyframes correctPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+}
+
+@keyframes wrongShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+}
+
+.correct-highlight { animation: correctPulse 0.4s ease infinite; }
+.wrong-highlight { animation: wrongShake 0.4s ease; }
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.bounce-anim { 
+    animation: bounce 1s ease infinite;
+    display: inline-block;
+}
+
+@keyframes popIn {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.pop-in { 
+    animation: popIn 0.25s ease forwards;
+    display: block;
+}
+
+/* Answer grid responsive */
+.answer-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(8px, 2vw, 12px);
+    flex: 1;
+    max-height: clamp(200px, 50vh, 400px);
+}
+
+.answer-btn {
+    font-size: clamp(1.5rem, 8vw, 2.5rem);
+}
+
+/* Pulse animation */
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.02); }
+}
+
+.pulse {
+    animation: pulse 2s ease infinite;
+    display: inline-flex;
+}
+
+/* Animated background particles */
+.bg-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.particle {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.4;
+    animation: floatParticle 15s infinite ease-in-out;
+    will-change: transform;
+}
+
+@keyframes floatParticle {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 0.4; }
+    25% { transform: translate(30px, -30px) rotate(90deg); opacity: 0.6; }
+    50% { transform: translate(0, -60px) rotate(180deg); opacity: 0.4; }
+    75% { transform: translate(-30px, -30px) rotate(270deg); opacity: 0.6; }
+}
+
+.category-icon {
+    font-size: clamp(2rem, 8vw, 3rem);
+    display: inline-block;
+}

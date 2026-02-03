@@ -1,0 +1,235 @@
+/* ==========================================================================
+   BASE STYLES
+   ========================================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    position: fixed;
+    top: 0;
+    left: 0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #f8f9fa;
+}
+
+/* ==========================================================================
+   TITLE STYLES
+   ========================================================================== */
+.title-steam { color: #0595AE; }
+.title-platformer { color: #73A03F; }
+
+/* ==========================================================================
+   PLAYER AVATAR
+   ========================================================================== */
+.player-avatar {
+    width: clamp(50px, 8vw, 80px);
+    height: clamp(50px, 8vw, 80px);
+    border-radius: 16px;
+    position: relative;
+    box-shadow: 0 6px 0 rgba(0,0,0,0.15), 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.player-avatar::before,
+.player-avatar::after {
+    content: '';
+    position: absolute;
+    width: 24%;
+    height: 24%;
+    top: 32%;
+    background: radial-gradient(circle at 50% 50%, #222 35%, transparent 36%), white;
+    border-radius: 50%;
+    animation: idleBlink 4s ease-in-out infinite;
+}
+
+.player-avatar::before { left: 18%; }
+.player-avatar::after { right: 18%; animation-delay: 0.05s; }
+
+.player-avatar-small {
+    width: clamp(35px, 5vw, 50px);
+    height: clamp(35px, 5vw, 50px);
+    border-radius: 10px;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.15);
+}
+
+/* ==========================================================================
+   PLAYER CARD
+   ========================================================================== */
+.player-card {
+    background: white;
+    border-radius: 20px;
+    padding: clamp(16px, 3vw, 28px);
+    border: 4px solid #e5e7eb;
+    transition: all 0.3s ease;
+}
+
+.player-card.ready {
+    border-color: #73A03F;
+    background: #f0fdf4;
+}
+
+.player-card.admin {
+    border-color: #EB8225;
+    background: #fff7ed;
+}
+
+/* Player card ready/admin animations */
+.player-card.ready .player-avatar::before,
+.player-card.ready .player-avatar::after,
+.player-card.admin .player-avatar::before,
+.player-card.admin .player-avatar::after {
+    animation: blinkHappy 0.6s ease-out, idleBlink 4s ease-in-out 0.6s infinite;
+}
+
+.player-card.ready .player-avatar,
+.player-card.admin .player-avatar {
+    animation: happyJump 0.5s ease-out;
+}
+
+/* ==========================================================================
+   COUNTDOWN
+   ========================================================================== */
+.countdown-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.countdown-number {
+    font-size: clamp(120px, 30vw, 250px);
+    font-weight: 900;
+    color: white;
+    text-shadow: 0 0 60px currentColor;
+    animation: countPop 0.6s ease-out;
+}
+
+/* ==========================================================================
+   ANIMATIONS
+   ========================================================================== */
+@keyframes idleBlink {
+    0%, 42%, 48%, 100% { transform: scaleY(1); }
+    45% { transform: scaleY(0.05); }
+}
+
+@keyframes blinkHappy {
+    0% { transform: scaleY(1); }
+    20% { transform: scaleY(0.05); }
+    40% { transform: scaleY(1); }
+    60% { transform: scaleY(0.05); }
+    80%, 100% { transform: scaleY(1); }
+}
+
+@keyframes happyJump {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.15) translateY(-12px); }
+    70% { transform: scale(0.95) translateY(0); }
+    100% { transform: scale(1) translateY(0); }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+.float { animation: float 3s ease-in-out infinite; }
+
+@keyframes countPop {
+    0% { transform: scale(2.5); opacity: 0; }
+    60% { transform: scale(0.9); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fall {
+    to { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+.confetti {
+    position: absolute;
+    animation: fall 3s ease-out forwards;
+}
+
+@keyframes pulse { 50% { opacity: 0.6; } }
+.pulse { animation: pulse 2s ease infinite; }
+
+@keyframes winner {
+    0% { transform: scale(0) rotate(-10deg); }
+    70% { transform: scale(1.1) rotate(5deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
+.winner-anim { animation: winner 0.6s ease-out; }
+
+/* ==========================================================================
+   LIVE RANKING OVERLAY STYLES
+   ========================================================================== */
+.overlay-backdrop {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.overlay-backdrop.visible {
+    pointer-events: auto;
+}
+
+.ranking-panel {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 24px;
+    padding: clamp(20px, 4vw, 32px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    max-width: 90%;
+    width: 500px;
+    max-height: 80%;
+    overflow-y: auto;
+    animation: slideIn 0.4s ease-out;
+}
+
+@keyframes slideIn {
+    0% {
+        transform: translate(-50%, -60%);
+        opacity: 0;
+    }
+    100% {
+        transform: translate(-50%, -50%);
+        opacity: 1;
+    }
+}
+
+.winner-title {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.position-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: white;
+    border-radius: 12px;
+    border-left: 4px solid;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.continue-message {
+    animation: pulse 2s ease infinite;
+}

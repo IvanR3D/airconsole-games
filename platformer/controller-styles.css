@@ -1,0 +1,259 @@
+/* ==========================================================================
+   STEAM Platformer Controller - Styles
+   ========================================================================== */
+
+/* ==========================================================================
+   BASE STYLES
+   ========================================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    touch-action: none;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+/* ==========================================================================
+   AVATAR STYLES
+   ========================================================================== */
+.avatar {
+    width: clamp(70px, 22vw, 100px);
+    height: clamp(70px, 22vw, 100px);
+    border-radius: 18px;
+    position: relative;
+    box-shadow: 0 8px 0 rgba(0,0,0,0.15), 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.avatar::before,
+.avatar::after {
+    content: '';
+    position: absolute;
+    width: 24%;
+    height: 24%;
+    top: 32%;
+    background: radial-gradient(circle at 50% 50%, #222 35%, transparent 36%), white;
+    border-radius: 50%;
+    animation: idleBlink 4s ease-in-out infinite;
+}
+
+.avatar::before { left: 18%; }
+.avatar::after { right: 18%; animation-delay: 0.05s; }
+
+.avatar-sm {
+    width: clamp(45px, 14vw, 60px);
+    height: clamp(45px, 14vw, 60px);
+    border-radius: 12px;
+    box-shadow: 0 5px 0 rgba(0,0,0,0.15);
+    position: relative;
+}
+
+.avatar-sm::before,
+.avatar-sm::after {
+    content: '';
+    position: absolute;
+    width: 26%;
+    height: 26%;
+    top: 30%;
+    background: radial-gradient(circle at 50% 50%, #222 35%, transparent 36%), white;
+    border-radius: 50%;
+    animation: idleBlink 4s ease-in-out infinite;
+}
+
+.avatar-sm::before { left: 16%; }
+.avatar-sm::after { right: 16%; animation-delay: 0.05s; }
+
+/* ==========================================================================
+   COLOR PICKER
+   ========================================================================== */
+.color-btn {
+    width: clamp(52px, 15vw, 68px);
+    height: clamp(52px, 15vw, 68px);
+    border-radius: 50%;
+    border: 4px solid white;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.2), 0 6px 15px rgba(0,0,0,0.15);
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.color-btn:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 rgba(0,0,0,0.2);
+}
+
+.color-btn.selected {
+    transform: scale(1.12);
+    border-color: #EB8225;
+    box-shadow: 0 0 0 4px #EB8225, 0 6px 20px rgba(235,130,37,0.4);
+}
+
+/* ==========================================================================
+   ACTION BUTTONS
+   ========================================================================== */
+.btn {
+    border: none;
+    border-radius: 50px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.btn:active { transform: translateY(4px); }
+
+.btn-verde { background: #73A03F; box-shadow: 0 6px 0 #5a8030; }
+.btn-verde:active { box-shadow: 0 2px 0 #5a8030; }
+
+.btn-turquesa { background: #0595AE; box-shadow: 0 6px 0 #047a91; }
+.btn-turquesa:active { box-shadow: 0 2px 0 #047a91; }
+
+.btn-morado { background: #AB3D8B; box-shadow: 0 6px 0 #8a3070; }
+.btn-morado:active { box-shadow: 0 2px 0 #8a3070; }
+
+/* ==========================================================================
+   GAME CONTROLS
+   ========================================================================== */
+.ctrl-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.08s, box-shadow 0.08s;
+}
+
+.ctrl-btn:active,
+.ctrl-btn.pressed { transform: translateY(6px); }
+
+.jump-btn {
+    width: clamp(100px, 30vmin, 150px);
+    height: clamp(100px, 30vmin, 150px);
+    border-radius: 50%;
+    background: #73A03F;
+    box-shadow: 0 10px 0 #5a8030;
+}
+
+.jump-btn:active,
+.jump-btn.pressed { box-shadow: 0 2px 0 #5a8030; }
+
+.move-btn {
+    width: clamp(70px, 22vmin, 100px);
+    height: clamp(70px, 22vmin, 100px);
+    border-radius: 20px;
+}
+
+.left-btn { background: #AB3D8B; box-shadow: 0 8px 0 #8a3070; }
+.left-btn:active,
+.left-btn.pressed { box-shadow: 0 2px 0 #8a3070; }
+
+.right-btn { background: #0595AE; box-shadow: 0 8px 0 #047a91; }
+.right-btn:active,
+.right-btn.pressed { box-shadow: 0 2px 0 #047a91; }
+
+.ctrl-icon {
+    font-size: clamp(2rem, 10vmin, 3.5rem);
+    color: white;
+    line-height: 1;
+}
+
+.ctrl-label {
+    font-size: clamp(0.7rem, 3vmin, 1rem);
+    font-weight: 700;
+    color: white;
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ==========================================================================
+   RESPONSIVE LAYOUTS
+   ========================================================================== */
+
+/* Portrait */
+@media (orientation: portrait) {
+    .game-controls {
+        flex-direction: column !important;
+        gap: clamp(15px, 4vh, 30px) !important;
+    }
+    .move-gap { gap: clamp(30px, 15vw, 80px) !important; }
+    .game-header { display: flex !important; }
+}
+
+/* Landscape */
+@media (orientation: landscape) {
+    .game-controls {
+        flex-direction: row !important;
+        justify-content: space-around !important;
+        align-items: center !important;
+        gap: 4vw !important;
+        width: 100% !important;
+    }
+    .jump-btn { width: clamp(80px, 20vmin, 130px); height: clamp(80px, 20vmin, 130px); }
+    .move-btn { width: clamp(65px, 16vmin, 90px); height: clamp(65px, 16vmin, 90px); }
+    .move-gap { gap: clamp(15px, 5vw, 40px) !important; }
+    .game-header { display: none !important; }
+    .ctrl-icon { font-size: clamp(1.8rem, 8vmin, 3rem); }
+    .ctrl-label { font-size: clamp(0.6rem, 2.5vmin, 0.9rem); }
+}
+
+/* Small height screens */
+@media (max-height: 400px) {
+    .game-header { display: none !important; }
+    .jump-btn { width: 70px; height: 70px; }
+    .move-btn { width: 60px; height: 60px; }
+}
+
+/* ==========================================================================
+   ANIMATIONS
+   ========================================================================== */
+@keyframes idleBlink {
+    0%, 42%, 48%, 100% { transform: scaleY(1); }
+    45% { transform: scaleY(0.05); }
+}
+
+@keyframes happyJump {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.15) translateY(-12px); }
+    70% { transform: scale(0.95) translateY(0); }
+    100% { transform: scale(1) translateY(0); }
+}
+
+.avatar.jump { animation: happyJump 0.5s ease-out; }
+
+@keyframes blinkHappy {
+    0% { transform: scaleY(1); }
+    20% { transform: scaleY(0.05); }
+    40% { transform: scaleY(1); }
+    60% { transform: scaleY(0.05); }
+    80%, 100% { transform: scaleY(1); }
+}
+
+.avatar.blink::before,
+.avatar.blink::after { animation: blinkHappy 0.6s ease-out !important; }
+
+@keyframes float { 50% { transform: translateY(-8px); } }
+.float { animation: float 3s ease-in-out infinite; }
+
+@keyframes spin { 50% { transform: rotate(90deg); } }
+.spin { animation: spin 2s ease-in-out infinite; }
+
+@keyframes pulse { 50% { opacity: 0.6; } }
+.pulse { animation: pulse 2s ease infinite; }
+
+@keyframes pop {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+.pop { animation: pop 0.4s ease-out; }

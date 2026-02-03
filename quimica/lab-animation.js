@@ -11,6 +11,7 @@ const colorDv = '#0595AE';  // Turquesa STEAM
 const colorVerde = '#73A03F'; // Verde STEAM
 
 let labAnimationInitialized = false;
+let labAnimationRunning = false; // Flag para evitar múltiples inicializaciones durante la animación
 let S, S2;
 let circleFumeeLoop_stop = true;
 let gradient_anim_pause = true;
@@ -23,9 +24,10 @@ let nbrCircle = 0;
 let goCircle = false;
 let circleFumee = [];
 let svgContent = '';
+let animationTimeouts = []; // Para limpiar timeouts pendientes
 
 function initLabAnimation() {
-  if (labAnimationInitialized) return;
+  if (labAnimationInitialized || labAnimationRunning) return;
   if (typeof Raphael === 'undefined') {
     console.log('Lab animation: waiting for Raphael...');
     return;
@@ -41,6 +43,7 @@ function initLabAnimation() {
   }
   
   labAnimationInitialized = true;
+  labAnimationRunning = true;
   initSVGLines();
 }
 
@@ -71,7 +74,7 @@ function initSVGLines() {
     }
   });
   
-  // Inicializar Raphael
+  // Inicializar Raphael solo si no existe
   initRaphaelElements();
 }
 
@@ -80,6 +83,22 @@ function initRaphaelElements() {
   const lineBack = document.getElementById('canvas_line_back');
   
   if (!container || !lineBack) return;
+  
+  // Limpiar instancias de Raphael existentes
+  if (S) {
+    S.clear();
+    S.remove();
+    S = null;
+  }
+  if (S2) {
+    S2.clear();
+    S2.remove();
+    S2 = null;
+  }
+  
+  // Limpiar contenedores antes de crear nuevos elementos
+  container.innerHTML = '';
+  lineBack.innerHTML = '';
   
   S = new Raphael(container, 500, 600);
   S2 = new Raphael(lineBack, 500, 400);
@@ -165,31 +184,37 @@ function initRaphaelElements() {
 
 // Animación de humo/burbujas
 function circleFumeeLoop(posX, posY, color) {
-  if (!circleFumeeLoop_stop || !S) return;
+  if (!circleFumeeLoop_stop || !S || !labAnimationRunning) return;
   
   setTimeout(() => {
+    if (!labAnimationRunning || !S) return; // Verificar de nuevo dentro del timeout
+    
     const x = Math.floor(Math.random() * 20 + posX);
     const y = posY;
     const diam = Math.floor(Math.random() * 3 + 2);
     
-    circleFumee[nbrCircle] = S.circle(x, y, diam).attr({fill: color, stroke: 'none'});
-    circleFumee[nbrCircle].animate({transform: 't0,-10'}, 400);
-    circleFumee[nbrCircle].animate({opacity: '0'}, 400);
-    nbrCircle++;
-    
-    if (circleFumee[nbrCircle - 5] && !goCircle) {
-      circleFumee[nbrCircle - 5].remove();
-    } else if (goCircle) {
-      circleFumee[10 - nbrCircle]?.remove();
-    }
-    
-    if (nbrCircle === 10) {
-      nbrCircle = 0;
-      goCircle = true;
-    }
-    
-    if (nbrCircle < 10) {
-      circleFumeeLoop(posX, posY, color);
+    try {
+      circleFumee[nbrCircle] = S.circle(x, y, diam).attr({fill: color, stroke: 'none'});
+      circleFumee[nbrCircle].animate({transform: 't0,-10'}, 400);
+      circleFumee[nbrCircle].animate({opacity: '0'}, 400);
+      nbrCircle++;
+      
+      if (circleFumee[nbrCircle - 5] && !goCircle) {
+        circleFumee[nbrCircle - 5].remove();
+      } else if (goCircle) {
+        circleFumee[10 - nbrCircle]?.remove();
+      }
+      
+      if (nbrCircle === 10) {
+        nbrCircle = 0;
+        goCircle = true;
+      }
+      
+      if (nbrCircle < 10 && labAnimationRunning) {
+        circleFumeeLoop(posX, posY, color);
+      }
+    } catch (e) {
+      // Ignorar errores si Raphael fue limpiado
     }
   }, 100);
 }
@@ -210,9 +235,11 @@ function bocal_anim(e) {
   let currentIndex = 0;
   
   function animate() {
-    if (!bocal_anim_stop) return;
+    if (!bocal_anim_stop || !labAnimationRunning) return;
     currentIndex = (currentIndex + 1) % paths.length;
-    e.animate({path: paths[currentIndex]}, time, animate);
+    try {
+      e.animate({path: paths[currentIndex]}, time, animate);
+    } catch (err) {}
   }
   
   animate();
@@ -220,7 +247,7 @@ function bocal_anim(e) {
 
 // Animación de llama
 function flamme_anim(e) {
-  if (!flamme_anim_stop) return;
+  if (!flamme_anim_stop || !labAnimationRunning) return;
   
   const time = 100;
   const paths = [
@@ -233,9 +260,11 @@ function flamme_anim(e) {
   let currentIndex = 0;
   
   function animate() {
-    if (!flamme_anim_stop) return;
+    if (!flamme_anim_stop || !labAnimationRunning) return;
     currentIndex = (currentIndex + 1) % paths.length;
-    e.animate({path: paths[currentIndex]}, time, animate);
+    try {
+      e.animate({path: paths[currentIndex]}, time, animate);
+    } catch (err) {}
   }
   
   animate();
@@ -244,17 +273,25 @@ function flamme_anim(e) {
 // Animación de gota
 function goutte_anim(e, dec) {
   function first() {
-    e.animate({transform: 't431,60'}, dec, firstbis);
+    if (!labAnimationRunning) return;
+    try {
+      e.animate({transform: 't431,60'}, dec, firstbis);
+    } catch (err) {}
   }
   
   function firstbis() {
-    if (goutte_anim_stop) {
-      e.animate({transform: 't431,160'}, 1350, second);
+    if (goutte_anim_stop && labAnimationRunning) {
+      try {
+        e.animate({transform: 't431,160'}, 1350, second);
+      } catch (err) {}
     }
   }
   
   function second() {
-    e.animate({transform: 't431,60'}, 0, firstbis);
+    if (!labAnimationRunning) return;
+    try {
+      e.animate({transform: 't431,60'}, 0, firstbis);
+    } catch (err) {}
   }
   
   first();
@@ -263,14 +300,23 @@ function goutte_anim(e, dec) {
 // Animación de gradiente
 function gradient_anim(e) {
   const timerGradient = setInterval(() => {
-    const gradient = '90-' + colorGd + '-' + colorGd + ':' + gradient_anim_level + '-#fff:' + (gradient_anim_level + 1) + '#fff';
-    e.animate({fill: gradient}, 0);
-    
-    if (gradient_anim_pause) {
-      gradient_anim_level++;
+    if (!labAnimationRunning) {
+      clearInterval(timerGradient);
+      return;
     }
     
-    if (gradient_anim_level === 100) {
+    try {
+      const gradient = '90-' + colorGd + '-' + colorGd + ':' + gradient_anim_level + '-#fff:' + (gradient_anim_level + 1) + '#fff';
+      e.animate({fill: gradient}, 0);
+      
+      if (gradient_anim_pause) {
+        gradient_anim_level++;
+      }
+      
+      if (gradient_anim_level === 100) {
+        clearInterval(timerGradient);
+      }
+    } catch (err) {
       clearInterval(timerGradient);
     }
   }, 100);
@@ -289,72 +335,64 @@ function ballon_anim(e) {
   let currentIndex = 0;
   
   function animate() {
-    if (!ballon_anim_stop) return;
+    if (!ballon_anim_stop || !labAnimationRunning) return;
     currentIndex = (currentIndex + 1) % paths.length;
-    e.animate({path: paths[currentIndex]}, 100, animate);
+    try {
+      e.animate({path: paths[currentIndex]}, 100, animate);
+    } catch (err) {}
   }
   
   animate();
 }
 
 
-// Timeline principal de animación
+// Timeline principal de animación (velocidad normal)
 function startAnimationTimeline(fiole2, ballon2, ballon3, goutte2, goutte3, goutte4, fiole1, flamme, flamme2, ballon1) {
-  // 4s - Fiole2 cambia de color
-  setTimeout(() => {
-    fiole2.animate({fill: colorDv}, 1000);
-  }, 4000);
+  // Usar velocidad rápida por defecto para el juego
+  startFastAnimationTimeline(fiole2, ballon2, ballon3, goutte2, goutte3, goutte4, fiole1, flamme, flamme2, ballon1);
+}
+
+// Timeline de animación RÁPIDA (para mostrar resultados)
+function startFastAnimationTimeline(fiole2, ballon2, ballon3, goutte2, goutte3, goutte4, fiole1, flamme, flamme2, ballon1) {
+  // Limpiar timeouts anteriores
+  animationTimeouts.forEach(t => clearTimeout(t));
+  animationTimeouts = [];
   
-  // 8s - Ballon2 cambia de color + humo
-  setTimeout(() => {
-    ballon2.animate({fill: colorGd}, 1000);
-    circleFumeeLoop_stop = false;
-    setTimeout(() => {
-      circleFumeeLoop_stop = true;
-      circleFumeeLoop(355, 305, colorGd);
-    }, 101);
-  }, 8000);
+  // Los colores se mantienen estáticos: morado, turquesa, naranja
   
-  // 13.2s - Gotas animadas
+  // Burbujas en el matraz izquierdo (morado) - ballon1
+  circleFumeeLoop(72, 280, colorGr);
+  
+  // Burbujas en el matraz central (morado) - fiole2
   setTimeout(() => {
+    if (labAnimationRunning) circleFumeeLoop(225, 350, colorGr);
+  }, 200);
+  
+  // Burbujas en el matraz derecho (turquesa) - ballon2
+  setTimeout(() => {
+    if (labAnimationRunning) circleFumeeLoop(355, 305, colorDv);
+  }, 400);
+  
+  // Gotas cayendo al matraz inferior derecho (fiole1)
+  animationTimeouts.push(setTimeout(() => {
+    if (!labAnimationRunning) return;
     goutte_anim_stop = true;
     goutte2.attr({fill: colorGd});
     goutte3.attr({fill: colorGd});
     goutte4.attr({fill: colorGd});
-    goutte_anim(goutte2, 450);
-    goutte_anim(goutte3, 900);
+    goutte_anim(goutte2, 150);
+    goutte_anim(goutte3, 300);
     goutte_anim(goutte4, 0);
-  }, 13200);
+  }, 500));
   
-  // 13.85s - Ballon3 animación
-  setTimeout(() => {
-    ballon_anim_stop = true;
-    ballon_anim(ballon3);
-  }, 13850);
-  
-  // 16s - Fiole2 vuelve a color original + gradiente
-  setTimeout(() => {
-    fiole2.animate({fill: colorGr}, 2000);
+  // Animación de llenado del matraz inferior derecho (fiole1)
+  animationTimeouts.push(setTimeout(() => {
+    if (!labAnimationRunning) return;
     gradient_anim_pause = true;
     gradient_anim(fiole1);
-  }, 16000);
+  }, 800));
   
-  // 19s - Ballon2 cambia de color + humo
-  setTimeout(() => {
-    ballon2.animate({fill: colorDv}, 1000);
-    circleFumeeLoop_stop = false;
-    setTimeout(() => {
-      circleFumeeLoop_stop = true;
-    }, 101);
-  }, 19000);
-  
-  // 24s - Reiniciar animación
-  setTimeout(() => {
-    if (gradient_anim_level < 100) {
-      resetAnimationState(goutte2, goutte3, goutte4);
-      initSVGLines();
-    }
-  }, 24000);
+  // Las animaciones de líquido ondulando ya están activas desde initRaphaelElements
 }
 
 // Resetear estado de animación
@@ -370,6 +408,7 @@ function resetAnimationState(goutte2, goutte3, goutte4) {
 
 // Funciones de control para integración con el juego
 function pauseLabAnimation() {
+  labAnimationRunning = false;
   circleFumeeLoop_stop = false;
   bocal_anim_stop = false;
   flamme_anim_stop = false;
@@ -378,6 +417,7 @@ function pauseLabAnimation() {
 }
 
 function resumeLabAnimation() {
+  labAnimationRunning = true;
   circleFumeeLoop_stop = true;
   bocal_anim_stop = true;
   flamme_anim_stop = true;
@@ -386,21 +426,55 @@ function resumeLabAnimation() {
 }
 
 function resetLabAnimation() {
+  // Pausar todas las animaciones
+  pauseLabAnimation();
+  
+  // Limpiar todos los timeouts pendientes
+  animationTimeouts.forEach(t => clearTimeout(t));
+  animationTimeouts = [];
+  
+  // Limpiar los contenedores de Raphael
+  const container = document.getElementById('canvas_container');
+  const lineBack = document.getElementById('canvas_line_back');
+  
+  if (container) container.innerHTML = '';
+  if (lineBack) lineBack.innerHTML = '';
+  
+  // Limpiar referencias de Raphael
+  if (S) {
+    try {
+      S.clear();
+      S.remove();
+    } catch (e) {}
+    S = null;
+  }
+  if (S2) {
+    try {
+      S2.clear();
+      S2.remove();
+    } catch (e) {}
+    S2 = null;
+  }
+  
+  // Resetear estado
   labAnimationInitialized = false;
+  labAnimationRunning = false;
   gradient_anim_level = 0;
   nbrCircle = 0;
   goCircle = false;
   circleFumee = [];
+  
+  // Resetear flags de animación
+  circleFumeeLoop_stop = true;
+  gradient_anim_pause = true;
+  ballon_anim_stop = true;
+  bocal_anim_stop = true;
+  flamme_anim_stop = true;
+  goutte_anim_stop = true;
 }
 
-// Auto-init cuando el DOM esté listo
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(initLabAnimation, 100);
-  });
-} else {
-  setTimeout(initLabAnimation, 100);
-}
+// Auto-init deshabilitado - la animación se inicia manualmente cuando los jugadores contestan
+// La inicialización se hace desde showLabAnimationInMixingZone() en screen-app.js
 
 // Export para integración con el juego
 window.labAnimation = {

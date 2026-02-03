@@ -994,6 +994,62 @@ body {
 
 
 /* ============================================
+   MODE SELECTOR (Admin)
+   ============================================ */
+
+.mode-selector-admin {
+    background: var(--color-bg-soft);
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 16px;
+}
+
+.mode-options {
+    display: flex;
+    gap: 8px;
+}
+
+.mode-option {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 8px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.mode-option iconify-icon {
+    font-size: 28px;
+    color: var(--mode-color);
+}
+
+.mode-option .mode-name {
+    font-weight: bold;
+    font-size: 13px;
+    color: var(--color-text);
+}
+
+.mode-option:active {
+    transform: scale(0.98);
+}
+
+.mode-option.selected {
+    border-color: var(--mode-color);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--mode-color) 15%, white) 0%, white 100%);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--mode-color) 20%, transparent);
+}
+
+.mode-option.selected iconify-icon {
+    transform: scale(1.1);
+}
+
+/* ============================================
    DIFFICULTY SELECTOR (Admin)
    ============================================ */
 

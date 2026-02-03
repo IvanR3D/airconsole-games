@@ -1,6 +1,6 @@
 // ============================================
 // LABORATORIO QUÍMICO - SCREEN APP
-// Sistema de Dificultades
+// Sistema de Equipos y Modo Individual
 // ============================================
 
 // Cargar estilos
@@ -8,6 +8,68 @@ const styleLink = document.createElement('link');
 styleLink.rel = 'stylesheet';
 styleLink.href = 'screen-styles.css';
 document.head.appendChild(styleLink);
+
+// ============================================
+// CONFIGURACIÓN DE MODOS DE JUEGO
+// ============================================
+
+const GAME_MODES = {
+    teams: {
+        id: 'teams',
+        name: 'Equipos',
+        icon: 'mdi:account-group',
+        color: '#3b82f6',
+        description: '2 equipos compiten entre sí',
+        minPlayers: 2,
+        maxPlayers: 40
+    },
+    individual: {
+        id: 'individual',
+        name: 'Individual',
+        icon: 'mdi:account',
+        color: '#8b5cf6',
+        description: 'Todos contra todos',
+        minPlayers: 1,
+        maxPlayers: 20
+    }
+};
+
+let currentGameMode = 'teams'; // 'teams' o 'individual'
+
+// ============================================
+// CONFIGURACIÓN DE EQUIPOS
+// ============================================
+
+const TEAM_CONFIG = {
+    team1: {
+        name: 'Equipo Azul',
+        color: '#3b82f6',
+        icon: 'mdi:flask',
+        bgColor: 'rgba(59, 130, 246, 0.15)'
+    },
+    team2: {
+        name: 'Equipo Naranja', 
+        color: '#f59e0b',
+        icon: 'mdi:atom',
+        bgColor: 'rgba(245, 158, 11, 0.15)'
+    }
+};
+
+// Colores para modo individual
+const INDIVIDUAL_COLORS = [
+    '#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444',
+    '#06b6d4', '#84cc16', '#f97316', '#ec4899', '#6366f1',
+    '#14b8a6', '#eab308', '#a855f7', '#22c55e', '#0ea5e9',
+    '#d946ef', '#f43f5e', '#64748b', '#78716c', '#059669'
+];
+
+const INDIVIDUAL_ICONS = [
+    'mdi:flask', 'mdi:atom', 'mdi:molecule', 'mdi:test-tube',
+    'mdi:beaker', 'mdi:flask-round-bottom', 'mdi:flask-outline',
+    'mdi:atom-variant', 'mdi:chemical-weapon', 'mdi:bacteria'
+];
+
+const MAX_PLAYERS = 40; // Máximo de jugadores permitidos
 
 // ============================================
 // CONFIGURACIÓN DE DIFICULTADES
@@ -173,13 +235,20 @@ let airconsole;
 let players = {};
 let currentCompound = null;
 let selectedElements = [];
-let playerSelections = {};
+let playerSelections = {}; // { device_id: { hasSelected, elements, isCorrect } }
+let playerResults = {};    // Resultados individuales de cada jugador
 let gameTimer = 45;
 let timerInterval = null;
 let roundNumber = 0;
 let usedCompounds = [];
 let currentDifficulty = 'easy';
 let difficultyConfig = DIFFICULTY_CONFIG.easy;
+
+// Estado de equipos
+let teams = {
+    team1: { score: 0, players: [] },
+    team2: { score: 0, players: [] }
+};
 
 // ============================================
 // SISTEMA DE AUDIO
@@ -289,7 +358,16 @@ function init() {
                 if (data.customRounds) {
                     setCustomRounds(data.customRounds);
                 }
+                if (data.gameMode) {
+                    setGameMode(data.gameMode);
+                }
                 startGame();
+                break;
+            case 'setGameMode':
+                // Solo el admin puede cambiar el modo de juego
+                if (players[from]?.isAdmin && data.mode) {
+                    setGameMode(data.mode);
+                }
                 break;
             case 'setRounds':
                 // Solo el admin puede cambiar las rondas
@@ -406,6 +484,24 @@ function renderIntroScreen() {
                 <h1 class="intro-title">LABORATORIO</h1>
                 <h2 class="subtitle">QUÍMICO</h2>
                 
+                <!-- Selector de Modo de Juego -->
+                <div class="game-mode-selector" id="gameModeSelector">
+                    <p class="selector-label" style="color: var(--color-text-light);">
+                        <iconify-icon icon="mdi:gamepad-variant"></iconify-icon>
+                        Modo de juego:
+                    </p>
+                    <div class="mode-buttons">
+                        <button class="mode-btn active" data-mode="teams" onclick="setGameMode('teams')">
+                            <iconify-icon icon="${GAME_MODES.teams.icon}"></iconify-icon>
+                            <span>${GAME_MODES.teams.name}</span>
+                        </button>
+                        <button class="mode-btn" data-mode="individual" onclick="setGameMode('individual')">
+                            <iconify-icon icon="${GAME_MODES.individual.icon}"></iconify-icon>
+                            <span>${GAME_MODES.individual.name}</span>
+                        </button>
+                    </div>
+                </div>
+                
                 <div class="formula-demo" id="formulaDemo">
                     <div class="element-card element-nonmetal intro-element">
                         <span class="atomic-number">1</span>
@@ -427,51 +523,47 @@ function renderIntroScreen() {
                 
                 <p class="intro-description" style="color: var(--color-text-light);">
                     <iconify-icon icon="mdi:flask" style="color: var(--color-accent);"></iconify-icon>
-                    Combina elementos y crea compuestos químicos
+                    Cada jugador sintetiza individualmente - ¡El equipo con más aciertos gana!
                 </p>
                 
                 <!-- Selector de Dificultad -->
                 <div class="difficulty-selector-compact" id="difficultySelector">
                     <p class="difficulty-label" style="color: var(--color-text-light);">
                         <iconify-icon icon="mdi:speedometer"></iconify-icon>
-                        Dificultad seleccionada:
+                        Dificultad:
                     </p>
                     <div class="difficulty-display" id="difficultyDisplay">
                         <iconify-icon icon="${DIFFICULTY_CONFIG.easy.icon}" style="color: ${DIFFICULTY_CONFIG.easy.color};"></iconify-icon>
                         <span style="color: ${DIFFICULTY_CONFIG.easy.color};">${DIFFICULTY_CONFIG.easy.name}</span>
                     </div>
-                    <p class="difficulty-hint" style="color: var(--color-text-light);">
-                        El admin puede cambiar la dificultad desde su control
-                    </p>
                 </div>
                 
                 <p class="waiting-text waiting-dots" style="color: var(--color-primary);">Esperando científicos</p>
                 
                 <div class="player-slots-row" id="playerSlots">
-                    ${[0,1,2,3].map(i => `
-                        <div class="player-slot" data-slot="${i}">
-                            <iconify-icon icon="mdi:account-plus"></iconify-icon>
-                        </div>
-                    `).join('')}
+                    <!-- Se actualiza dinámicamente con updatePlayerSlots() -->
                 </div>
                 
                 <div class="intro-footer" style="color: var(--color-text-light);">
                     <div class="footer-item">
                         <iconify-icon icon="mdi:account-group" style="color: var(--color-primary);"></iconify-icon>
-                        <span>2-4 jugadores</span>
+                        <span id="playersRangeInfo">2-${MAX_PLAYERS} jugadores</span>
                     </div>
                     <div class="footer-item">
                         <iconify-icon icon="mdi:timer" style="color: var(--color-warning);"></iconify-icon>
                         <span id="roundsInfo">${DIFFICULTY_CONFIG.easy.defaultRounds} rondas</span>
                     </div>
-                    <div class="footer-item">
+                    <div class="footer-item" id="modeFooterItem">
                         <iconify-icon icon="mdi:trophy" style="color: var(--color-warning);"></iconify-icon>
-                        <span>Gana puntos</span>
+                        <span>Equipos VS</span>
                     </div>
                 </div>
             </div>
         </div>
     `;
+    
+    // Inicializar slots según modo actual
+    updatePlayerSlots();
     
     setTimeout(() => {
         if (window.anime) {
@@ -589,9 +681,49 @@ function renderPlayingScreen() {
                     <div class="mixing-zone" id="mixingZone">
                         <div id="bubblesContainer" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
                         
+                        <!-- Lab Animation Container (se muestra cuando los jugadores contestan) -->
+                        <div class="lab-animation-container hidden" id="labAnimationZone">
+                            <div class="schema-anim">
+                                <div id="canvas_line_back"></div>
+                                <div id="canvas_line1">
+                                    <svg id="svg_line" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+                                         x="0px" y="0px" width="500px" height="400px" viewBox="0 0 500 400" 
+                                         enable-background="new 0 0 500 400" xml:space="preserve">
+                                        <g id="Layer_1">
+                                            <path id="line1" fill="none" stroke="#AB3D8B" stroke-width="3" stroke-miterlimit="10" 
+                                                  d="M80.193,227.11v-48.02c0-2.209,1.869-4,4.176-4h18.648c2.306,0,4.176,1.791,4.176,4v14.625v24.54h0.068c0,3.927,3.184,7.111,7.111,7.111s7.111-3.184,7.111-7.111l-0.097-38.442c0-3.928,3.185-7.112,7.112-7.112c3.927,0,7.111,3.184,7.111,7.112l-0.142,38.442c0,3.927,3.185,7.111,7.112,7.111c3.927,0,7.111-3.184,7.111-7.111l-0.029-38.442c0-3.928,3.185-7.112,7.112-7.112c3.927,0,7.111,3.184,7.111,7.112l-0.142,38.442c0,3.927,3.185,7.111,7.112,7.111c3.927,0,7.111-3.184,7.111-7.111v-38.442c0-3.928,3.184-7.112,7.112-7.112c3.927,0,7.111,3.184,7.111,7.112l-0.141,38.442c0,3.927,3.184,7.111,7.112,7.111c3.927,0,7.111-3.184,7.111-7.111v-38.165v-1.125c0-2.209,1.87-4,4.176-4h18.648c2.306,0,4.176,1.791,4.176,4v14.625v112.188">
+                                                <animate id="a1" attributeName="stroke-dashoffset" from="0" to="0" dur="1.2s" fill="freeze" calcMode="paced"/>
+                                            </path>
+                                            <path id="line2" fill="none" stroke="#000000" stroke-width="3" stroke-miterlimit="10" 
+                                                  d="M80.193,227.11v-48.02c0-2.209,1.869-4,4.176-4h18.648c2.306,0,4.176,1.791,4.176,4v14.625v24.54h0.068c0,3.927,3.184,7.111,7.111,7.111s7.111-3.184,7.111-7.111l-0.097-38.442c0-3.928,3.185-7.112,7.112-7.112c3.927,0,7.111,3.184,7.111,7.112l-0.142,38.442c0,3.927,3.185,7.111,7.112,7.111c3.927,0,7.111-3.184,7.111-7.111l-0.029-38.442c0-3.928,3.185-7.112,7.112-7.112c3.927,0,7.111,3.184,7.111,7.112l-0.142,38.442c0,3.927,3.185,7.111,7.112,7.111c3.927,0,7.111-3.184,7.111-7.111v-38.442c0-3.928,3.184-7.112,7.112-7.112c3.927,0,7.111,3.184,7.111,7.112l-0.141,38.442c0,3.927,3.184,7.111,7.112,7.111c3.927,0,7.111-3.184,7.111-7.111v-38.165v-1.125c0-2.209,1.87-4,4.176-4h18.648c2.306,0,4.176,1.791,4.176,4v14.625v112.188">
+                                                <animate id="a2" begin="a3.end" attributeName="stroke-dashoffset" from="0" to="0" dur="2.4s" fill="freeze" calcMode="paced"/>
+                                            </path>
+                                            <path id="line3" fill="none" stroke="#0595AE" stroke-width="3" stroke-miterlimit="10" 
+                                                  d="M259.73,317.604L300.209,277.125L300.304,277.061L314.467,277.125L315.262,277.125L331.936,293.8">
+                                                <animate id="a3" begin="1.5s" attributeName="stroke-dashoffset" from="0" to="0" dur="0.9s" fill="freeze" calcMode="paced"/>
+                                            </path>
+                                            <path id="line4" fill="none" stroke="#000000" stroke-width="3" stroke-miterlimit="10" 
+                                                  d="M259.73,317.604L300.209,277.125L300.304,277.061L314.467,277.125L315.262,277.125L331.936,293.8">
+                                                <animate id="a4" begin="a2.end" attributeName="stroke-dashoffset" from="0" to="0" dur="0.9s" fill="freeze" calcMode="paced"/>
+                                            </path>
+                                            <path id="line5" fill="none" stroke="#EB8225" stroke-width="3" stroke-miterlimit="10" 
+                                                  d="M364.125,266.366L364.125,46.667L371.729,39.062L463,54L463,66.667">
+                                                <animate id="a5" begin="a3.end" attributeName="stroke-dashoffset" from="0" to="0" dur="1.5s" fill="freeze" calcMode="paced"/>
+                                            </path>
+                                            <path id="line6" fill="none" stroke="#000000" stroke-width="3" stroke-miterlimit="10" 
+                                                  d="M364.125,266.366L364.125,46.667L371.729,39.062L463,54L463,66.667">
+                                                <animate id="a6" begin="a4.end" attributeName="stroke-dashoffset" from="0" to="0" dur="1.5s" fill="freeze" calcMode="paced"/>
+                                            </path>
+                                        </g>
+                                    </svg>
+                                </div>
+                                <div id="canvas_container"></div>
+                            </div>
+                        </div>
+                        
                         <div class="text-center" id="mixingContent">
                             <iconify-icon icon="mdi:beaker-question" class="text-3xl sm:text-4xl lg:text-5xl mb-2" style="color: var(--color-text-light); opacity: 0.4;"></iconify-icon>
-                            <p class="text-xs sm:text-sm" style="color: var(--color-text-light);">Los científicos están seleccionando...</p>
+                            <p class="text-xs sm:text-sm" style="color: var(--color-text-light);">Cada científico sintetiza individualmente...</p>
                         </div>
                         
                         <div class="hidden mixing-elements flex-wrap justify-center gap-2" id="selectedElements"></div>
@@ -631,17 +763,46 @@ function recalculatePlayersGrid() {
     updatePlayersArea();
 }
 
-function renderEndScreen(winner, sortedPlayers) {
+function renderEndScreen(winningTeam, sortedPlayers) {
     const app = document.getElementById('app');
+    
+    const team1Config = TEAM_CONFIG.team1;
+    const team2Config = TEAM_CONFIG.team2;
+    
+    let winnerHTML = '';
+    if (winningTeam === 'team1') {
+        winnerHTML = `
+            <div class="winner-team-card" style="border-color: ${team1Config.color}; background: ${team1Config.bgColor};">
+                <iconify-icon icon="mdi:trophy" class="text-5xl" style="color: ${team1Config.color};"></iconify-icon>
+                <h2 style="color: ${team1Config.color};">¡${team1Config.name} Gana!</h2>
+                <p class="team-final-score">${teams.team1.score} pts</p>
+            </div>
+        `;
+    } else if (winningTeam === 'team2') {
+        winnerHTML = `
+            <div class="winner-team-card" style="border-color: ${team2Config.color}; background: ${team2Config.bgColor};">
+                <iconify-icon icon="mdi:trophy" class="text-5xl" style="color: ${team2Config.color};"></iconify-icon>
+                <h2 style="color: ${team2Config.color};">¡${team2Config.name} Gana!</h2>
+                <p class="team-final-score">${teams.team2.score} pts</p>
+            </div>
+        `;
+    } else {
+        winnerHTML = `
+            <div class="winner-team-card" style="border-color: #9ca3af; background: rgba(156, 163, 175, 0.15);">
+                <iconify-icon icon="mdi:scale-balance" class="text-5xl" style="color: #9ca3af;"></iconify-icon>
+                <h2 style="color: #9ca3af;">¡Empate!</h2>
+                <p class="team-final-score">${teams.team1.score} pts</p>
+            </div>
+        `;
+    }
+    
     app.innerHTML = `
         <div class="screen active flex-col items-center justify-center p-4 sm:p-6 lg:p-8 min-h-screen relative" id="endScreen">
             <div class="lab-bg"></div>
             <div id="confettiContainer" class="fixed inset-0 pointer-events-none z-50"></div>
             
-            <div class="relative z-10 text-center max-w-3xl w-full px-2">
-                <iconify-icon icon="mdi:trophy" class="text-5xl sm:text-6xl lg:text-8xl text-yellow-400 glow-orange mb-4 sm:mb-6 result-icon"></iconify-icon>
-                
-                <h1 class="text-2xl sm:text-4xl lg:text-5xl font-black mb-1 sm:mb-2 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+            <div class="relative z-10 text-center max-w-4xl w-full px-2">
+                <h1 class="text-2xl sm:text-4xl lg:text-5xl font-black mb-2 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
                     ¡Experimento Completado!
                 </h1>
                 
@@ -650,22 +811,33 @@ function renderEndScreen(winner, sortedPlayers) {
                     Dificultad: ${difficultyConfig.name} (x${difficultyConfig.pointsMultiplier})
                 </div>
                 
-                <p class="text-base sm:text-lg lg:text-xl text-white/70 mb-4 sm:mb-6 lg:mb-8">El mejor científico del laboratorio es...</p>
+                ${winnerHTML}
                 
-                <div class="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border-2 border-yellow-500 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 mb-4 sm:mb-6 lg:mb-8 winner-card">
-                    <div class="flex items-center justify-center gap-3 sm:gap-4 lg:gap-6">
-                        <div class="player-avatar text-2xl sm:text-3xl lg:text-4xl" style="background: ${winner.color}; width: clamp(60px, 12vw, 100px); height: clamp(60px, 12vw, 100px);">
-                            <iconify-icon icon="mdi:crown" class="text-yellow-300"></iconify-icon>
-                        </div>
-                        <div class="text-left">
-                            <p class="text-xl sm:text-2xl lg:text-3xl font-black">${winner.name}</p>
-                            <p class="text-2xl sm:text-3xl lg:text-4xl font-black text-yellow-400">${winner.score} pts</p>
-                        </div>
+                <!-- Comparación de equipos -->
+                <div class="teams-final-comparison">
+                    <div class="team-final-card" style="border-color: ${team1Config.color}; background: ${team1Config.bgColor};">
+                        <iconify-icon icon="${team1Config.icon}" style="color: ${team1Config.color}; font-size: 2rem;"></iconify-icon>
+                        <h3 style="color: ${team1Config.color};">${team1Config.name}</h3>
+                        <p class="team-score">${teams.team1.score} pts</p>
+                        <p class="team-players-count">${teams.team1.players.length} jugadores</p>
+                    </div>
+                    
+                    <div class="vs-final">VS</div>
+                    
+                    <div class="team-final-card" style="border-color: ${team2Config.color}; background: ${team2Config.bgColor};">
+                        <iconify-icon icon="${team2Config.icon}" style="color: ${team2Config.color}; font-size: 2rem;"></iconify-icon>
+                        <h3 style="color: ${team2Config.color};">${team2Config.name}</h3>
+                        <p class="team-score">${teams.team2.score} pts</p>
+                        <p class="team-players-count">${teams.team2.players.length} jugadores</p>
                     </div>
                 </div>
                 
-                <div class="space-y-2 sm:space-y-3 mb-4 sm:mb-6 lg:mb-8" id="leaderboard">
-                    ${sortedPlayers.map((player, i) => `
+                <!-- Top jugadores -->
+                <h3 class="text-lg font-bold mt-6 mb-3" style="color: var(--color-text);">
+                    <iconify-icon icon="mdi:podium"></iconify-icon> Mejores Científicos
+                </h3>
+                <div class="space-y-2 sm:space-y-3 mb-4" id="leaderboard">
+                    ${sortedPlayers.slice(0, 5).map((player, i) => `
                         <div class="leaderboard-item ${i === 0 ? 'first' : i === 1 ? 'second' : i === 2 ? 'third' : ''}">
                             <div class="rank-badge ${i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : 'bg-white/10'}">${i + 1}</div>
                             <div class="player-avatar" style="background: ${player.color};">
@@ -679,7 +851,7 @@ function renderEndScreen(winner, sortedPlayers) {
                     `).join('')}
                 </div>
                 
-                <p class="text-white/50 text-xs sm:text-sm">
+                <p style="color: var(--color-text-light);" class="text-xs sm:text-sm">
                     <iconify-icon icon="mdi:information" class="mr-1"></iconify-icon>
                     El Jugador 1 puede iniciar una nueva partida
                 </p>
@@ -722,21 +894,35 @@ function renderEndScreen(winner, sortedPlayers) {
 // ============================================
 
 function handlePlayerJoin(device_id) {
-    if (Object.keys(players).length >= 4) {
+    if (Object.keys(players).length >= MAX_PLAYERS) {
         airconsole.message(device_id, { action: 'gameFull' });
         return;
     }
     
-    const colors = ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b'];
-    const icons = ['mdi:flask', 'mdi:atom', 'mdi:molecule', 'mdi:test-tube'];
     const playerNum = Object.keys(players).length;
+    
+    let playerColor, playerIcon, team = null;
+    
+    if (currentGameMode === 'teams') {
+        // Modo equipos: asignar equipo alternando (balanceado)
+        team = (teams.team1.players.length <= teams.team2.players.length) ? 'team1' : 'team2';
+        const teamConfig = TEAM_CONFIG[team];
+        playerColor = teamConfig.color;
+        playerIcon = teamConfig.icon;
+        teams[team].players.push(device_id);
+    } else {
+        // Modo individual: asignar color e icono único
+        playerColor = INDIVIDUAL_COLORS[playerNum % INDIVIDUAL_COLORS.length];
+        playerIcon = INDIVIDUAL_ICONS[playerNum % INDIVIDUAL_ICONS.length];
+    }
     
     players[device_id] = {
         id: device_id,
         name: airconsole.getNickname(device_id) || `Científico ${playerNum + 1}`,
-        color: colors[playerNum],
-        icon: icons[playerNum],
+        color: playerColor,
+        icon: playerIcon,
         score: 0,
+        team: team,
         isAdmin: playerNum === 0
     };
     
@@ -749,22 +935,18 @@ function handlePlayerJoin(device_id) {
         isAdmin: players[device_id].isAdmin,
         elements: availableElements,
         difficulty: currentDifficulty,
-        difficultyConfig: difficultyConfig
+        difficultyConfig: difficultyConfig,
+        gameMode: currentGameMode,
+        team: team,
+        teamConfig: team ? TEAM_CONFIG[team] : null
     });
     
     updatePlayerSlots();
+    if (currentGameMode === 'teams') updateTeamDisplay();
     broadcastGameState();
     
-    if (window.anime) {
-        const slot = document.querySelector(`.player-slot[data-slot="${playerNum}"]`);
-        if (slot) {
-            window.anime.animate(slot, {
-                scale: [0.5, 1.2, 1],
-                duration: 500,
-                easing: 'easeOutBack'
-            });
-        }
-    }
+    const modeText = currentGameMode === 'teams' ? TEAM_CONFIG[team].name : 'Modo Individual';
+    console.log(`🧪 Jugador ${players[device_id].name} se unió (${modeText})`);
 }
 
 function getAvailableElements() {
@@ -776,28 +958,94 @@ function getAvailableElements() {
 }
 
 function updatePlayerSlots() {
-    const playerList = Object.values(players);
+    // Actualizar display de equipos en la pantalla de intro
+    const slotsContainer = document.getElementById('playerSlots');
+    if (!slotsContainer) return;
     
-    for (let i = 0; i < 4; i++) {
-        const slot = document.querySelector(`.player-slot[data-slot="${i}"]`);
-        if (!slot) continue;
+    if (currentGameMode === 'teams') {
+        // Modo equipos: mostrar dos equipos
+        const team1Players = teams.team1.players.map(id => players[id]).filter(Boolean);
+        const team2Players = teams.team2.players.map(id => players[id]).filter(Boolean);
         
-        if (playerList[i]) {
-            slot.classList.add('filled');
-            slot.style.setProperty('--player-color', playerList[i].color);
-            slot.innerHTML = `<iconify-icon icon="${playerList[i].icon}" style="font-size: 2rem; color: white;"></iconify-icon>`;
-        } else {
-            slot.classList.remove('filled');
-            slot.style.removeProperty('--player-color');
-            slot.innerHTML = `<iconify-icon icon="mdi:account-plus" style="font-size: 2rem; color: rgba(255,255,255,0.3);"></iconify-icon>`;
-        }
+        slotsContainer.innerHTML = `
+            <div class="team-slots-container">
+                <div class="team-slot" style="border-color: ${TEAM_CONFIG.team1.color}; background: ${TEAM_CONFIG.team1.bgColor};">
+                    <div class="team-header">
+                        <iconify-icon icon="${TEAM_CONFIG.team1.icon}" style="color: ${TEAM_CONFIG.team1.color};"></iconify-icon>
+                        <span style="color: ${TEAM_CONFIG.team1.color};">${TEAM_CONFIG.team1.name}</span>
+                        <span class="player-count">${team1Players.length}</span>
+                    </div>
+                    <div class="team-players">
+                        ${team1Players.slice(0, 10).map(p => `
+                            <div class="mini-player" style="background: ${TEAM_CONFIG.team1.color};">
+                                <iconify-icon icon="mdi:account"></iconify-icon>
+                            </div>
+                        `).join('')}
+                        ${team1Players.length > 10 ? `<span class="more-players">+${team1Players.length - 10}</span>` : ''}
+                        ${team1Players.length === 0 ? '<span class="waiting-text">Esperando...</span>' : ''}
+                    </div>
+                </div>
+                
+                <div class="vs-badge">VS</div>
+                
+                <div class="team-slot" style="border-color: ${TEAM_CONFIG.team2.color}; background: ${TEAM_CONFIG.team2.bgColor};">
+                    <div class="team-header">
+                        <iconify-icon icon="${TEAM_CONFIG.team2.icon}" style="color: ${TEAM_CONFIG.team2.color};"></iconify-icon>
+                        <span style="color: ${TEAM_CONFIG.team2.color};">${TEAM_CONFIG.team2.name}</span>
+                        <span class="player-count">${team2Players.length}</span>
+                    </div>
+                    <div class="team-players">
+                        ${team2Players.slice(0, 10).map(p => `
+                            <div class="mini-player" style="background: ${TEAM_CONFIG.team2.color};">
+                                <iconify-icon icon="mdi:account"></iconify-icon>
+                            </div>
+                        `).join('')}
+                        ${team2Players.length > 10 ? `<span class="more-players">+${team2Players.length - 10}</span>` : ''}
+                        ${team2Players.length === 0 ? '<span class="waiting-text">Esperando...</span>' : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+    } else {
+        // Modo individual: mostrar lista de jugadores
+        const playerList = Object.values(players);
+        
+        slotsContainer.innerHTML = `
+            <div class="individual-slots-container">
+                <div class="players-grid">
+                    ${playerList.slice(0, 12).map(p => `
+                        <div class="individual-player-slot" style="background: ${p.color}20; border-color: ${p.color};">
+                            <iconify-icon icon="${p.icon}" style="color: ${p.color};"></iconify-icon>
+                            <span class="player-name">${p.name.substring(0, 10)}</span>
+                        </div>
+                    `).join('')}
+                    ${playerList.length > 12 ? `<div class="more-players-badge">+${playerList.length - 12} más</div>` : ''}
+                    ${playerList.length === 0 ? '<div class="waiting-slot"><iconify-icon icon="mdi:account-plus"></iconify-icon><span>Esperando jugadores...</span></div>' : ''}
+                </div>
+                <div class="player-count-badge">
+                    <iconify-icon icon="mdi:account-group"></iconify-icon>
+                    <span>${playerList.length} jugador${playerList.length !== 1 ? 'es' : ''}</span>
+                </div>
+            </div>
+        `;
     }
+}
+
+function updateTeamDisplay() {
+    // Actualizar contadores de equipos si existen
+    const team1Count = document.getElementById('team1Count');
+    const team2Count = document.getElementById('team2Count');
+    
+    if (team1Count) team1Count.textContent = teams.team1.players.length;
+    if (team2Count) team2Count.textContent = teams.team2.players.length;
 }
 
 function broadcastGameState() {
     airconsole.broadcast({
         action: 'gameStateUpdate',
         players: players,
+        teams: teams,
+        gameMode: currentGameMode,
         currentCompound: currentCompound,
         selectedElements: selectedElements,
         round: roundNumber,
@@ -807,12 +1055,99 @@ function broadcastGameState() {
     });
 }
 
+// Función para cambiar el modo de juego
+function setGameMode(mode) {
+    if (GAME_MODES[mode]) {
+        currentGameMode = mode;
+        
+        // Resetear equipos si cambiamos de modo
+        teams = {
+            team1: { score: 0, players: [] },
+            team2: { score: 0, players: [] }
+        };
+        
+        // Reasignar jugadores existentes
+        Object.keys(players).forEach((pid, index) => {
+            if (mode === 'teams') {
+                const team = (index % 2 === 0) ? 'team1' : 'team2';
+                players[pid].team = team;
+                players[pid].color = TEAM_CONFIG[team].color;
+                players[pid].icon = TEAM_CONFIG[team].icon;
+                teams[team].players.push(pid);
+            } else {
+                players[pid].team = null;
+                players[pid].color = INDIVIDUAL_COLORS[index % INDIVIDUAL_COLORS.length];
+                players[pid].icon = INDIVIDUAL_ICONS[index % INDIVIDUAL_ICONS.length];
+            }
+        });
+        
+        updatePlayerSlots();
+        updateGameModeDisplay();
+        broadcastGameState();
+        
+        console.log(`🎮 Modo de juego cambiado a: ${GAME_MODES[mode].name}`);
+    }
+}
+
+function updateGameModeDisplay() {
+    const modeConfig = GAME_MODES[currentGameMode];
+    
+    // Actualizar botones de modo
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.mode === currentGameMode) {
+            btn.classList.add('active');
+        }
+    });
+    
+    // Actualizar descripción
+    const introDesc = document.querySelector('.intro-description');
+    if (introDesc) {
+        if (currentGameMode === 'teams') {
+            introDesc.innerHTML = `
+                <iconify-icon icon="mdi:flask" style="color: var(--color-accent);"></iconify-icon>
+                Cada jugador sintetiza individualmente - ¡El equipo con más aciertos gana!
+            `;
+        } else {
+            introDesc.innerHTML = `
+                <iconify-icon icon="mdi:flask" style="color: var(--color-accent);"></iconify-icon>
+                Cada jugador compite por sí mismo - ¡El que más puntos acumule gana!
+            `;
+        }
+    }
+    
+    // Actualizar footer
+    const modeFooterItem = document.getElementById('modeFooterItem');
+    if (modeFooterItem) {
+        if (currentGameMode === 'teams') {
+            modeFooterItem.innerHTML = `
+                <iconify-icon icon="mdi:trophy" style="color: var(--color-warning);"></iconify-icon>
+                <span>Equipos VS</span>
+            `;
+        } else {
+            modeFooterItem.innerHTML = `
+                <iconify-icon icon="mdi:trophy" style="color: var(--color-warning);"></iconify-icon>
+                <span>Todos vs Todos</span>
+            `;
+        }
+    }
+    
+    // Actualizar rango de jugadores
+    const playersRangeInfo = document.getElementById('playersRangeInfo');
+    if (playersRangeInfo) {
+        playersRangeInfo.textContent = `${modeConfig.minPlayers}-${modeConfig.maxPlayers} jugadores`;
+    }
+}
+
 function startGame() {
-    // Permitir de 1 a 4 jugadores
-    if (Object.keys(players).length < 1) {
+    const modeConfig = GAME_MODES[currentGameMode];
+    const playerCount = Object.keys(players).length;
+    
+    // Verificar mínimo de jugadores según modo
+    if (playerCount < modeConfig.minPlayers) {
         airconsole.broadcast({
             action: 'gameError',
-            message: 'Se necesita al menos 1 jugador para iniciar'
+            message: `Se necesitan al menos ${modeConfig.minPlayers} jugador(es) para ${modeConfig.name}`
         });
         return;
     }
@@ -995,11 +1330,22 @@ function updateRequiredElements() {
 
 function resetMixingZone() {
     const zone = document.getElementById('mixingZone');
-    zone.classList.remove('active', 'reacting');
+    zone.classList.remove('active', 'reacting', 'success', 'error');
     
     document.getElementById('mixingContent').classList.remove('hidden');
     document.getElementById('selectedElements').classList.add('hidden');
     document.getElementById('selectedElements').innerHTML = '';
+    
+    // Ocultar la animación del laboratorio
+    const labAnimationZone = document.getElementById('labAnimationZone');
+    if (labAnimationZone) {
+        labAnimationZone.classList.add('hidden');
+    }
+    
+    // Pausar la animación
+    if (window.labAnimation) {
+        window.labAnimation.pause();
+    }
 }
 
 function updateTimerDisplay() {
@@ -1022,65 +1368,43 @@ function handleElementSelection(device_id, elementsArray) {
     if (!playerSelections[device_id]) return;
     if (playerSelections[device_id].hasSelected) return;
     
+    // Guardar selección individual del jugador
     playerSelections[device_id].hasSelected = true;
     playerSelections[device_id].elements = elementsArray;
     
-    elementsArray.forEach(element => {
-        selectedElements.push({ element, player: device_id });
-    });
+    // Verificar si la respuesta individual es correcta
+    const playerSelected = [...elementsArray].sort();
+    const required = [...currentCompound.elements].sort();
+    const isCorrect = playerSelected.length === required.length && 
+                     playerSelected.every((el, i) => el === required[i]);
     
-    const zone = document.getElementById('mixingZone');
-    const content = document.getElementById('mixingContent');
-    const container = document.getElementById('selectedElements');
+    playerSelections[device_id].isCorrect = isCorrect;
     
-    content.classList.add('hidden');
-    container.classList.remove('hidden');
-    zone.classList.add('active');
-    
-    elementsArray.forEach((element, index) => {
-        const el = elements[element];
-        if (!el) return;
-        
-        const card = document.createElement('div');
-        card.className = `element-card element-${el.group}`;
-        card.innerHTML = `
-            <span class="atomic-number">${el.number}</span>
-            <span class="symbol">${el.symbol}</span>
-            <span class="name">${el.name}</span>
-        `;
-        container.appendChild(card);
-        
-        if (window.anime) {
-            window.anime.animate(card, {
-                scale: [0, 1.2, 1],
-                rotate: [Math.random() * 20 - 10, 0],
-                duration: 400,
-                delay: index * 100,
-                easing: 'easeOutBack'
-            });
-        }
-    });
-    
-    createBubbles();
+    // Actualizar UI para mostrar que el jugador ya respondió
     updatePlayersArea(device_id);
     
+    // Confirmar al jugador que su selección fue recibida
     airconsole.message(device_id, { 
         action: 'selectionConfirmed', 
-        elements: elementsArray 
+        elements: elementsArray,
+        waiting: true // Esperando a los demás
     });
     
     const totalPlayers = Object.keys(players).length;
-    const playersWhoSelected = Object.values(playerSelections).filter(p => p.hasSelected).length;
+    const playersWhoSelected = Object.values(playerSelections).filter(p => p && p.hasSelected).length;
     
     updateStatusIndicator(playersWhoSelected, totalPlayers);
     
+    // Cuando todos han respondido, mostrar resultados
     if (playersWhoSelected >= totalPlayers) {
         clearInterval(timerInterval);
-        zone.classList.add('reacting');
+        
+        const zone = document.getElementById('mixingZone');
+        if (zone) zone.classList.add('reacting');
         
         setTimeout(() => {
-            checkCompound();
-        }, 1000);
+            checkAllPlayersResults();
+        }, 500);
     }
     
     broadcastGameState();
@@ -1094,7 +1418,7 @@ function updateStatusIndicator(selected, total) {
         indicator.className = 'status-indicator ready inline-flex';
         indicator.innerHTML = `
             <iconify-icon icon="mdi:flask-round-bottom"></iconify-icon>
-            <span>¡Mezclando elementos!</span>
+            <span>¡Verificando resultados!</span>
         `;
     } else {
         indicator.className = 'status-indicator waiting inline-flex';
@@ -1105,43 +1429,314 @@ function updateStatusIndicator(selected, total) {
     }
 }
 
-function checkCompound() {
-    const selected = selectedElements.map(e => e.element).sort();
-    const required = [...currentCompound.elements].sort();
+// Verificar resultados de todos los jugadores
+function checkAllPlayersResults() {
+    playerResults = {};
     
-    const isCorrect = selected.length === required.length && 
-                     selected.every((el, i) => el === required[i]);
+    const basePoints = currentCompound.points;
+    const timeBonus = Math.floor(gameTimer * 2);
+    const difficultyBonus = Math.floor((basePoints + timeBonus) * (difficultyConfig.pointsMultiplier - 1));
+    const totalPoints = basePoints + timeBonus + difficultyBonus;
     
-    showResult(isCorrect);
+    let team1Correct = 0;
+    let team2Correct = 0;
+    let totalCorrect = 0;
     
-    if (isCorrect) {
-        const participants = [...new Set(selectedElements.map(e => e.player))];
-        const basePoints = currentCompound.points;
-        const timeBonus = Math.floor(gameTimer * 2);
-        const difficultyBonus = Math.floor((basePoints + timeBonus) * (difficultyConfig.pointsMultiplier - 1));
-        const totalPoints = basePoints + timeBonus + difficultyBonus;
-        const pointsPerPlayer = Math.floor(totalPoints / participants.length);
+    // Evaluar cada jugador individualmente
+    Object.keys(playerSelections).forEach(pid => {
+        const selection = playerSelections[pid];
+        if (!selection || !selection.hasSelected) return;
         
-        participants.forEach(pid => {
-            if (players[pid]) {
-                players[pid].score += pointsPerPlayer;
+        const player = players[pid];
+        if (!player) return;
+        
+        const isCorrect = selection.isCorrect;
+        
+        playerResults[pid] = {
+            isCorrect: isCorrect,
+            elements: selection.elements,
+            points: isCorrect ? totalPoints : 0
+        };
+        
+        if (isCorrect) {
+            totalCorrect++;
+            // Dar puntos al jugador
+            player.score += totalPoints;
+            
+            // Sumar al equipo (solo en modo equipos)
+            if (currentGameMode === 'teams' && player.team) {
+                if (player.team === 'team1') {
+                    team1Correct++;
+                    teams.team1.score += totalPoints;
+                } else if (player.team === 'team2') {
+                    team2Correct++;
+                    teams.team2.score += totalPoints;
+                }
             }
+        }
+    });
+    
+    // Mostrar la animación del laboratorio
+    const anyCorrect = totalCorrect > 0;
+    showLabAnimationInMixingZone(anyCorrect);
+    
+    if (currentGameMode === 'teams') {
+        // Determinar qué equipo ganó la ronda
+        const roundWinner = team1Correct > team2Correct ? 'team1' : 
+                           team2Correct > team1Correct ? 'team2' : 'tie';
+        
+        // Mostrar resultados de equipos
+        showTeamResults(team1Correct, team2Correct, roundWinner, totalPoints);
+        
+        // Broadcast resultados
+        airconsole.broadcast({
+            action: 'roundResult',
+            gameMode: 'teams',
+            compound: currentCompound,
+            playerResults: playerResults,
+            teams: teams,
+            roundWinner: roundWinner,
+            team1Correct: team1Correct,
+            team2Correct: team2Correct,
+            pointsAwarded: totalPoints
+        });
+    } else {
+        // Modo individual: mostrar resultados individuales
+        showIndividualResults(totalCorrect, totalPoints);
+        
+        // Broadcast resultados
+        airconsole.broadcast({
+            action: 'roundResult',
+            gameMode: 'individual',
+            compound: currentCompound,
+            playerResults: playerResults,
+            players: players,
+            totalCorrect: totalCorrect,
+            pointsAwarded: totalPoints
+        });
+    }
+}
+
+// Función legacy para compatibilidad
+function checkCompound() {
+    checkAllPlayersResults();
+}
+
+// Mostrar resultados individuales
+function showIndividualResults(totalCorrect, pointsAwarded) {
+    const overlay = document.getElementById('resultOverlay');
+    const content = document.getElementById('resultContent');
+    
+    if (!overlay || !content) return;
+    
+    const totalPlayers = Object.keys(players).length;
+    const sortedPlayers = Object.values(players).sort((a, b) => b.score - a.score);
+    const topPlayers = sortedPlayers.slice(0, 5);
+    
+    content.innerHTML = `
+        <div class="individual-results-container">
+            <h2 class="text-2xl font-bold mb-4" style="color: var(--color-text);">
+                <iconify-icon icon="mdi:flask-round-bottom" class="mr-2"></iconify-icon>
+                Resultados de la Ronda
+            </h2>
+            
+            <div class="compound-result-display mb-4">
+                <iconify-icon icon="${currentCompound.icon}" class="text-3xl"></iconify-icon>
+                <span class="text-xl font-bold">${currentCompound.formula}</span>
+                <span class="text-lg">${currentCompound.name}</span>
+            </div>
+            
+            <div class="correct-summary ${totalCorrect > 0 ? 'success' : 'error'}">
+                <iconify-icon icon="${totalCorrect > 0 ? 'mdi:check-circle' : 'mdi:close-circle'}"></iconify-icon>
+                <span>${totalCorrect}/${totalPlayers} científicos acertaron</span>
+            </div>
+            
+            <h3 class="text-lg font-bold mt-4 mb-2" style="color: var(--color-text);">
+                <iconify-icon icon="mdi:podium"></iconify-icon> Ranking Actual
+            </h3>
+            
+            <div class="mini-leaderboard">
+                ${topPlayers.map((p, i) => `
+                    <div class="mini-leader-item ${playerResults[p.id]?.isCorrect ? 'correct' : ''}">
+                        <span class="rank">${i + 1}</span>
+                        <div class="player-dot" style="background: ${p.color};"></div>
+                        <span class="name">${p.name}</span>
+                        <span class="score">${p.score} pts</span>
+                        ${playerResults[p.id]?.isCorrect ? '<iconify-icon icon="mdi:check" class="correct-icon"></iconify-icon>' : ''}
+                    </div>
+                `).join('')}
+            </div>
+            
+            <p class="text-sm mt-4" style="color: var(--color-text-light);">
+                <iconify-icon icon="mdi:information"></iconify-icon>
+                +${pointsAwarded} puntos por respuesta correcta
+            </p>
+        </div>
+    `;
+    
+    overlay.classList.add('active');
+    
+    // Sonido según resultado
+    if (totalCorrect > 0) {
+        playSuccessSound();
+    } else {
+        playErrorSound();
+    }
+}
+
+// Mostrar resultados por equipos
+function showTeamResults(team1Correct, team2Correct, roundWinner, pointsAwarded) {
+    const overlay = document.getElementById('resultOverlay');
+    const content = document.getElementById('resultContent');
+    
+    if (!overlay || !content) return;
+    
+    const team1Config = TEAM_CONFIG.team1;
+    const team2Config = TEAM_CONFIG.team2;
+    const totalTeam1 = teams.team1.players.length;
+    const totalTeam2 = teams.team2.players.length;
+    
+    let winnerHTML = '';
+    if (roundWinner === 'team1') {
+        winnerHTML = `<div class="round-winner" style="color: ${team1Config.color};">
+            <iconify-icon icon="mdi:trophy"></iconify-icon> ¡${team1Config.name} gana la ronda!
+        </div>`;
+    } else if (roundWinner === 'team2') {
+        winnerHTML = `<div class="round-winner" style="color: ${team2Config.color};">
+            <iconify-icon icon="mdi:trophy"></iconify-icon> ¡${team2Config.name} gana la ronda!
+        </div>`;
+    } else {
+        winnerHTML = `<div class="round-winner" style="color: #9ca3af;">
+            <iconify-icon icon="mdi:scale-balance"></iconify-icon> ¡Empate!
+        </div>`;
+    }
+    
+    content.innerHTML = `
+        <div class="team-results-container">
+            <h2 class="text-2xl font-bold mb-4" style="color: var(--color-text);">
+                <iconify-icon icon="mdi:flask-round-bottom" class="mr-2"></iconify-icon>
+                Resultados de la Ronda
+            </h2>
+            
+            <div class="compound-result-display mb-4">
+                <iconify-icon icon="${currentCompound.icon}" class="text-3xl"></iconify-icon>
+                <span class="text-xl font-bold">${currentCompound.formula}</span>
+                <span class="text-lg">${currentCompound.name}</span>
+            </div>
+            
+            ${winnerHTML}
+            
+            <div class="teams-score-row">
+                <div class="team-score-card" style="border-color: ${team1Config.color}; background: ${team1Config.bgColor};">
+                    <iconify-icon icon="${team1Config.icon}" style="color: ${team1Config.color}; font-size: 2rem;"></iconify-icon>
+                    <h3 style="color: ${team1Config.color};">${team1Config.name}</h3>
+                    <div class="correct-count">
+                        <iconify-icon icon="mdi:check-circle" style="color: #10b981;"></iconify-icon>
+                        <span>${team1Correct}/${totalTeam1} correctos</span>
+                    </div>
+                    <div class="team-total-score">
+                        <iconify-icon icon="mdi:star"></iconify-icon>
+                        ${teams.team1.score} pts
+                    </div>
+                </div>
+                
+                <div class="vs-divider">VS</div>
+                
+                <div class="team-score-card" style="border-color: ${team2Config.color}; background: ${team2Config.bgColor};">
+                    <iconify-icon icon="${team2Config.icon}" style="color: ${team2Config.color}; font-size: 2rem;"></iconify-icon>
+                    <h3 style="color: ${team2Config.color};">${team2Config.name}</h3>
+                    <div class="correct-count">
+                        <iconify-icon icon="mdi:check-circle" style="color: #10b981;"></iconify-icon>
+                        <span>${team2Correct}/${totalTeam2} correctos</span>
+                    </div>
+                    <div class="team-total-score">
+                        <iconify-icon icon="mdi:star"></iconify-icon>
+                        ${teams.team2.score} pts
+                    </div>
+                </div>
+            </div>
+            
+            <p class="text-sm mt-4" style="color: var(--color-text-light);">
+                <iconify-icon icon="mdi:information"></iconify-icon>
+                +${pointsAwarded} puntos por respuesta correcta
+            </p>
+        </div>
+    `;
+    
+    overlay.classList.add('active');
+    
+    // Animación de entrada
+    if (window.anime) {
+        window.anime.animate('.team-score-card', {
+            scale: [0.8, 1],
+            opacity: [0, 1],
+            delay: window.anime.stagger(200),
+            duration: 500,
+            easing: 'easeOutBack'
         });
     }
     
-    updatePlayersArea();
+    // Sonido según resultado
+    const anyCorrect = team1Correct > 0 || team2Correct > 0;
+    if (anyCorrect) {
+        playSuccessSound();
+    } else {
+        playErrorSound();
+    }
+}
+
+// Mostrar la animación del laboratorio en la mixing-zone
+function showLabAnimationInMixingZone(isCorrect) {
+    const labAnimationZone = document.getElementById('labAnimationZone');
+    const mixingContent = document.getElementById('mixingContent');
+    const selectedElementsContainer = document.getElementById('selectedElements');
     
-    airconsole.broadcast({
-        action: 'roundResult',
-        correct: isCorrect,
-        compound: currentCompound,
-        players: players,
-        timeBonus: isCorrect ? Math.floor(gameTimer * 2) : 0,
-        difficultyMultiplier: difficultyConfig.pointsMultiplier
-    });
+    if (!labAnimationZone) return;
     
-    // Esperar a que el admin presione "Siguiente"
-    // No avanzar automáticamente
+    // Ocultar el contenido de mezcla y mostrar la animación
+    if (mixingContent) mixingContent.classList.add('hidden');
+    if (selectedElementsContainer) selectedElementsContainer.classList.add('hidden');
+    
+    // Mostrar el contenedor de la animación
+    labAnimationZone.classList.remove('hidden');
+    
+    // Reiniciar y ejecutar la animación del laboratorio
+    if (window.labAnimation) {
+        window.labAnimation.reset();
+        setTimeout(() => {
+            window.labAnimation.init();
+        }, 100);
+    }
+    
+    // Agregar clase de éxito o error para efectos visuales
+    const mixingZone = document.getElementById('mixingZone');
+    if (mixingZone) {
+        mixingZone.classList.remove('success', 'error');
+        mixingZone.classList.add(isCorrect ? 'success' : 'error');
+    }
+}
+
+// Ocultar la animación del laboratorio y resetear la mixing-zone
+function hideLabAnimationInMixingZone() {
+    const labAnimationZone = document.getElementById('labAnimationZone');
+    const mixingContent = document.getElementById('mixingContent');
+    const selectedElementsContainer = document.getElementById('selectedElements');
+    const mixingZone = document.getElementById('mixingZone');
+    
+    if (labAnimationZone) labAnimationZone.classList.add('hidden');
+    if (mixingContent) mixingContent.classList.remove('hidden');
+    if (selectedElementsContainer) {
+        selectedElementsContainer.classList.add('hidden');
+        selectedElementsContainer.innerHTML = '';
+    }
+    if (mixingZone) {
+        mixingZone.classList.remove('success', 'error', 'active', 'reacting');
+    }
+    
+    // Pausar la animación
+    if (window.labAnimation) {
+        window.labAnimation.pause();
+    }
 }
 
 function showResult(isCorrect) {
@@ -1476,16 +2071,125 @@ function endGame() {
     stopBackgroundMusic();
     
     const sorted = Object.values(players).sort((a, b) => b.score - a.score);
-    const winner = sorted[0];
     
-    renderEndScreen(winner, sorted);
+    if (currentGameMode === 'teams') {
+        // Determinar equipo ganador
+        const winningTeam = teams.team1.score > teams.team2.score ? 'team1' : 
+                           teams.team2.score > teams.team1.score ? 'team2' : 'tie';
+        
+        renderEndScreen(winningTeam, sorted);
+        
+        airconsole.broadcast({
+            action: 'gameEnd',
+            gameMode: 'teams',
+            winningTeam: winningTeam,
+            teams: teams,
+            players: sorted,
+            difficulty: currentDifficulty
+        });
+    } else {
+        // Modo individual: el ganador es el jugador con más puntos
+        const winner = sorted[0];
+        
+        renderEndScreenIndividual(winner, sorted);
+        
+        airconsole.broadcast({
+            action: 'gameEnd',
+            gameMode: 'individual',
+            winner: winner,
+            players: sorted,
+            difficulty: currentDifficulty
+        });
+    }
+}
+
+// Pantalla final para modo individual
+function renderEndScreenIndividual(winner, sortedPlayers) {
+    const app = document.getElementById('app');
     
-    airconsole.broadcast({
-        action: 'gameEnd',
-        winner: winner,
-        players: sorted,
-        difficulty: currentDifficulty
-    });
+    app.innerHTML = `
+        <div class="screen active flex-col items-center justify-center p-4 sm:p-6 lg:p-8 min-h-screen relative" id="endScreen">
+            <div class="lab-bg"></div>
+            <div id="confettiContainer" class="fixed inset-0 pointer-events-none z-50"></div>
+            
+            <div class="relative z-10 text-center max-w-3xl w-full px-2">
+                <iconify-icon icon="mdi:trophy" class="text-5xl sm:text-6xl lg:text-8xl text-yellow-400 glow-orange mb-4 sm:mb-6 result-icon"></iconify-icon>
+                
+                <h1 class="text-2xl sm:text-4xl lg:text-5xl font-black mb-2 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                    ¡Experimento Completado!
+                </h1>
+                
+                <div class="difficulty-completed mb-4" style="color: ${difficultyConfig.color};">
+                    <iconify-icon icon="${difficultyConfig.icon}"></iconify-icon>
+                    Dificultad: ${difficultyConfig.name} (x${difficultyConfig.pointsMultiplier})
+                </div>
+                
+                <p class="text-base sm:text-lg lg:text-xl mb-4" style="color: var(--color-text-light);">El mejor científico del laboratorio es...</p>
+                
+                <div class="winner-individual-card" style="border-color: ${winner.color}; background: ${winner.color}20;">
+                    <iconify-icon icon="mdi:crown" class="crown-icon" style="color: #fbbf24;"></iconify-icon>
+                    <div class="winner-avatar" style="background: ${winner.color};">
+                        <iconify-icon icon="${winner.icon}"></iconify-icon>
+                    </div>
+                    <h2 class="winner-name">${winner.name}</h2>
+                    <p class="winner-score">${winner.score} pts</p>
+                </div>
+                
+                <h3 class="text-lg font-bold mt-6 mb-3" style="color: var(--color-text);">
+                    <iconify-icon icon="mdi:podium"></iconify-icon> Clasificación Final
+                </h3>
+                
+                <div class="space-y-2 sm:space-y-3 mb-4" id="leaderboard">
+                    ${sortedPlayers.slice(0, 10).map((player, i) => `
+                        <div class="leaderboard-item ${i === 0 ? 'first' : i === 1 ? 'second' : i === 2 ? 'third' : ''}">
+                            <div class="rank-badge ${i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : 'bg-white/10'}">${i + 1}</div>
+                            <div class="player-avatar" style="background: ${player.color};">
+                                <iconify-icon icon="${player.icon}" class="text-base sm:text-lg lg:text-xl"></iconify-icon>
+                            </div>
+                            <div class="flex-1 text-left min-w-0">
+                                <p class="font-bold text-sm sm:text-base lg:text-lg truncate">${player.name}</p>
+                            </div>
+                            <div class="score-badge">${player.score} pts</div>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <p style="color: var(--color-text-light);" class="text-xs sm:text-sm">
+                    <iconify-icon icon="mdi:information" class="mr-1"></iconify-icon>
+                    El Jugador 1 puede iniciar una nueva partida
+                </p>
+            </div>
+        </div>
+    `;
+    
+    createConfetti();
+    
+    setTimeout(() => {
+        if (window.anime) {
+            window.anime.animate('.result-icon', {
+                scale: [0, 1.2, 1],
+                rotate: [0, 10, -10, 0],
+                duration: 1000,
+                easing: 'easeOutElastic(1, .5)'
+            });
+            
+            window.anime.animate('.winner-individual-card', {
+                scale: [0.8, 1],
+                opacity: [0, 1],
+                duration: 600,
+                delay: 300,
+                easing: 'easeOutBack'
+            });
+            
+            window.anime.animate('.leaderboard-item', {
+                translateX: [-50, 0],
+                opacity: [0, 1],
+                delay: window.anime.stagger(100, {start: 600}),
+                duration: 500,
+                easing: 'easeOutCubic'
+            });
+        }
+    }, 100);
 }
 
 function resetGame() {
@@ -1494,13 +2198,37 @@ function resetGame() {
     roundNumber = 0;
     currentCompound = null;
     playerSelections = {};
+    playerResults = {};
+    
+    // Resetear equipos
+    teams = {
+        team1: { score: 0, players: [] },
+        team2: { score: 0, players: [] }
+    };
+    
+    // Reasignar jugadores según modo actual
+    Object.keys(players).forEach((pid, index) => {
+        if (currentGameMode === 'teams') {
+            const team = (index % 2 === 0) ? 'team1' : 'team2';
+            players[pid].team = team;
+            players[pid].color = TEAM_CONFIG[team].color;
+            players[pid].icon = TEAM_CONFIG[team].icon;
+            teams[team].players.push(pid);
+        } else {
+            players[pid].team = null;
+            players[pid].color = INDIVIDUAL_COLORS[index % INDIVIDUAL_COLORS.length];
+            players[pid].icon = INDIVIDUAL_ICONS[index % INDIVIDUAL_ICONS.length];
+        }
+    });
+    
     stopBackgroundMusic();
     
     // Notificar a todos los controllers que vuelvan a la pantalla de espera/dificultad
     airconsole.broadcast({
         action: 'gameReset',
         difficulty: currentDifficulty,
-        difficultyConfig: difficultyConfig
+        difficultyConfig: difficultyConfig,
+        teams: teams
     });
     
     renderIntroScreen();
@@ -1600,4 +2328,9 @@ function createConfetti() {
 // INICIAR
 // ============================================
 
-init();
+// Esperar a que el DOM esté listo antes de inicializar
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
