@@ -2071,3 +2071,326 @@ body {
     font-weight: 800;
     color: var(--color-warning);
 }
+
+
+/* ============================================
+   RESULTADOS INLINE (en mixing-zone)
+   ============================================ */
+
+.inline-results-container {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(12px, 2vw, 24px);
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: inherit;
+    z-index: 10;
+}
+
+.inline-results-container.hidden {
+    display: none;
+}
+
+.inline-results-content {
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(8px, 1.5vw, 16px);
+}
+
+/* Header de resultado inline */
+.inline-result-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(8px, 1.5vw, 12px);
+    padding: clamp(10px, 2vw, 16px);
+    border-radius: clamp(12px, 2vw, 16px);
+    background: rgba(255, 255, 255, 0.8);
+    border: 2px solid #e2e8f0;
+}
+
+.inline-result-header.success {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.inline-result-header.error {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* Compuesto inline */
+.compound-inline {
+    display: flex;
+    align-items: center;
+    gap: clamp(6px, 1vw, 10px);
+}
+
+.compound-inline iconify-icon {
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    color: var(--color-primary);
+}
+
+.compound-inline .formula {
+    font-size: clamp(1.25rem, 3.5vw, 2rem);
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-primary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.compound-inline .name {
+    font-size: clamp(0.875rem, 2vw, 1.125rem);
+    color: var(--color-text-light);
+    font-weight: 500;
+}
+
+/* Badge de correctos */
+.correct-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: clamp(6px, 1vw, 10px) clamp(12px, 2vw, 18px);
+    border-radius: 30px;
+    font-size: clamp(0.75rem, 1.8vw, 1rem);
+    font-weight: 600;
+}
+
+.correct-badge.success {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+
+.correct-badge.error {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+}
+
+.correct-badge iconify-icon {
+    font-size: clamp(1rem, 2.5vw, 1.5rem);
+}
+
+/* Ganador de ronda inline */
+.round-winner-inline {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: clamp(0.875rem, 2vw, 1.125rem);
+    font-weight: 700;
+    color: var(--winner-color);
+    padding: clamp(6px, 1vw, 10px) clamp(12px, 2vw, 18px);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--winner-color) 15%, white) 0%, white 100%);
+    border-radius: 30px;
+}
+
+.round-winner-inline iconify-icon {
+    font-size: clamp(1rem, 2.5vw, 1.5rem);
+}
+
+/* Ranking inline */
+.inline-ranking {
+    background: var(--color-bg-soft);
+    border-radius: clamp(10px, 1.5vw, 14px);
+    padding: clamp(10px, 1.5vw, 14px);
+}
+
+.inline-ranking h4 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: clamp(0.75rem, 1.8vw, 0.95rem);
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: clamp(8px, 1.2vw, 12px);
+}
+
+.inline-ranking h4 iconify-icon {
+    color: var(--color-warning);
+}
+
+.ranking-list {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(4px, 0.8vw, 6px);
+}
+
+.ranking-item {
+    display: flex;
+    align-items: center;
+    gap: clamp(6px, 1vw, 10px);
+    padding: clamp(6px, 1vw, 8px) clamp(8px, 1.2vw, 12px);
+    border-radius: 8px;
+    background: white;
+    font-size: clamp(0.7rem, 1.6vw, 0.875rem);
+}
+
+.ranking-item.correct {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.ranking-item .rank {
+    font-weight: 700;
+    color: var(--color-text-light);
+    width: clamp(16px, 2.5vw, 22px);
+    text-align: center;
+}
+
+.ranking-item .player-dot {
+    width: clamp(10px, 1.5vw, 14px);
+    height: clamp(10px, 1.5vw, 14px);
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.ranking-item .name {
+    flex: 1;
+    text-align: left;
+    color: var(--color-text);
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ranking-item .score {
+    font-weight: 600;
+    color: var(--color-warning);
+}
+
+/* Equipos inline */
+.teams-inline-row {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    gap: clamp(8px, 1.5vw, 16px);
+}
+
+.team-inline-card {
+    flex: 1;
+    max-width: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(4px, 0.8vw, 8px);
+    padding: clamp(10px, 1.5vw, 16px);
+    border-radius: clamp(10px, 1.5vw, 14px);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--team-color) 10%, white) 0%, white 100%);
+    border: 2px solid var(--team-color);
+}
+
+.team-inline-card iconify-icon {
+    font-size: clamp(1.25rem, 3vw, 1.75rem);
+    color: var(--team-color);
+}
+
+.team-inline-card .team-name {
+    font-size: clamp(0.7rem, 1.6vw, 0.875rem);
+    font-weight: 600;
+    color: var(--team-color);
+}
+
+.team-inline-card .team-correct {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: clamp(0.65rem, 1.4vw, 0.8rem);
+    color: #10b981;
+}
+
+.team-inline-card .team-correct iconify-icon {
+    font-size: clamp(0.875rem, 2vw, 1.125rem);
+    color: #10b981;
+}
+
+.team-inline-card .team-score {
+    font-size: clamp(0.875rem, 2vw, 1.125rem);
+    font-weight: 700;
+    color: var(--color-warning);
+}
+
+.vs-inline {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: clamp(0.875rem, 2vw, 1.125rem);
+    color: var(--color-text-light);
+    opacity: 0.4;
+}
+
+/* Info de puntos inline */
+.inline-points-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: clamp(0.65rem, 1.4vw, 0.8rem);
+    color: var(--color-text-light);
+    padding-top: clamp(6px, 1vw, 10px);
+    border-top: 1px solid #e2e8f0;
+}
+
+.inline-points-info iconify-icon {
+    font-size: clamp(0.875rem, 2vw, 1rem);
+}
+
+/* Responsive para resultados inline */
+@media (max-width: 500px) {
+    .teams-inline-row {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .team-inline-card {
+        max-width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 10px 14px;
+    }
+    
+    .vs-inline {
+        display: none;
+    }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+    .inline-results-content {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+    }
+    
+    .inline-result-header {
+        flex-direction: row;
+        flex: 1;
+        min-width: 200px;
+    }
+    
+    .inline-ranking {
+        flex: 1;
+        min-width: 200px;
+    }
+    
+    .ranking-list {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+    
+    .ranking-item {
+        flex: 1;
+        min-width: 120px;
+    }
+}

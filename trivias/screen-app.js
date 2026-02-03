@@ -24,7 +24,17 @@ const categoryColors = {
 // Usar la base de datos de preguntas del archivo externo
 const questions = questionsDatabase;
 
-const playerColors = ['#0595AE', '#73A03F', '#EB8225', '#AB3D8B'];
+// Colores para jugadores (expandido para soportar más jugadores)
+const playerColors = [
+    '#0595AE', '#73A03F', '#EB8225', '#AB3D8B',
+    '#6366F1', '#0D9488', '#B45309', '#2563EB',
+    '#10b981', '#f59e0b', '#ef4444', '#8b5cf6',
+    '#06b6d4', '#84cc16', '#f97316', '#ec4899',
+    '#14b8a6', '#eab308', '#a855f7', '#22c55e',
+    '#0ea5e9', '#d946ef', '#f43f5e', '#64748b'
+];
+
+const MAX_PLAYERS = 32; // Máximo de jugadores permitidos
 
 let airconsole;
 let players = {};
@@ -146,7 +156,7 @@ function setCategoryBackground(category) {
 }
 
 function init() {
-    airconsole = new AirConsole();
+    airconsole = new AirConsole({ max_players: MAX_PLAYERS });
     cacheDomElements();
     
     // Initialize particle network background
@@ -236,7 +246,7 @@ function init() {
                     id => !players[id].disconnected
                 ).length;
                 
-                if (connectedPlayersCount < 4) {
+                if (connectedPlayersCount < MAX_PLAYERS) {
                     const isAdmin = adminDeviceId === null;
                     if (isAdmin) {
                         adminDeviceId = deviceId;

@@ -55,18 +55,29 @@ const TEAM_CONFIG = {
     }
 };
 
-// Colores para modo individual
+// Colores para modo individual (32+ jugadores)
 const INDIVIDUAL_COLORS = [
+    // Primarios vibrantes
     '#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444',
     '#06b6d4', '#84cc16', '#f97316', '#ec4899', '#6366f1',
+    // Secundarios
     '#14b8a6', '#eab308', '#a855f7', '#22c55e', '#0ea5e9',
-    '#d946ef', '#f43f5e', '#64748b', '#78716c', '#059669'
+    '#d946ef', '#f43f5e', '#64748b', '#78716c', '#059669',
+    // Adicionales para 32+ jugadores
+    '#7c3aed', '#db2777', '#0891b2', '#65a30d', '#c026d3',
+    '#ea580c', '#4f46e5', '#16a34a', '#dc2626', '#0284c7',
+    '#9333ea', '#e11d48', '#0d9488', '#ca8a04', '#7e22ce',
+    '#be123c', '#0369a1', '#15803d', '#b91c1c', '#1d4ed8'
 ];
 
 const INDIVIDUAL_ICONS = [
     'mdi:flask', 'mdi:atom', 'mdi:molecule', 'mdi:test-tube',
     'mdi:beaker', 'mdi:flask-round-bottom', 'mdi:flask-outline',
-    'mdi:atom-variant', 'mdi:chemical-weapon', 'mdi:bacteria'
+    'mdi:atom-variant', 'mdi:chemical-weapon', 'mdi:bacteria',
+    // Adicionales para más variedad
+    'mdi:microscope', 'mdi:dna', 'mdi:virus', 'mdi:biohazard',
+    'mdi:radioactive', 'mdi:magnet', 'mdi:lightning-bolt', 'mdi:fire',
+    'mdi:water', 'mdi:leaf', 'mdi:diamond-stone', 'mdi:star-four-points'
 ];
 
 const MAX_PLAYERS = 40; // Máximo de jugadores permitidos
@@ -318,10 +329,11 @@ function init() {
     renderIntroScreen();
     initBackgroundMusic();
     
-    airconsole = new AirConsole();
+    airconsole = new AirConsole({ max_players: MAX_PLAYERS });
     
     airconsole.onReady = function() {
         console.log('🧪 Laboratorio Químico listo!');
+        console.log(`👥 Máximo de jugadores: ${MAX_PLAYERS}`);
         createFloatingMolecules();
     };
     
@@ -721,9 +733,9 @@ function renderPlayingScreen() {
                             </div>
                         </div>
                         
-                        <!-- Texto de espera (se oculta cuando inicia animación) -->
-                        <div class="lab-waiting-text" id="labWaitingText">
-                            <p class="text-xs sm:text-sm" style="color: var(--color-text-light);">Esperando respuestas...</p>
+                        <!-- Contenedor de resultados inline (se muestra después de la animación) -->
+                        <div class="inline-results-container hidden" id="inlineResults">
+                            <div class="inline-results-content" id="inlineResultsContent"></div>
                         </div>
                     </div>
                 </div>
@@ -1344,9 +1356,9 @@ function resetMixingZone() {
     const zone = document.getElementById('mixingZone');
     zone.classList.remove('active', 'reacting', 'success', 'error');
     
-    // Mostrar texto de espera
-    const labWaitingText = document.getElementById('labWaitingText');
-    if (labWaitingText) labWaitingText.classList.remove('hidden');
+    // Ocultar resultados inline
+    const inlineResults = document.getElementById('inlineResults');
+    if (inlineResults) inlineResults.classList.add('hidden');
     
     // Inicializar el laboratorio estático (sin animación activa)
     initStaticLab();
@@ -1547,57 +1559,66 @@ function checkCompound() {
 
 // Mostrar resultados individuales
 function showIndividualResults(totalCorrect, pointsAwarded) {
-    const overlay = document.getElementById('resultOverlay');
-    const content = document.getElementById('resultContent');
+    const inlineResults = document.getElementById('inlineResults');
+    const inlineContent = document.getElementById('inlineResultsContent');
     
-    if (!overlay || !content) return;
+    if (!inlineResults || !inlineContent) return;
     
     const totalPlayers = Object.keys(players).length;
     const sortedPlayers = Object.values(players).sort((a, b) => b.score - a.score);
     const topPlayers = sortedPlayers.slice(0, 5);
     
-    content.innerHTML = `
-        <div class="individual-results-container">
-            <h2 class="text-2xl font-bold mb-4" style="color: var(--color-text);">
-                <iconify-icon icon="mdi:flask-round-bottom" class="mr-2"></iconify-icon>
-                Resultados de la Ronda
-            </h2>
-            
-            <div class="compound-result-display mb-4">
-                <iconify-icon icon="${currentCompound.icon}" class="text-3xl"></iconify-icon>
-                <span class="text-xl font-bold">${currentCompound.formula}</span>
-                <span class="text-lg">${currentCompound.name}</span>
+    inlineContent.innerHTML = `
+        <div class="inline-result-header ${totalCorrect > 0 ? 'success' : 'error'}">
+            <div class="compound-inline">
+                <iconify-icon icon="${currentCompound.icon}"></iconify-icon>
+                <span class="formula">${currentCompound.formula}</span>
+                <span class="name">${currentCompound.name}</span>
             </div>
-            
-            <div class="correct-summary ${totalCorrect > 0 ? 'success' : 'error'}">
+            <div class="correct-badge ${totalCorrect > 0 ? 'success' : 'error'}">
                 <iconify-icon icon="${totalCorrect > 0 ? 'mdi:check-circle' : 'mdi:close-circle'}"></iconify-icon>
-                <span>${totalCorrect}/${totalPlayers} científicos acertaron</span>
+                <span>${totalCorrect}/${totalPlayers} acertaron</span>
             </div>
-            
-            <h3 class="text-lg font-bold mt-4 mb-2" style="color: var(--color-text);">
-                <iconify-icon icon="mdi:podium"></iconify-icon> Ranking Actual
-            </h3>
-            
-            <div class="mini-leaderboard">
+        </div>
+        
+        <div class="inline-ranking">
+            <h4><iconify-icon icon="mdi:podium"></iconify-icon> Ranking Actual</h4>
+            <div class="ranking-list">
                 ${topPlayers.map((p, i) => `
-                    <div class="mini-leader-item ${playerResults[p.id]?.isCorrect ? 'correct' : ''}">
+                    <div class="ranking-item ${playerResults[p.id]?.isCorrect ? 'correct' : ''}">
                         <span class="rank">${i + 1}</span>
                         <div class="player-dot" style="background: ${p.color};"></div>
                         <span class="name">${p.name}</span>
                         <span class="score">${p.score} pts</span>
-                        ${playerResults[p.id]?.isCorrect ? '<iconify-icon icon="mdi:check" class="correct-icon"></iconify-icon>' : ''}
                     </div>
                 `).join('')}
             </div>
-            
-            <p class="text-sm mt-4" style="color: var(--color-text-light);">
-                <iconify-icon icon="mdi:information"></iconify-icon>
-                +${pointsAwarded} puntos por respuesta correcta
-            </p>
+        </div>
+        
+        <div class="inline-points-info">
+            <iconify-icon icon="mdi:information"></iconify-icon>
+            +${pointsAwarded} puntos por respuesta correcta
         </div>
     `;
     
-    overlay.classList.add('active');
+    // Mostrar resultados encima de la animación (sin ocultarla)
+    inlineResults.classList.remove('hidden');
+    
+    // Animación de entrada
+    if (window.anime) {
+        window.anime.animate('.inline-result-header', {
+            translateY: [-20, 0],
+            opacity: [0, 1],
+            duration: 400,
+            easing: 'easeOutBack'
+        });
+        window.anime.animate('.ranking-item', {
+            translateX: [-20, 0],
+            opacity: [0, 1],
+            delay: window.anime.stagger(80, {start: 200}),
+            duration: 300
+        });
+    }
     
     // Sonido según resultado
     if (totalCorrect > 0) {
@@ -1605,107 +1626,123 @@ function showIndividualResults(totalCorrect, pointsAwarded) {
     } else {
         playErrorSound();
     }
+    
+    // Auto-avance a la siguiente ronda después de 4 segundos
+    scheduleNextRound();
 }
 
 // Mostrar resultados por equipos
 function showTeamResults(team1Correct, team2Correct, roundWinner, pointsAwarded) {
-    const overlay = document.getElementById('resultOverlay');
-    const content = document.getElementById('resultContent');
+    const inlineResults = document.getElementById('inlineResults');
+    const inlineContent = document.getElementById('inlineResultsContent');
     
-    if (!overlay || !content) return;
+    if (!inlineResults || !inlineContent) return;
     
     const team1Config = TEAM_CONFIG.team1;
     const team2Config = TEAM_CONFIG.team2;
     const totalTeam1 = teams.team1.players.length;
     const totalTeam2 = teams.team2.players.length;
+    const anyCorrect = team1Correct > 0 || team2Correct > 0;
     
     let winnerHTML = '';
     if (roundWinner === 'team1') {
-        winnerHTML = `<div class="round-winner" style="color: ${team1Config.color};">
-            <iconify-icon icon="mdi:trophy"></iconify-icon> ¡${team1Config.name} gana la ronda!
+        winnerHTML = `<div class="round-winner-inline" style="--winner-color: ${team1Config.color};">
+            <iconify-icon icon="mdi:trophy"></iconify-icon> ¡${team1Config.name} gana!
         </div>`;
     } else if (roundWinner === 'team2') {
-        winnerHTML = `<div class="round-winner" style="color: ${team2Config.color};">
-            <iconify-icon icon="mdi:trophy"></iconify-icon> ¡${team2Config.name} gana la ronda!
+        winnerHTML = `<div class="round-winner-inline" style="--winner-color: ${team2Config.color};">
+            <iconify-icon icon="mdi:trophy"></iconify-icon> ¡${team2Config.name} gana!
         </div>`;
     } else {
-        winnerHTML = `<div class="round-winner" style="color: #9ca3af;">
+        winnerHTML = `<div class="round-winner-inline" style="--winner-color: #9ca3af;">
             <iconify-icon icon="mdi:scale-balance"></iconify-icon> ¡Empate!
         </div>`;
     }
     
-    content.innerHTML = `
-        <div class="team-results-container">
-            <h2 class="text-2xl font-bold mb-4" style="color: var(--color-text);">
-                <iconify-icon icon="mdi:flask-round-bottom" class="mr-2"></iconify-icon>
-                Resultados de la Ronda
-            </h2>
-            
-            <div class="compound-result-display mb-4">
-                <iconify-icon icon="${currentCompound.icon}" class="text-3xl"></iconify-icon>
-                <span class="text-xl font-bold">${currentCompound.formula}</span>
-                <span class="text-lg">${currentCompound.name}</span>
+    inlineContent.innerHTML = `
+        <div class="inline-result-header ${anyCorrect ? 'success' : 'error'}">
+            <div class="compound-inline">
+                <iconify-icon icon="${currentCompound.icon}"></iconify-icon>
+                <span class="formula">${currentCompound.formula}</span>
+                <span class="name">${currentCompound.name}</span>
             </div>
-            
             ${winnerHTML}
-            
-            <div class="teams-score-row">
-                <div class="team-score-card" style="border-color: ${team1Config.color}; background: ${team1Config.bgColor};">
-                    <iconify-icon icon="${team1Config.icon}" style="color: ${team1Config.color}; font-size: 2rem;"></iconify-icon>
-                    <h3 style="color: ${team1Config.color};">${team1Config.name}</h3>
-                    <div class="correct-count">
-                        <iconify-icon icon="mdi:check-circle" style="color: #10b981;"></iconify-icon>
-                        <span>${team1Correct}/${totalTeam1} correctos</span>
-                    </div>
-                    <div class="team-total-score">
-                        <iconify-icon icon="mdi:star"></iconify-icon>
-                        ${teams.team1.score} pts
-                    </div>
+        </div>
+        
+        <div class="teams-inline-row">
+            <div class="team-inline-card" style="--team-color: ${team1Config.color};">
+                <iconify-icon icon="${team1Config.icon}"></iconify-icon>
+                <span class="team-name">${team1Config.name}</span>
+                <div class="team-correct">
+                    <iconify-icon icon="mdi:check-circle"></iconify-icon>
+                    ${team1Correct}/${totalTeam1}
                 </div>
-                
-                <div class="vs-divider">VS</div>
-                
-                <div class="team-score-card" style="border-color: ${team2Config.color}; background: ${team2Config.bgColor};">
-                    <iconify-icon icon="${team2Config.icon}" style="color: ${team2Config.color}; font-size: 2rem;"></iconify-icon>
-                    <h3 style="color: ${team2Config.color};">${team2Config.name}</h3>
-                    <div class="correct-count">
-                        <iconify-icon icon="mdi:check-circle" style="color: #10b981;"></iconify-icon>
-                        <span>${team2Correct}/${totalTeam2} correctos</span>
-                    </div>
-                    <div class="team-total-score">
-                        <iconify-icon icon="mdi:star"></iconify-icon>
-                        ${teams.team2.score} pts
-                    </div>
-                </div>
+                <span class="team-score">${teams.team1.score} pts</span>
             </div>
             
-            <p class="text-sm mt-4" style="color: var(--color-text-light);">
-                <iconify-icon icon="mdi:information"></iconify-icon>
-                +${pointsAwarded} puntos por respuesta correcta
-            </p>
+            <div class="vs-inline">VS</div>
+            
+            <div class="team-inline-card" style="--team-color: ${team2Config.color};">
+                <iconify-icon icon="${team2Config.icon}"></iconify-icon>
+                <span class="team-name">${team2Config.name}</span>
+                <div class="team-correct">
+                    <iconify-icon icon="mdi:check-circle"></iconify-icon>
+                    ${team2Correct}/${totalTeam2}
+                </div>
+                <span class="team-score">${teams.team2.score} pts</span>
+            </div>
+        </div>
+        
+        <div class="inline-points-info">
+            <iconify-icon icon="mdi:information"></iconify-icon>
+            +${pointsAwarded} puntos por respuesta correcta
         </div>
     `;
     
-    overlay.classList.add('active');
+    // Mostrar resultados encima de la animación (sin ocultarla)
+    inlineResults.classList.remove('hidden');
     
     // Animación de entrada
     if (window.anime) {
-        window.anime.animate('.team-score-card', {
+        window.anime.animate('.inline-result-header', {
+            translateY: [-20, 0],
+            opacity: [0, 1],
+            duration: 400,
+            easing: 'easeOutBack'
+        });
+        window.anime.animate('.team-inline-card', {
             scale: [0.8, 1],
             opacity: [0, 1],
-            delay: window.anime.stagger(200),
-            duration: 500,
+            delay: window.anime.stagger(150, {start: 200}),
+            duration: 400,
             easing: 'easeOutBack'
         });
     }
     
     // Sonido según resultado
-    const anyCorrect = team1Correct > 0 || team2Correct > 0;
     if (anyCorrect) {
         playSuccessSound();
     } else {
         playErrorSound();
     }
+    
+    // Auto-avance a la siguiente ronda después de 4 segundos
+    scheduleNextRound();
+}
+
+// Programar el avance automático a la siguiente ronda
+let nextRoundTimeout = null;
+
+function scheduleNextRound() {
+    // Cancelar cualquier timeout previo
+    if (nextRoundTimeout) {
+        clearTimeout(nextRoundTimeout);
+    }
+    
+    // Avanzar automáticamente después de 4 segundos
+    nextRoundTimeout = setTimeout(() => {
+        nextRound();
+    }, 4000);
 }
 
 // Mostrar la animación del laboratorio en la mixing-zone (cuando los jugadores responden)
@@ -1739,11 +1776,13 @@ function showLabAnimationInMixingZone(isCorrect) {
 
 // Ocultar la animación del laboratorio y resetear la mixing-zone
 function hideLabAnimationInMixingZone() {
-    const labWaitingText = document.getElementById('labWaitingText');
+    const labAnimationZone = document.getElementById('labAnimationZone');
+    const inlineResults = document.getElementById('inlineResults');
     const mixingZone = document.getElementById('mixingZone');
     
-    // Mostrar texto de espera
-    if (labWaitingText) labWaitingText.classList.remove('hidden');
+    // Mostrar animación del lab y ocultar resultados
+    if (labAnimationZone) labAnimationZone.classList.remove('hidden');
+    if (inlineResults) inlineResults.classList.add('hidden');
     
     if (mixingZone) {
         mixingZone.classList.remove('success', 'error', 'active', 'reacting');
