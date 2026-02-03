@@ -553,7 +553,7 @@ function renderPlayingScreen() {
             <div class="relative z-10 selection-area mb-2" id="selectionArea">
                 <p class="text-sm" style="color: var(--color-text-light);">
                     <iconify-icon icon="mdi:hand-pointing-up" class="mr-1"></iconify-icon>
-                    Toca los elementos para seleccionar
+                    Selecciona ${maxSelections} elemento${maxSelections !== 1 ? 's' : ''}
                 </p>
             </div>
             
@@ -562,8 +562,8 @@ function renderPlayingScreen() {
             
             <!-- Botón confirmar -->
             <button class="relative z-10 confirm-btn mt-2" id="confirmSelectionBtn" onclick="confirmSelection()" disabled>
-                <iconify-icon icon="mdi:flask-round-bottom" class="mr-2"></iconify-icon>
-                CONFIRMAR MEZCLA
+                <iconify-icon icon="mdi:flask-empty-outline" class="mr-2"></iconify-icon>
+                Faltan ${maxSelections} elementos
             </button>
             
             <!-- Player Info compacto -->
@@ -739,10 +739,11 @@ function updateSelectionUI() {
             selectionArea.innerHTML = `
                 <p class="text-sm" style="color: var(--color-text-light);">
                     <iconify-icon icon="mdi:hand-pointing-up" class="mr-1"></iconify-icon>
-                    Toca los elementos para seleccionar
+                    Selecciona ${maxSelections} elemento${maxSelections !== 1 ? 's' : ''}
                 </p>
             `;
         } else {
+            const remaining = maxSelections - selectedElements.length;
             selectionArea.innerHTML = `
                 <div class="selected-elements-row">
                     ${selectedElements.map((el, i) => `
@@ -752,8 +753,10 @@ function updateSelectionUI() {
                         </button>
                     `).join('')}
                 </div>
-                <p class="text-xs mt-2" style="color: var(--color-text-light);">
-                    ${selectedElements.length}/${maxSelections} • Toca para quitar
+                <p class="text-xs mt-2" style="color: ${remaining === 0 ? 'var(--color-success)' : 'var(--color-text-light)'};">
+                    ${remaining === 0 
+                        ? '<iconify-icon icon="mdi:check-circle" class="mr-1"></iconify-icon>¡Listo para confirmar!' 
+                        : `${selectedElements.length}/${maxSelections} • Faltan ${remaining}`}
                 </p>
             `;
         }
@@ -762,8 +765,23 @@ function updateSelectionUI() {
     // Actualizar botón de confirmar
     const confirmBtn = document.getElementById('confirmSelectionBtn');
     if (confirmBtn) {
-        confirmBtn.disabled = selectedElements.length === 0;
-        confirmBtn.classList.toggle('ready', selectedElements.length > 0);
+        // Solo habilitar cuando se han seleccionado TODOS los elementos requeridos
+        const isComplete = selectedElements.length === maxSelections;
+        confirmBtn.disabled = !isComplete;
+        confirmBtn.classList.toggle('ready', isComplete);
+        
+        // Actualizar texto del botón según el estado
+        if (isComplete) {
+            confirmBtn.innerHTML = `
+                <iconify-icon icon="mdi:flask-round-bottom" class="mr-2"></iconify-icon>
+                ¡CONFIRMAR MEZCLA!
+            `;
+        } else {
+            confirmBtn.innerHTML = `
+                <iconify-icon icon="mdi:flask-empty-outline" class="mr-2"></iconify-icon>
+                Faltan ${maxSelections - selectedElements.length} elemento${maxSelections - selectedElements.length !== 1 ? 's' : ''}
+            `;
+        }
     }
 }
 
