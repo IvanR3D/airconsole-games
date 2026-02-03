@@ -1476,45 +1476,48 @@ function checkAllPlayersResults() {
         }
     });
     
-    // Mostrar la animación del laboratorio
+    // Mostrar la animación del laboratorio primero
     const anyCorrect = totalCorrect > 0;
     showLabAnimationInMixingZone(anyCorrect);
     
-    if (currentGameMode === 'teams') {
-        // Determinar qué equipo ganó la ronda
-        const roundWinner = team1Correct > team2Correct ? 'team1' : 
-                           team2Correct > team1Correct ? 'team2' : 'tie';
-        
-        // Mostrar resultados de equipos
-        showTeamResults(team1Correct, team2Correct, roundWinner, totalPoints);
-        
-        // Broadcast resultados
-        airconsole.broadcast({
-            action: 'roundResult',
-            gameMode: 'teams',
-            compound: currentCompound,
-            playerResults: playerResults,
-            teams: teams,
-            roundWinner: roundWinner,
-            team1Correct: team1Correct,
-            team2Correct: team2Correct,
-            pointsAwarded: totalPoints
-        });
-    } else {
-        // Modo individual: mostrar resultados individuales
-        showIndividualResults(totalCorrect, totalPoints);
-        
-        // Broadcast resultados
-        airconsole.broadcast({
-            action: 'roundResult',
-            gameMode: 'individual',
-            compound: currentCompound,
-            playerResults: playerResults,
-            players: players,
-            totalCorrect: totalCorrect,
-            pointsAwarded: totalPoints
-        });
-    }
+    // Esperar a que la animación se muestre antes de enviar resultados
+    setTimeout(() => {
+        if (currentGameMode === 'teams') {
+            // Determinar qué equipo ganó la ronda
+            const roundWinner = team1Correct > team2Correct ? 'team1' : 
+                               team2Correct > team1Correct ? 'team2' : 'tie';
+            
+            // Mostrar resultados de equipos
+            showTeamResults(team1Correct, team2Correct, roundWinner, totalPoints);
+            
+            // Broadcast resultados
+            airconsole.broadcast({
+                action: 'roundResult',
+                gameMode: 'teams',
+                compound: currentCompound,
+                playerResults: playerResults,
+                teams: teams,
+                roundWinner: roundWinner,
+                team1Correct: team1Correct,
+                team2Correct: team2Correct,
+                pointsAwarded: totalPoints
+            });
+        } else {
+            // Modo individual: mostrar resultados individuales
+            showIndividualResults(totalCorrect, totalPoints);
+            
+            // Broadcast resultados
+            airconsole.broadcast({
+                action: 'roundResult',
+                gameMode: 'individual',
+                compound: currentCompound,
+                playerResults: playerResults,
+                players: players,
+                totalCorrect: totalCorrect,
+                pointsAwarded: totalPoints
+            });
+        }
+    }, 2000); // 2 segundos para ver la animación
 }
 
 // Función legacy para compatibilidad
@@ -1690,8 +1693,12 @@ function showLabAnimationInMixingZone(isCorrect) {
     const labAnimationZone = document.getElementById('labAnimationZone');
     const mixingContent = document.getElementById('mixingContent');
     const selectedElementsContainer = document.getElementById('selectedElements');
+    const mixingZone = document.getElementById('mixingZone');
     
-    if (!labAnimationZone) return;
+    if (!labAnimationZone) {
+        console.log('Lab animation zone not found');
+        return;
+    }
     
     // Ocultar el contenido de mezcla y mostrar la animación
     if (mixingContent) mixingContent.classList.add('hidden');
@@ -1700,19 +1707,24 @@ function showLabAnimationInMixingZone(isCorrect) {
     // Mostrar el contenedor de la animación
     labAnimationZone.classList.remove('hidden');
     
+    // Agregar clase de éxito o error para efectos visuales
+    if (mixingZone) {
+        mixingZone.classList.remove('success', 'error', 'reacting');
+        mixingZone.classList.add(isCorrect ? 'success' : 'error');
+    }
+    
     // Reiniciar y ejecutar la animación del laboratorio
     if (window.labAnimation) {
         window.labAnimation.reset();
+        // Dar tiempo para que el DOM se actualice antes de inicializar
         setTimeout(() => {
-            window.labAnimation.init();
-        }, 100);
-    }
-    
-    // Agregar clase de éxito o error para efectos visuales
-    const mixingZone = document.getElementById('mixingZone');
-    if (mixingZone) {
-        mixingZone.classList.remove('success', 'error');
-        mixingZone.classList.add(isCorrect ? 'success' : 'error');
+            if (window.labAnimation) {
+                window.labAnimation.init();
+                console.log('Lab animation initialized');
+            }
+        }, 150);
+    } else {
+        console.log('Lab animation not available');
     }
 }
 

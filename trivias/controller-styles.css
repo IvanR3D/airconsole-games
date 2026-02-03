@@ -5,37 +5,123 @@
     -webkit-tap-highlight-color: transparent;
 }
 
-html, body {
+html {
     width: 100%;
     height: 100%;
-    overflow: hidden;
-    background: transparent;
 }
 
 body {
+    width: 100%;
+    min-height: 100%;
     touch-action: manipulation;
     background: transparent;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .screen {
     display: none;
     opacity: 0;
     transition: opacity 0.2s ease;
+    min-height: 100vh;
+    min-height: 100dvh; /* Dynamic viewport height for mobile */
+    padding-top: 50px; /* Space for AirConsole button */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .screen.active {
     display: flex;
     opacity: 1;
-    height: 100vh;
-    padding-top: 50px; /* Espacio para el botón de AirConsole */
-    overflow-y: auto;
+}
+
+/* Step indicators */
+.step-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    opacity: 0.4;
+    transition: all 0.3s ease;
+}
+
+.step-indicator.active {
+    opacity: 1;
+}
+
+.step-indicator.completed {
+    opacity: 1;
+}
+
+.step-number {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #e5e7eb;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.step-indicator.active .step-number {
+    background: #0595AE;
+    color: white;
+}
+
+.step-indicator.completed .step-number {
+    background: #73A03F;
+    color: white;
+}
+
+.step-label {
+    font-size: 10px;
+    color: #6b7280;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.step-indicator.active .step-label {
+    color: #0595AE;
+}
+
+.step-indicator.completed .step-label {
+    color: #73A03F;
+}
+
+.step-line {
+    width: 30px;
+    height: 2px;
+    background: #e5e7eb;
+    margin-bottom: 18px;
+    transition: all 0.3s ease;
+}
+
+.step-line.completed {
+    background: #73A03F;
+}
+
+/* Step content */
+.step-content {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.step-content.active {
+    display: flex;
+    flex-direction: column;
+    opacity: 1;
 }
 
 /* Player avatar visual - responsive */
 .player-avatar-visual {
-    width: clamp(50px, 15vw, 70px);
-    height: clamp(50px, 15vw, 70px);
-    border-radius: clamp(10px, 3vw, 14px);
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
     position: relative;
     box-shadow: 0 4px 15px rgba(0,0,0,0.25);
 }
@@ -46,23 +132,28 @@ body {
     top: 5px;
     left: 5px;
     right: 5px;
-    height: clamp(10px, 3vw, 14px);
+    height: 12px;
     background: rgba(255,255,255,0.35);
     border-radius: 9px 9px 0 0;
 }
 
 .player-avatar-visual-small {
-    width: clamp(28px, 8vw, 40px);
-    height: clamp(28px, 8vw, 40px);
-    border-radius: clamp(6px, 1.5vw, 9px);
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    position: relative;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
 .player-avatar-visual-small::before {
-    height: clamp(6px, 1.5vw, 9px);
+    content: '';
+    position: absolute;
+    height: 8px;
     top: 3px;
     left: 3px;
     right: 3px;
     border-radius: 5px 5px 0 0;
+    background: rgba(255,255,255,0.35);
 }
 
 /* Button 3D effect */
@@ -95,7 +186,7 @@ body {
     right: 0;
     height: 50%;
     background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 100%);
-    border-radius: 15px 15px 0 0;
+    border-radius: 12px 12px 0 0;
     pointer-events: none;
 }
 
@@ -146,13 +237,14 @@ body {
 .answer-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: clamp(8px, 2vw, 12px);
-    flex: 1;
-    max-height: clamp(200px, 50vh, 400px);
+    gap: 10px;
+    min-height: 180px;
+    max-height: 50vh;
 }
 
 .answer-btn {
-    font-size: clamp(1.5rem, 8vw, 2.5rem);
+    font-size: clamp(1.5rem, 6vw, 2rem);
+    min-height: 80px;
 }
 
 /* Pulse animation */
@@ -194,6 +286,42 @@ body {
 }
 
 .category-icon {
-    font-size: clamp(2rem, 8vw, 3rem);
+    font-size: 2rem;
     display: inline-block;
+}
+
+/* Category button styles */
+.category-btn {
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Smooth scrolling */
+.overflow-y-auto {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+}
+
+/* Hide scrollbar but keep functionality */
+.overflow-y-auto::-webkit-scrollbar {
+    width: 4px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.1);
+    border-radius: 4px;
+}
+
+/* Safe area for notched phones */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+    .screen {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
 }

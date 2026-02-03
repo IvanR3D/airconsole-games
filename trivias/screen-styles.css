@@ -50,6 +50,10 @@ body.cat-default {
     height: 100%;
     background: linear-gradient(90deg, #EB8225 0%, #FFD54F 50%, #73A03F 100%);
     border-radius: 14px;
+    transition: background 0.3s ease;
+}
+
+.timer-bar.animating {
     transition: width 1s linear, background 0.3s ease;
 }
 
@@ -62,27 +66,9 @@ body.cat-default {
     animation: pulse 0.5s ease infinite;
 }
 
-/* Flecha al final de la barra */
+/* Flecha al final de la barra - OCULTA */
 .timer-arrow {
-    position: absolute;
-    right: -18px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 0;
-    height: 0;
-    border-top: 14px solid transparent;
-    border-bottom: 14px solid transparent;
-    border-left: 20px solid #73A03F;
-    transition: border-left-color 0.3s ease;
-    filter: drop-shadow(2px 0 2px rgba(0,0,0,0.2));
-}
-
-.timer-bar.warning ~ .timer-arrow {
-    border-left-color: #FFA726;
-}
-
-.timer-bar.danger ~ .timer-arrow {
-    border-left-color: #FF7043;
+    display: none;
 }
 
 .timer-circle-standalone {

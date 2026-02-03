@@ -1,12 +1,23 @@
 const categories = {
     general: { name: "General", icon: "mdi:earth" },
     science: { name: "Ciencia", icon: "mdi:microscope" },
-    mathematics: { name: "Matematicas", icon: "mdi:math-compass" },
-    robotics: { name: "Robotica", icon: "mdi:robot" },
-    chemistry: { name: "Quimica", icon: "mdi:flask" },
-    technology: { name: "Tecnologia", icon: "mdi:laptop" },
-    history: { name: "Historia", icon: "mdi:book-open-page-variant" },
-    geography: { name: "Geografia", icon: "mdi:map" }
+    mathematics: { name: "Matemáticas", icon: "mdi:compass-outline" },
+    robotics: { name: "Robótica", icon: "mdi:robot-outline" },
+    chemistry: { name: "Química", icon: "mdi:flask-outline" },
+    technology: { name: "Tecnología", icon: "mdi:laptop" },
+    history: { name: "Historia", icon: "mdi:book-open-outline" },
+    geography: { name: "Geografía", icon: "mdi:map-outline" }
+};
+
+const categoryColors = {
+    general: '#0595AE',
+    science: '#73A03F',
+    mathematics: '#0595AE',
+    robotics: '#AB3D8B',
+    chemistry: '#EB8225',
+    technology: '#AB3D8B',
+    history: '#EB8225',
+    geography: '#0595AE'
 };
 
 let airconsole;
@@ -17,8 +28,9 @@ let hasAnswered = false;
 let myScore = 0;
 let myRank = 1;
 let selectedCategory = 'general';
-let selectedQuestionCount = 10; // Cantidad de preguntas seleccionada
-let hasJoined = false; // Track if player has explicitly joined
+let selectedQuestionCount = 10;
+let hasJoined = false;
+let currentStep = 1;
 
 const domCache = {};
 
@@ -49,14 +61,11 @@ function init() {
     airconsole.onReady = function() {
         setupCategoryGrid();
         setupAnswerButtons();
-        createJoinParticles();
-        
-        // Get player name but don't auto-join
-        playerName = airconsole.getNickname() || `Jugador ${airconsole.device_id}`;
+        setupStepNavigation();
+        playerName = airconsole.getNickname() || `Player ${airconsole.device_id}`;
     };
 
     airconsole.onMessage = function(from, data) {
-        
         switch(data.action) {
             case 'joined':
                 handleJoined(data);
@@ -98,27 +107,22 @@ function init() {
                 showEndScreen(data.winner, data.players);
                 break;
             case 'reset':
-                handleReset(data);
-                break;
             case 'exitGame':
                 handleReset(data);
                 break;
         }
     };
 
-    // Join button handler
+    // Join button
     document.getElementById('joinBtn').addEventListener('click', () => {
         if (!hasJoined) {
             hasJoined = true;
             document.getElementById('joinBtn').classList.add('hidden');
             document.getElementById('connectingMsg').classList.remove('hidden');
-            document.getElementById('connectingMsg').classList.add('flex');
-            
-            // Send join request to screen
-            sendMessage({ action: 'join' });
+            sendMessage({ action: 'join', name: playerName });
         }
     });
-
+    
     document.getElementById('startGameBtn').addEventListener('click', startGame);
     document.getElementById('playAgainBtn').addEventListener('click', playAgain);
     document.getElementById('exitGameBtn').addEventListener('click', exitGame);

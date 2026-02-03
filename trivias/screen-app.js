@@ -833,6 +833,20 @@ function displayOptions(question) {
 
 function startTimer() {
     clearInterval(timer);
+    
+    // Resetear la barra al 100% sin animación
+    const timerBar = document.getElementById('timerBar');
+    if (timerBar) {
+        timerBar.classList.remove('animating', 'warning', 'danger');
+        timerBar.style.width = '100%';
+        // Forzar reflow para aplicar el cambio inmediatamente
+        timerBar.offsetHeight;
+        // Activar la animación después de un pequeño delay
+        setTimeout(() => {
+            timerBar.classList.add('animating');
+        }, 50);
+    }
+    
     updateTimerDisplay();
     
     timer = setInterval(() => {

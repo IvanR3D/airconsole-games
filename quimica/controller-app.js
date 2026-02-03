@@ -639,29 +639,13 @@ function setupElementsGrid() {
     
     grid.innerHTML = '';
     
-    // Obtener elementos requeridos para el compuesto actual (modo fácil)
-    const requiredElements = new Set();
-    if (difficultyConfig.showRequiredElements && currentCompound?.elements) {
-        currentCompound.elements.forEach(el => requiredElements.add(el));
-    }
-    
     // Usar solo los elementos disponibles para esta dificultad
     availableElementKeys.forEach(key => {
         const el = allElements[key];
         if (!el) return;
         
-        const isRequired = requiredElements.has(key);
         const btn = document.createElement('button');
         btn.className = `element-btn element-${el.group}`;
-        
-        // En modo fácil, resaltar elementos requeridos
-        if (difficultyConfig.showRequiredElements) {
-            if (isRequired) {
-                btn.classList.add('highlighted-element');
-            } else {
-                btn.classList.add('dimmed-element');
-            }
-        }
         
         btn.dataset.element = key;
         btn.innerHTML = `
@@ -669,7 +653,6 @@ function setupElementsGrid() {
             <span class="symbol">${el.symbol}</span>
             <span class="name">${el.name}</span>
             <span class="selection-count" id="count-${key}"></span>
-            ${isRequired && difficultyConfig.showRequiredElements ? '<iconify-icon icon="mdi:star-four-points" class="highlight-star"></iconify-icon>' : ''}
         `;
         btn.addEventListener('click', () => handleElementClick(key, btn));
         
@@ -1084,17 +1067,20 @@ function handleRoundResult(data) {
     
     if (!overlay || !content) return;
     
+    // Actualizar puntuación del jugador
     if (data.players && data.players[playerData?.id]) {
         myScore = data.players[playerData.id].score;
     }
     
-    if (data.correct) {
+    // Determinar si ESTE jugador acertó (buscar en playerResults)
+    const myResult = data.playerResults && data.playerResults[playerData?.id];
+    const isCorrect = myResult ? myResult.isCorrect : false;
+    
+    if (isCorrect) {
         playSound('success');
         
-        const basePoints = data.compound.points;
-        const timeBonus = data.timeBonus || 0;
-        const multiplier = data.difficultyMultiplier || 1;
-        const difficultyBonus = Math.floor((basePoints + timeBonus) * (multiplier - 1));
+        // Usar los puntos del resultado del jugador
+        const pointsEarned = myResult.points || data.pointsAwarded || data.compound.points;
         
         content.innerHTML = `
             <div class="success-animation">
@@ -1107,9 +1093,7 @@ function handleRoundResult(data) {
             <p class="text-lg mb-3" style="color: var(--color-text);">${data.compound.formula} - ${data.compound.name}</p>
             <div class="points-earned">
                 <iconify-icon icon="mdi:star" class="mr-2"></iconify-icon>
-                +${basePoints} pts
-                ${timeBonus > 0 ? `<span class="bonus">+${timeBonus} tiempo</span>` : ''}
-                ${difficultyBonus > 0 ? `<span class="bonus diff-bonus">+${difficultyBonus} ${difficultyConfig.name}</span>` : ''}
+                +${pointsEarned} pts
             </div>
             ${isAdmin ? `
                 <button class="btn-primary mt-4" id="nextRoundBtn">
