@@ -9,6 +9,18 @@ const categories = {
     geography: { name: "Geografia", icon: "mdi:map", color: "geography" }
 };
 
+// Colores únicos por categoría - mismo que controller para consistencia
+const categoryColors = {
+    general: '#0595AE',    // turquesa
+    science: '#73A03F',    // verde
+    mathematics: '#6366F1', // indigo
+    robotics: '#AB3D8B',   // morado
+    chemistry: '#EB8225',  // naranja
+    technology: '#0D9488', // esmeralda
+    history: '#B45309',    // ámbar
+    geography: '#2563EB'   // azul
+};
+
 // Usar la base de datos de preguntas del archivo externo
 const questions = questionsDatabase;
 
@@ -337,15 +349,15 @@ function setupCategories() {
         geography: '#73A03F'
     };
     
-    // Icon mapping with outline versions
+    // Icon mapping - same as controller for unified design
     const categoryIcons = {
         general: 'mdi:earth',
         science: 'mdi:microscope',
-        mathematics: 'mdi:math-compass',
+        mathematics: 'mdi:compass-outline',
         robotics: 'mdi:robot-outline',
         chemistry: 'mdi:flask-outline',
         technology: 'mdi:laptop',
-        history: 'mdi:book-open-page-variant',
+        history: 'mdi:book-open-outline',
         geography: 'mdi:map-outline'
     };
     
@@ -353,41 +365,28 @@ function setupCategories() {
         const card = document.createElement('div');
         const categoryColor = categoryColors[key] || categoryColors.general;
         
-        card.className = 'category-card rounded-3xl p-4 sm:p-5 lg:p-6 text-center cursor-pointer transition-all shadow-lg hover:shadow-xl relative overflow-hidden power-up';
+        card.className = 'category-card rounded-2xl sm:rounded-3xl p-4 sm:p-5 lg:p-6 text-center cursor-pointer transition-all relative power-up';
         card.style.animationDelay = `${index * 0.1}s`;
-        // Inicialmente gris (no seleccionado)
-        card.style.background = '#9E9E9E';
-        card.style.border = `3px solid #9E9E9E`;
+        card.style.background = '#f0f9ff';
+        card.style.border = '2px solid #BFDBFE';
         card.dataset.category = key;
-        card.dataset.categoryColor = categoryColor; // Guardar el color en el dataset
+        card.dataset.categoryColor = categoryColor;
         
         card.innerHTML = `
-            <!-- Icon container -->
-            <div class="relative mb-3 sm:mb-4">
-                <iconify-icon icon="${categoryIcons[key]}" class="category-icon relative z-10" style="color: #FFFFFF;"></iconify-icon>
+            <div class="mb-3 sm:mb-4">
+                <iconify-icon icon="${categoryIcons[key]}" class="category-icon" style="color: ${categoryColor};"></iconify-icon>
             </div>
-            
-            <!-- Category name -->
-            <div class="relative text-base sm:text-lg lg:text-xl font-black uppercase tracking-wide mb-2 category-name" style="color: #FFFFFF;">
+            <div class="text-base sm:text-lg lg:text-xl font-bold category-name" style="color: #0595AE;">
                 ${category.name}
             </div>
-            
-            <!-- Underline -->
-            <div class="flex gap-1 justify-center mt-2">
-                <div class="w-8 h-1 rounded-full" style="background: rgba(255, 255, 255, 0.8);"></div>
-                <div class="w-8 h-1 rounded-full" style="background: rgba(255, 255, 255, 0.6);"></div>
-                <div class="w-8 h-1 rounded-full" style="background: rgba(255, 255, 255, 0.4);"></div>
-            </div>
-            
-            <!-- Selection indicator -->
-            <div class="selection-check absolute top-2 right-2 w-8 h-8 rounded-full bg-white hidden items-center justify-center text-lg font-bold" style="color: ${categoryColor};">
+            <div class="selection-check absolute top-2 right-2 w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 bg-white/90 hidden items-center justify-center text-sm font-bold" style="border-color: ${categoryColor}; color: ${categoryColor};">
                 ✓
             </div>
         `;
 
         // Add click handler with animation
         card.addEventListener('click', () => {
-            // Remove selection from all cards - volver a gris pero mantener texto e iconos blancos
+            // Remove selection from all cards - vuelven a fondo claro
             document.querySelectorAll('.category-card').forEach(c => {
                 c.classList.remove('selected', 'scale-105');
                 const check = c.querySelector('.selection-check');
@@ -395,30 +394,25 @@ function setupCategories() {
                     check.classList.add('hidden');
                     check.classList.remove('flex');
                 }
-                // Volver a gris
-                c.style.background = '#9E9E9E';
-                c.style.border = '3px solid #9E9E9E';
-                
-                // Asegurar que iconos y texto permanezcan blancos
+                const catColor = c.dataset.categoryColor;
+                c.style.background = '#f0f9ff';
+                c.style.borderColor = '#BFDBFE';
                 const icon = c.querySelector('.category-icon');
                 const text = c.querySelector('.category-name');
-                if (icon) icon.style.color = '#FFFFFF';
-                if (text) text.style.color = '#FFFFFF';
+                if (icon) icon.style.color = catColor;
+                if (text) text.style.color = '#0595AE';
             });
             
-            // Add selection to clicked card - cambiar al color de la categoría
+            // Add selection to clicked card - fondo del color de la categoría
             card.classList.add('selected', 'scale-105');
             const check = card.querySelector('.selection-check');
             if (check) {
                 check.classList.remove('hidden');
                 check.classList.add('flex');
             }
-            // Cambiar al color de la categoría usando el dataset
             const selectedColor = card.dataset.categoryColor;
             card.style.background = selectedColor;
-            card.style.border = `3px solid ${selectedColor}`;
-            
-            // Asegurar que iconos y texto permanezcan blancos
+            card.style.borderColor = selectedColor;
             const icon = card.querySelector('.category-icon');
             const text = card.querySelector('.category-name');
             if (icon) icon.style.color = '#FFFFFF';
@@ -480,16 +474,16 @@ function createBackgroundParticles(category) {
     
     container.innerHTML = '';
     
-    // STEAM colors for each category
+    // Colores para partículas - mismo que controller
     const colorMap = {
         general: ['#0595AE', '#73A03F', '#EB8225', '#AB3D8B'],
         science: ['#73A03F', '#0595AE', '#EB8225'],
-        mathematics: ['#0595AE', '#AB3D8B', '#73A03F'],
+        mathematics: ['#6366F1', '#8B5CF6', '#A78BFA'],
         robotics: ['#AB3D8B', '#EB8225', '#0595AE'],
-        chemistry: ['#73A03F', '#EB8225', '#0595AE'],
-        technology: ['#AB3D8B', '#0595AE', '#EB8225'],
-        history: ['#EB8225', '#AB3D8B', '#73A03F'],
-        geography: ['#0595AE', '#73A03F', '#EB8225']
+        chemistry: ['#EB8225', '#F59E0B', '#F97316'],
+        technology: ['#0D9488', '#14B8A6', '#2DD4BF'],
+        history: ['#B45309', '#D97706', '#F59E0B'],
+        geography: ['#2563EB', '#3B82F6', '#60A5FA']
     };
     
     // Outline icons for each category
@@ -780,19 +774,6 @@ function displayOptions(question) {
     container.innerHTML = '';
     
     const letters = ['A', 'B', 'C', 'D'];
-    
-    // Get category color
-    const categoryColors = {
-        science: '#73A03F',
-        mathematics: '#0595AE',
-        robotics: '#AB3D8B',
-        chemistry: '#EB8225',
-        technology: '#0595AE',
-        history: '#EB8225',
-        geography: '#73A03F',
-        general: '#0595AE'
-    };
-    
     const categoryColor = categoryColors[selectedCategory] || '#0595AE';
     
     const fragment = document.createDocumentFragment();

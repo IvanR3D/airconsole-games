@@ -291,7 +291,7 @@ body {
     display: inline-block;
 }
 
-/* Category button styles */
+/* Category button styles - same design as screen */
 .category-btn {
     min-height: 70px;
     padding: 8px;
@@ -299,20 +299,21 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: #FFFFFF;
+    background: #f0f9ff;
 }
 
 .category-btn .category-icon {
     font-size: 1.5rem;
 }
 
-.category-btn span:last-child {
-    font-size: 0.7rem;
+.category-btn .category-name {
+    font-size: 0.75rem;
 }
 
 /* Category scroll container - solo scroll cuando necesario */
 #categoryScrollContainer {
     -webkit-overflow-scrolling: touch;
+    min-height: 120px;
 }
 
 /* Smooth scrolling */

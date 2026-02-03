@@ -157,50 +157,7 @@ function createJoinParticles() {
 }
 
 function createWaitingControllerParticles() {
-    const container = document.getElementById('waitingControllerBgParticles');
-    if (!container || container.children.length > 0) return;
-    
-    const colors = ['#00d9ff', '#00ff88', '#ff00ff', '#ff9900'];
-    const icons = ['⏳', '⭐', '💡', '🎯'];
-    
-    for (let i = 0; i < 6; i++) {
-        const particle = document.createElement('div');
-        const size = Math.random() * 40 + 20;
-        const color = colors[Math.floor(Math.random() * colors.length)];
-        
-        particle.className = 'particle';
-        particle.style.width = size + 'px';
-        particle.style.height = size + 'px';
-        particle.style.borderRadius = '50%';
-        particle.style.background = `radial-gradient(circle, ${color}, transparent)`;
-        particle.style.boxShadow = `0 0 ${size}px ${color}`;
-        particle.style.left = Math.random() * 100 + '%';
-        particle.style.top = Math.random() * 100 + '%';
-        particle.style.animationDelay = Math.random() * 5 + 's';
-        particle.style.animationDuration = (Math.random() * 15 + 15) + 's';
-        particle.style.opacity = '0.4';
-        
-        container.appendChild(particle);
-    }
-    
-    for (let i = 0; i < 4; i++) {
-        const iconEl = document.createElement('div');
-        const icon = icons[Math.floor(Math.random() * icons.length)];
-        const color = colors[Math.floor(Math.random() * colors.length)];
-        
-        iconEl.className = 'particle icon-particle';
-        iconEl.textContent = icon;
-        iconEl.style.color = color;
-        iconEl.style.fontSize = (Math.random() * 30 + 20) + 'px';
-        iconEl.style.left = Math.random() * 100 + '%';
-        iconEl.style.top = Math.random() * 100 + '%';
-        iconEl.style.animationDelay = Math.random() * 5 + 's';
-        iconEl.style.animationDuration = (Math.random() * 20 + 20) + 's';
-        iconEl.style.filter = `drop-shadow(0 0 8px ${color})`;
-        iconEl.style.opacity = '0.5';
-        
-        container.appendChild(iconEl);
-    }
+    createControllerParticles(selectedCategory, 'waitingControllerBgParticles');
 }
 
 function setupCategoryGrid() {
@@ -234,21 +191,15 @@ function setupCategoryGrid() {
         const btnColor = categoryColors[key] || categoryColors.general;
         const isSelected = key === selectedCategory;
         const btn = document.createElement('div');
-        btn.className = `category-btn border-[3px] rounded-xl sm:rounded-2xl p-3 sm:p-4 text-center cursor-pointer transition-all shadow-md active:scale-95`;
+        btn.className = 'category-btn rounded-xl sm:rounded-2xl p-3 sm:p-4 text-center cursor-pointer transition-all active:scale-95';
+        btn.style.background = '#f0f9ff';
+        btn.style.border = '2px solid ' + (isSelected ? btnColor : '#BFDBFE');
         btn.dataset.category = key;
         btn.dataset.color = btnColor;
         
-        if (isSelected) {
-            btn.style.background = btnColor;
-            btn.style.borderColor = btnColor;
-        } else {
-            btn.style.background = '#FFFFFF';
-            btn.style.borderColor = '#E5E7EB';
-        }
-        
         btn.innerHTML = `
-            <iconify-icon icon="${categoryIcons[key]}" class="category-icon mb-2" style="color: ${isSelected ? '#FFFFFF' : '#9E9E9E'};"></iconify-icon>
-            <div class="text-xs sm:text-sm font-bold" style="color: ${isSelected ? '#FFFFFF' : '#757575'};">${cat.name}</div>
+            <iconify-icon icon="${categoryIcons[key]}" class="category-icon mb-2" style="color: ${btnColor};"></iconify-icon>
+            <div class="category-name text-xs sm:text-sm font-bold" style="color: #0595AE;">${cat.name}</div>
         `;
         btn.addEventListener('click', () => selectCategory(key));
         grid.appendChild(btn);
@@ -356,6 +307,7 @@ function handleJoined(data) {
     if (isAdmin) {
         currentStep = 1;
         goToStep(1);
+        setupCategoryGrid();
         showScreen('categorySelect');
     } else {
         createWaitingControllerParticles();
@@ -391,6 +343,7 @@ function handleReconnected(data) {
         showScreen('waiting');
     } else if (data.gameState === 'categorySelect') {
         if (isAdmin) {
+            setupCategoryGrid();
             showScreen('categorySelect');
         } else {
             createWaitingControllerParticles();
@@ -398,6 +351,7 @@ function handleReconnected(data) {
         }
     } else {
         if (isAdmin) {
+            setupCategoryGrid();
             showScreen('categorySelect');
         } else {
             createWaitingControllerParticles();
@@ -462,20 +416,17 @@ function selectCategory(category) {
         const isSelected = btnCategory === category;
         
         if (isSelected) {
-            // Selected: fondo y borde del color de la categoría
             btn.style.background = btnColor;
             btn.style.borderColor = btnColor;
         } else {
-            // Not selected: fondo blanco con borde gris
-            btn.style.background = '#FFFFFF';
-            btn.style.borderColor = '#E5E7EB';
+            btn.style.background = '#f0f9ff';
+            btn.style.borderColor = '#BFDBFE';
         }
         
-        // Update icon and text colors
         const icon = btn.querySelector('.category-icon');
-        const text = btn.querySelector('.text-xs');
-        if (icon) icon.style.color = isSelected ? '#FFFFFF' : '#9E9E9E';
-        if (text) text.style.color = isSelected ? '#FFFFFF' : '#757575';
+        const text = btn.querySelector('.category-name');
+        if (icon) icon.style.color = isSelected ? '#FFFFFF' : btnColor;
+        if (text) text.style.color = isSelected ? '#FFFFFF' : '#0595AE';
         
         if (isSelected && icon && anime && anime.animate) {
             anime.animate(icon, {
@@ -492,22 +443,22 @@ function selectCategory(category) {
     sendMessage({ action: 'selectCategory', category: category });
 }
 
-function createControllerParticles(category) {
-    const container = document.getElementById('controllerBgParticles');
+function createControllerParticles(category, containerId) {
+    const container = document.getElementById(containerId || 'controllerBgParticles');
     if (!container) return;
     
     container.innerHTML = '';
     
-    // STEAM colors for each category
+    // Colores para partículas - usa el color principal de cada categoría
     const colorMap = {
         general: ['#0595AE', '#73A03F', '#EB8225', '#AB3D8B'],
         science: ['#73A03F', '#0595AE', '#EB8225'],
-        mathematics: ['#0595AE', '#AB3D8B', '#73A03F'],
+        mathematics: ['#6366F1', '#8B5CF6', '#A78BFA'],
         robotics: ['#AB3D8B', '#EB8225', '#0595AE'],
-        chemistry: ['#73A03F', '#EB8225', '#0595AE'],
-        technology: ['#AB3D8B', '#0595AE', '#EB8225'],
-        history: ['#EB8225', '#AB3D8B', '#73A03F'],
-        geography: ['#0595AE', '#73A03F', '#EB8225']
+        chemistry: ['#EB8225', '#F59E0B', '#F97316'],
+        technology: ['#0D9488', '#14B8A6', '#2DD4BF'],
+        history: ['#B45309', '#D97706', '#F59E0B'],
+        geography: ['#2563EB', '#3B82F6', '#60A5FA']
     };
     
     // Outline icons for each category
@@ -590,16 +541,6 @@ function updateSelectedCategory(category) {
     selectedCategory = category;
     
     const cat = categories[category];
-    const categoryColors = {
-        general: '#0595AE',
-        science: '#73A03F',
-        mathematics: '#0595AE',
-        robotics: '#AB3D8B',
-        chemistry: '#EB8225',
-        technology: '#AB3D8B',
-        history: '#EB8225',
-        geography: '#0595AE'
-    };
     const catColor = categoryColors[category] || '#0595AE';
     
     if (cat) {
@@ -618,18 +559,19 @@ function updateSelectedCategory(category) {
             btn.style.background = btnColor;
             btn.style.borderColor = btnColor;
         } else {
-            btn.style.background = '#FFFFFF';
-            btn.style.borderColor = '#E5E7EB';
+            btn.style.background = '#f0f9ff';
+            btn.style.borderColor = '#BFDBFE';
         }
         
         const icon = btn.querySelector('.category-icon');
-        const text = btn.querySelector('.text-xs');
-        if (icon) icon.style.color = isSelected ? '#FFFFFF' : '#9E9E9E';
-        if (text) text.style.color = isSelected ? '#FFFFFF' : '#757575';
+        const text = btn.querySelector('.category-name');
+        if (icon) icon.style.color = isSelected ? '#FFFFFF' : btnColor;
+        if (text) text.style.color = isSelected ? '#FFFFFF' : '#0595AE';
     });
     
-    // Always update background particles when category changes
+    // Update background particles (admin and waiting screens)
     createControllerParticles(category);
+    createControllerParticles(category, 'waitingControllerBgParticles');
 }
 
 function startGame() {
@@ -806,6 +748,7 @@ function handleReset(data) {
     // Reset to step 1 for admin
     if (isAdmin) {
         goToStep(1);
+        setupCategoryGrid();
         showScreen('categorySelect');
     } else {
         showScreen('waiting');
