@@ -301,6 +301,10 @@ body {
     justify-content: center;
     background: #f0f9ff;
     gap: 2px;
+    cursor: pointer;
+    touch-action: manipulation;
+    position: relative;
+    z-index: 1;
 }
 
 .category-btn .category-icon {
@@ -318,14 +322,30 @@ body {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
+    position: relative;
+    z-index: 1;
 }
 
-/* Category scroll container - increased height */
+/* Step 1 area: asegura que botón Siguiente y grid reciban clics */
+#step1 {
+    position: relative;
+    z-index: 1;
+}
+#nextStep1Btn {
+    touch-action: manipulation;
+    position: relative;
+    z-index: 1;
+}
+
+/* Category scroll container - increased height; asegura que reciba clics */
 #categoryScrollContainer {
     -webkit-overflow-scrolling: touch;
     min-height: 280px;
     max-height: 320px;
     overflow-y: auto;
+    position: relative;
+    z-index: 1;
+    touch-action: pan-y;
 }
 
 /* Smooth scrolling */
@@ -366,6 +386,12 @@ body {
 }
 @supports (padding-right: env(safe-area-inset-right)) {
     .screen { padding-right: env(safe-area-inset-right); }
+}
+
+/* Result overlay: no bloquear clics cuando está oculto */
+#resultOverlay.hidden {
+    pointer-events: none;
+    visibility: hidden;
 }
 
 /* Prevent overflow on result overlay text */

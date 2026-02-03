@@ -772,6 +772,11 @@ function showScreen(screen) {
     if (screenCache[screen]) {
         screenCache[screen].classList.add('active');
     }
+    // Evitar que el overlay de resultado bloquee clics al volver a categorías u otras pantallas
+    if (domCache.resultOverlay) {
+        domCache.resultOverlay.classList.add('hidden');
+        domCache.resultOverlay.classList.remove('flex');
+    }
 }
 
 window.onload = init;
