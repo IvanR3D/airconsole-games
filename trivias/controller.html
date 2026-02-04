@@ -31,19 +31,18 @@
     </script>
     <link rel="stylesheet" href="controller-styles.css">
 </head>
-<body class="w-full max-w-full min-w-0 font-sans text-steam-negro overflow-x-hidden">
-    <div class="w-full flex flex-col min-h-screen">
+<body class="font-sans text-steam-negro">
+    <div class="w-full h-full flex flex-col">
+        
         <!-- JOIN SCREEN -->
-        <div class="screen active flex-col items-center justify-center p-4 text-center gap-4 relative bg-white" id="joinScreen">
-            <div class="relative z-10 w-full max-w-md">
-                <div class="mb-4">
-                    <img src="../LogoSteamRD-Color.webp" alt="STEAM RD Logo" class="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-2 object-contain" style="filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1));">
-                </div>
+        <div class="screen active flex-col items-center justify-center text-center gap-4 bg-white" id="joinScreen">
+            <div class="w-full max-w-sm mx-auto">
+                <img src="../LogoSteamRD-Color.webp" alt="STEAM RD Logo" class="w-16 h-16 mx-auto mb-3 object-contain">
                 
-                <h1 class="text-2xl sm:text-3xl font-black mb-4 text-steam-turquesa">TRIVIA</h1>
+                <h1 class="text-2xl font-black mb-4 text-steam-turquesa">TRIVIA</h1>
                 
                 <div class="space-y-2 mb-4">
-                    <div class="bg-white border-2 border-gray-200 rounded-xl p-3 shadow-sm">
+                    <div class="bg-white border-2 border-gray-200 rounded-xl p-3">
                         <div class="flex items-center gap-3">
                             <div class="text-xl">🎯</div>
                             <div class="text-left">
@@ -53,7 +52,7 @@
                         </div>
                     </div>
                     
-                    <div class="bg-white border-2 border-gray-200 rounded-xl p-3 shadow-sm">
+                    <div class="bg-white border-2 border-gray-200 rounded-xl p-3">
                         <div class="flex items-center gap-3">
                             <div class="text-xl">👥</div>
                             <div class="text-left">
@@ -63,7 +62,7 @@
                         </div>
                     </div>
                     
-                    <div class="bg-white border-2 border-gray-200 rounded-xl p-3 shadow-sm">
+                    <div class="bg-white border-2 border-gray-200 rounded-xl p-3">
                         <div class="flex items-center gap-3">
                             <div class="text-xl">⚡</div>
                             <div class="text-left">
@@ -74,84 +73,88 @@
                     </div>
                 </div>
                 
-                <button class="bg-steam-verde text-white border-none py-3 px-6 sm:py-4 sm:px-8 text-base sm:text-lg font-black rounded-full cursor-pointer uppercase w-full shadow-lg transition-all active:scale-95 flex items-center justify-center gap-3" id="joinBtn">
-                    <iconify-icon icon="mdi:gamepad-variant" style="font-size: 1.5rem;"></iconify-icon>
+                <button class="bg-steam-verde text-white py-3 px-6 text-base font-black rounded-full w-full shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-3" id="joinBtn">
+                    <iconify-icon icon="mdi:gamepad-variant" class="text-2xl"></iconify-icon>
                     UNIRSE AL JUEGO
                 </button>
                 
-                <div class="bg-green-50 border-2 border-steam-verde rounded-2xl py-4 px-6 pulse hidden items-center gap-3 mt-4" id="connectingMsg">
-                    <div class="w-5 h-5 border-3 border-steam-verde rounded-full animate-spin" style="border-top-color: transparent;"></div>
+                <div class="bg-green-50 border-2 border-steam-verde rounded-2xl py-3 px-4 pulse hidden items-center gap-3 mt-4" id="connectingMsg">
+                    <div class="w-5 h-5 border-2 border-steam-verde border-t-transparent rounded-full animate-spin"></div>
                     <span class="font-bold text-steam-verde">Conectando...</span>
                 </div>
-                <div class="bg-red-50 border-2 border-red-500 rounded-2xl py-4 px-6 hidden items-center gap-3 mt-4" id="errorMsg">
-                    <div class="text-3xl">⚠</div>
-                    <div>
-                        <p class="font-bold text-red-600">Juego Lleno</p>
-                        <p class="text-sm text-gray-600">Ya hay 4 jugadores conectados</p>
+                
+                <div class="bg-red-50 border-2 border-red-500 rounded-2xl py-3 px-4 hidden items-center gap-3 mt-4" id="errorMsg">
+                    <div class="text-2xl">⚠</div>
+                    <div class="text-left">
+                        <p class="font-bold text-red-600 text-sm">Juego Lleno</p>
+                        <p class="text-xs text-gray-600">Ya hay 4 jugadores conectados</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- WAITING SCREEN (Non-admin) -->
-        <div class="screen flex-col items-center justify-center p-4 text-center relative bg-white" id="waitingScreen">
-            <div class="bg-particles pointer-events-none" id="waitingControllerBgParticles"></div>
+        <div class="screen flex-col items-center justify-center text-center bg-white" id="waitingScreen">
+            <div class="bg-particles" id="waitingControllerBgParticles"></div>
             
-            <div class="relative z-10 w-full max-w-md">
+            <div class="relative z-10 w-full max-w-sm mx-auto">
                 <div class="mb-6">
-                    <div class="mx-auto mb-4 w-20 h-20 rounded-full flex items-center justify-center relative border-4 border-white shadow-lg" id="playerAvatar">
-                        <iconify-icon icon="mdi:gamepad-variant" style="font-size: 2.5rem; color: white;"></iconify-icon>
+                    <div class="mx-auto mb-4 w-16 h-16 rounded-full flex items-center justify-center border-4 border-white shadow-lg" id="playerAvatar">
+                        <iconify-icon icon="mdi:gamepad-variant" class="text-3xl text-white"></iconify-icon>
                     </div>
-                    <div class="text-xl font-black mb-2 text-steam-turquesa" id="playerNameDisplay"></div>
+                    <div class="text-lg font-black text-steam-turquesa" id="playerNameDisplay"></div>
                 </div>
                 
-                <iconify-icon icon="mdi:timer-sand" class="bounce-anim" style="font-size: 3rem; color: #0595AE;"></iconify-icon>
+                <iconify-icon icon="mdi:timer-sand" class="bounce-anim text-5xl text-steam-turquesa"></iconify-icon>
                 
-                <div class="bg-green-50 border-3 border-steam-verde rounded-2xl py-4 px-6 mb-6 shadow-lg">
-                    <p class="text-lg font-black text-steam-verde">Esperando que inicie el juego...</p>
+                <div class="bg-green-50 border-2 border-steam-verde rounded-2xl py-4 px-6 my-4 shadow-lg">
+                    <p class="text-base font-black text-steam-verde">Esperando que inicie el juego...</p>
                 </div>
                 
-                <div class="text-center" id="nonAdminWaiting">
+                <div id="nonAdminWaiting">
                     <p class="text-sm mb-4 text-gray-600">El Jugador 1 está configurando la partida</p>
-                    <div class="bg-blue-50 rounded-2xl p-5 border-2 border-steam-turquesa hidden" id="selectedCategoryDisplay">
-                        <div class="text-5xl mb-3" id="selectedCategoryEmoji">🌍</div>
-                        <div class="text-xl font-black text-steam-turquesa" id="selectedCategoryName">General</div>
+                    <div class="bg-blue-50 rounded-2xl p-4 border-2 border-steam-turquesa hidden" id="selectedCategoryDisplay">
+                        <div class="text-4xl mb-2" id="selectedCategoryEmoji">🌍</div>
+                        <div class="text-lg font-black text-steam-turquesa" id="selectedCategoryName">General</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- ADMIN SETUP SCREEN - STEP BY STEP -->
-        <div class="screen flex-col p-2 relative bg-white" id="categorySelectScreen">
-            <div class="bg-particles pointer-events-none" id="controllerBgParticles"></div>
+        <!-- ADMIN SETUP SCREEN - WIZARD -->
+        <div class="screen flex-col bg-white" id="categorySelectScreen">
+            <div class="bg-particles" id="controllerBgParticles"></div>
             
-            <div class="relative z-10 flex flex-col flex-1 min-h-0">
-                <!-- Admin Badge - Compacto -->
-                <div class="text-center mb-1 flex-shrink-0" style="margin-top: 60px;">
+            <div class="relative z-10 flex flex-col flex-1 min-h-0 w-full max-w-md mx-auto">
+                <!-- Admin Badge -->
+                <div class="text-center mb-3 flex-shrink-0">
                     <div class="inline-flex items-center gap-2 bg-orange-50 border-2 border-steam-naranja rounded-full py-1 px-3 shadow-md">
-                        <iconify-icon icon="mdi:crown" style="font-size: 1rem; color: #EB8225;"></iconify-icon>
+                        <iconify-icon icon="mdi:crown" class="text-steam-naranja"></iconify-icon>
                         <span class="font-black text-xs text-steam-naranja">ADMIN</span>
                         <div class="w-6 h-6 rounded-full flex items-center justify-center border-2 border-white shadow-sm" id="adminAvatar">
-                            <iconify-icon icon="mdi:crown" style="font-size: 0.8rem; color: white;"></iconify-icon>
+                            <iconify-icon icon="mdi:crown" class="text-xs text-white"></iconify-icon>
                         </div>
                     </div>
                 </div>
 
-                <!-- Step Indicators -->
-                <div class="flex items-center justify-center gap-1 mb-1 flex-shrink-0">
-                    <div class="step-indicator active" data-step="1">
-                        <span class="step-number">1</span>
-                        <span class="step-label">Categoría</span>
+                <!-- Progress Bar -->
+                <div class="w-full bg-gray-200 h-2 rounded-full mb-3 overflow-hidden flex-shrink-0">
+                    <div id="wizardProgress" class="h-full bg-steam-turquesa transition-all duration-300" style="width: 33.33%"></div>
+                </div>
+
+                <!-- Step Labels -->
+                <div class="flex items-center justify-between mb-3 flex-shrink-0">
+                    <div class="step-label-item active" data-step="1">
+                        <span class="step-dot"></span>
+                        <span class="step-text">Categoría</span>
                     </div>
-                    <div class="step-line"></div>
-                    <div class="step-indicator" data-step="2">
-                        <span class="step-number">2</span>
-                        <span class="step-label">Preguntas</span>
+                    <div class="step-label-item" data-step="2">
+                        <span class="step-dot"></span>
+                        <span class="step-text">Preguntas</span>
                     </div>
-                    <div class="step-line"></div>
-                    <div class="step-indicator" data-step="3">
-                        <span class="step-number">3</span>
-                        <span class="step-label">Iniciar</span>
+                    <div class="step-label-item" data-step="3">
+                        <span class="step-dot"></span>
+                        <span class="step-text">Iniciar</span>
                     </div>
                 </div>
 
@@ -159,82 +162,78 @@
                 <div class="step-content active flex-1 flex flex-col min-h-0" id="step1">
                     <h2 class="text-sm font-black text-center mb-2 text-steam-turquesa flex-shrink-0">Elige una Categoría</h2>
                     <div class="flex-1 overflow-y-auto min-h-0" id="categoryScrollContainer">
-                        <div class="grid grid-cols-2 gap-2 pb-2" id="categoryGrid"></div>
+                        <div id="categoryGrid"></div>
                     </div>
-                    <div class="pt-2 flex-shrink-0">
-                        <button class="bg-steam-turquesa text-white border-none py-3 px-4 text-sm font-black rounded-full cursor-pointer uppercase w-full shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2" id="nextStep1Btn">
+                    <div class="pt-3 flex-shrink-0">
+                        <button class="bg-steam-turquesa text-white py-3 px-4 text-sm font-black rounded-full w-full shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2" id="nextStep1Btn">
                             Siguiente
-                            <iconify-icon icon="mdi:arrow-right" style="font-size: 1rem;"></iconify-icon>
+                            <iconify-icon icon="mdi:arrow-right"></iconify-icon>
                         </button>
                     </div>
                 </div>
 
                 <!-- STEP 2: Question Count -->
-                <div class="step-content flex-1 flex flex-col justify-center min-h-0" id="step2">
-                    <h2 class="text-base font-black text-center mb-3 text-steam-turquesa">¿Cuántas Preguntas?</h2>
+                <div class="step-content flex-1 flex flex-col justify-center" id="step2">
+                    <h2 class="text-base font-black text-center mb-4 text-steam-turquesa">¿Cuántas Preguntas?</h2>
                     
                     <div class="bg-gray-50 rounded-xl p-4 mb-4 border-2 border-gray-200">
-                        <div class="flex items-center justify-center gap-3 mb-3">
-                            <button class="w-11 h-11 rounded-full bg-steam-morado text-white font-bold text-xl flex items-center justify-center shadow-md active:scale-95 transition-all" id="decreaseQuestions">-</button>
-                            <div class="bg-white rounded-lg px-6 py-3 border-2 border-steam-turquesa min-w-[90px] text-center">
+                        <div class="flex items-center justify-center gap-4 mb-3">
+                            <button class="w-12 h-12 rounded-full bg-steam-morado text-white font-bold text-xl flex items-center justify-center shadow-md active:scale-95 transition-transform" id="decreaseQuestions">-</button>
+                            <div class="bg-white rounded-lg px-6 py-3 border-2 border-steam-turquesa min-w-[5rem] text-center">
                                 <span class="text-3xl font-black text-steam-turquesa" id="questionCountValue">10</span>
                             </div>
-                            <button class="w-11 h-11 rounded-full bg-steam-verde text-white font-bold text-xl flex items-center justify-center shadow-md active:scale-95 transition-all" id="increaseQuestions">+</button>
+                            <button class="w-12 h-12 rounded-full bg-steam-verde text-white font-bold text-xl flex items-center justify-center shadow-md active:scale-95 transition-transform" id="increaseQuestions">+</button>
                         </div>
-                        <div class="text-center">
-                            <span class="text-xs text-gray-500">Mínimo 5 - Máximo 50</span>
-                        </div>
+                        <p class="text-center text-xs text-gray-500">Mínimo 5 - Máximo 50</p>
                     </div>
 
-                    <div class="bg-blue-50 rounded-lg p-2 mb-3 border-2 border-steam-turquesa flex items-center gap-2">
-                        <iconify-icon id="selectedCatIcon" icon="mdi:earth" style="font-size: 1.5rem; color: #0595AE;"></iconify-icon>
+                    <div class="bg-blue-50 rounded-lg p-3 mb-4 border-2 border-steam-turquesa flex items-center gap-3">
+                        <iconify-icon id="selectedCatIcon" icon="mdi:earth" class="text-2xl text-steam-turquesa"></iconify-icon>
                         <div>
-                            <div class="text-[10px] text-gray-500">Categoría</div>
+                            <div class="text-xs text-gray-500">Categoría</div>
                             <div class="font-bold text-sm text-steam-turquesa" id="selectedCatName">General</div>
                         </div>
                     </div>
                     
-                    <div class="flex gap-2">
-                        <button class="flex-1 bg-gray-200 text-gray-700 border-none py-2 px-3 text-sm font-bold rounded-full cursor-pointer uppercase shadow-md transition-all active:scale-95 flex items-center justify-center gap-1" id="prevStep2Btn">
-                            <iconify-icon icon="mdi:arrow-left" style="font-size: 1rem;"></iconify-icon>
+                    <div class="flex gap-3">
+                        <button class="flex-1 bg-gray-200 text-gray-700 py-3 px-4 text-sm font-bold rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2" id="prevStep2Btn">
+                            <iconify-icon icon="mdi:arrow-left"></iconify-icon>
                             Atrás
                         </button>
-                        <button class="flex-1 bg-steam-turquesa text-white border-none py-2 px-3 text-sm font-black rounded-full cursor-pointer uppercase shadow-lg transition-all active:scale-95 flex items-center justify-center gap-1" id="nextStep2Btn">
+                        <button class="flex-1 bg-steam-turquesa text-white py-3 px-4 text-sm font-black rounded-full shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2" id="nextStep2Btn">
                             Siguiente
-                            <iconify-icon icon="mdi:arrow-right" style="font-size: 1rem;"></iconify-icon>
+                            <iconify-icon icon="mdi:arrow-right"></iconify-icon>
                         </button>
                     </div>
                 </div>
 
                 <!-- STEP 3: Ready to Start -->
-                <div class="step-content flex-1 flex flex-col min-h-0" id="step3">
-                    <h2 class="text-base font-black text-center mb-2 text-steam-turquesa">¡Todo Listo!</h2>
+                <div class="step-content flex-1 flex flex-col justify-center" id="step3">
+                    <h2 class="text-base font-black text-center mb-4 text-steam-turquesa">¡Todo Listo!</h2>
                     
-                    <div class="bg-gradient-to-br from-blue-50 to-green-50 rounded-xl p-3 mb-3 border-2 border-steam-verde">
-                        <div class="text-center mb-2">
-                            <iconify-icon id="finalCatIcon" icon="mdi:earth" style="font-size: 2rem; color: #0595AE;"></iconify-icon>
+                    <div class="bg-gradient-to-br from-blue-50 to-green-50 rounded-xl p-4 mb-4 border-2 border-steam-verde">
+                        <div class="text-center mb-3">
+                            <iconify-icon id="finalCatIcon" icon="mdi:earth" class="text-4xl text-steam-turquesa"></iconify-icon>
                         </div>
-                        <div class="space-y-1">
-                            <div class="flex justify-between items-center bg-white rounded-lg p-2">
-                                <span class="text-gray-600 text-xs">Categoría</span>
-                                <span class="font-bold text-sm text-steam-turquesa" id="finalCatName">General</span>
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center bg-white rounded-lg p-3">
+                                <span class="text-gray-600 text-sm">Categoría</span>
+                                <span class="font-bold text-steam-turquesa" id="finalCatName">General</span>
                             </div>
-                            <div class="flex justify-between items-center bg-white rounded-lg p-2">
-                                <span class="text-gray-600 text-xs">Preguntas</span>
-                                <span class="font-bold text-sm text-steam-naranja" id="finalQuestionCount">10</span>
+                            <div class="flex justify-between items-center bg-white rounded-lg p-3">
+                                <span class="text-gray-600 text-sm">Preguntas</span>
+                                <span class="font-bold text-steam-naranja" id="finalQuestionCount">10</span>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="flex gap-2 mb-2">
-                        <button class="flex-1 bg-gray-200 text-gray-700 border-none py-2 px-3 text-sm font-bold rounded-full cursor-pointer uppercase shadow-md transition-all active:scale-95 flex items-center justify-center gap-1" id="prevStep3Btn">
-                            <iconify-icon icon="mdi:arrow-left" style="font-size: 1rem;"></iconify-icon>
-                            Atrás
-                        </button>
-                    </div>
+                    <button class="bg-gray-200 text-gray-700 py-3 px-4 text-sm font-bold rounded-full w-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2 mb-3" id="prevStep3Btn">
+                        <iconify-icon icon="mdi:arrow-left"></iconify-icon>
+                        Atrás
+                    </button>
                     
-                    <button class="bg-steam-verde text-white border-none py-3 px-4 text-base font-black rounded-full cursor-pointer uppercase w-full shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 btn-3d btn-verde" id="startGameBtn">
-                        <iconify-icon icon="mdi:rocket-launch" style="font-size: 1.3rem;"></iconify-icon>
+                    <button class="bg-steam-verde text-white py-4 px-4 text-base font-black rounded-full w-full shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2 btn-3d btn-verde" id="startGameBtn">
+                        <iconify-icon icon="mdi:rocket-launch" class="text-xl"></iconify-icon>
                         INICIAR JUEGO!
                     </button>
                 </div>
@@ -242,52 +241,52 @@
         </div>
 
         <!-- PLAYING SCREEN -->
-        <div class="screen flex-col p-3 bg-white" id="playingScreen">
-            <div class="text-center mb-2" id="adminExitContainer" style="display: none;">
-                <button class="bg-red-500 text-white border-none py-2 px-4 text-sm font-bold rounded-full cursor-pointer uppercase shadow-md transition-all active:scale-95 flex items-center justify-center gap-2 mx-auto" id="exitGameBtn">
-                    <iconify-icon icon="mdi:exit-to-app" style="font-size: 1.2rem;"></iconify-icon>
+        <div class="screen flex-col bg-white" id="playingScreen">
+            <div class="text-center mb-2 hidden" id="adminExitContainer">
+                <button class="bg-red-500 text-white py-2 px-4 text-sm font-bold rounded-full shadow-md active:scale-95 transition-transform inline-flex items-center gap-2" id="exitGameBtn">
+                    <iconify-icon icon="mdi:exit-to-app" class="text-lg"></iconify-icon>
                     SALIR
                 </button>
             </div>
             
-            <div class="text-center mb-2">
+            <div class="text-center mb-3">
                 <div class="text-sm text-steam-turquesa font-bold mb-1" id="questionIndicator">Pregunta 1 de 5</div>
                 <p class="text-base">Selecciona tu respuesta:</p>
             </div>
 
-            <div class="answer-grid flex-1" id="answerGrid">
-                <button class="answer-btn bg-steam-verde border-none rounded-xl font-bold text-white cursor-pointer relative btn-3d btn-verde" data-option="0">A</button>
-                <button class="answer-btn bg-steam-morado border-none rounded-xl font-bold text-white cursor-pointer relative btn-3d btn-morado" data-option="1">B</button>
-                <button class="answer-btn bg-steam-turquesa border-none rounded-xl font-bold text-white cursor-pointer relative btn-3d btn-turquesa" data-option="2">C</button>
-                <button class="answer-btn bg-steam-naranja border-none rounded-xl font-bold text-white cursor-pointer relative btn-3d btn-naranja" data-option="3">D</button>
+            <div class="answer-grid" id="answerGrid">
+                <button class="answer-btn bg-steam-verde rounded-xl font-bold text-white relative btn-3d btn-verde" data-option="0">A</button>
+                <button class="answer-btn bg-steam-morado rounded-xl font-bold text-white relative btn-3d btn-morado" data-option="1">B</button>
+                <button class="answer-btn bg-steam-turquesa rounded-xl font-bold text-white relative btn-3d btn-turquesa" data-option="2">C</button>
+                <button class="answer-btn bg-steam-naranja rounded-xl font-bold text-white relative btn-3d btn-naranja" data-option="3">D</button>
             </div>
 
-            <div class="flex items-center justify-between bg-gray-100 p-2 rounded-lg mt-3 border-2 border-gray-200">
+            <div class="flex items-center gap-3 bg-gray-100 p-3 rounded-lg mt-3 border-2 border-gray-200 flex-shrink-0">
                 <div class="player-avatar-visual-small" id="miniAvatar"></div>
-                <div class="flex-1 ml-2">
-                    <div class="font-bold text-xs" id="miniName"></div>
-                    <div class="text-[10px] text-gray-500" id="miniRank">Rank 1</div>
+                <div class="flex-1 min-w-0">
+                    <div class="font-bold text-sm truncate" id="miniName"></div>
+                    <div class="text-xs text-gray-500" id="miniRank">Rank 1</div>
                 </div>
-                <div class="bg-steam-naranja text-white py-1 px-2 rounded-lg font-bold text-sm" id="miniScore">0</div>
+                <div class="bg-steam-naranja text-white py-1 px-3 rounded-lg font-bold text-sm" id="miniScore">0</div>
             </div>
         </div>
 
         <!-- END SCREEN -->
-        <div class="screen flex-col items-center justify-center p-4 text-center gap-3 bg-white" id="endScreen">
-            <div class="text-4xl" id="finalRank">1ro</div>
+        <div class="screen flex-col items-center justify-center text-center gap-4 bg-white" id="endScreen">
+            <div class="text-5xl font-black" id="finalRank">1ro</div>
             <div class="player-avatar-visual mx-auto" id="resultAvatar"></div>
             <p class="text-lg font-bold text-steam-turquesa" id="finalMessage">Felicidades!</p>
             <div class="text-xl font-bold text-steam-verde" id="finalScore">0 puntos</div>
-            <button class="bg-steam-morado text-white border-none py-3 px-6 text-base font-bold rounded-full cursor-pointer uppercase btn-3d btn-morado hidden" id="playAgainBtn">JUGAR DE NUEVO</button>
-            <p class="text-xs text-gray-600" id="waitingNextText">Esperando al Jugador 1...</p>
+            <button class="bg-steam-morado text-white py-3 px-6 text-base font-bold rounded-full btn-3d btn-morado hidden" id="playAgainBtn">JUGAR DE NUEVO</button>
+            <p class="text-sm text-gray-600" id="waitingNextText">Esperando al Jugador 1...</p>
         </div>
 
         <!-- RESULT OVERLAY -->
-        <div class="fixed top-0 left-0 w-full h-full bg-white/95 hidden items-center justify-center z-50 p-4" id="resultOverlay">
-            <div class="text-center pop-in max-w-full" id="resultContent">
-                <div class="text-5xl mb-3 result-icon">✓</div>
-                <div class="text-xl font-bold mb-2 result-text">Correcto!</div>
-                <div class="text-lg result-points">+500 pts</div>
+        <div class="bg-white/95 hidden items-center justify-center p-4" id="resultOverlay">
+            <div class="text-center pop-in" id="resultContent">
+                <div class="text-5xl mb-3">✓</div>
+                <div class="text-xl font-bold mb-2">Correcto!</div>
+                <div class="text-lg">+500 pts</div>
             </div>
         </div>
     </div>

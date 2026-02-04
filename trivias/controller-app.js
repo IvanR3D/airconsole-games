@@ -250,7 +250,25 @@ function setupStepNavigation() {
 function goToStep(step) {
     currentStep = step;
     
-    // Update step indicators
+    // Update progress bar
+    const progressBar = document.getElementById('wizardProgress');
+    if (progressBar) {
+        const progressWidth = (step / 3) * 100;
+        progressBar.style.width = progressWidth + '%';
+    }
+    
+    // Update step label items (new style)
+    document.querySelectorAll('.step-label-item').forEach((item, index) => {
+        const stepNum = index + 1;
+        item.classList.remove('active', 'completed');
+        if (stepNum < step) {
+            item.classList.add('completed');
+        } else if (stepNum === step) {
+            item.classList.add('active');
+        }
+    });
+    
+    // Update legacy step indicators (for compatibility)
     document.querySelectorAll('.step-indicator').forEach((indicator, index) => {
         const stepNum = index + 1;
         indicator.classList.remove('active', 'completed');
