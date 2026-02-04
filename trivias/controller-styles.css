@@ -38,6 +38,12 @@ body {
     opacity: 1;
 }
 
+/* Playing screen: extra top spacing so AirConsole UI doesn't overlap
+   exit button (admin) or "Pregunta X de 15" text (player) */
+#playingScreen {
+    padding-top: max(3rem, calc(env(safe-area-inset-top, 0px) + 2rem));
+}
+
 /* ========================================
    WIZARD PROGRESS BAR
    ======================================== */

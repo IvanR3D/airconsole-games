@@ -11,6 +11,9 @@ body {
     touch-action: manipulation;
     font-size: 16px;
     color: #1a1a2e;
+    overscroll-behavior: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 :root {
@@ -25,17 +28,23 @@ body {
     --color-bg: #ffffff;
     --color-bg-soft: #f8fafc;
     
-    --element-size: clamp(55px, 18vw, 70px);
-    --element-height: clamp(65px, 21vw, 80px);
-    --avatar-size: clamp(50px, 18vw, 70px);
+    --element-size: clamp(50px, 15vw, 70px);
+    --element-height: clamp(60px, 18vw, 80px);
+    --avatar-size: clamp(45px, 15vw, 70px);
     
-    --font-xs: clamp(0.625rem, 2.5vw, 0.75rem);
-    --font-sm: clamp(0.75rem, 3vw, 0.875rem);
-    --font-base: clamp(0.875rem, 3.5vw, 1rem);
-    --font-lg: clamp(1rem, 4vw, 1.25rem);
-    --font-xl: clamp(1.25rem, 5vw, 1.5rem);
-    --font-2xl: clamp(1.5rem, 6vw, 2rem);
-    --font-3xl: clamp(2rem, 8vw, 3rem);
+    --font-xs: clamp(0.625rem, 2.2vw, 0.75rem);
+    --font-sm: clamp(0.7rem, 2.8vw, 0.875rem);
+    --font-base: clamp(0.8rem, 3.2vw, 1rem);
+    --font-lg: clamp(0.95rem, 3.8vw, 1.25rem);
+    --font-xl: clamp(1.15rem, 4.5vw, 1.5rem);
+    --font-2xl: clamp(1.4rem, 5.5vw, 2rem);
+    --font-3xl: clamp(1.8rem, 7vw, 3rem);
+    
+    --spacing-xs: clamp(4px, 1vw, 6px);
+    --spacing-sm: clamp(6px, 1.5vw, 8px);
+    --spacing-md: clamp(8px, 2vw, 12px);
+    --spacing-lg: clamp(12px, 3vw, 16px);
+    --spacing-xl: clamp(16px, 4vw, 24px);
 }
 
 .screen { display: none; opacity: 0; transition: opacity 0.3s ease; }
@@ -47,7 +56,7 @@ body {
     opacity: 1; 
     height: 100vh; 
     height: 100dvh;
-    padding: 110px 16px 16px 16px;
+    padding: clamp(80px, 15vh, 110px) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
 }
@@ -91,7 +100,7 @@ body {
 .element-btn {
     width: var(--element-size);
     height: var(--element-height);
-    border-radius: clamp(8px, 3vw, 12px);
+    border-radius: clamp(6px, 2.5vw, 12px);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -101,8 +110,10 @@ body {
     cursor: pointer;
     position: relative;
     transition: all 0.15s ease;
-    box-shadow: 0 clamp(3px, 1vw, 4px) 0 rgba(0,0,0,0.2), 
-                0 clamp(4px, 1.5vw, 6px) clamp(12px, 4vw, 16px) rgba(0,0,0,0.1);
+    box-shadow: 0 clamp(2px, 0.8vw, 4px) 0 rgba(0,0,0,0.2), 
+                0 clamp(3px, 1.2vw, 6px) clamp(8px, 3vw, 16px) rgba(0,0,0,0.1);
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .element-btn::before {
@@ -144,15 +155,16 @@ body {
 }
 
 .element-btn .symbol {
-    font-size: clamp(18px, 6vw, 24px);
+    font-size: clamp(16px, 5vw, 24px);
     line-height: 1;
     text-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
 .element-btn .name {
-    font-size: clamp(6px, 2vw, 8px);
-    margin-top: clamp(1px, 0.5vw, 2px);
+    font-size: clamp(5px, 1.8vw, 8px);
+    margin-top: clamp(1px, 0.3vw, 2px);
     opacity: 0.9;
+    line-height: 1.1;
 }
 
 /* Colores por grupo - Basados en la tabla periódica estándar */
@@ -234,12 +246,12 @@ body {
 .player-avatar {
     width: var(--avatar-size);
     height: var(--avatar-size);
-    border-radius: clamp(12px, 4vw, 18px);
-    box-shadow: 0 clamp(4px, 2vw, 8px) clamp(12px, 5vw, 20px) rgba(0,0,0,0.15);
+    border-radius: clamp(10px, 3.5vw, 18px);
+    box-shadow: 0 clamp(3px, 1.5vw, 8px) clamp(10px, 4vw, 20px) rgba(0,0,0,0.15);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: clamp(24px, 8vw, 32px);
+    font-size: clamp(20px, 7vw, 32px);
     position: relative;
     flex-shrink: 0;
 }
@@ -247,12 +259,12 @@ body {
 .player-avatar::after {
     content: '';
     position: absolute;
-    top: clamp(3px, 1vw, 5px);
-    left: clamp(3px, 1vw, 5px);
-    right: clamp(3px, 1vw, 5px);
+    top: clamp(2px, 0.8vw, 5px);
+    left: clamp(2px, 0.8vw, 5px);
+    right: clamp(2px, 0.8vw, 5px);
     height: 25%;
     background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, transparent 100%);
-    border-radius: clamp(10px, 3vw, 14px) clamp(10px, 3vw, 14px) 0 0;
+    border-radius: clamp(8px, 2.5vw, 14px) clamp(8px, 2.5vw, 14px) 0 0;
 }
 
 
@@ -272,8 +284,8 @@ body {
 .target-card-compact {
     background: linear-gradient(135deg, rgba(171, 61, 139, 0.08) 0%, rgba(5, 149, 174, 0.08) 100%);
     border: 2px solid rgba(171, 61, 139, 0.15);
-    border-radius: clamp(12px, 3vw, 16px);
-    padding: clamp(8px, 2.5vw, 12px);
+    border-radius: clamp(10px, 2.5vw, 16px);
+    padding: var(--spacing-md);
 }
 
 .target-formula {
@@ -286,12 +298,13 @@ body {
 }
 
 .target-formula-compact {
-    font-size: clamp(1.5rem, 7vw, 2rem);
+    font-size: clamp(1.3rem, 6vw, 2rem);
     font-weight: 900;
     background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-primary) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    line-height: 1.2;
 }
 
 /* Required elements - compacto */
@@ -327,12 +340,12 @@ body {
 
 .score-display {
     background: linear-gradient(135deg, var(--color-warning) 0%, #ea580c 100%);
-    padding: clamp(8px, 2.5vw, 10px) clamp(14px, 4vw, 20px);
+    padding: clamp(6px, 2vw, 10px) clamp(12px, 3.5vw, 20px);
     border-radius: 30px;
     font-weight: bold;
     font-size: var(--font-lg);
     color: white;
-    box-shadow: 0 clamp(2px, 1vw, 4px) clamp(8px, 3vw, 12px) rgba(235, 130, 37, 0.3);
+    box-shadow: 0 clamp(2px, 0.8vw, 4px) clamp(6px, 2.5vw, 12px) rgba(235, 130, 37, 0.3);
     white-space: nowrap;
 }
 
@@ -397,7 +410,7 @@ body {
     background: linear-gradient(135deg, var(--color-accent) 0%, #059669 100%);
     color: white;
     border: none;
-    padding: clamp(12px, 4vw, 16px) clamp(24px, 8vw, 32px);
+    padding: clamp(10px, 3.5vw, 16px) clamp(20px, 7vw, 32px);
     border-radius: 50px;
     font-weight: bold;
     font-size: var(--font-lg);
@@ -406,12 +419,14 @@ body {
                 0 clamp(4px, 1.5vw, 6px) clamp(12px, 4vw, 16px) rgba(16, 185, 129, 0.3);
     transition: all 0.15s ease;
     width: 100%;
-    max-width: 320px;
+    max-width: clamp(280px, 85vw, 320px);
     margin-left: auto;
     margin-right: auto;
     display: flex;
     align-items: center;
     justify-content: center;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .btn-primary:active {
@@ -550,11 +565,11 @@ body {
 .info-card {
     background: var(--color-bg-soft);
     border: 1px solid #e2e8f0;
-    border-radius: clamp(12px, 4vw, 16px);
-    padding: clamp(10px, 3vw, 14px);
+    border-radius: clamp(10px, 3vw, 16px);
+    padding: var(--spacing-md);
     display: flex;
     align-items: center;
-    gap: clamp(8px, 3vw, 12px);
+    gap: var(--spacing-md);
 }
 
 .info-card .info-title {
@@ -579,22 +594,22 @@ body {
 
 .mini-player {
     background: var(--color-bg-soft);
-    border-radius: clamp(12px, 4vw, 16px);
-    padding: clamp(10px, 3vw, 12px) clamp(12px, 4vw, 16px);
+    border-radius: clamp(10px, 3vw, 16px);
+    padding: var(--spacing-md);
     display: flex;
     align-items: center;
-    gap: clamp(8px, 3vw, 12px);
+    gap: var(--spacing-md);
     border: 1px solid #e2e8f0;
 }
 
 .mini-avatar {
-    width: clamp(32px, 10vw, 40px);
-    height: clamp(32px, 10vw, 40px);
-    border-radius: clamp(8px, 2.5vw, 10px);
+    width: clamp(28px, 9vw, 40px);
+    height: clamp(28px, 9vw, 40px);
+    border-radius: clamp(7px, 2vw, 10px);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: clamp(16px, 5vw, 20px);
+    font-size: clamp(14px, 4.5vw, 20px);
     flex-shrink: 0;
 }
 
@@ -614,9 +629,9 @@ body {
 .selection-area {
     background: var(--color-bg-soft);
     border: 2px dashed #e2e8f0;
-    border-radius: 12px;
-    padding: 10px;
-    min-height: 50px;
+    border-radius: clamp(10px, 2.5vw, 14px);
+    padding: var(--spacing-md);
+    min-height: clamp(45px, 12vw, 55px);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -640,16 +655,18 @@ body {
 .selected-element-chip {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    padding: 4px 10px;
+    gap: clamp(3px, 1vw, 5px);
+    padding: clamp(3px, 1vw, 5px) clamp(8px, 2.5vw, 12px);
     border-radius: 20px;
     font-weight: bold;
-    font-size: 12px;
+    font-size: clamp(10px, 3vw, 13px);
     color: white;
     border: none;
     cursor: pointer;
     transition: all 0.2s ease;
     box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .selected-element-chip:active {
@@ -703,7 +720,7 @@ body {
     background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
     color: white;
     border: none;
-    padding: 12px 24px;
+    padding: clamp(10px, 3vw, 14px) clamp(20px, 6vw, 28px);
     border-radius: 50px;
     font-weight: bold;
     font-size: var(--font-base);
@@ -714,6 +731,8 @@ body {
     align-items: center;
     justify-content: center;
     width: 100%;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .confirm-btn.ready {
@@ -738,20 +757,23 @@ body {
 .elements-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 6px;
+    gap: clamp(4px, 1.2vw, 8px);
     justify-items: center;
-    padding-bottom: 8px;
+    padding-bottom: var(--spacing-md);
+    width: 100%;
+    max-width: 100%;
 }
 
-@media (min-width: 400px) {
+@media (min-width: 380px) {
     .elements-grid {
-        gap: 8px;
+        gap: clamp(5px, 1.5vw, 8px);
     }
 }
 
-@media (min-width: 500px) {
+@media (min-width: 480px) {
     .elements-grid {
         grid-template-columns: repeat(5, 1fr);
+        gap: clamp(6px, 1.8vw, 10px);
     }
 }
 
@@ -863,78 +885,119 @@ body {
 /* Móviles muy pequeños (iPhone SE, etc) */
 @media (max-width: 350px) {
     :root {
-        --element-size: 48px;
-        --element-height: 56px;
-        --avatar-size: 42px;
+        --element-size: 46px;
+        --element-height: 54px;
+        --avatar-size: 40px;
+        --spacing-xs: 3px;
+        --spacing-sm: 5px;
+        --spacing-md: 6px;
+        --spacing-lg: 10px;
+        --spacing-xl: 12px;
     }
-    .screen.active { padding: 80px 10px 10px 10px; }
+    
+    .screen.active { 
+        padding: clamp(70px, 12vh, 85px) 10px 10px 10px; 
+    }
+    
+    .elements-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 3px;
+    }
+    
+    .element-btn .symbol { font-size: 14px; }
+    .element-btn .name { font-size: 4.5px; }
+    .element-btn .atomic-number { font-size: 7px; }
+    
+    .target-card-compact { padding: 5px 7px; }
+    .target-formula-compact { font-size: 1.15rem; }
+    
+    .confirm-btn { padding: 9px 16px; font-size: 11px; }
+    .selection-area { padding: 5px; min-height: 38px; }
+    .selected-element-chip { padding: 2px 7px; font-size: 9px; }
+    
+    .info-card { padding: 7px; gap: 7px; }
+    .info-card iconify-icon { font-size: 18px; }
+    .info-card .info-title { font-size: 12px; }
+    .info-card .info-description { font-size: 10px; }
+    
+    .btn-primary, .btn-admin { 
+        padding: 9px 18px; 
+        font-size: 13px; 
+        max-width: 270px; 
+    }
+    
+    .exit-btn-text {
+        padding: 5px 10px;
+        font-size: 10px;
+    }
+    
+    .exit-btn-text iconify-icon {
+        font-size: 14px;
+    }
+}
+
+/* Móviles pequeños */
+@media (min-width: 351px) and (max-width: 400px) {
+    :root {
+        --element-size: 50px;
+        --element-height: 60px;
+        --avatar-size: 46px;
+        --spacing-xs: 4px;
+        --spacing-sm: 6px;
+        --spacing-md: 7px;
+        --spacing-lg: 11px;
+        --spacing-xl: 14px;
+    }
+    
+    .screen.active { 
+        padding: clamp(80px, 13vh, 95px) 12px 12px 12px; 
+    }
     
     .elements-grid {
         grid-template-columns: repeat(4, 1fr);
         gap: 4px;
     }
     
-    .element-btn .symbol { font-size: 16px; }
+    .btn-primary, .btn-admin { max-width: 290px; }
+    
+    .element-btn .symbol { font-size: 15px; }
     .element-btn .name { font-size: 5px; }
-    .element-btn .atomic-number { font-size: 8px; }
-    
-    .target-card-compact { padding: 6px 8px; }
-    .target-formula-compact { font-size: 1.25rem; }
-    
-    .confirm-btn { padding: 10px 16px; font-size: 12px; }
-    .selection-area { padding: 6px; min-height: 40px; }
-    .selected-element-chip { padding: 3px 8px; font-size: 10px; }
-    
-    .info-card { padding: 8px; gap: 8px; }
-    .btn-primary, .btn-admin { padding: 10px 20px; font-size: 14px; max-width: 280px; }
 }
 
-/* Móviles pequeños */
-@media (min-width: 351px) and (max-width: 400px) {
+/* Móviles medianos */
+@media (min-width: 401px) and (max-width: 480px) {
     :root {
-        --element-size: 52px;
-        --element-height: 62px;
-        --avatar-size: 48px;
+        --element-size: 56px;
+        --element-height: 66px;
+        --avatar-size: 50px;
     }
     
-    .screen.active { padding: 90px 12px 12px 12px; }
+    .screen.active { 
+        padding: clamp(90px, 14vh, 105px) 14px 14px 14px; 
+    }
     
     .elements-grid {
         grid-template-columns: repeat(4, 1fr);
         gap: 5px;
     }
     
-    .btn-primary, .btn-admin { max-width: 300px; }
-}
-
-/* Móviles medianos */
-@media (min-width: 401px) and (max-width: 480px) {
-    :root {
-        --element-size: 58px;
-        --element-height: 68px;
-        --avatar-size: 52px;
-    }
-    
-    .screen.active { padding: 100px 16px 16px 16px; }
-    
-    .elements-grid {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 6px;
-    }
+    .btn-primary, .btn-admin { max-width: 310px; }
 }
 
 @media (min-width: 481px) and (max-width: 600px) {
     :root {
-        --element-size: 70px;
-        --element-height: 82px;
-        --avatar-size: 65px;
+        --element-size: 64px;
+        --element-height: 76px;
+        --avatar-size: 60px;
     }
     
-    .screen.active { padding: 100px 20px 20px 20px; }
+    .screen.active { 
+        padding: clamp(95px, 15vh, 110px) 16px 16px 16px; 
+    }
     
     .elements-grid {
         grid-template-columns: repeat(5, 1fr);
-        gap: 8px;
+        gap: 6px;
     }
 }
 
@@ -976,12 +1039,61 @@ body {
     .selection-area { min-height: 35px; padding: 4px; }
 }
 
+/* Landscape en móviles - Optimizado para pantallas horizontales */
+@media (max-height: 500px) and (orientation: landscape) {
+    :root {
+        --element-size: 42px;
+        --element-height: 50px;
+        --avatar-size: 34px;
+        --spacing-xs: 2px;
+        --spacing-sm: 4px;
+        --spacing-md: 5px;
+        --spacing-lg: 8px;
+        --spacing-xl: 10px;
+    }
+    
+    .screen.active { 
+        padding: clamp(35px, 8vh, 45px) 10px 10px 10px; 
+    }
+    
+    .target-card { padding: 5px 8px; }
+    .target-card-compact { padding: 4px 7px; }
+    .target-formula-compact { font-size: 1rem; line-height: 1.1; }
+    
+    .elements-grid {
+        grid-template-columns: repeat(6, 1fr);
+        gap: 3px;
+    }
+    
+    .element-btn .symbol { font-size: 13px; }
+    .element-btn .name { font-size: 4px; }
+    .element-btn .atomic-number { font-size: 6px; }
+    
+    .confirm-btn { padding: 7px 14px; font-size: 11px; }
+    .mini-player-compact { padding: 3px 7px; }
+    .selection-area { min-height: 32px; padding: 3px; }
+    .selected-element-chip { padding: 2px 6px; font-size: 9px; }
+    
+    .btn-primary, .btn-admin { 
+        padding: 8px 16px; 
+        font-size: 12px; 
+        max-width: 260px; 
+    }
+    
+    .info-card { padding: 6px; gap: 6px; }
+    .info-card iconify-icon { font-size: 16px; }
+    
+    .wizard-header { margin-top: 5px; margin-bottom: 5px !important; }
+    .step-indicator { padding: 5px 0; }
+    .wizard-nav { padding-bottom: 10px; }
+}
+
 @supports (padding-top: env(safe-area-inset-top)) {
     .screen.active {
-        padding-top: calc(110px + env(safe-area-inset-top));
-        padding-left: calc(16px + env(safe-area-inset-left));
-        padding-right: calc(16px + env(safe-area-inset-right));
-        padding-bottom: calc(16px + env(safe-area-inset-bottom));
+        padding-top: calc(clamp(80px, 15vh, 110px) + env(safe-area-inset-top));
+        padding-left: calc(var(--spacing-lg) + env(safe-area-inset-left));
+        padding-right: calc(var(--spacing-lg) + env(safe-area-inset-right));
+        padding-bottom: calc(var(--spacing-lg) + env(safe-area-inset-bottom));
     }
 }
 
@@ -1837,45 +1949,69 @@ body {
 /* Responsive para wizard */
 @media (max-width: 350px) {
     .step-dot {
-        width: 30px;
-        height: 30px;
+        width: 28px;
+        height: 28px;
     }
     .step-dot iconify-icon {
-        font-size: 14px;
+        font-size: 12px;
     }
     .step-line {
-        width: 16px;
+        width: 14px;
+        height: 2px;
     }
     .mode-card, .difficulty-card {
-        padding: 10px 8px;
+        padding: 8px 6px;
+        gap: 6px;
     }
     .mode-card-icon, .difficulty-card-icon {
-        width: 40px;
-        height: 40px;
+        width: 38px;
+        height: 38px;
     }
     .mode-card-icon iconify-icon, .difficulty-card-icon iconify-icon {
-        font-size: 20px;
+        font-size: 18px;
     }
     .mode-card-name, .difficulty-card-name {
-        font-size: 12px;
+        font-size: 11px;
     }
     .mode-card-desc, .difficulty-card-desc {
-        font-size: 9px;
+        font-size: 8px;
     }
     .rounds-grid {
-        gap: 8px;
+        gap: 7px;
+        grid-template-columns: repeat(3, 1fr);
     }
     .rounds-card {
-        padding: 12px 8px;
+        padding: 10px 8px;
     }
     .rounds-number {
-        font-size: 22px;
+        font-size: 20px;
+    }
+    .rounds-label {
+        font-size: 9px;
     }
     .step-title h2 {
-        font-size: 1.1rem;
+        font-size: 1rem;
     }
     .step-subtitle {
+        font-size: 11px;
+        margin-bottom: 10px;
+    }
+    .wizard-btn-back, .wizard-btn-next {
+        padding: 10px 16px;
         font-size: 12px;
-        margin-bottom: 12px;
+    }
+    .config-preview {
+        padding: 10px;
+    }
+    .preview-items {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+    }
+    .preview-item {
+        font-size: 11px;
+    }
+    .preview-item iconify-icon {
+        font-size: 16px;
     }
 }

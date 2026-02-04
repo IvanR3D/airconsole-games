@@ -204,11 +204,17 @@ body.cat-default {
     50% { transform: translateY(-4px); }
 }
 
-/* Category grid scroll - touch + mouse */
+/* Avoid clipping card border/shadow on first row */
 .category-scroll-container {
+    padding-top: 4px;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain;
     scrollbar-width: thin;
+}
+
+/* Option cards (playing screen): prevent top edge clipping */
+.options-grid-spaced {
+    padding-top: 4px;
 }
 .category-scroll-container::-webkit-scrollbar {
     width: 8px;
