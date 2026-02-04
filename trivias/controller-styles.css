@@ -115,7 +115,12 @@ body {
 /* Step 1 específico - necesita flex para el scroll de categorías */
 #step1.active {
     flex: 1;
-    min-height: 0;
+}
+
+#categoryScrollContainer {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* Category Select Screen - wizard container needs full height */
@@ -123,7 +128,6 @@ body {
     display: flex;
     flex-direction: column;
     flex: 1;
-    min-height: 0;
     height: 100%;
 }
 
