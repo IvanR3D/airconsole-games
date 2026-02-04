@@ -112,6 +112,21 @@ body {
     pointer-events: none;
 }
 
+/* Step 1 específico - necesita flex para el scroll de categorías */
+#step1.active {
+    flex: 1;
+    min-height: 0;
+}
+
+/* Category Select Screen - wizard container needs full height */
+#categorySelectScreen > .relative {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    height: 100%;
+}
+
 /* ========================================
    CATEGORY GRID - Responsive
    ======================================== */
@@ -119,12 +134,12 @@ body {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 0.5rem;
+    padding-bottom: 0.5rem;
 }
 
 .category-btn {
-    aspect-ratio: 1;
-    min-height: 0;
-    padding: 0.5rem;
+    min-height: 70px;
+    padding: 0.75rem 0.5rem;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -143,14 +158,25 @@ body {
 }
 
 .category-btn .category-icon {
-    font-size: clamp(1.25rem, 5vw, 2rem);
+    font-size: 1.5rem;
+    color: #9CA3AF;
 }
 
 .category-btn .category-name {
-    font-size: clamp(0.5rem, 2.5vw, 0.75rem);
+    font-size: 0.65rem;
     line-height: 1.2;
     text-align: center;
     font-weight: 600;
+    color: #6B7280;
+}
+
+.category-btn.selected {
+    border-color: currentColor;
+}
+
+.category-btn.selected .category-icon,
+.category-btn.selected .category-name {
+    color: white;
 }
 
 /* Category scroll container */
@@ -158,7 +184,7 @@ body {
     flex: 1;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    min-height: 0;
+    min-height: 150px;
 }
 
 /* ========================================

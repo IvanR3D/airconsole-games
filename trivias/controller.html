@@ -125,7 +125,7 @@
         <div class="screen flex-col bg-white" id="categorySelectScreen">
             <div class="bg-particles" id="controllerBgParticles"></div>
             
-            <div class="relative z-10 flex flex-col flex-1 min-h-0 w-full max-w-md mx-auto">
+            <div class="relative z-10 flex flex-col flex-1 min-h-0 w-full max-w-md mx-auto h-full">
                 <!-- Admin Badge -->
                 <div class="text-center mb-3 flex-shrink-0">
                     <div class="inline-flex items-center gap-2 bg-orange-50 border-2 border-steam-naranja rounded-full py-1 px-3 shadow-md">
@@ -159,9 +159,9 @@
                 </div>
 
                 <!-- STEP 1: Category Selection -->
-                <div class="step-content active flex-1 flex flex-col min-h-0" id="step1">
+                <div class="step-content active" id="step1">
                     <h2 class="text-sm font-black text-center mb-2 text-steam-turquesa flex-shrink-0">Elige una Categoría</h2>
-                    <div class="flex-1 overflow-y-auto min-h-0" id="categoryScrollContainer">
+                    <div id="categoryScrollContainer">
                         <div id="categoryGrid"></div>
                     </div>
                     <div class="pt-3 flex-shrink-0">
@@ -173,7 +173,7 @@
                 </div>
 
                 <!-- STEP 2: Question Count -->
-                <div class="step-content flex-1 flex flex-col justify-center" id="step2">
+                <div class="step-content" id="step2">
                     <h2 class="text-base font-black text-center mb-4 text-steam-turquesa">¿Cuántas Preguntas?</h2>
                     
                     <div class="bg-gray-50 rounded-xl p-4 mb-4 border-2 border-gray-200">
@@ -195,7 +195,7 @@
                         </div>
                     </div>
                     
-                    <div class="flex gap-3">
+                    <div class="flex gap-3 mt-auto">
                         <button class="flex-1 bg-gray-200 text-gray-700 py-3 px-4 text-sm font-bold rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2" id="prevStep2Btn">
                             <iconify-icon icon="mdi:arrow-left"></iconify-icon>
                             Atrás
@@ -208,7 +208,7 @@
                 </div>
 
                 <!-- STEP 3: Ready to Start -->
-                <div class="step-content flex-1 flex flex-col justify-center" id="step3">
+                <div class="step-content" id="step3">
                     <h2 class="text-base font-black text-center mb-4 text-steam-turquesa">¡Todo Listo!</h2>
                     
                     <div class="bg-gradient-to-br from-blue-50 to-green-50 rounded-xl p-4 mb-4 border-2 border-steam-verde">
@@ -227,15 +227,17 @@
                         </div>
                     </div>
                     
-                    <button class="bg-gray-200 text-gray-700 py-3 px-4 text-sm font-bold rounded-full w-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2 mb-3" id="prevStep3Btn">
-                        <iconify-icon icon="mdi:arrow-left"></iconify-icon>
-                        Atrás
-                    </button>
-                    
-                    <button class="bg-steam-verde text-white py-4 px-4 text-base font-black rounded-full w-full shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2 btn-3d btn-verde" id="startGameBtn">
-                        <iconify-icon icon="mdi:rocket-launch" class="text-xl"></iconify-icon>
-                        INICIAR JUEGO!
-                    </button>
+                    <div class="mt-auto">
+                        <button class="bg-gray-200 text-gray-700 py-3 px-4 text-sm font-bold rounded-full w-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2 mb-3" id="prevStep3Btn">
+                            <iconify-icon icon="mdi:arrow-left"></iconify-icon>
+                            Atrás
+                        </button>
+                        
+                        <button class="bg-steam-verde text-white py-4 px-4 text-base font-black rounded-full w-full shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2 btn-3d btn-verde" id="startGameBtn">
+                            <iconify-icon icon="mdi:rocket-launch" class="text-xl"></iconify-icon>
+                            INICIAR JUEGO!
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
