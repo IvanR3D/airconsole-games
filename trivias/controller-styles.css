@@ -135,6 +135,22 @@ body {
     pointer-events: none;
 }
 
+/* Step 3 - asegurar que el botón de iniciar sea visible */
+#step3 {
+    justify-content: flex-start;
+    padding-top: 10px;
+    overflow-y: auto;
+}
+
+#step3 h2 {
+    flex-shrink: 0;
+}
+
+#step3 > div,
+#step3 > button {
+    flex-shrink: 0;
+}
+
 /* Player avatar visual - responsive */
 .player-avatar-visual {
     width: 60px;
