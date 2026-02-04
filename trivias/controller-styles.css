@@ -192,23 +192,22 @@ body {
 }
 
 /* ========================================
-   ANSWER GRID - Responsive
+   ANSWER GRID - Responsive 2x2
    ======================================== */
 .answer-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 0.625rem;
+    grid-template-rows: repeat(2, 1fr);
+    gap: 0.5rem;
     flex: 1;
-    min-height: 0;
 }
 
 .answer-btn {
-    font-size: clamp(1.25rem, 5vw, 2rem);
-    min-height: 0;
-    aspect-ratio: 1.5;
+    font-size: clamp(1.5rem, 6vw, 2.5rem);
     display: flex;
     align-items: center;
     justify-content: center;
+    min-height: 0;
 }
 
 .answer-btn::before {
