@@ -50,6 +50,7 @@ let timeLeft = 20;
 let soundEnabled = true;
 let adminDeviceId = null;
 let resultsShown = false; // Evita mostrar resultados múltiples veces
+let backgroundMusic = null;
 
 const domCache = {};
 
@@ -159,6 +160,25 @@ function init() {
     airconsole = new AirConsole({ max_players: MAX_PLAYERS });
     cacheDomElements();
     
+    // Initialize background music
+    backgroundMusic = document.getElementById('backgroundMusic');
+    if (backgroundMusic) {
+        backgroundMusic.volume = 0.5; // Set volume to 50%
+        // Start playing music when user interacts (required by browsers)
+        const startMusic = () => {
+            if (backgroundMusic && soundEnabled) {
+                backgroundMusic.play().catch(err => {
+                    console.log('Music autoplay prevented:', err);
+                });
+            }
+            // Remove event listeners after first interaction
+            document.removeEventListener('click', startMusic);
+            document.removeEventListener('touchstart', startMusic);
+        };
+        document.addEventListener('click', startMusic);
+        document.addEventListener('touchstart', startMusic);
+    }
+    
     // Initialize particle network background
     initParticleNetwork();
     
@@ -175,6 +195,13 @@ function init() {
         
         // Start on intro screen, stay there until players join
         showScreen('intro');
+        
+        // Try to start music after AirConsole is ready
+        if (backgroundMusic && soundEnabled) {
+            backgroundMusic.play().catch(err => {
+                console.log('Music autoplay prevented, waiting for user interaction');
+            });
+        }
     };
 
     airconsole.onConnect = function(deviceId) {
@@ -337,6 +364,17 @@ function broadcastGameState() {
 function toggleSound() {
     soundEnabled = !soundEnabled;
     document.getElementById('soundToggle').textContent = soundEnabled ? '🔊' : '🔇';
+    
+    // Control background music
+    if (backgroundMusic) {
+        if (soundEnabled) {
+            backgroundMusic.play().catch(err => {
+                console.log('Could not play music:', err);
+            });
+        } else {
+            backgroundMusic.pause();
+        }
+    }
 }
 
 // Particle Network Animation - Disabled for clean background
