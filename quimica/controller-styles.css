@@ -1502,23 +1502,25 @@ body {
 
 /* ============================================
    WIZARD DE CONFIGURACIÓN (Admin)
+   Sin scroll - todo visible
    ============================================ */
 
 .wizard-header {
     text-align: center;
-    padding-top: 5px;
-    margin-bottom: 8px !important;
-    margin-top: 15px;
+    padding-top: 0;
+    margin-bottom: 6px !important;
+    margin-top: 8px;
+    flex-shrink: 0;
 }
 
 .player-avatar-sm {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: 16px;
     flex-shrink: 0;
 }
 
@@ -1528,12 +1530,12 @@ body {
     align-items: center;
     justify-content: center;
     gap: 0;
-    padding: 8px 0;
+    padding: 6px 0;
 }
 
 .step-dot {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     background: var(--color-bg-soft);
     border: 2px solid #e2e8f0;
@@ -1545,18 +1547,18 @@ body {
 }
 
 .step-dot iconify-icon {
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .step-dot.active {
     background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
     border-color: var(--color-primary);
     color: white;
-    box-shadow: 0 4px 12px rgba(5, 149, 174, 0.3);
+    box-shadow: 0 3px 10px rgba(5, 149, 174, 0.3);
 }
 
 .step-line {
-    width: 24px;
+    width: 20px;
     height: 3px;
     background: #e2e8f0;
     transition: all 0.3s ease;
@@ -1566,14 +1568,19 @@ body {
     background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-secondary) 100%);
 }
 
-/* Contenido del wizard */
+/* Contenido del wizard - sin scroll */
 .wizard-content {
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 .wizard-step {
     animation: fadeSlideIn 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
 
 @keyframes fadeSlideIn {
@@ -1585,16 +1592,17 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    margin-bottom: 4px;
+    gap: 6px;
+    margin-bottom: 2px;
+    flex-shrink: 0;
 }
 
 .step-title iconify-icon {
-    font-size: 24px;
+    font-size: 20px;
 }
 
 .step-title h2 {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     font-weight: 800;
     color: var(--color-text);
     margin: 0;
@@ -1602,29 +1610,33 @@ body {
 
 .step-subtitle {
     color: var(--color-text-light);
-    font-size: 13px;
-    margin-bottom: 16px;
+    font-size: 12px;
+    margin-bottom: 10px;
+    flex-shrink: 0;
 }
 
-/* Cards de modo de juego */
+/* Cards de modo de juego - 2 columnas */
 .mode-cards {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    gap: 8px;
+    flex: 1;
+    align-content: center;
 }
 
 .mode-card {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
-    padding: 14px 10px;
+    gap: 6px;
+    padding: 12px 8px;
     border: 2px solid #e2e8f0;
-    border-radius: 16px;
+    border-radius: 14px;
     background: white;
     cursor: pointer;
     transition: all 0.2s ease;
     text-align: center;
+    position: relative;
 }
 
 .mode-card:active {
@@ -1632,9 +1644,9 @@ body {
 }
 
 .mode-card-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 14px;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
     background: linear-gradient(135deg, color-mix(in srgb, var(--mode-color) 15%, white) 0%, white 100%);
     display: flex;
     align-items: center;
@@ -1643,44 +1655,40 @@ body {
 }
 
 .mode-card-icon iconify-icon {
-    font-size: 28px;
+    font-size: 24px;
     color: var(--mode-color);
 }
 
 .mode-card-info {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 1px;
 }
 
 .mode-card-name {
     font-weight: 700;
-    font-size: 14px;
+    font-size: 13px;
     color: var(--color-text);
 }
 
 .mode-card-desc {
-    font-size: 10px;
+    font-size: 9px;
     color: var(--color-text-light);
     line-height: 1.2;
 }
 
 .mode-card-check {
     position: absolute;
-    top: 6px;
-    right: 6px;
+    top: 5px;
+    right: 5px;
     opacity: 0;
     transform: scale(0);
     transition: all 0.2s ease;
 }
 
 .mode-card-check iconify-icon {
-    font-size: 20px;
+    font-size: 18px;
     color: var(--mode-color);
-}
-
-.mode-card {
-    position: relative;
 }
 
 .mode-card.selected {
@@ -1694,21 +1702,23 @@ body {
     transform: scale(1);
 }
 
-/* Cards de dificultad */
+/* Cards de dificultad - grid 2x2 (3 items) */
 .difficulty-cards {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    gap: 8px;
+    flex: 1;
+    align-content: center;
 }
 
 .difficulty-card {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
-    padding: 14px 10px;
+    gap: 6px;
+    padding: 12px 8px;
     border: 2px solid #e2e8f0;
-    border-radius: 16px;
+    border-radius: 14px;
     background: white;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -1721,9 +1731,9 @@ body {
 }
 
 .difficulty-card-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 14px;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
     background: linear-gradient(135deg, color-mix(in srgb, var(--diff-color) 15%, white) 0%, white 100%);
     display: flex;
     align-items: center;
@@ -1732,39 +1742,39 @@ body {
 }
 
 .difficulty-card-icon iconify-icon {
-    font-size: 28px;
+    font-size: 24px;
     color: var(--diff-color);
 }
 
 .difficulty-card-info {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 1px;
 }
 
 .difficulty-card-name {
     font-weight: 700;
-    font-size: 14px;
+    font-size: 13px;
     color: var(--color-text);
 }
 
 .difficulty-card-desc {
-    font-size: 10px;
+    font-size: 9px;
     color: var(--color-text-light);
     line-height: 1.2;
 }
 
 .difficulty-card-check {
     position: absolute;
-    top: 6px;
-    right: 6px;
+    top: 5px;
+    right: 5px;
     opacity: 0;
     transform: scale(0);
     transition: all 0.2s ease;
 }
 
 .difficulty-card-check iconify-icon {
-    font-size: 20px;
+    font-size: 18px;
     color: var(--diff-color);
 }
 
@@ -1779,12 +1789,14 @@ body {
     transform: scale(1);
 }
 
-/* Grid de rondas */
+/* Grid de rondas - 3x2 */
 .rounds-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-bottom: 20px;
+    gap: 8px;
+    flex: 1;
+    align-content: center;
+    margin-bottom: 10px;
 }
 
 .rounds-card {
@@ -1792,9 +1804,9 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 16px 12px;
+    padding: 12px 8px;
     border: 2px solid #e2e8f0;
-    border-radius: 16px;
+    border-radius: 14px;
     background: white;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -1805,14 +1817,14 @@ body {
 }
 
 .rounds-number {
-    font-size: 28px;
+    font-size: clamp(22px, 6vw, 28px);
     font-weight: 800;
     color: var(--color-text);
     line-height: 1;
 }
 
 .rounds-label {
-    font-size: 11px;
+    font-size: 10px;
     color: var(--color-text-light);
     margin-top: 2px;
 }
@@ -1827,38 +1839,39 @@ body {
     color: var(--color-accent);
 }
 
-/* Preview de configuración */
+/* Preview de configuración - más compacto */
 .config-preview {
     background: var(--color-bg-soft);
     border: 1px solid #e2e8f0;
-    border-radius: 14px;
-    padding: 14px;
+    border-radius: 12px;
+    padding: 10px;
+    flex-shrink: 0;
 }
 
 .preview-title {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--color-text-light);
-    margin-bottom: 10px;
+    margin-bottom: 6px;
     text-align: center;
 }
 
 .preview-items {
     display: flex;
     justify-content: center;
-    gap: 16px;
+    gap: 12px;
 }
 
 .preview-item {
     display: flex;
     align-items: center;
-    gap: 6px;
-    font-size: 13px;
+    gap: 4px;
+    font-size: 12px;
     font-weight: 600;
     color: var(--color-text);
 }
 
 .preview-item iconify-icon {
-    font-size: 18px;
+    font-size: 16px;
 }
 
 /* Navegación del wizard */
@@ -1866,8 +1879,10 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 12px;
-    padding-bottom: 20px;
+    gap: 10px;
+    padding-bottom: 10px;
+    padding-top: 8px;
+    flex-shrink: 0;
     margin-top: auto;
 }
 
@@ -2737,5 +2752,889 @@ body {
     .rotate-hint.show {
         display: flex;
         align-items: center;
+    }
+}
+
+
+/* ============================================
+   RESULTADO DE RONDA - GRANDE Y SIMPLE
+   ============================================ */
+
+.result-big {
+    position: relative;
+    margin-bottom: 16px;
+}
+
+.result-icon-big {
+    font-size: clamp(80px, 25vw, 120px);
+    line-height: 1;
+}
+
+.result-icon-big.success {
+    color: var(--color-success);
+}
+
+.result-icon-big.error {
+    color: var(--color-danger);
+}
+
+.result-title {
+    font-size: clamp(1.8rem, 8vw, 2.5rem);
+    font-weight: 900;
+    margin-bottom: 8px;
+}
+
+.result-title.success {
+    color: var(--color-success);
+}
+
+.result-title.error {
+    color: var(--color-danger);
+}
+
+.result-formula {
+    font-size: clamp(1.5rem, 6vw, 2rem);
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-primary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 4px;
+}
+
+.result-name {
+    font-size: clamp(1rem, 4vw, 1.25rem);
+    color: var(--color-primary);
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.result-answer {
+    font-size: clamp(0.9rem, 3.5vw, 1.1rem);
+    color: var(--color-text-light);
+    margin-bottom: 20px;
+}
+
+.result-waiting {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--color-text-light);
+    margin-top: 20px;
+}
+
+.result-waiting iconify-icon {
+    font-size: 18px;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+.btn-next-round {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: linear-gradient(135deg, var(--color-accent) 0%, #059669 100%);
+    color: white;
+    border: none;
+    padding: 14px 32px;
+    border-radius: 50px;
+    font-size: clamp(1rem, 4vw, 1.2rem);
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 16px;
+    box-shadow: 0 4px 0 #047857, 0 6px 16px rgba(16, 185, 129, 0.3);
+    transition: all 0.15s ease;
+    touch-action: manipulation;
+}
+
+.btn-next-round iconify-icon {
+    font-size: 20px;
+}
+
+.btn-next-round:active {
+    transform: translateY(4px);
+    box-shadow: 0 0 0 #047857, 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+/* Landscape - resultado más compacto pero visible */
+@media (orientation: landscape) {
+    .result-icon-big {
+        font-size: clamp(60px, 18vh, 90px);
+    }
+    
+    .result-title {
+        font-size: clamp(1.4rem, 5vh, 2rem);
+        margin-bottom: 4px;
+    }
+    
+    .result-formula {
+        font-size: clamp(1.2rem, 4vh, 1.6rem);
+    }
+    
+    .result-name {
+        font-size: clamp(0.9rem, 3vh, 1.1rem);
+        margin-bottom: 12px;
+    }
+    
+    .result-answer {
+        font-size: clamp(0.8rem, 2.5vh, 1rem);
+        margin-bottom: 12px;
+    }
+    
+    .btn-next-round {
+        padding: 10px 24px;
+        font-size: clamp(0.9rem, 3vh, 1.1rem);
+        margin-top: 10px;
+    }
+    
+    .result-waiting {
+        margin-top: 12px;
+        font-size: 12px;
+    }
+}
+
+
+/* ============================================
+   CONFIG WIZARD SCREEN - SIN SCROLL
+   ============================================ */
+
+.config-wizard-screen {
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    padding: 10px !important;
+}
+
+.config-wizard-screen .screen.active {
+    padding: 10px;
+}
+
+/* Pantallas pequeñas - ajustes adicionales */
+@media (max-height: 600px) {
+    .wizard-header {
+        margin-top: 4px;
+        margin-bottom: 4px !important;
+    }
+    
+    .step-indicator {
+        padding: 4px 0;
+    }
+    
+    .step-dot {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .step-dot iconify-icon {
+        font-size: 12px;
+    }
+    
+    .step-line {
+        width: 16px;
+    }
+    
+    .step-title iconify-icon {
+        font-size: 18px;
+    }
+    
+    .step-title h2 {
+        font-size: 1rem;
+    }
+    
+    .step-subtitle {
+        font-size: 11px;
+        margin-bottom: 8px;
+    }
+    
+    .mode-card, .difficulty-card {
+        padding: 10px 6px;
+        gap: 4px;
+        border-radius: 12px;
+    }
+    
+    .mode-card-icon, .difficulty-card-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+    }
+    
+    .mode-card-icon iconify-icon, .difficulty-card-icon iconify-icon {
+        font-size: 20px;
+    }
+    
+    .mode-card-name, .difficulty-card-name {
+        font-size: 12px;
+    }
+    
+    .mode-card-desc, .difficulty-card-desc {
+        font-size: 8px;
+    }
+    
+    .rounds-card {
+        padding: 10px 6px;
+        border-radius: 12px;
+    }
+    
+    .rounds-number {
+        font-size: 20px;
+    }
+    
+    .rounds-label {
+        font-size: 9px;
+    }
+    
+    .config-preview {
+        padding: 8px;
+    }
+    
+    .preview-title {
+        font-size: 10px;
+        margin-bottom: 4px;
+    }
+    
+    .preview-item {
+        font-size: 11px;
+        gap: 3px;
+    }
+    
+    .preview-item iconify-icon {
+        font-size: 14px;
+    }
+    
+    .wizard-nav {
+        padding-bottom: 6px;
+        padding-top: 6px;
+    }
+    
+    .wizard-btn-back, .wizard-btn-next {
+        padding: 8px 14px;
+        font-size: 12px;
+    }
+    
+    .btn-admin {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+}
+
+/* Pantallas muy pequeñas */
+@media (max-height: 550px) {
+    .player-avatar-sm {
+        width: 28px;
+        height: 28px;
+        font-size: 14px;
+    }
+    
+    .mode-cards, .difficulty-cards {
+        gap: 6px;
+    }
+    
+    .rounds-grid {
+        gap: 6px;
+        margin-bottom: 6px;
+    }
+    
+    .mode-card, .difficulty-card {
+        padding: 8px 4px;
+        gap: 3px;
+    }
+    
+    .mode-card-icon, .difficulty-card-icon {
+        width: 34px;
+        height: 34px;
+    }
+    
+    .mode-card-icon iconify-icon, .difficulty-card-icon iconify-icon {
+        font-size: 18px;
+    }
+    
+    .rounds-card {
+        padding: 8px 4px;
+    }
+    
+    .rounds-number {
+        font-size: 18px;
+    }
+}
+
+
+/* ============================================
+   PLAYING SCREEN MINIMAL
+   Solo elementos + preview de selección
+   ============================================ */
+
+.playing-screen-minimal {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    padding: 0;
+    overflow: hidden;
+}
+
+/* Header mínimo */
+.playing-header-minimal {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid #e2e8f0;
+    flex-shrink: 0;
+    z-index: 10;
+}
+
+.header-info-minimal {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* Contenedor de elementos - ocupa todo el espacio */
+.elements-container-minimal {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    overflow: hidden;
+}
+
+.elements-grid-minimal {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    width: 100%;
+    max-width: 400px;
+    align-content: center;
+}
+
+/* Barra de selección inferior */
+.selection-bar-minimal {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid #e2e8f0;
+    flex-shrink: 0;
+}
+
+.selection-preview {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+    min-height: 32px;
+}
+
+.selection-empty {
+    color: var(--color-text-light);
+    font-size: 14px;
+    opacity: 0.5;
+}
+
+.chip-mini {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 10px;
+    border-radius: 14px;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+    border: none;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: transform 0.1s ease;
+}
+
+.chip-mini:active {
+    transform: scale(0.9);
+}
+
+.confirm-btn-minimal {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #d1d5db;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+    cursor: not-allowed;
+    opacity: 0.5;
+    flex-shrink: 0;
+    touch-action: manipulation;
+    transition: all 0.2s ease;
+}
+
+.confirm-btn-minimal.ready {
+    background: linear-gradient(135deg, var(--color-accent) 0%, #059669 100%);
+    cursor: pointer;
+    opacity: 1;
+    box-shadow: 0 3px 10px rgba(16, 185, 129, 0.4);
+    animation: confirmPulseMini 1.5s ease-in-out infinite;
+}
+
+.confirm-btn-minimal.ready:active {
+    transform: scale(0.9);
+}
+
+.selection-sent {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(16, 185, 129, 0.1);
+    border: 2px solid var(--color-success);
+    border-radius: 24px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-success);
+    width: 100%;
+    justify-content: center;
+}
+
+.selection-sent iconify-icon {
+    font-size: 18px;
+}
+
+/* Portrait - móviles */
+@media (orientation: portrait) {
+    .elements-grid-minimal {
+        grid-template-columns: repeat(5, 1fr);
+    }
+    
+    .element-btn-mini {
+        width: clamp(48px, 16vw, 60px);
+        height: clamp(48px, 16vw, 60px);
+    }
+    
+    .element-btn-mini .symbol {
+        font-size: clamp(15px, 5vw, 19px);
+    }
+}
+
+@media (orientation: portrait) and (max-width: 350px) {
+    .elements-grid-minimal {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 4px;
+    }
+    
+    .element-btn-mini {
+        width: 46px;
+        height: 46px;
+    }
+    
+    .element-btn-mini .symbol {
+        font-size: 14px;
+    }
+    
+    .selection-bar-minimal {
+        padding: 8px;
+    }
+    
+    .chip-mini {
+        padding: 3px 8px;
+        font-size: 11px;
+    }
+    
+    .confirm-btn-minimal {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+}
+
+/* Landscape - todos los elementos visibles */
+@media (orientation: landscape) {
+    .playing-header-minimal {
+        padding: 4px 10px;
+    }
+    
+    .exit-btn-mini {
+        width: 28px;
+        height: 28px;
+        font-size: 14px;
+    }
+    
+    .round-badge-mini, .score-badge-mini {
+        font-size: 10px;
+        padding: 2px 6px;
+    }
+    
+    .elements-container-minimal {
+        padding: 6px 10px;
+    }
+    
+    .elements-grid-minimal {
+        grid-template-columns: repeat(10, 1fr);
+        gap: 4px;
+        max-width: none;
+    }
+    
+    .element-btn-mini {
+        width: clamp(32px, 8vh, 44px);
+        height: clamp(32px, 8vh, 44px);
+        border-radius: 8px;
+    }
+    
+    .element-btn-mini .symbol {
+        font-size: clamp(12px, 3vh, 16px);
+    }
+    
+    .element-btn-mini .selection-count {
+        min-width: 14px;
+        height: 14px;
+        font-size: 9px;
+        top: -3px;
+        right: -3px;
+    }
+    
+    .selection-bar-minimal {
+        padding: 6px 10px;
+    }
+    
+    .chip-mini {
+        padding: 3px 8px;
+        font-size: 11px;
+        border-radius: 10px;
+    }
+    
+    .confirm-btn-minimal {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+    
+    .selection-sent {
+        padding: 5px 12px;
+        font-size: 11px;
+    }
+}
+
+/* Landscape pantallas pequeñas */
+@media (orientation: landscape) and (max-height: 400px) {
+    .playing-header-minimal {
+        padding: 3px 8px;
+    }
+    
+    .elements-grid-minimal {
+        gap: 3px;
+    }
+    
+    .element-btn-mini {
+        width: clamp(28px, 7vh, 38px);
+        height: clamp(28px, 7vh, 38px);
+        border-radius: 6px;
+    }
+    
+    .element-btn-mini .symbol {
+        font-size: clamp(10px, 2.5vh, 14px);
+    }
+    
+    .selection-bar-minimal {
+        padding: 4px 8px;
+    }
+    
+    .confirm-btn-minimal {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+}
+
+
+/* ============================================
+   PLAYING SCREEN CLEAN
+   Solo lo esencial: elementos + selección
+   ============================================ */
+
+.playing-screen-clean {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    padding: 0;
+    overflow: hidden;
+    background: #f8fafc;
+}
+
+/* Botón salir flotante (solo admin) */
+.exit-btn-floating {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-danger);
+    font-size: 18px;
+    cursor: pointer;
+    z-index: 20;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    touch-action: manipulation;
+}
+
+.exit-btn-floating:active {
+    transform: scale(0.9);
+    background: rgba(239, 68, 68, 0.1);
+}
+
+/* Área de elementos */
+.elements-area {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    overflow: hidden;
+}
+
+.elements-grid-clean {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    width: 100%;
+    max-width: 380px;
+}
+
+/* Barra de selección */
+.selection-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: white;
+    border-top: 1px solid #e2e8f0;
+    flex-shrink: 0;
+}
+
+.selection-preview {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-height: 36px;
+    align-items: center;
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 13px;
+    font-weight: bold;
+    color: white;
+    border: none;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: transform 0.1s ease;
+}
+
+.chip:active {
+    transform: scale(0.9);
+}
+
+.confirm-btn-round {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #d1d5db;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 22px;
+    cursor: not-allowed;
+    opacity: 0.5;
+    flex-shrink: 0;
+    touch-action: manipulation;
+    transition: all 0.2s ease;
+}
+
+.confirm-btn-round.ready {
+    background: linear-gradient(135deg, var(--color-accent) 0%, #059669 100%);
+    cursor: pointer;
+    opacity: 1;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.confirm-btn-round.ready:active {
+    transform: scale(0.9);
+}
+
+.selection-sent {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: rgba(16, 185, 129, 0.1);
+    border: 2px solid var(--color-success);
+    border-radius: 24px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-success);
+    width: 100%;
+    justify-content: center;
+}
+
+.selection-sent iconify-icon {
+    font-size: 20px;
+}
+
+/* Portrait */
+@media (orientation: portrait) {
+    .elements-grid-clean {
+        grid-template-columns: repeat(5, 1fr);
+    }
+    
+    .element-btn-mini {
+        width: clamp(50px, 17vw, 64px);
+        height: clamp(50px, 17vw, 64px);
+    }
+    
+    .element-btn-mini .symbol {
+        font-size: clamp(16px, 5vw, 20px);
+    }
+}
+
+@media (orientation: portrait) and (max-width: 360px) {
+    .elements-area {
+        padding: 12px;
+    }
+    
+    .elements-grid-clean {
+        gap: 6px;
+    }
+    
+    .element-btn-mini {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .element-btn-mini .symbol {
+        font-size: 15px;
+    }
+    
+    .selection-bar {
+        padding: 10px 12px;
+    }
+    
+    .chip {
+        padding: 5px 10px;
+        font-size: 12px;
+    }
+    
+    .confirm-btn-round {
+        width: 42px;
+        height: 42px;
+        font-size: 20px;
+    }
+}
+
+/* Landscape - todos visibles */
+@media (orientation: landscape) {
+    .exit-btn-floating {
+        top: 8px;
+        right: 8px;
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+    }
+    
+    .elements-area {
+        padding: 8px 16px;
+    }
+    
+    .elements-grid-clean {
+        grid-template-columns: repeat(10, 1fr);
+        gap: 5px;
+        max-width: none;
+    }
+    
+    .element-btn-mini {
+        width: clamp(34px, 8vh, 48px);
+        height: clamp(34px, 8vh, 48px);
+        border-radius: 8px;
+    }
+    
+    .element-btn-mini .symbol {
+        font-size: clamp(13px, 3vh, 17px);
+    }
+    
+    .element-btn-mini .selection-count {
+        min-width: 14px;
+        height: 14px;
+        font-size: 9px;
+        top: -3px;
+        right: -3px;
+    }
+    
+    .selection-bar {
+        padding: 8px 16px;
+    }
+    
+    .chip {
+        padding: 4px 10px;
+        font-size: 12px;
+        border-radius: 12px;
+    }
+    
+    .confirm-btn-round {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+    
+    .selection-sent {
+        padding: 6px 16px;
+        font-size: 12px;
+    }
+}
+
+@media (orientation: landscape) and (max-height: 400px) {
+    .elements-area {
+        padding: 6px 12px;
+    }
+    
+    .elements-grid-clean {
+        gap: 4px;
+    }
+    
+    .element-btn-mini {
+        width: clamp(30px, 7vh, 40px);
+        height: clamp(30px, 7vh, 40px);
+        border-radius: 6px;
+    }
+    
+    .element-btn-mini .symbol {
+        font-size: clamp(11px, 2.5vh, 14px);
+    }
+    
+    .selection-bar {
+        padding: 6px 12px;
+    }
+    
+    .confirm-btn-round {
+        width: 34px;
+        height: 34px;
+        font-size: 16px;
     }
 }

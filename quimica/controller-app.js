@@ -343,7 +343,7 @@ function renderConfigWizard() {
     const app = document.getElementById('app');
     
     app.innerHTML = `
-        <div class="screen active flex-col items-center p-5 text-center relative" id="configWizard">
+        <div class="screen active flex-col p-3 relative config-wizard-screen" id="configWizard">
             <div class="controller-bg"></div>
             
             <!-- Botón salir en esquina superior -->
@@ -351,17 +351,17 @@ function renderConfigWizard() {
                 <iconify-icon icon="mdi:exit-to-app"></iconify-icon>
             </button>
             
-            <div class="relative z-10 w-full max-w-sm flex flex-col" style="height: 100%;">
+            <div class="relative z-10 w-full max-w-sm mx-auto flex flex-col h-full">
                 <!-- Header con info del jugador -->
-                <div class="wizard-header mb-4">
-                    <div class="flex items-center justify-center gap-3 mb-3">
+                <div class="wizard-header">
+                    <div class="flex items-center justify-center gap-2 mb-2">
                         <div class="player-avatar-sm" style="background: ${playerData.color};">
                             <iconify-icon icon="${playerData.icon}" style="color: white;"></iconify-icon>
                         </div>
                         <div class="text-left">
-                            <p class="font-bold" style="color: ${playerData.color};">${playerData.name}</p>
+                            <p class="font-bold text-sm" style="color: ${playerData.color};">${playerData.name}</p>
                             <div class="flex items-center gap-1">
-                                <iconify-icon icon="mdi:crown" style="color: var(--color-warning); font-size: 14px;"></iconify-icon>
+                                <iconify-icon icon="mdi:crown" style="color: var(--color-warning); font-size: 12px;"></iconify-icon>
                                 <span class="text-xs" style="color: var(--color-warning);">Admin</span>
                             </div>
                         </div>
@@ -384,12 +384,12 @@ function renderConfigWizard() {
                 </div>
                 
                 <!-- Contenido del paso actual -->
-                <div class="wizard-content flex-1" id="wizardContent">
+                <div class="wizard-content" id="wizardContent">
                     ${renderWizardStep()}
                 </div>
                 
                 <!-- Botones de navegación -->
-                <div class="wizard-nav mt-4">
+                <div class="wizard-nav">
                     ${configStep > 1 ? `
                         <button class="wizard-btn-back" id="wizardBackBtn">
                             <iconify-icon icon="mdi:arrow-left"></iconify-icon>
@@ -404,7 +404,7 @@ function renderConfigWizard() {
                         </button>
                     ` : `
                         <button class="btn-admin" id="startGameBtn">
-                            <iconify-icon icon="mdi:rocket-launch" style="font-size: 20px;"></iconify-icon>
+                            <iconify-icon icon="mdi:rocket-launch" style="font-size: 18px;"></iconify-icon>
                             ¡INICIAR!
                         </button>
                     `}
@@ -671,66 +671,26 @@ function renderPlayingScreen() {
     maxSelections = currentCompound?.elements?.length || 5;
     
     app.innerHTML = `
-        <div class="screen active flex-col relative playing-screen-optimized" id="playingScreen">
+        <div class="screen active flex-col relative playing-screen-clean" id="playingScreen">
             <div class="controller-bg"></div>
             
-            <!-- Header ultra-compacto fijo -->
-            <div class="playing-header-fixed">
-                <div class="playing-header-row">
-                    <button class="exit-btn-mini" id="exitGameBtn" title="Salir">
-                        <iconify-icon icon="mdi:exit-to-app"></iconify-icon>
-                    </button>
-                    
-                    <div class="target-inline">
-                        ${difficultyConfig.showFormula ? `
-                            <span class="target-formula-inline">${currentCompound?.formula || '???'}</span>
-                            <span class="target-name-inline">${currentCompound?.name || ''}</span>
-                        ` : `
-                            <span class="target-formula-inline mystery">???</span>
-                            <span class="target-name-inline">${currentCompound?.name || ''}</span>
-                        `}
-                    </div>
-                    
-                    <div class="header-right-info">
-                        <span class="round-badge-mini">${currentRound}/${maxRounds}</span>
-                        <span class="score-badge-mini" id="scoreDisplay">${myScore}</span>
-                    </div>
-                </div>
-                
-                ${difficultyConfig.showRequiredElements && currentCompound?.elements ? `
-                    <div class="required-elements-inline">
-                        ${[...new Set(currentCompound.elements)].map(el => {
-                            const count = currentCompound.elements.filter(e => e === el).length;
-                            return `<span class="required-mini">${count > 1 ? count + '×' : ''}${el}</span>`;
-                        }).join('')}
-                    </div>
-                ` : ''}
-                
-                ${difficultyConfig.showHint && currentCompound?.hint ? `
-                    <div class="hint-inline">
-                        <iconify-icon icon="mdi:lightbulb"></iconify-icon>
-                        <span>${currentCompound.hint}</span>
-                    </div>
-                ` : ''}
-            </div>
-            
-            <!-- Área de selección flotante -->
-            <div class="selection-floating" id="selectionArea">
-                <div class="selection-chips" id="selectionChips">
-                    <span class="selection-placeholder">
-                        <iconify-icon icon="mdi:hand-pointing-up"></iconify-icon>
-                        Toca ${maxSelections} elementos
-                    </span>
-                </div>
-                <button class="confirm-btn-floating" id="confirmSelectionBtn" onclick="confirmSelection()" disabled>
-                    <iconify-icon icon="mdi:flask-empty-outline"></iconify-icon>
-                    <span class="confirm-text">Faltan ${maxSelections}</span>
+            ${isAdmin ? `
+                <button class="exit-btn-floating" id="exitGameBtn" title="Salir">
+                    <iconify-icon icon="mdi:exit-to-app"></iconify-icon>
                 </button>
+            ` : ''}
+            
+            <!-- Grid de elementos -->
+            <div class="elements-area" id="elementsContainer">
+                <div class="elements-grid-clean" id="elementsGrid"></div>
             </div>
             
-            <!-- Grid de elementos - área principal scrolleable -->
-            <div class="elements-container" id="elementsContainer">
-                <div class="elements-grid-optimized" id="elementsGrid"></div>
+            <!-- Preview de selección + confirmar -->
+            <div class="selection-bar" id="selectionArea">
+                <div class="selection-preview" id="selectionChips"></div>
+                <button class="confirm-btn-round" id="confirmSelectionBtn" onclick="confirmSelection()" disabled>
+                    <iconify-icon icon="mdi:send"></iconify-icon>
+                </button>
             </div>
         </div>
         
@@ -739,28 +699,22 @@ function renderPlayingScreen() {
             <div class="text-center p-6" id="resultContent"></div>
         </div>
         
-        <!-- Hint de rotación -->
-        <div class="rotate-hint" id="rotateHint">
-            <iconify-icon icon="mdi:screen-rotation"></iconify-icon>
-            Prueba en horizontal
-        </div>
-        
         <!-- Exit Confirmation Modal -->
         <div class="exit-modal" id="exitModal">
             <div class="exit-modal-content">
-                <iconify-icon icon="${isAdmin ? 'mdi:alert-octagon' : 'mdi:alert-circle'}" class="text-4xl mb-3" style="color: ${isAdmin ? 'var(--color-danger)' : 'var(--color-warning)'};"></iconify-icon>
-                <h3 class="text-lg font-bold mb-2" style="color: var(--color-text);">${isAdmin ? '¿Terminar el juego?' : '¿Salir del juego?'}</h3>
-                <p class="text-sm mb-4" style="color: var(--color-text-light);">${isAdmin ? 'Esto terminará el juego para TODOS los jugadores' : 'Perderás tu progreso actual'}</p>
+                <iconify-icon icon="mdi:alert-octagon" class="text-4xl mb-3" style="color: var(--color-danger);"></iconify-icon>
+                <h3 class="text-lg font-bold mb-2" style="color: var(--color-text);">¿Terminar el juego?</h3>
+                <p class="text-sm mb-4" style="color: var(--color-text-light);">Esto terminará el juego para TODOS</p>
                 <div class="flex gap-3">
                     <button class="exit-modal-btn cancel" id="exitCancelBtn">Cancelar</button>
-                    <button class="exit-modal-btn confirm" id="exitConfirmBtn" style="${isAdmin ? 'background: var(--color-danger);' : ''}">${isAdmin ? 'Terminar' : 'Salir'}</button>
+                    <button class="exit-modal-btn confirm" id="exitConfirmBtn" style="background: var(--color-danger);">Terminar</button>
                 </div>
             </div>
         </div>
     `;
     
     setupElementsGrid();
-    setupExitButton();
+    if (isAdmin) setupExitButton();
 }
 
 window.confirmSelection = confirmSelection;
@@ -893,21 +847,15 @@ function updateSelectionUI() {
         }
     });
     
-    // Actualizar área de selección flotante
+    // Actualizar preview de selección
     const selectionChips = document.getElementById('selectionChips');
     if (selectionChips) {
         if (selectedElements.length === 0) {
-            selectionChips.innerHTML = `
-                <span class="selection-placeholder">
-                    <iconify-icon icon="mdi:hand-pointing-up"></iconify-icon>
-                    Toca ${maxSelections} elementos
-                </span>
-            `;
+            selectionChips.innerHTML = '';
         } else {
             selectionChips.innerHTML = selectedElements.map((el, i) => `
-                <button class="chip-mini element-${allElements[el]?.group || 'nonmetal'}" onclick="removeSelectedElement(${i})">
+                <button class="chip element-${allElements[el]?.group || 'nonmetal'}" onclick="removeSelectedElement(${i})">
                     ${el}
-                    <iconify-icon icon="mdi:close"></iconify-icon>
                 </button>
             `).join('');
         }
@@ -917,20 +865,8 @@ function updateSelectionUI() {
     const confirmBtn = document.getElementById('confirmSelectionBtn');
     if (confirmBtn) {
         const isComplete = selectedElements.length === maxSelections;
-        const remaining = maxSelections - selectedElements.length;
         confirmBtn.disabled = !isComplete;
         confirmBtn.classList.toggle('ready', isComplete);
-        
-        const confirmText = confirmBtn.querySelector('.confirm-text');
-        const confirmIcon = confirmBtn.querySelector('iconify-icon');
-        
-        if (isComplete) {
-            if (confirmIcon) confirmIcon.setAttribute('icon', 'mdi:flask-round-bottom');
-            if (confirmText) confirmText.textContent = '¡CONFIRMAR!';
-        } else {
-            if (confirmIcon) confirmIcon.setAttribute('icon', 'mdi:flask-empty-outline');
-            if (confirmText) confirmText.textContent = `Faltan ${remaining}`;
-        }
     }
 }
 
@@ -947,17 +883,19 @@ function confirmSelection() {
         navigator.vibrate([50, 30, 50]);
     }
     
+    // Deshabilitar elementos
     document.querySelectorAll('.element-btn-mini').forEach(btn => {
         btn.disabled = true;
-        btn.style.opacity = '0.5';
+        btn.style.opacity = '0.3';
     });
     
+    // Mostrar confirmación
     const selectionArea = document.getElementById('selectionArea');
     if (selectionArea) {
         selectionArea.innerHTML = `
-            <div class="selection-confirmed-mini">
-                <iconify-icon icon="mdi:check-circle" style="color: var(--color-success);"></iconify-icon>
-                <span>Enviado: ${selectedElements.join(' + ')}</span>
+            <div class="selection-sent">
+                <iconify-icon icon="mdi:check"></iconify-icon>
+                ${selectedElements.join(' + ')}
             </div>
         `;
     }
@@ -1229,90 +1167,79 @@ function handleRoundResult(data) {
         myScore = data.players[playerData.id].score;
     }
     
-    // Determinar si ESTE jugador acertó (buscar en playerResults)
+    // Determinar si ESTE jugador acertó
     const myResult = data.playerResults && data.playerResults[playerData?.id];
     const isCorrect = myResult ? myResult.isCorrect : false;
     
     if (isCorrect) {
         playSound('success');
         
-        // Usar los puntos del resultado del jugador
-        const pointsEarned = myResult.points || data.pointsAwarded || data.compound.points;
-        
         content.innerHTML = `
-            <div class="success-animation">
-                <div class="success-icon-container">
-                    <iconify-icon icon="mdi:check-circle" class="text-7xl success-icon" style="color: var(--color-success);"></iconify-icon>
+            <div class="result-big">
+                <div class="result-icon-big success">
+                    <iconify-icon icon="mdi:check-circle"></iconify-icon>
                 </div>
                 <div class="confetti-burst" id="miniConfetti"></div>
             </div>
-            <h2 class="text-2xl font-black mb-2" style="color: var(--color-success);">¡Síntesis Exitosa!</h2>
-            <p class="text-lg mb-3" style="color: var(--color-text);">${data.compound.formula} - ${data.compound.name}</p>
-            <div class="points-earned">
-                <iconify-icon icon="mdi:star" class="mr-2"></iconify-icon>
-                +${pointsEarned} pts
-            </div>
+            <h2 class="result-title success">¡Correcto!</h2>
+            <p class="result-formula">${data.compound.formula}</p>
+            <p class="result-name">${data.compound.name}</p>
             ${isAdmin ? `
-                <button class="btn-primary mt-4" id="nextRoundBtn">
-                    <iconify-icon icon="mdi:arrow-right" class="mr-2"></iconify-icon>
-                    Siguiente Ronda
+                <button class="btn-next-round" id="nextRoundBtn">
+                    <iconify-icon icon="mdi:arrow-right"></iconify-icon>
+                    Siguiente
                 </button>
             ` : `
-                <p class="text-sm mt-4" style="color: var(--color-text-light);">
-                    <iconify-icon icon="mdi:timer-sand" class="mr-1"></iconify-icon>
-                    Esperando al admin...
+                <p class="result-waiting">
+                    <iconify-icon icon="mdi:timer-sand"></iconify-icon>
+                    Esperando...
                 </p>
             `}
         `;
         
         createMiniConfetti();
-        
-        if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 100]);
+        if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
     } else {
         playSound('error');
         
         content.innerHTML = `
-            <div class="error-animation">
-                <div class="error-icon-container shake-animation">
-                    <iconify-icon icon="mdi:close-circle" class="text-7xl" style="color: var(--color-danger);"></iconify-icon>
+            <div class="result-big">
+                <div class="result-icon-big error shake-animation">
+                    <iconify-icon icon="mdi:close-circle"></iconify-icon>
                 </div>
                 <div class="error-x-burst" id="errorBurst"></div>
             </div>
-            <h2 class="text-2xl font-black mb-2" style="color: var(--color-danger);">Reacción Fallida</h2>
-            <p class="text-base mb-3" style="color: var(--color-text-light);">La combinación no fue correcta</p>
-            <p class="text-sm" style="color: var(--color-text-light); opacity: 0.7;">
-                Se necesitaba: ${data.compound.formula}<br>
-                (${data.compound.elements.join(' + ')})
-            </p>
+            <h2 class="result-title error">¡Incorrecto!</h2>
+            <p class="result-formula">${data.compound.formula}</p>
+            <p class="result-answer">Era: ${data.compound.elements.join(' + ')}</p>
             ${isAdmin ? `
-                <button class="btn-primary mt-4" id="nextRoundBtn">
-                    <iconify-icon icon="mdi:arrow-right" class="mr-2"></iconify-icon>
-                    Siguiente Ronda
+                <button class="btn-next-round" id="nextRoundBtn">
+                    <iconify-icon icon="mdi:arrow-right"></iconify-icon>
+                    Siguiente
                 </button>
             ` : `
-                <p class="text-sm mt-4" style="color: var(--color-text-light);">
-                    <iconify-icon icon="mdi:timer-sand" class="mr-1"></iconify-icon>
-                    Esperando al admin...
+                <p class="result-waiting">
+                    <iconify-icon icon="mdi:timer-sand"></iconify-icon>
+                    Esperando...
                 </p>
             `}
         `;
         
         createErrorBurst();
-        
         if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
     }
     
     overlay.classList.add('active');
     
     if (window.anime) {
-        window.anime.animate('#resultContent .success-icon, #resultContent .error-icon-container', {
-            scale: [0, 1.2, 1],
+        window.anime.animate('.result-icon-big', {
+            scale: [0, 1.3, 1],
             duration: 500,
             easing: 'easeOutElastic(1, .5)'
         });
     }
     
-    // Configurar botón de siguiente para el admin
+    // Botón siguiente para admin
     if (isAdmin) {
         setTimeout(() => {
             const nextBtn = document.getElementById('nextRoundBtn');
