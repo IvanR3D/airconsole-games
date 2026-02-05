@@ -179,6 +179,42 @@ function init() {
             case 'roundsChanged': handleRoundsChanged(data); break;
         }
     };
+    
+    // Detectar cambios de orientación
+    setupOrientationListener();
+}
+
+// Listener para cambios de orientación
+function setupOrientationListener() {
+    // Usar tanto resize como orientationchange para máxima compatibilidad
+    window.addEventListener('resize', handleOrientationChange);
+    window.addEventListener('orientationchange', handleOrientationChange);
+    
+    // También usar matchMedia para detectar cambios de orientación
+    const landscapeQuery = window.matchMedia('(orientation: landscape)');
+    landscapeQuery.addEventListener('change', handleOrientationChange);
+}
+
+let lastOrientation = null;
+
+function handleOrientationChange() {
+    const isLandscape = window.innerWidth > window.innerHeight;
+    const currentOrientation = isLandscape ? 'landscape' : 'portrait';
+    
+    // Solo actuar si realmente cambió la orientación
+    if (lastOrientation !== currentOrientation) {
+        lastOrientation = currentOrientation;
+        console.log('📱 Orientación:', currentOrientation);
+        
+        // Agregar clase al body para CSS fallback
+        document.body.classList.remove('is-landscape', 'is-portrait');
+        document.body.classList.add(`is-${currentOrientation}`);
+        
+        // Forzar re-layout
+        document.body.style.display = 'none';
+        document.body.offsetHeight; // Trigger reflow
+        document.body.style.display = '';
+    }
 }
 
 function handleRoundsChanged(data) {
@@ -680,17 +716,19 @@ function renderPlayingScreen() {
                 </button>
             ` : ''}
             
+            <!-- Área de selección arriba -->
+            <div class="selection-display" id="selectionDisplay">
+                <div class="selection-chips" id="selectionChips">
+                    <span class="selection-placeholder">Toca los elementos</span>
+                </div>
+                <button class="confirm-btn-inline" id="confirmSelectionBtn" onclick="confirmSelection()" disabled>
+                    <iconify-icon icon="mdi:send"></iconify-icon>
+                </button>
+            </div>
+            
             <!-- Grid de elementos -->
             <div class="elements-area" id="elementsContainer">
                 <div class="elements-grid-clean" id="elementsGrid"></div>
-            </div>
-            
-            <!-- Preview de selección + confirmar -->
-            <div class="selection-bar" id="selectionArea">
-                <div class="selection-preview" id="selectionChips"></div>
-                <button class="confirm-btn-round" id="confirmSelectionBtn" onclick="confirmSelection()" disabled>
-                    <iconify-icon icon="mdi:send"></iconify-icon>
-                </button>
             </div>
         </div>
         
@@ -766,6 +804,7 @@ function setupElementsGrid() {
         btn.dataset.element = key;
         btn.innerHTML = `
             <span class="symbol">${el.symbol}</span>
+            <span class="name">${el.name}</span>
             <span class="selection-count" id="count-${key}"></span>
         `;
         btn.addEventListener('click', () => handleElementClick(key, btn));
@@ -847,11 +886,11 @@ function updateSelectionUI() {
         }
     });
     
-    // Actualizar preview de selección
+    // Actualizar área de selección
     const selectionChips = document.getElementById('selectionChips');
     if (selectionChips) {
         if (selectedElements.length === 0) {
-            selectionChips.innerHTML = '';
+            selectionChips.innerHTML = `<span class="selection-placeholder">Toca los elementos</span>`;
         } else {
             selectionChips.innerHTML = selectedElements.map((el, i) => `
                 <button class="chip element-${allElements[el]?.group || 'nonmetal'}" onclick="removeSelectedElement(${i})">
@@ -890,12 +929,12 @@ function confirmSelection() {
     });
     
     // Mostrar confirmación
-    const selectionArea = document.getElementById('selectionArea');
-    if (selectionArea) {
-        selectionArea.innerHTML = `
+    const selectionDisplay = document.getElementById('selectionDisplay');
+    if (selectionDisplay) {
+        selectionDisplay.innerHTML = `
             <div class="selection-sent">
                 <iconify-icon icon="mdi:check"></iconify-icon>
-                ${selectedElements.join(' + ')}
+                <span>${selectedElements.join(' + ')}</span>
             </div>
         `;
     }
