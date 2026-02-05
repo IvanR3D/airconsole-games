@@ -17,6 +17,9 @@ body {
 }
 
 :root {
+    /* Espacio seguro para logo y botón AirConsole (evitar superposición) */
+    --airconsole-safe-top: 85px;
+    
     --color-primary: #0595AE;
     --color-secondary: #AB3D8B;
     --color-accent: #73A03F;
@@ -56,7 +59,7 @@ body {
     opacity: 1; 
     height: 100vh; 
     height: 100dvh;
-    padding: clamp(80px, 15vh, 110px) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
+    padding: var(--airconsole-safe-top) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
 }
@@ -1008,7 +1011,7 @@ body {
         --avatar-size: 75px;
     }
     
-    .screen.active { padding: 110px 24px 24px 24px; }
+    .screen.active { padding: var(--airconsole-safe-top) 24px 24px 24px; }
     .btn-primary, .btn-admin { max-width: 400px; }
     
     .elements-grid {
@@ -1024,7 +1027,7 @@ body {
         --element-height: 52px;
         --avatar-size: 36px;
     }
-    .screen.active { padding: 40px 12px 12px 12px; }
+    .screen.active { padding: 50px 12px 12px 12px; }
     .target-card { padding: 6px 10px; }
     .target-card-compact { padding: 4px 8px; }
     .target-formula-compact { font-size: 1.1rem; }
@@ -1090,10 +1093,22 @@ body {
 
 @supports (padding-top: env(safe-area-inset-top)) {
     .screen.active {
-        padding-top: calc(clamp(80px, 15vh, 110px) + env(safe-area-inset-top));
+        padding-top: calc(var(--airconsole-safe-top) + env(safe-area-inset-top));
         padding-left: calc(var(--spacing-lg) + env(safe-area-inset-left));
         padding-right: calc(var(--spacing-lg) + env(safe-area-inset-right));
         padding-bottom: calc(var(--spacing-lg) + env(safe-area-inset-bottom));
+    }
+    
+    .playing-screen-clean {
+        padding-top: calc(var(--airconsole-safe-top) + env(safe-area-inset-top));
+    }
+    
+    .config-wizard-screen {
+        padding-top: calc(var(--airconsole-safe-top) + env(safe-area-inset-top)) !important;
+    }
+    
+    .exit-btn-corner, .exit-btn-floating {
+        top: calc(20px + env(safe-area-inset-top));
     }
 }
 
@@ -1407,10 +1422,10 @@ body {
     box-shadow: none;
 }
 
-/* Botón salir en esquina (waiting screen) */
+/* Botón salir en esquina - espacio propio, no choca con logo AirConsole */
 .exit-btn-corner {
     position: absolute;
-    top: 60px;
+    top: 20px;
     right: 16px;
     width: 40px;
     height: 40px;
@@ -1615,21 +1630,42 @@ body {
     flex-shrink: 0;
 }
 
-/* Cards de modo de juego - 2 columnas */
+/* Consejos en el wizard - rellenan espacio vacío */
+.wizard-tip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: linear-gradient(135deg, rgba(5, 149, 174, 0.08) 0%, rgba(171, 61, 139, 0.06) 100%);
+    border: 1px solid rgba(5, 149, 174, 0.15);
+    border-radius: 12px;
+    margin-bottom: 12px;
+    font-size: 12px;
+    color: var(--color-text);
+}
+
+.wizard-tip iconify-icon {
+    font-size: 18px;
+    color: var(--color-primary);
+    flex-shrink: 0;
+}
+
+/* Cards de modo de juego - 2 columnas, ocupan más espacio */
 .mode-cards {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
+    gap: 12px;
     flex: 1;
     align-content: center;
+    min-height: 140px;
 }
 
 .mode-card {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
-    padding: 12px 8px;
+    gap: 8px;
+    padding: 16px 12px;
     border: 2px solid #e2e8f0;
     border-radius: 14px;
     background: white;
@@ -1644,9 +1680,9 @@ body {
 }
 
 .mode-card-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
     background: linear-gradient(135deg, color-mix(in srgb, var(--mode-color) 15%, white) 0%, white 100%);
     display: flex;
     align-items: center;
@@ -1702,21 +1738,22 @@ body {
     transform: scale(1);
 }
 
-/* Cards de dificultad - grid 2x2 (3 items) */
+/* Cards de dificultad - grid 2x2 (3 items), más grandes */
 .difficulty-cards {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
+    gap: 12px;
     flex: 1;
     align-content: center;
+    min-height: 180px;
 }
 
 .difficulty-card {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
-    padding: 12px 8px;
+    gap: 8px;
+    padding: 16px 12px;
     border: 2px solid #e2e8f0;
     border-radius: 14px;
     background: white;
@@ -1731,9 +1768,9 @@ body {
 }
 
 .difficulty-card-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
     background: linear-gradient(135deg, color-mix(in srgb, var(--diff-color) 15%, white) 0%, white 100%);
     display: flex;
     align-items: center;
@@ -1789,14 +1826,15 @@ body {
     transform: scale(1);
 }
 
-/* Grid de rondas - 3x2 */
+/* Grid de rondas - 3x2, más espacioso */
 .rounds-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+    gap: 10px;
     flex: 1;
     align-content: center;
-    margin-bottom: 10px;
+    margin-bottom: 14px;
+    min-height: 130px;
 }
 
 .rounds-card {
@@ -1804,7 +1842,7 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 12px 8px;
+    padding: 14px 10px;
     border: 2px solid #e2e8f0;
     border-radius: 14px;
     background: white;
@@ -2726,20 +2764,24 @@ body {
 .rotate-hint {
     display: none;
     position: fixed;
-    bottom: 10px;
+    bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.85);
     color: white;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 10px;
+    padding: 10px 18px;
+    border-radius: 24px;
+    font-size: 12px;
+    font-weight: 600;
     z-index: 100;
-    animation: fadeInOut 4s ease-in-out;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
 }
 
 .rotate-hint iconify-icon {
-    margin-right: 4px;
+    font-size: 20px;
+    flex-shrink: 0;
 }
 
 @keyframes fadeInOut {
@@ -2747,12 +2789,15 @@ body {
     20%, 80% { opacity: 1; }
 }
 
-/* Mostrar hint solo en portrait en pantallas pequeñas */
-@media (orientation: portrait) and (max-height: 600px) {
-    .rotate-hint.show {
-        display: flex;
-        align-items: center;
-    }
+/* Mostrar hint de rotación en portrait */
+.rotate-hint.show {
+    display: flex !important;
+    animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
 
@@ -2905,6 +2950,7 @@ body {
     height: 100dvh;
     overflow: hidden;
     padding: 10px !important;
+    padding-top: var(--airconsole-safe-top) !important; /* Espacio logo AirConsole */
 }
 
 .config-wizard-screen .screen.active {
@@ -3364,15 +3410,15 @@ body {
     height: 100vh;
     height: 100dvh;
     padding: 0;
-    padding-top: 50px; /* Espacio para botón AirConsole */
+    padding-top: var(--airconsole-safe-top); /* Espacio para logo AirConsole */
     overflow: hidden;
     background: #f8fafc;
 }
 
-/* Botón salir flotante (solo admin) */
+/* Botón salir flotante (solo admin) - debajo del logo AirConsole */
 .exit-btn-floating {
     position: absolute;
-    top: 55px; /* Debajo del botón AirConsole */
+    top: 20px;
     right: 10px;
     width: 36px;
     height: 36px;
@@ -3487,13 +3533,13 @@ body {
     font-size: 18px;
 }
 
-/* Área de elementos */
+/* Área de elementos - padding extra para badges de selección */
 .elements-area {
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 12px;
+    padding: 14px;
     overflow: hidden;
 }
 
@@ -3562,29 +3608,39 @@ body {
                 0 1px 4px rgba(0,0,0,0.1);
 }
 
+/* Elemento con selección activa - borde resaltado */
+.element-btn-mini.has-selection {
+    box-shadow: 0 0 0 3px var(--color-success),
+                0 2px 0 rgba(0,0,0,0.2), 
+                0 3px 8px rgba(0,0,0,0.1);
+}
+
 .element-btn-mini:disabled {
     opacity: 0.3;
     cursor: not-allowed;
 }
 
+/* Badge de conteo de selección - siempre visible cuando hay selección */
 .element-btn-mini .selection-count {
     position: absolute;
-    top: -5px;
-    right: -5px;
-    min-width: 18px;
-    height: 18px;
+    top: -6px;
+    right: -6px;
+    min-width: 20px;
+    height: 20px;
     background: var(--color-danger);
     color: white;
     border-radius: 50%;
     font-size: 11px;
     font-weight: bold;
-    display: flex;
+    display: flex !important;
     align-items: center;
     justify-content: center;
     opacity: 0;
     transform: scale(0);
     transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    z-index: 10;
+    border: 2px solid white;
 }
 
 .element-btn-mini .selection-count.visible {

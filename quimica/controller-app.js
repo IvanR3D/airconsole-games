@@ -201,19 +201,21 @@ function handleOrientationChange() {
     const isLandscape = window.innerWidth > window.innerHeight;
     const currentOrientation = isLandscape ? 'landscape' : 'portrait';
     
-    // Solo actuar si realmente cambió la orientación
     if (lastOrientation !== currentOrientation) {
         lastOrientation = currentOrientation;
         console.log('📱 Orientación:', currentOrientation);
         
-        // Agregar clase al body para CSS fallback
         document.body.classList.remove('is-landscape', 'is-portrait');
         document.body.classList.add(`is-${currentOrientation}`);
         
-        // Forzar re-layout
         document.body.style.display = 'none';
-        document.body.offsetHeight; // Trigger reflow
+        document.body.offsetHeight;
         document.body.style.display = '';
+    }
+    
+    // Actualizar hint de rotación cuando hay playing screen
+    if (document.getElementById('playingScreen')) {
+        showRotateHint();
     }
 }
 
@@ -474,6 +476,11 @@ function renderStepMode() {
             </div>
             <p class="step-subtitle">¿Cómo quieres que compitan?</p>
             
+            <div class="wizard-tip">
+                <iconify-icon icon="mdi:lightbulb-outline"></iconify-icon>
+                <span>Equipos: 2 vs 2. Individual: todos contra todos.</span>
+            </div>
+            
             <div class="mode-cards">
                 ${Object.entries(GAME_MODES).map(([key, config]) => `
                     <button class="mode-card ${key === currentGameMode ? 'selected' : ''}" 
@@ -504,6 +511,11 @@ function renderStepDifficulty() {
                 <h2>Dificultad</h2>
             </div>
             <p class="step-subtitle">¿Qué tan difícil será el reto?</p>
+            
+            <div class="wizard-tip">
+                <iconify-icon icon="mdi:flask-outline"></iconify-icon>
+                <span>Más difícil = más puntos. ¡Reto extra!</span>
+            </div>
             
             <div class="difficulty-cards">
                 ${Object.entries(DIFFICULTY_CONFIG).map(([key, config]) => `
@@ -536,6 +548,11 @@ function renderStepRounds() {
                 <h2>Número de Rondas</h2>
             </div>
             <p class="step-subtitle">¿Cuántos compuestos sintetizarán?</p>
+            
+            <div class="wizard-tip">
+                <iconify-icon icon="mdi:counter"></iconify-icon>
+                <span>Selecciona 4 a 15 rondas según el tiempo disponible.</span>
+            </div>
             
             <div class="rounds-grid">
                 ${ROUNDS_OPTIONS.map(rounds => `
@@ -733,6 +750,12 @@ function renderPlayingScreen() {
         </div>
         
         <!-- Result Overlay -->
+        <!-- Hint de rotación para modo horizontal -->
+        <div class="rotate-hint" id="rotateHint">
+            <iconify-icon icon="mdi:phone-rotate-landscape"></iconify-icon>
+            Gira el teléfono para ver más elementos
+        </div>
+        
         <div class="result-overlay" id="resultOverlay">
             <div class="text-center p-6" id="resultContent"></div>
         </div>
@@ -829,18 +852,22 @@ function setupElementsGrid() {
     showRotateHint();
 }
 
-// Mostrar sugerencia de rotación solo una vez
+// Mostrar sugerencia de rotación en portrait
 function showRotateHint() {
-    if (sessionStorage.getItem('rotateHintShown')) return;
-    
     const hint = document.getElementById('rotateHint');
-    if (hint && window.innerHeight < 600 && window.innerWidth < window.innerHeight) {
+    if (!hint) return;
+    
+    const isPortrait = window.innerWidth < window.innerHeight;
+    const isSmallScreen = window.innerHeight < 600;
+    
+    if (isPortrait && isSmallScreen) {
         hint.classList.add('show');
-        sessionStorage.setItem('rotateHintShown', 'true');
-        
-        setTimeout(() => {
-            hint.classList.remove('show');
-        }, 4000);
+        if (!sessionStorage.getItem('rotateHintShown')) {
+            sessionStorage.setItem('rotateHintShown', 'true');
+        }
+        setTimeout(() => hint.classList.remove('show'), 5000);
+    } else {
+        hint.classList.remove('show');
     }
 }
 
@@ -876,13 +903,17 @@ function removeSelectedElement(index) {
 }
 
 function updateSelectionUI() {
-    // Actualizar contadores en cada botón
+    // Actualizar contadores y estado visual en cada botón
     availableElementKeys.forEach(key => {
         const countEl = document.getElementById(`count-${key}`);
         const count = selectedElements.filter(e => e === key).length;
+        const btn = document.querySelector(`[data-element="${key}"]`);
         if (countEl) {
             countEl.textContent = count > 0 ? count : '';
             countEl.classList.toggle('visible', count > 0);
+        }
+        if (btn) {
+            btn.classList.toggle('has-selection', count > 0);
         }
     });
     
