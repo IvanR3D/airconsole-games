@@ -671,94 +671,78 @@ function renderPlayingScreen() {
     maxSelections = currentCompound?.elements?.length || 5;
     
     app.innerHTML = `
-        <div class="screen active flex-col p-3 relative" id="playingScreen">
+        <div class="screen active flex-col relative playing-screen-optimized" id="playingScreen">
             <div class="controller-bg"></div>
             
-            <!-- Header compacto con botón salir -->
-            <div class="relative z-10 text-center mb-2">
-                <div class="flex items-center justify-between gap-2 mb-2">
-                    <button class="exit-btn-text" id="exitGameBtn" title="Salir del juego">
+            <!-- Header ultra-compacto fijo -->
+            <div class="playing-header-fixed">
+                <div class="playing-header-row">
+                    <button class="exit-btn-mini" id="exitGameBtn" title="Salir">
                         <iconify-icon icon="mdi:exit-to-app"></iconify-icon>
-                        <span>Salir</span>
                     </button>
-                    <div class="flex items-center gap-2">
-                        <img src="../LogoSteamRD-Color.webp" alt="STEAM RD" class="w-8 h-8">
-                        <span class="text-xs px-2 py-1 rounded-full" style="background: var(--color-bg-soft); color: var(--color-text-light);">
-                            Ronda ${currentRound}/${maxRounds}
-                        </span>
-                        <span class="difficulty-badge-sm" style="background: ${difficultyConfig.color}20; color: ${difficultyConfig.color};">
-                            <iconify-icon icon="${difficultyConfig.icon}"></iconify-icon>
-                        </span>
+                    
+                    <div class="target-inline">
+                        ${difficultyConfig.showFormula ? `
+                            <span class="target-formula-inline">${currentCompound?.formula || '???'}</span>
+                            <span class="target-name-inline">${currentCompound?.name || ''}</span>
+                        ` : `
+                            <span class="target-formula-inline mystery">???</span>
+                            <span class="target-name-inline">${currentCompound?.name || ''}</span>
+                        `}
                     </div>
-                    <div style="width: 60px;"></div>
+                    
+                    <div class="header-right-info">
+                        <span class="round-badge-mini">${currentRound}/${maxRounds}</span>
+                        <span class="score-badge-mini" id="scoreDisplay">${myScore}</span>
+                    </div>
                 </div>
                 
-                <p class="text-xs mb-1" style="color: var(--color-text-light);">Sintetiza:</p>
-                
-                <div class="target-card-compact mb-2">
-                    ${difficultyConfig.showFormula ? `
-                        <div class="target-formula-compact">${currentCompound?.formula || '???'}</div>
-                        <p class="text-sm font-semibold" style="color: var(--color-primary);">${currentCompound?.name || ''}</p>
-                        ${difficultyConfig.showRequiredElements && currentCompound?.elements ? `
-                            <div class="required-elements-row mt-2">
-                                ${[...new Set(currentCompound.elements)].map(el => {
-                                    const count = currentCompound.elements.filter(e => e === el).length;
-                                    return `<span class="required-badge-sm">${count > 1 ? count + '×' : ''}${el}</span>`;
-                                }).join('')}
-                            </div>
-                        ` : ''}
-                    ` : `
-                        <div class="target-formula-compact mystery">???</div>
-                        <p class="text-base font-bold" style="color: var(--color-secondary);">${currentCompound?.name || ''}</p>
-                        <p class="text-xs mt-1" style="color: var(--color-text-light);">¡Descubre la fórmula!</p>
-                    `}
-                </div>
+                ${difficultyConfig.showRequiredElements && currentCompound?.elements ? `
+                    <div class="required-elements-inline">
+                        ${[...new Set(currentCompound.elements)].map(el => {
+                            const count = currentCompound.elements.filter(e => e === el).length;
+                            return `<span class="required-mini">${count > 1 ? count + '×' : ''}${el}</span>`;
+                        }).join('')}
+                    </div>
+                ` : ''}
                 
                 ${difficultyConfig.showHint && currentCompound?.hint ? `
-                    <p class="text-xs mb-2" style="color: var(--color-text-light);">
-                        <iconify-icon icon="mdi:lightbulb" class="mr-1" style="color: var(--color-warning);"></iconify-icon>
-                        ${currentCompound.hint}
-                    </p>
-                ` : (!difficultyConfig.showHint ? `
-                    <p class="text-xs mb-2" style="color: var(--color-text-light); opacity: 0.7;">
-                        <iconify-icon icon="mdi:help-circle" class="mr-1"></iconify-icon>
-                        Sin pistas - ¡Buena suerte!
-                    </p>
-                ` : '')}
+                    <div class="hint-inline">
+                        <iconify-icon icon="mdi:lightbulb"></iconify-icon>
+                        <span>${currentCompound.hint}</span>
+                    </div>
+                ` : ''}
             </div>
             
-            <!-- Área de selección -->
-            <div class="relative z-10 selection-area mb-2" id="selectionArea">
-                <p class="text-sm" style="color: var(--color-text-light);">
-                    <iconify-icon icon="mdi:hand-pointing-up" class="mr-1"></iconify-icon>
-                    Selecciona ${maxSelections} elemento${maxSelections !== 1 ? 's' : ''}
-                </p>
+            <!-- Área de selección flotante -->
+            <div class="selection-floating" id="selectionArea">
+                <div class="selection-chips" id="selectionChips">
+                    <span class="selection-placeholder">
+                        <iconify-icon icon="mdi:hand-pointing-up"></iconify-icon>
+                        Toca ${maxSelections} elementos
+                    </span>
+                </div>
+                <button class="confirm-btn-floating" id="confirmSelectionBtn" onclick="confirmSelection()" disabled>
+                    <iconify-icon icon="mdi:flask-empty-outline"></iconify-icon>
+                    <span class="confirm-text">Faltan ${maxSelections}</span>
+                </button>
             </div>
             
-            <!-- Elements Grid -->
-            <div class="relative z-10 elements-grid flex-1 overflow-y-auto" id="elementsGrid"></div>
-            
-            <!-- Botón confirmar -->
-            <button class="relative z-10 confirm-btn mt-2" id="confirmSelectionBtn" onclick="confirmSelection()" disabled>
-                <iconify-icon icon="mdi:flask-empty-outline" class="mr-2"></iconify-icon>
-                Faltan ${maxSelections} elementos
-            </button>
-            
-            <!-- Player Info compacto -->
-            <div class="relative z-10 mini-player-compact mt-2">
-                <div class="mini-avatar-sm" style="background: ${playerData?.color || '#6366f1'};">
-                    <iconify-icon icon="${playerData?.icon || 'mdi:flask'}" style="color: white;"></iconify-icon>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <p class="font-bold text-xs truncate" style="color: var(--color-text);">${playerData?.name || 'Científico'}</p>
-                </div>
-                <div class="score-display-sm" id="scoreDisplay">${myScore}</div>
+            <!-- Grid de elementos - área principal scrolleable -->
+            <div class="elements-container" id="elementsContainer">
+                <div class="elements-grid-optimized" id="elementsGrid"></div>
             </div>
         </div>
         
         <!-- Result Overlay -->
         <div class="result-overlay" id="resultOverlay">
             <div class="text-center p-6" id="resultContent"></div>
+        </div>
+        
+        <!-- Hint de rotación -->
+        <div class="rotate-hint" id="rotateHint">
+            <iconify-icon icon="mdi:screen-rotation"></iconify-icon>
+            Prueba en horizontal
         </div>
         
         <!-- Exit Confirmation Modal -->
@@ -823,13 +807,11 @@ function setupElementsGrid() {
         if (!el) return;
         
         const btn = document.createElement('button');
-        btn.className = `element-btn element-${el.group}`;
+        btn.className = `element-btn-mini element-${el.group}`;
         
         btn.dataset.element = key;
         btn.innerHTML = `
-            <span class="atomic-number">${el.number}</span>
             <span class="symbol">${el.symbol}</span>
-            <span class="name">${el.name}</span>
             <span class="selection-count" id="count-${key}"></span>
         `;
         btn.addEventListener('click', () => handleElementClick(key, btn));
@@ -839,16 +821,34 @@ function setupElementsGrid() {
     
     // Animación de entrada
     if (window.anime) {
-        window.anime.animate('.element-btn', {
+        window.anime.animate('.element-btn-mini', {
             scale: [0, 1],
             opacity: [0, 1],
-            delay: window.anime.stagger(20),
-            duration: 300,
+            delay: window.anime.stagger(15),
+            duration: 250,
             easing: 'easeOutBack'
         });
     }
     
     updateSelectionUI();
+    
+    // Mostrar hint de rotación una vez
+    showRotateHint();
+}
+
+// Mostrar sugerencia de rotación solo una vez
+function showRotateHint() {
+    if (sessionStorage.getItem('rotateHintShown')) return;
+    
+    const hint = document.getElementById('rotateHint');
+    if (hint && window.innerHeight < 600 && window.innerWidth < window.innerHeight) {
+        hint.classList.add('show');
+        sessionStorage.setItem('rotateHintShown', 'true');
+        
+        setTimeout(() => {
+            hint.classList.remove('show');
+        }, 4000);
+    }
 }
 
 function handleElementClick(element, btn) {
@@ -893,55 +893,43 @@ function updateSelectionUI() {
         }
     });
     
-    // Actualizar área de selección
-    const selectionArea = document.getElementById('selectionArea');
-    if (selectionArea) {
+    // Actualizar área de selección flotante
+    const selectionChips = document.getElementById('selectionChips');
+    if (selectionChips) {
         if (selectedElements.length === 0) {
-            selectionArea.innerHTML = `
-                <p class="text-sm" style="color: var(--color-text-light);">
-                    <iconify-icon icon="mdi:hand-pointing-up" class="mr-1"></iconify-icon>
-                    Selecciona ${maxSelections} elemento${maxSelections !== 1 ? 's' : ''}
-                </p>
+            selectionChips.innerHTML = `
+                <span class="selection-placeholder">
+                    <iconify-icon icon="mdi:hand-pointing-up"></iconify-icon>
+                    Toca ${maxSelections} elementos
+                </span>
             `;
         } else {
-            const remaining = maxSelections - selectedElements.length;
-            selectionArea.innerHTML = `
-                <div class="selected-elements-row">
-                    ${selectedElements.map((el, i) => `
-                        <button class="selected-element-chip element-${allElements[el]?.group || 'nonmetal'}" onclick="removeSelectedElement(${i})">
-                            ${el}
-                            <iconify-icon icon="mdi:close" class="remove-icon"></iconify-icon>
-                        </button>
-                    `).join('')}
-                </div>
-                <p class="text-xs mt-2" style="color: ${remaining === 0 ? 'var(--color-success)' : 'var(--color-text-light)'};">
-                    ${remaining === 0 
-                        ? '<iconify-icon icon="mdi:check-circle" class="mr-1"></iconify-icon>¡Listo para confirmar!' 
-                        : `${selectedElements.length}/${maxSelections} • Faltan ${remaining}`}
-                </p>
-            `;
+            selectionChips.innerHTML = selectedElements.map((el, i) => `
+                <button class="chip-mini element-${allElements[el]?.group || 'nonmetal'}" onclick="removeSelectedElement(${i})">
+                    ${el}
+                    <iconify-icon icon="mdi:close"></iconify-icon>
+                </button>
+            `).join('');
         }
     }
     
     // Actualizar botón de confirmar
     const confirmBtn = document.getElementById('confirmSelectionBtn');
     if (confirmBtn) {
-        // Solo habilitar cuando se han seleccionado TODOS los elementos requeridos
         const isComplete = selectedElements.length === maxSelections;
+        const remaining = maxSelections - selectedElements.length;
         confirmBtn.disabled = !isComplete;
         confirmBtn.classList.toggle('ready', isComplete);
         
-        // Actualizar texto del botón según el estado
+        const confirmText = confirmBtn.querySelector('.confirm-text');
+        const confirmIcon = confirmBtn.querySelector('iconify-icon');
+        
         if (isComplete) {
-            confirmBtn.innerHTML = `
-                <iconify-icon icon="mdi:flask-round-bottom" class="mr-2"></iconify-icon>
-                ¡CONFIRMAR MEZCLA!
-            `;
+            if (confirmIcon) confirmIcon.setAttribute('icon', 'mdi:flask-round-bottom');
+            if (confirmText) confirmText.textContent = '¡CONFIRMAR!';
         } else {
-            confirmBtn.innerHTML = `
-                <iconify-icon icon="mdi:flask-empty-outline" class="mr-2"></iconify-icon>
-                Faltan ${maxSelections - selectedElements.length} elemento${maxSelections - selectedElements.length !== 1 ? 's' : ''}
-            `;
+            if (confirmIcon) confirmIcon.setAttribute('icon', 'mdi:flask-empty-outline');
+            if (confirmText) confirmText.textContent = `Faltan ${remaining}`;
         }
     }
 }
@@ -959,7 +947,7 @@ function confirmSelection() {
         navigator.vibrate([50, 30, 50]);
     }
     
-    document.querySelectorAll('.element-btn').forEach(btn => {
+    document.querySelectorAll('.element-btn-mini').forEach(btn => {
         btn.disabled = true;
         btn.style.opacity = '0.5';
     });
@@ -967,20 +955,11 @@ function confirmSelection() {
     const selectionArea = document.getElementById('selectionArea');
     if (selectionArea) {
         selectionArea.innerHTML = `
-            <div class="selection-confirmed">
-                <iconify-icon icon="mdi:check-circle" class="text-3xl" style="color: var(--color-success);"></iconify-icon>
-                <p class="font-bold mt-2" style="color: var(--color-success);">¡Selección enviada!</p>
-                <div class="selected-elements-row mt-2">
-                    ${selectedElements.map(el => `<span class="final-element-chip">${el}</span>`).join('')}
-                </div>
-                <p class="text-sm mt-2" style="color: var(--color-text-light);">Esperando a los demás...</p>
+            <div class="selection-confirmed-mini">
+                <iconify-icon icon="mdi:check-circle" style="color: var(--color-success);"></iconify-icon>
+                <span>Enviado: ${selectedElements.join(' + ')}</span>
             </div>
         `;
-    }
-    
-    const confirmBtn = document.getElementById('confirmSelectionBtn');
-    if (confirmBtn) {
-        confirmBtn.style.display = 'none';
     }
 }
 
