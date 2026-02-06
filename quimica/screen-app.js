@@ -960,12 +960,25 @@ function handlePlayerJoin(device_id) {
 }
 
 // Validar si los elementos seleccionados son correctos
-// El orden exacto importa: H₂O debe ser H,H,O (no H,O,H)
+// Comparamos contando la cantidad de cada elemento (el orden no importa en química)
 function validateElementSelection(playerElements, requiredElements) {
     if (playerElements.length !== requiredElements.length) return false;
     
-    // Comparar elemento por elemento en el mismo orden
-    return playerElements.every((el, i) => el === requiredElements[i]);
+    // Contar elementos del jugador
+    const playerCounts = {};
+    playerElements.forEach(el => playerCounts[el] = (playerCounts[el] || 0) + 1);
+    
+    // Contar elementos requeridos
+    const requiredCounts = {};
+    requiredElements.forEach(el => requiredCounts[el] = (requiredCounts[el] || 0) + 1);
+    
+    // Comparar que tengan los mismos elementos en las mismas cantidades
+    const playerKeys = Object.keys(playerCounts);
+    const requiredKeys = Object.keys(requiredCounts);
+    
+    if (playerKeys.length !== requiredKeys.length) return false;
+    
+    return playerKeys.every(key => playerCounts[key] === requiredCounts[key]);
 }
 
 function getAvailableElements() {

@@ -160,6 +160,9 @@ function init() {
     
     airconsole.onReady = function() {
         console.log('🎮 Controller listo!');
+        
+        // Forzar orientación horizontal (landscape) en el controlador
+        airconsole.setOrientation(AirConsole.ORIENTATION_LANDSCAPE);
     };
     
     airconsole.onMessage = function(from, data) {
@@ -723,60 +726,41 @@ function renderPlayingScreen() {
     
     maxSelections = currentCompound?.elements?.length || 5;
     
+    // Diseño optimizado según documentación AirConsole:
+    // - Botones grandes que ocupan todo el espacio
+    // - Mínima UI adicional
+    // - Selección visible pero compacta
+    // - Botón confirmar grande y accesible
+    
     app.innerHTML = `
-        <div class="screen active flex-col relative playing-screen-clean" id="playingScreen">
+        <div class="screen active playing-screen-optimized" id="playingScreen">
             <div class="controller-bg"></div>
             
-            <!-- Barra superior con botones laterales y selección en el centro -->
-            <div class="top-bar-playing">
-                <!-- Botón salir (izquierda) -->
-                <button class="top-bar-btn exit-btn-large" id="exitGameBtn" title="Salir del juego">
-                    <iconify-icon icon="mdi:exit-to-app"></iconify-icon>
-                    <span>Salir</span>
-                </button>
-                
-                <!-- Elementos seleccionados en tiempo real (centro) -->
-                <div class="selection-live" id="selectionLive">
-                    <div class="selection-chips-live" id="selectionChipsLive">
-                        <span class="selection-placeholder-live">Toca elementos</span>
-                    </div>
+            <!-- Botón salir discreto en esquina superior izquierda -->
+            <button class="exit-btn-corner-small" id="exitGameBtn" title="Salir">
+                <iconify-icon icon="mdi:close"></iconify-icon>
+            </button>
+            
+            <!-- Área de selección compacta en la parte superior -->
+            <div class="selection-bar" id="selectionBar">
+                <div class="selection-chips-compact" id="selectionChips">
+                    <span class="selection-hint">Selecciona ${maxSelections} elementos</span>
                 </div>
-                
-                <!-- Botón confirmar (cuando está listo) -->
-                <button class="confirm-btn-top" id="confirmBtnTop" onclick="confirmSelection()" disabled title="Confirmar selección">
-                    <iconify-icon icon="mdi:check-circle"></iconify-icon>
-                </button>
-                
-                <!-- Botón rotar pantalla (derecha) -->
-                <button class="top-bar-btn rotate-btn-large" id="rotateScreenBtn" title="Rotar pantalla">
-                    <iconify-icon icon="mdi:phone-rotate-landscape"></iconify-icon>
-                    <span>Rotar</span>
-                </button>
             </div>
             
-            <!-- Área de selección con botón confirmar -->
-            <div class="selection-display" id="selectionDisplay">
-                <div class="selection-chips" id="selectionChips">
-                    <span class="selection-placeholder">Toca los elementos</span>
-                </div>
-                <button class="confirm-btn-inline" id="confirmSelectionBtn" onclick="confirmSelection()" disabled>
-                    <iconify-icon icon="mdi:send"></iconify-icon>
-                </button>
+            <!-- Grid de elementos - OCUPA TODO EL ESPACIO DISPONIBLE -->
+            <div class="elements-fullscreen" id="elementsContainer">
+                <div class="elements-grid-optimized" id="elementsGrid"></div>
             </div>
             
-            <!-- Grid de elementos -->
-            <div class="elements-area" id="elementsContainer">
-                <div class="elements-grid-clean" id="elementsGrid"></div>
-            </div>
+            <!-- Botón confirmar GRANDE en la parte inferior -->
+            <button class="confirm-btn-large" id="confirmBtn" onclick="confirmSelection()" disabled>
+                <iconify-icon icon="mdi:flask-round-bottom"></iconify-icon>
+                <span>SINTETIZAR</span>
+            </button>
         </div>
         
         <!-- Result Overlay -->
-        <!-- Hint de rotación para modo horizontal -->
-        <div class="rotate-hint" id="rotateHint">
-            <iconify-icon icon="mdi:phone-rotate-landscape"></iconify-icon>
-            Gira el teléfono para ver más elementos
-        </div>
-        
         <div class="result-overlay" id="resultOverlay">
             <div class="text-center p-6" id="resultContent"></div>
         </div>
@@ -785,11 +769,11 @@ function renderPlayingScreen() {
         <div class="exit-modal" id="exitModal">
             <div class="exit-modal-content">
                 <iconify-icon icon="mdi:alert-octagon" class="text-4xl mb-3" style="color: var(--color-danger);"></iconify-icon>
-                <h3 class="text-lg font-bold mb-2" style="color: var(--color-text);">¿Terminar el juego?</h3>
-                <p class="text-sm mb-4" style="color: var(--color-text-light);">Esto terminará el juego para TODOS</p>
+                <h3 class="text-lg font-bold mb-2" style="color: var(--color-text);">¿Salir del juego?</h3>
+                <p class="text-sm mb-4" style="color: var(--color-text-light);">Perderás tu progreso en esta ronda</p>
                 <div class="flex gap-3">
                     <button class="exit-modal-btn cancel" id="exitCancelBtn">Cancelar</button>
-                    <button class="exit-modal-btn confirm" id="exitConfirmBtn" style="background: var(--color-danger);">Terminar</button>
+                    <button class="exit-modal-btn confirm" id="exitConfirmBtn">Salir</button>
                 </div>
             </div>
         </div>
@@ -797,7 +781,6 @@ function renderPlayingScreen() {
     
     setupElementsGrid();
     setupExitButton();
-    setupRotateButton();
 }
 
 window.confirmSelection = confirmSelection;
@@ -832,38 +815,6 @@ function setupExitButton() {
     }
 }
 
-function setupRotateButton() {
-    const rotateBtn = document.getElementById('rotateScreenBtn');
-    if (rotateBtn) {
-        rotateBtn.addEventListener('click', () => {
-            if (navigator.vibrate) navigator.vibrate(30);
-            
-            // Intentar solicitar orientación landscape
-            if (screen.orientation && screen.orientation.lock) {
-                const currentOrientation = screen.orientation.type;
-                const isLandscape = currentOrientation.includes('landscape');
-                
-                screen.orientation.lock(isLandscape ? 'portrait' : 'landscape')
-                    .catch(() => {
-                        // Si no se puede bloquear, mostrar mensaje
-                        showRotateMessage();
-                    });
-            } else {
-                // Mostrar mensaje para rotar manualmente
-                showRotateMessage();
-            }
-        });
-    }
-}
-
-function showRotateMessage() {
-    const hint = document.getElementById('rotateHint');
-    if (hint) {
-        hint.classList.add('show');
-        setTimeout(() => hint.classList.remove('show'), 3000);
-    }
-}
-
 function setupElementsGrid() {
     const grid = document.getElementById('elementsGrid');
     if (!grid) return;
@@ -876,13 +827,13 @@ function setupElementsGrid() {
         if (!el) return;
         
         const btn = document.createElement('button');
-        btn.className = `element-btn-mini element-${el.group}`;
+        btn.className = `element-btn-large element-${el.group}`;
         
         btn.dataset.element = key;
         btn.innerHTML = `
             <span class="symbol">${el.symbol}</span>
             <span class="name">${el.name}</span>
-            <span class="selection-count" id="count-${key}"></span>
+            <span class="selection-badge" id="count-${key}"></span>
         `;
         btn.addEventListener('click', () => handleElementClick(key, btn));
         
@@ -891,38 +842,16 @@ function setupElementsGrid() {
     
     // Animación de entrada
     if (window.anime) {
-        window.anime.animate('.element-btn-mini', {
-            scale: [0, 1],
+        window.anime.animate('.element-btn-large', {
+            scale: [0.8, 1],
             opacity: [0, 1],
-            delay: window.anime.stagger(15),
-            duration: 250,
+            delay: window.anime.stagger(20),
+            duration: 300,
             easing: 'easeOutBack'
         });
     }
     
     updateSelectionUI();
-    
-    // Mostrar hint de rotación una vez
-    showRotateHint();
-}
-
-// Mostrar sugerencia de rotación en portrait
-function showRotateHint() {
-    const hint = document.getElementById('rotateHint');
-    if (!hint) return;
-    
-    const isPortrait = window.innerWidth < window.innerHeight;
-    const isSmallScreen = window.innerHeight < 600;
-    
-    if (isPortrait && isSmallScreen) {
-        hint.classList.add('show');
-        if (!sessionStorage.getItem('rotateHintShown')) {
-            sessionStorage.setItem('rotateHintShown', 'true');
-        }
-        setTimeout(() => hint.classList.remove('show'), 5000);
-    } else {
-        hint.classList.remove('show');
-    }
 }
 
 function handleElementClick(element, btn) {
@@ -967,51 +896,48 @@ function updateSelectionUI() {
             countEl.classList.toggle('visible', count > 0);
         }
         if (btn) {
-            btn.classList.toggle('has-selection', count > 0);
+            btn.classList.toggle('selected', count > 0);
         }
     });
     
-    // Actualizar área de selección principal
+    // Actualizar área de selección compacta
     const selectionChips = document.getElementById('selectionChips');
     if (selectionChips) {
         if (selectedElements.length === 0) {
-            selectionChips.innerHTML = `<span class="selection-placeholder">Toca los elementos</span>`;
+            selectionChips.innerHTML = `<span class="selection-hint">Selecciona ${maxSelections} elementos</span>`;
         } else {
-            selectionChips.innerHTML = selectedElements.map((el, i) => `
-                <button class="chip element-${allElements[el]?.group || 'nonmetal'}" onclick="removeSelectedElement(${i})">
-                    ${el}
-                </button>
-            `).join('');
+            const remaining = maxSelections - selectedElements.length;
+            selectionChips.innerHTML = `
+                <div class="selected-elements-row">
+                    ${selectedElements.map((el, i) => `
+                        <button class="chip-compact element-${allElements[el]?.group || 'nonmetal'}" onclick="removeSelectedElement(${i})">
+                            ${el}<iconify-icon icon="mdi:close" class="chip-remove"></iconify-icon>
+                        </button>
+                    `).join('')}
+                </div>
+                ${remaining > 0 ? `<span class="remaining-hint">Faltan ${remaining}</span>` : ''}
+            `;
         }
     }
     
-    // Actualizar barra superior con elementos en tiempo real
-    const selectionChipsLive = document.getElementById('selectionChipsLive');
-    if (selectionChipsLive) {
-        if (selectedElements.length === 0) {
-            selectionChipsLive.innerHTML = `<span class="selection-placeholder-live">Toca elementos</span>`;
-        } else {
-            selectionChipsLive.innerHTML = selectedElements.map((el, i) => `
-                <span class="chip-live element-${allElements[el]?.group || 'nonmetal'}" onclick="removeSelectedElement(${i})">
-                    ${el}
-                </span>
-            `).join(' + ');
-        }
-    }
-    
-    // Actualizar botones de confirmar (ambos)
+    // Actualizar botón de confirmar grande
     const isComplete = selectedElements.length === maxSelections;
-    
-    const confirmBtn = document.getElementById('confirmSelectionBtn');
+    const confirmBtn = document.getElementById('confirmBtn');
     if (confirmBtn) {
         confirmBtn.disabled = !isComplete;
         confirmBtn.classList.toggle('ready', isComplete);
-    }
-    
-    const confirmBtnTop = document.getElementById('confirmBtnTop');
-    if (confirmBtnTop) {
-        confirmBtnTop.disabled = !isComplete;
-        confirmBtnTop.classList.toggle('ready', isComplete);
+        
+        if (isComplete) {
+            confirmBtn.innerHTML = `
+                <iconify-icon icon="mdi:flask-round-bottom"></iconify-icon>
+                <span>¡SINTETIZAR!</span>
+            `;
+        } else {
+            confirmBtn.innerHTML = `
+                <iconify-icon icon="mdi:flask-outline"></iconify-icon>
+                <span>Selecciona ${maxSelections - selectedElements.length} más</span>
+            `;
+        }
     }
 }
 
@@ -1029,16 +955,28 @@ function confirmSelection() {
     }
     
     // Deshabilitar elementos
-    document.querySelectorAll('.element-btn-mini').forEach(btn => {
+    document.querySelectorAll('.element-btn-large').forEach(btn => {
         btn.disabled = true;
-        btn.style.opacity = '0.3';
+        btn.classList.add('disabled');
     });
     
-    // Mostrar confirmación
-    const selectionDisplay = document.getElementById('selectionDisplay');
-    if (selectionDisplay) {
-        selectionDisplay.innerHTML = `
-            <div class="selection-sent">
+    // Mostrar confirmación en el botón
+    const confirmBtn = document.getElementById('confirmBtn');
+    if (confirmBtn) {
+        confirmBtn.disabled = true;
+        confirmBtn.classList.remove('ready');
+        confirmBtn.classList.add('sent');
+        confirmBtn.innerHTML = `
+            <iconify-icon icon="mdi:check-circle"></iconify-icon>
+            <span>¡Enviado! Esperando...</span>
+        `;
+    }
+    
+    // Actualizar barra de selección
+    const selectionChips = document.getElementById('selectionChips');
+    if (selectionChips) {
+        selectionChips.innerHTML = `
+            <div class="selection-confirmed">
                 <iconify-icon icon="mdi:check"></iconify-icon>
                 <span>${selectedElements.join(' + ')}</span>
             </div>
