@@ -3,13 +3,48 @@
    Tema claro con manchas de colores
    ============================================ */
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html, body { width: 100%; height: 100%; overflow: hidden; }
+/* ============================================
+   AIRCONSOLE: Configuración base para TV
+   Resolución base: 960x540 (16:9)
+   El juego debe escalar proporcionalmente
+   ============================================ */
+
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box;
+    /* AirConsole: Prevenir comportamientos táctiles no deseados */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body { 
+    width: 100%; 
+    height: 100%; 
+    overflow: hidden;
+    /* AirConsole: Asegurar que no haya scroll */
+    position: fixed;
+    top: 0;
+    left: 0;
+}
 
 body {
     background: #ffffff;
     color: #1a1a2e;
-    font-size: 16px;
+    /* AirConsole: Font-size base escalable para TV */
+    font-size: clamp(12px, 1.5vw, 18px);
+    position: relative;
+}
+
+/* AirConsole: Contenedor principal que escala al viewport */
+#app {
+    width: 100vw;
+    height: 100vh;
+    max-width: 100%;
+    max-height: 100%;
+    overflow: hidden;
     position: relative;
 }
 
@@ -2392,5 +2427,160 @@ body {
     .ranking-item {
         flex: 1;
         min-width: 120px;
+    }
+}
+
+
+/* ============================================
+   AIRCONSOLE: Media Queries para TV
+   Resolución base: 960x540 (16:9)
+   ============================================ */
+
+/* AirConsole TV Standard Resolution */
+@media (min-width: 900px) and (max-width: 1024px) and (min-height: 500px) and (max-height: 600px) {
+    :root {
+        --element-size: 70px;
+        --element-height: 85px;
+        --avatar-size: 45px;
+        --timer-size: 70px;
+        --font-xs: 0.7rem;
+        --font-sm: 0.8rem;
+        --font-base: 0.9rem;
+        --font-lg: 1.1rem;
+        --font-xl: 1.3rem;
+        --font-2xl: 1.6rem;
+        --font-3xl: 2.2rem;
+        --font-4xl: 3rem;
+        --font-5xl: 4rem;
+    }
+    
+    body {
+        font-size: 14px;
+    }
+    
+    .playing-screen {
+        padding: 10px;
+        gap: 8px;
+    }
+    
+    .player-card {
+        padding: 10px;
+    }
+    
+    .mixing-zone {
+        min-height: 150px;
+        max-height: 250px;
+    }
+    
+    .target-display {
+        padding: 14px;
+    }
+    
+    .players-area {
+        gap: 8px;
+    }
+}
+
+/* AirConsole: Aspect ratio 16:9 (TV estándar) */
+@media (aspect-ratio: 16/9) {
+    .playing-screen {
+        padding: clamp(8px, 1.5vh, 16px);
+    }
+    
+    .playing-content {
+        flex-direction: row;
+    }
+    
+    .target-column {
+        flex: 0 0 25%;
+        max-width: 300px;
+    }
+    
+    .mixing-column {
+        flex: 1;
+    }
+}
+
+/* AirConsole: Pantallas más anchas (21:9, ultrawide) */
+@media (min-aspect-ratio: 2/1) {
+    .playing-content {
+        flex-direction: row;
+        max-width: 1600px;
+        margin: 0 auto;
+    }
+    
+    .target-column {
+        flex: 0 0 300px;
+    }
+    
+    .players-area {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+}
+
+/* AirConsole: Pantallas más cuadradas (4:3) */
+@media (max-aspect-ratio: 4/3) {
+    .playing-content {
+        flex-direction: column;
+    }
+    
+    .target-column {
+        flex: 0 0 auto;
+        max-width: 100%;
+    }
+    
+    .mixing-column {
+        flex: 1;
+        min-height: 0;
+    }
+}
+
+/* AirConsole: Safe area para TVs con overscan */
+@supports (padding: env(safe-area-inset-top)) {
+    .playing-screen,
+    .intro-screen,
+    .results-screen {
+        padding-top: max(env(safe-area-inset-top), 10px);
+        padding-bottom: max(env(safe-area-inset-bottom), 10px);
+        padding-left: max(env(safe-area-inset-left), 10px);
+        padding-right: max(env(safe-area-inset-right), 10px);
+    }
+}
+
+/* AirConsole: Asegurar visibilidad en TVs con overscan (5% margin) */
+.screen {
+    /* Safe area del 5% para TVs con overscan */
+    padding: max(2.5vh, 10px) max(2.5vw, 10px);
+}
+
+/* AirConsole: Optimización para renderizado en TV */
+.screen * {
+    /* Mejorar renderizado de texto en TV */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+/* AirConsole: Asegurar que elementos interactivos sean visibles */
+.element-card,
+.player-card,
+.timer-ring,
+.target-display {
+    /* Mínimo tamaño legible en TV a distancia */
+    min-width: 50px;
+    min-height: 50px;
+}
+
+/* AirConsole: Contraste mejorado para TV */
+@media (dynamic-range: standard) {
+    :root {
+        --color-text: #0a0a1a;
+        --color-text-light: #4a5568;
+    }
+    
+    .player-card,
+    .target-display,
+    .mixing-zone {
+        border-width: 3px;
     }
 }

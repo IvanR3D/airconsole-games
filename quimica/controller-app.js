@@ -245,53 +245,26 @@ function sendMessage(msg) {
 function renderJoinScreen() {
     const app = document.getElementById('app');
     app.innerHTML = `
-        <div class="screen active flex-col items-center justify-center p-5 text-center" id="joinScreen">
-            <div class="w-full max-w-sm mx-auto">
-                <img src="../LogoSteamRD-Color.webp" alt="STEAM RD" class="w-20 h-20 mx-auto mb-4" style="filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));">
+        <div class="screen active" id="joinScreen">
+            <div class="controller-bg"></div>
+            
+            <div class="join-content">
+                <h1 class="join-title">LABORATORIO</h1>
+                <h2 class="join-subtitle">QUÍMICO</h2>
                 
-                <h1 class="text-3xl font-black mb-1" style="color: #10b981;">LABORATORIO</h1>
-                <h2 class="text-xl font-bold mb-6" style="color: #06b6d4;">QUÍMICO</h2>
-                
-                <div class="space-y-3 mb-6">
-                    <div class="info-card">
-                        <iconify-icon icon="mdi:flask" style="color: #10b981;"></iconify-icon>
-                        <div class="text-left">
-                            <p class="info-title">Sintetiza compuestos</p>
-                            <p class="info-description">Combina elementos químicos</p>
-                        </div>
-                    </div>
-                    
-                    <div class="info-card">
-                        <iconify-icon icon="mdi:account-group" style="color: #3b82f6;"></iconify-icon>
-                        <div class="text-left">
-                            <p class="info-title">Trabaja en equipo</p>
-                            <p class="info-description">Colabora con otros científicos</p>
-                        </div>
-                    </div>
-                    
-                    <div class="info-card">
-                        <iconify-icon icon="mdi:timer" style="color: #f59e0b;"></iconify-icon>
-                        <div class="text-left">
-                            <p class="info-title">Contra el tiempo</p>
-                            <p class="info-description">Más rápido = más puntos</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <button class="btn-primary w-full flex items-center justify-center gap-3" id="joinBtn">
-                    <iconify-icon icon="mdi:flask" style="font-size: 24px;"></iconify-icon>
+                <button class="btn-join" id="joinBtn">
+                    <iconify-icon icon="mdi:flask"></iconify-icon>
                     UNIRSE AL LAB
                 </button>
                 
-                <div class="bg-lab-success/20 border-2 border-lab-success rounded-2xl py-3 px-6 mt-4 hidden items-center justify-center gap-3" id="connectingMsg">
-                    <div class="w-5 h-5 border-2 border-lab-success rounded-full animate-spin" style="border-top-color: transparent;"></div>
-                    <span class="font-bold text-lab-success">Conectando...</span>
+                <div class="connecting-msg" id="connectingMsg">
+                    <div class="spinner"></div>
+                    <span>Conectando...</span>
                 </div>
                 
-                <div class="bg-lab-danger/20 border-2 border-lab-danger rounded-2xl py-3 px-6 mt-4 hidden text-center" id="errorMsg">
-                    <iconify-icon icon="mdi:alert-circle" class="text-3xl text-lab-danger mb-2"></iconify-icon>
-                    <p class="font-bold text-lab-danger">Laboratorio lleno</p>
-                    <p class="text-sm text-white/60">Ya hay 4 científicos</p>
+                <div class="error-msg" id="errorMsg">
+                    <iconify-icon icon="mdi:alert-circle"></iconify-icon>
+                    <p>Laboratorio lleno</p>
                 </div>
             </div>
         </div>
@@ -309,64 +282,47 @@ function renderWaitingScreen() {
         return;
     }
     
-    // Para jugadores normales, mostrar pantalla de espera
+    // Para jugadores normales, mostrar pantalla de espera simple
     app.innerHTML = `
-        <div class="screen active flex-col items-center justify-center p-5 text-center relative" id="waitingScreen">
+        <div class="screen active" id="waitingScreen">
             <div class="controller-bg"></div>
             
-            <!-- Botón salir en esquina superior -->
-            <button class="exit-btn-corner" id="exitWaitingBtn" title="Salir del laboratorio">
+            <button class="exit-btn-corner" id="exitWaitingBtn">
                 <iconify-icon icon="mdi:exit-to-app"></iconify-icon>
             </button>
             
-            <div class="relative z-10 w-full max-w-sm">
-                <div class="player-avatar mx-auto mb-4" id="playerAvatar" style="background: ${playerData.color};">
-                    <iconify-icon icon="${playerData.icon}" style="color: white;"></iconify-icon>
+            <div class="waiting-content">
+                <div class="player-avatar-big" style="background: ${playerData.color};">
+                    <iconify-icon icon="${playerData.icon}"></iconify-icon>
                 </div>
                 
-                <p class="text-2xl font-black mb-2" style="color: ${playerData.color};">${playerData.name}</p>
+                <p class="player-name" style="color: ${playerData.color};">${playerData.name}</p>
                 
-                <div class="current-difficulty mb-4">
-                    <p class="text-sm mb-2" style="color: var(--color-text-light);">Configuración actual:</p>
-                    
-                    <div class="config-summary">
-                        <div class="config-item">
-                            <iconify-icon icon="${GAME_MODES[currentGameMode].icon}" style="color: ${GAME_MODES[currentGameMode].color};"></iconify-icon>
-                            <span>${GAME_MODES[currentGameMode].name}</span>
-                        </div>
-                        <div class="config-item">
-                            <iconify-icon icon="${difficultyConfig.icon}" style="color: ${difficultyConfig.color};"></iconify-icon>
-                            <span>${difficultyConfig.name}</span>
-                        </div>
-                        <div class="config-item">
-                            <iconify-icon icon="mdi:counter" style="color: var(--color-primary);"></iconify-icon>
-                            <span id="roundsDisplay">${selectedRounds || 8} rondas</span>
-                        </div>
-                    </div>
+                <div class="config-badges">
+                    <span class="config-badge">
+                        <iconify-icon icon="${GAME_MODES[currentGameMode].icon}"></iconify-icon>
+                        ${GAME_MODES[currentGameMode].name}
+                    </span>
+                    <span class="config-badge">
+                        <iconify-icon icon="${difficultyConfig.icon}"></iconify-icon>
+                        ${difficultyConfig.name}
+                    </span>
+                    <span class="config-badge" id="roundsDisplay">
+                        <iconify-icon icon="mdi:counter"></iconify-icon>
+                        ${selectedRounds || 8}
+                    </span>
                 </div>
                 
-                <div class="mb-6">
-                    <iconify-icon icon="mdi:flask" class="text-5xl bounce" style="color: var(--color-accent);"></iconify-icon>
+                <div class="waiting-status">
+                    <iconify-icon icon="mdi:flask" class="bounce"></iconify-icon>
+                    <span>Esperando inicio...</span>
                 </div>
-                
-                <div class="bg-green-50 border-2 border-green-400 rounded-2xl py-3 px-5 mb-4">
-                    <p class="text-base font-bold" style="color: var(--color-success);">
-                        <iconify-icon icon="mdi:check-circle" class="mr-2"></iconify-icon>
-                        ¡Conectado al laboratorio!
-                    </p>
-                </div>
-                
-                <p style="color: var(--color-text-light);">
-                    <iconify-icon icon="mdi:timer-sand" class="mr-2"></iconify-icon>
-                    Esperando que el admin inicie...
-                </p>
             </div>
         </div>
     `;
     
-    // Event listener para botón de salir
     document.getElementById('exitWaitingBtn')?.addEventListener('click', () => {
-        if (confirm('¿Seguro que quieres salir del laboratorio?')) {
+        if (confirm('¿Salir?')) {
             sendMessage({ action: 'playerLeave' });
             hasJoined = false;
             playerData = null;
@@ -377,76 +333,60 @@ function renderWaitingScreen() {
 }
 
 // ============================================
-// WIZARD DE CONFIGURACIÓN (Admin)
+// WIZARD DE CONFIGURACIÓN (Admin) - Simplificado
 // ============================================
 
 function renderConfigWizard() {
     const app = document.getElementById('app');
     
     app.innerHTML = `
-        <div class="screen active flex-col p-3 relative config-wizard-screen" id="configWizard">
+        <div class="screen active config-wizard-screen" id="configWizard">
             <div class="controller-bg"></div>
             
-            <!-- Botón salir en esquina superior -->
-            <button class="exit-btn-corner" id="exitWaitingBtn" title="Salir del laboratorio">
+            <button class="exit-btn-corner" id="exitWaitingBtn">
                 <iconify-icon icon="mdi:exit-to-app"></iconify-icon>
             </button>
             
-            <div class="relative z-10 w-full max-w-sm mx-auto flex flex-col h-full">
-                <!-- Header con info del jugador -->
+            <div class="wizard-container">
+                <!-- Header compacto -->
                 <div class="wizard-header">
-                    <div class="flex items-center justify-center gap-2 mb-2">
-                        <div class="player-avatar-sm" style="background: ${playerData.color};">
-                            <iconify-icon icon="${playerData.icon}" style="color: white;"></iconify-icon>
-                        </div>
-                        <div class="text-left">
-                            <p class="font-bold text-sm" style="color: ${playerData.color};">${playerData.name}</p>
-                            <div class="flex items-center gap-1">
-                                <iconify-icon icon="mdi:crown" style="color: var(--color-warning); font-size: 12px;"></iconify-icon>
-                                <span class="text-xs" style="color: var(--color-warning);">Admin</span>
-                            </div>
-                        </div>
+                    <div class="admin-badge" style="background: ${playerData.color};">
+                        <iconify-icon icon="${playerData.icon}"></iconify-icon>
+                        <span>${playerData.name}</span>
+                        <iconify-icon icon="mdi:crown" class="crown"></iconify-icon>
                     </div>
                     
-                    <!-- Indicador de pasos -->
                     <div class="step-indicator">
-                        <div class="step-dot ${configStep >= 1 ? 'active' : ''}" data-step="1">
-                            <iconify-icon icon="mdi:gamepad-variant"></iconify-icon>
-                        </div>
+                        <div class="step-dot ${configStep >= 1 ? 'active' : ''}">1</div>
                         <div class="step-line ${configStep >= 2 ? 'active' : ''}"></div>
-                        <div class="step-dot ${configStep >= 2 ? 'active' : ''}" data-step="2">
-                            <iconify-icon icon="mdi:speedometer"></iconify-icon>
-                        </div>
+                        <div class="step-dot ${configStep >= 2 ? 'active' : ''}">2</div>
                         <div class="step-line ${configStep >= 3 ? 'active' : ''}"></div>
-                        <div class="step-dot ${configStep >= 3 ? 'active' : ''}" data-step="3">
-                            <iconify-icon icon="mdi:counter"></iconify-icon>
-                        </div>
+                        <div class="step-dot ${configStep >= 3 ? 'active' : ''}">3</div>
                     </div>
                 </div>
                 
-                <!-- Contenido del paso actual -->
-                <div class="wizard-content" id="wizardContent">
+                <!-- Contenido -->
+                <div class="wizard-content">
                     ${renderWizardStep()}
                 </div>
                 
-                <!-- Botones de navegación -->
+                <!-- Navegación -->
                 <div class="wizard-nav">
                     ${configStep > 1 ? `
-                        <button class="wizard-btn-back" id="wizardBackBtn">
+                        <button class="btn-back" id="wizardBackBtn">
                             <iconify-icon icon="mdi:arrow-left"></iconify-icon>
-                            Atrás
                         </button>
                     ` : '<div></div>'}
                     
                     ${configStep < 3 ? `
-                        <button class="wizard-btn-next" id="wizardNextBtn">
+                        <button class="btn-next" id="wizardNextBtn">
                             Siguiente
                             <iconify-icon icon="mdi:arrow-right"></iconify-icon>
                         </button>
                     ` : `
-                        <button class="btn-admin" id="startGameBtn">
-                            <iconify-icon icon="mdi:rocket-launch" style="font-size: 18px;"></iconify-icon>
-                            ¡INICIAR!
+                        <button class="btn-start" id="startGameBtn">
+                            <iconify-icon icon="mdi:play"></iconify-icon>
+                            INICIAR
                         </button>
                     `}
                 </div>
@@ -459,46 +399,24 @@ function renderConfigWizard() {
 
 function renderWizardStep() {
     switch(configStep) {
-        case 1:
-            return renderStepMode();
-        case 2:
-            return renderStepDifficulty();
-        case 3:
-            return renderStepRounds();
-        default:
-            return '';
+        case 1: return renderStepMode();
+        case 2: return renderStepDifficulty();
+        case 3: return renderStepRounds();
+        default: return '';
     }
 }
 
 function renderStepMode() {
     return `
-        <div class="wizard-step" id="stepMode">
-            <div class="step-title">
-                <iconify-icon icon="mdi:gamepad-variant" style="color: var(--color-primary);"></iconify-icon>
-                <h2>Modo de Juego</h2>
-            </div>
-            <p class="step-subtitle">¿Cómo quieres que compitan?</p>
-            
-            <div class="wizard-tip">
-                <iconify-icon icon="mdi:lightbulb-outline"></iconify-icon>
-                <span>Equipos: 2 vs 2. Individual: todos contra todos.</span>
-            </div>
+        <div class="wizard-step">
+            <h2 class="step-title">Modo</h2>
             
             <div class="mode-cards">
                 ${Object.entries(GAME_MODES).map(([key, config]) => `
-                    <button class="mode-card ${key === currentGameMode ? 'selected' : ''}" 
-                            data-mode="${key}"
-                            style="--mode-color: ${config.color};">
-                        <div class="mode-card-icon">
-                            <iconify-icon icon="${config.icon}"></iconify-icon>
-                        </div>
-                        <div class="mode-card-info">
-                            <span class="mode-card-name">${config.name}</span>
-                            <span class="mode-card-desc">${config.description}</span>
-                        </div>
-                        <div class="mode-card-check">
-                            <iconify-icon icon="mdi:check-circle"></iconify-icon>
-                        </div>
+                    <button class="option-card ${key === currentGameMode ? 'selected' : ''}" 
+                            data-mode="${key}" style="--card-color: ${config.color};">
+                        <iconify-icon icon="${config.icon}"></iconify-icon>
+                        <span>${config.name}</span>
                     </button>
                 `).join('')}
             </div>
@@ -508,33 +426,15 @@ function renderStepMode() {
 
 function renderStepDifficulty() {
     return `
-        <div class="wizard-step" id="stepDifficulty">
-            <div class="step-title">
-                <iconify-icon icon="mdi:speedometer" style="color: var(--color-secondary);"></iconify-icon>
-                <h2>Dificultad</h2>
-            </div>
-            <p class="step-subtitle">¿Qué tan difícil será el reto?</p>
-            
-            <div class="wizard-tip">
-                <iconify-icon icon="mdi:flask-outline"></iconify-icon>
-                <span>Más difícil = más puntos. ¡Reto extra!</span>
-            </div>
+        <div class="wizard-step">
+            <h2 class="step-title">Dificultad</h2>
             
             <div class="difficulty-cards">
                 ${Object.entries(DIFFICULTY_CONFIG).map(([key, config]) => `
-                    <button class="difficulty-card ${key === currentDifficulty ? 'selected' : ''}" 
-                            data-difficulty="${key}"
-                            style="--diff-color: ${config.color};">
-                        <div class="difficulty-card-icon">
-                            <iconify-icon icon="${config.icon}"></iconify-icon>
-                        </div>
-                        <div class="difficulty-card-info">
-                            <span class="difficulty-card-name">${config.name}</span>
-                            <span class="difficulty-card-desc">${config.description}</span>
-                        </div>
-                        <div class="difficulty-card-check">
-                            <iconify-icon icon="mdi:check-circle"></iconify-icon>
-                        </div>
+                    <button class="option-card ${key === currentDifficulty ? 'selected' : ''}" 
+                            data-difficulty="${key}" style="--card-color: ${config.color};">
+                        <iconify-icon icon="${config.icon}"></iconify-icon>
+                        <span>${config.name}</span>
                     </button>
                 `).join('')}
             </div>
@@ -545,45 +445,22 @@ function renderStepDifficulty() {
 function renderStepRounds() {
     const currentRoundsValue = selectedRounds || 8;
     return `
-        <div class="wizard-step" id="stepRounds">
-            <div class="step-title">
-                <iconify-icon icon="mdi:counter" style="color: var(--color-accent);"></iconify-icon>
-                <h2>Número de Rondas</h2>
-            </div>
-            <p class="step-subtitle">¿Cuántos compuestos sintetizarán?</p>
-            
-            <div class="wizard-tip">
-                <iconify-icon icon="mdi:counter"></iconify-icon>
-                <span>Selecciona 4 a 15 rondas según el tiempo disponible.</span>
-            </div>
+        <div class="wizard-step">
+            <h2 class="step-title">Rondas</h2>
             
             <div class="rounds-grid">
                 ${ROUNDS_OPTIONS.map(rounds => `
-                    <button class="rounds-card ${currentRoundsValue === rounds ? 'selected' : ''}" 
+                    <button class="rounds-btn ${currentRoundsValue === rounds ? 'selected' : ''}" 
                             data-rounds="${rounds}">
-                        <span class="rounds-number">${rounds}</span>
-                        <span class="rounds-label">rondas</span>
+                        ${rounds}
                     </button>
                 `).join('')}
             </div>
             
-            <!-- Resumen de configuración -->
-            <div class="config-preview">
-                <p class="preview-title">Resumen del juego:</p>
-                <div class="preview-items">
-                    <div class="preview-item">
-                        <iconify-icon icon="${GAME_MODES[currentGameMode].icon}" style="color: ${GAME_MODES[currentGameMode].color};"></iconify-icon>
-                        <span>${GAME_MODES[currentGameMode].name}</span>
-                    </div>
-                    <div class="preview-item">
-                        <iconify-icon icon="${difficultyConfig.icon}" style="color: ${difficultyConfig.color};"></iconify-icon>
-                        <span>${difficultyConfig.name}</span>
-                    </div>
-                    <div class="preview-item">
-                        <iconify-icon icon="mdi:counter" style="color: var(--color-primary);"></iconify-icon>
-                        <span id="previewRounds">${currentRoundsValue} rondas</span>
-                    </div>
-                </div>
+            <div class="summary-bar">
+                <span><iconify-icon icon="${GAME_MODES[currentGameMode].icon}"></iconify-icon> ${GAME_MODES[currentGameMode].name}</span>
+                <span><iconify-icon icon="${difficultyConfig.icon}"></iconify-icon> ${difficultyConfig.name}</span>
+                <span id="previewRounds">${currentRoundsValue} rondas</span>
             </div>
         </div>
     `;
@@ -592,7 +469,7 @@ function renderStepRounds() {
 function setupWizardListeners() {
     // Botón salir
     document.getElementById('exitWaitingBtn')?.addEventListener('click', () => {
-        if (confirm('¿Seguro que quieres salir del laboratorio?')) {
+        if (confirm('¿Salir?')) {
             sendMessage({ action: 'playerLeave' });
             hasJoined = false;
             playerData = null;
@@ -633,6 +510,57 @@ function setupWizardListeners() {
     
     // Listeners según el paso actual
     switch(configStep) {
+        case 1: setupModeListeners(); break;
+        case 2: setupDifficultyListeners(); break;
+        case 3: setupRoundsListeners(); break;
+    }
+}
+
+function setupModeListeners() {
+    document.querySelectorAll('.option-card[data-mode]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentGameMode = btn.dataset.mode;
+            document.querySelectorAll('.option-card[data-mode]').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            sendMessage({ action: 'setGameMode', mode: currentGameMode });
+            if (navigator.vibrate) navigator.vibrate(30);
+        });
+    });
+}
+
+function setupDifficultyListeners() {
+    document.querySelectorAll('.option-card[data-difficulty]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentDifficulty = btn.dataset.difficulty;
+            difficultyConfig = DIFFICULTY_CONFIG[currentDifficulty];
+            document.querySelectorAll('.option-card[data-difficulty]').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            if (navigator.vibrate) navigator.vibrate(30);
+        });
+    });
+}
+
+function setupRoundsListeners() {
+    document.querySelectorAll('.rounds-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            selectedRounds = parseInt(btn.dataset.rounds);
+            document.querySelectorAll('.rounds-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            const preview = document.getElementById('previewRounds');
+            if (preview) preview.textContent = `${selectedRounds} rondas`;
+            sendMessage({ action: 'setRounds', rounds: selectedRounds });
+            if (navigator.vibrate) navigator.vibrate(30);
+        });
+    });
+}
+            customRounds: selectedRounds || 8,
+            gameMode: currentGameMode
+        });
+        if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
+    });
+    
+    // Listeners según el paso actual
+    switch(configStep) {
         case 1:
             setupModeListeners();
             break;
@@ -645,62 +573,6 @@ function setupWizardListeners() {
     }
 }
 
-function setupModeListeners() {
-    document.querySelectorAll('.mode-card').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const mode = btn.dataset.mode;
-            currentGameMode = mode;
-            
-            // Actualizar UI
-            document.querySelectorAll('.mode-card').forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
-            
-            // Notificar a la pantalla
-            sendMessage({ action: 'setGameMode', mode: mode });
-            
-            if (navigator.vibrate) navigator.vibrate(30);
-        });
-    });
-}
-
-function setupDifficultyListeners() {
-    document.querySelectorAll('.difficulty-card').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const diff = btn.dataset.difficulty;
-            currentDifficulty = diff;
-            difficultyConfig = DIFFICULTY_CONFIG[diff];
-            
-            // Actualizar UI
-            document.querySelectorAll('.difficulty-card').forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
-            
-            if (navigator.vibrate) navigator.vibrate(30);
-        });
-    });
-}
-
-function setupRoundsListeners() {
-    document.querySelectorAll('.rounds-card').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const rounds = parseInt(btn.dataset.rounds);
-            selectedRounds = rounds;
-            
-            // Actualizar UI
-            document.querySelectorAll('.rounds-card').forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
-            
-            // Actualizar preview
-            const previewRounds = document.getElementById('previewRounds');
-            if (previewRounds) previewRounds.textContent = `${rounds} rondas`;
-            
-            // Notificar al screen
-            sendMessage({ action: 'setRounds', rounds: rounds });
-            
-            if (navigator.vibrate) navigator.vibrate(30);
-        });
-    });
-}
-
 function selectGameMode(mode) {
     currentGameMode = mode;
     sendMessage({ action: 'setGameMode', mode: mode });
@@ -711,14 +583,12 @@ function selectDifficulty(difficulty) {
     currentDifficulty = difficulty;
     difficultyConfig = DIFFICULTY_CONFIG[difficulty];
     if (navigator.vibrate) navigator.vibrate(30);
-    playSound('select');
 }
 
 function selectRounds(rounds) {
     selectedRounds = rounds;
     sendMessage({ action: 'setRounds', rounds: rounds });
     if (navigator.vibrate) navigator.vibrate(30);
-    playSound('select');
 }
 
 function renderPlayingScreen() {
@@ -1152,9 +1022,12 @@ function joinGame() {
     if (hasJoined) return;
     hasJoined = true;
     
-    document.getElementById('joinBtn').classList.add('hidden');
-    document.getElementById('connectingMsg').classList.remove('hidden');
-    document.getElementById('connectingMsg').classList.add('flex');
+    // Ocultar botón y mostrar mensaje de conectando
+    const joinBtn = document.getElementById('joinBtn');
+    const connectingMsg = document.getElementById('connectingMsg');
+    
+    if (joinBtn) joinBtn.style.display = 'none';
+    if (connectingMsg) connectingMsg.classList.add('show');
     
     sendMessage({ action: 'join' });
 }
@@ -1179,8 +1052,12 @@ function handleJoined(data) {
 }
 
 function handleGameFull() {
-    document.getElementById('connectingMsg')?.classList.add('hidden');
-    document.getElementById('errorMsg')?.classList.remove('hidden');
+    const connectingMsg = document.getElementById('connectingMsg');
+    const errorMsg = document.getElementById('errorMsg');
+    
+    if (connectingMsg) connectingMsg.classList.remove('show');
+    if (errorMsg) errorMsg.classList.add('show');
+    
     hasJoined = false;
 }
 

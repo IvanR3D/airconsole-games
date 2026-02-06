@@ -2,11 +2,37 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <!-- AirConsole: viewport optimizado para controladores móviles -->
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, viewport-fit=cover">
     <title>Laboratorio Químico - Control</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- AirConsole: Prevenir comportamientos táctiles no deseados -->
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        html, body {
+            touch-action: manipulation;
+            overscroll-behavior: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        /* AirConsole: Ocultar vistas por defecto para evitar flash */
+        .view { display: none; }
+        .view.active { display: flex; }
+    </style>
+    
+    <!-- AirConsole API (versión 1.8.0 - última estable) -->
     <script src="https://www.airconsole.com/api/airconsole-1.8.0.js"></script>
+    <!-- Iconify para iconos -->
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -21,8 +47,9 @@
     </script>
     <link rel="stylesheet" href="controller-styles.css">
 </head>
-<body class="font-sans text-white overflow-hidden">
-    <div class="w-full flex flex-col" style="height: 100vh;" id="app"></div>
+<body class="font-sans overflow-hidden">
+    <!-- AirConsole: Contenedor principal del controlador -->
+    <div id="app" class="w-full h-screen"></div>
     
     <!-- Cargar anime.js y luego controller-app.js -->
     <script type="module">
