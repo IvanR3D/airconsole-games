@@ -553,25 +553,6 @@ function setupRoundsListeners() {
         });
     });
 }
-            customRounds: selectedRounds || 8,
-            gameMode: currentGameMode
-        });
-        if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
-    });
-    
-    // Listeners según el paso actual
-    switch(configStep) {
-        case 1:
-            setupModeListeners();
-            break;
-        case 2:
-            setupDifficultyListeners();
-            break;
-        case 3:
-            setupRoundsListeners();
-            break;
-    }
-}
 
 function selectGameMode(mode) {
     currentGameMode = mode;
