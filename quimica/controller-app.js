@@ -727,13 +727,34 @@ function renderPlayingScreen() {
         <div class="screen active flex-col relative playing-screen-clean" id="playingScreen">
             <div class="controller-bg"></div>
             
-            ${isAdmin ? `
-                <button class="exit-btn-floating" id="exitGameBtn" title="Salir">
+            <!-- Barra superior con botones laterales y selección en el centro -->
+            <div class="top-bar-playing">
+                <!-- Botón salir (izquierda) -->
+                <button class="top-bar-btn exit-btn-large" id="exitGameBtn" title="Salir del juego">
                     <iconify-icon icon="mdi:exit-to-app"></iconify-icon>
+                    <span>Salir</span>
                 </button>
-            ` : ''}
+                
+                <!-- Elementos seleccionados en tiempo real (centro) -->
+                <div class="selection-live" id="selectionLive">
+                    <div class="selection-chips-live" id="selectionChipsLive">
+                        <span class="selection-placeholder-live">Toca elementos</span>
+                    </div>
+                </div>
+                
+                <!-- Botón confirmar (cuando está listo) -->
+                <button class="confirm-btn-top" id="confirmBtnTop" onclick="confirmSelection()" disabled title="Confirmar selección">
+                    <iconify-icon icon="mdi:check-circle"></iconify-icon>
+                </button>
+                
+                <!-- Botón rotar pantalla (derecha) -->
+                <button class="top-bar-btn rotate-btn-large" id="rotateScreenBtn" title="Rotar pantalla">
+                    <iconify-icon icon="mdi:phone-rotate-landscape"></iconify-icon>
+                    <span>Rotar</span>
+                </button>
+            </div>
             
-            <!-- Área de selección arriba -->
+            <!-- Área de selección con botón confirmar -->
             <div class="selection-display" id="selectionDisplay">
                 <div class="selection-chips" id="selectionChips">
                     <span class="selection-placeholder">Toca los elementos</span>
@@ -775,7 +796,8 @@ function renderPlayingScreen() {
     `;
     
     setupElementsGrid();
-    if (isAdmin) setupExitButton();
+    setupExitButton();
+    setupRotateButton();
 }
 
 window.confirmSelection = confirmSelection;
@@ -807,6 +829,38 @@ function setupExitButton() {
             // Volver a la pantalla de espera
             renderWaitingScreen();
         });
+    }
+}
+
+function setupRotateButton() {
+    const rotateBtn = document.getElementById('rotateScreenBtn');
+    if (rotateBtn) {
+        rotateBtn.addEventListener('click', () => {
+            if (navigator.vibrate) navigator.vibrate(30);
+            
+            // Intentar solicitar orientación landscape
+            if (screen.orientation && screen.orientation.lock) {
+                const currentOrientation = screen.orientation.type;
+                const isLandscape = currentOrientation.includes('landscape');
+                
+                screen.orientation.lock(isLandscape ? 'portrait' : 'landscape')
+                    .catch(() => {
+                        // Si no se puede bloquear, mostrar mensaje
+                        showRotateMessage();
+                    });
+            } else {
+                // Mostrar mensaje para rotar manualmente
+                showRotateMessage();
+            }
+        });
+    }
+}
+
+function showRotateMessage() {
+    const hint = document.getElementById('rotateHint');
+    if (hint) {
+        hint.classList.add('show');
+        setTimeout(() => hint.classList.remove('show'), 3000);
     }
 }
 
@@ -917,7 +971,7 @@ function updateSelectionUI() {
         }
     });
     
-    // Actualizar área de selección
+    // Actualizar área de selección principal
     const selectionChips = document.getElementById('selectionChips');
     if (selectionChips) {
         if (selectedElements.length === 0) {
@@ -931,12 +985,33 @@ function updateSelectionUI() {
         }
     }
     
-    // Actualizar botón de confirmar
+    // Actualizar barra superior con elementos en tiempo real
+    const selectionChipsLive = document.getElementById('selectionChipsLive');
+    if (selectionChipsLive) {
+        if (selectedElements.length === 0) {
+            selectionChipsLive.innerHTML = `<span class="selection-placeholder-live">Toca elementos</span>`;
+        } else {
+            selectionChipsLive.innerHTML = selectedElements.map((el, i) => `
+                <span class="chip-live element-${allElements[el]?.group || 'nonmetal'}" onclick="removeSelectedElement(${i})">
+                    ${el}
+                </span>
+            `).join(' + ');
+        }
+    }
+    
+    // Actualizar botones de confirmar (ambos)
+    const isComplete = selectedElements.length === maxSelections;
+    
     const confirmBtn = document.getElementById('confirmSelectionBtn');
     if (confirmBtn) {
-        const isComplete = selectedElements.length === maxSelections;
         confirmBtn.disabled = !isComplete;
         confirmBtn.classList.toggle('ready', isComplete);
+    }
+    
+    const confirmBtnTop = document.getElementById('confirmBtnTop');
+    if (confirmBtnTop) {
+        confirmBtnTop.disabled = !isComplete;
+        confirmBtnTop.classList.toggle('ready', isComplete);
     }
 }
 
