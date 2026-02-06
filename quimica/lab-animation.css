@@ -20,10 +20,35 @@
   justify-content: center;
   pointer-events: none;
   z-index: 5;
+  /* Fondo sutil para el laboratorio */
+  background: linear-gradient(
+    135deg,
+    rgba(5, 149, 174, 0.03) 0%,
+    rgba(115, 160, 63, 0.02) 50%,
+    rgba(171, 61, 139, 0.03) 100%
+  );
+  border-radius: inherit;
 }
 
 .lab-animation-container.hidden {
   display: none;
+}
+
+/* Efecto de brillo sutil en el contenedor */
+.lab-animation-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.4) 0%,
+    transparent 100%
+  );
+  border-radius: inherit;
+  pointer-events: none;
 }
 
 /* Texto de espera superpuesto */
@@ -68,26 +93,34 @@
   position: relative;
   height: 100%;
   width: 100%;
-  max-height: 300px;
-  max-width: 400px;
+  max-height: 280px;
+  max-width: 380px;
   z-index: 1;
-  transform: scale(0.5);
+  transform: scale(0.55);
   transform-origin: center center;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 640px) {
   .schema-anim {
-    transform: scale(0.6);
-    max-height: 350px;
-    max-width: 450px;
+    transform: scale(0.65);
+    max-height: 320px;
+    max-width: 420px;
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 900px) {
   .schema-anim {
-    transform: scale(0.7);
-    max-height: 400px;
-    max-width: 500px;
+    transform: scale(0.75);
+    max-height: 380px;
+    max-width: 480px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .schema-anim {
+    transform: scale(0.85);
+    max-height: 420px;
+    max-width: 520px;
   }
 }
 
@@ -111,12 +144,28 @@
 /* Estilos para mixing-zone con animación */
 .mixing-zone.success {
   border-color: var(--color-success) !important;
-  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3), inset 0 0 30px rgba(16, 185, 129, 0.1);
+  background: linear-gradient(
+    180deg,
+    rgba(16, 185, 129, 0.08) 0%,
+    rgba(16, 185, 129, 0.15) 100%
+  ) !important;
+  box-shadow: 
+    0 0 30px rgba(16, 185, 129, 0.25),
+    0 8px 32px rgba(16, 185, 129, 0.15),
+    inset 0 0 40px rgba(16, 185, 129, 0.08);
 }
 
 .mixing-zone.error {
   border-color: var(--color-danger) !important;
-  box-shadow: 0 0 20px rgba(239, 68, 68, 0.3), inset 0 0 30px rgba(239, 68, 68, 0.1);
+  background: linear-gradient(
+    180deg,
+    rgba(239, 68, 68, 0.08) 0%,
+    rgba(239, 68, 68, 0.15) 100%
+  ) !important;
+  box-shadow: 
+    0 0 30px rgba(239, 68, 68, 0.25),
+    0 8px 32px rgba(239, 68, 68, 0.15),
+    inset 0 0 40px rgba(239, 68, 68, 0.08);
 }
 
 .mixing-zone.success .lab-animation-container,
@@ -124,10 +173,32 @@
   animation: fadeInScale 0.5s ease-out forwards;
 }
 
+/* Efecto de pulso suave en éxito */
+.mixing-zone.success::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  border: 2px solid rgba(16, 185, 129, 0.4);
+  animation: successPulseRing 1.5s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes successPulseRing {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1.02);
+    opacity: 0;
+  }
+}
+
 @keyframes fadeInScale {
   from {
     opacity: 0;
-    transform: scale(0.8);
+    transform: scale(0.9);
   }
   to {
     opacity: 1;

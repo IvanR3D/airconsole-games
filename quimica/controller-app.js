@@ -577,11 +577,10 @@ function renderPlayingScreen() {
     
     maxSelections = currentCompound?.elements?.length || 5;
     
-    // Diseño optimizado según documentación AirConsole:
-    // - Botones grandes que ocupan todo el espacio
-    // - Mínima UI adicional
-    // - Selección visible pero compacta
-    // - Botón confirmar grande y accesible
+    // Obtener info del compuesto para mostrar
+    const compoundName = currentCompound?.name || 'Compuesto';
+    const compoundFormula = difficultyConfig.showFormula ? currentCompound?.formula : '';
+    const compoundHint = difficultyConfig.showHint ? currentCompound?.hint : '';
     
     app.innerHTML = `
         <div class="screen active playing-screen-optimized" id="playingScreen">
@@ -592,14 +591,34 @@ function renderPlayingScreen() {
                 <iconify-icon icon="mdi:close"></iconify-icon>
             </button>
             
-            <!-- Área de selección compacta en la parte superior -->
-            <div class="selection-bar" id="selectionBar">
-                <div class="selection-chips-compact" id="selectionChips">
-                    <span class="selection-hint">Selecciona ${maxSelections} elementos</span>
+            <!-- Header con objetivo del compuesto -->
+            <div class="compound-objective-header">
+                <div class="compound-target-card">
+                    <div class="compound-icon-wrapper">
+                        <iconify-icon icon="mdi:flask-round-bottom"></iconify-icon>
+                    </div>
+                    <div class="compound-info">
+                        <span class="compound-label">Sintetiza:</span>
+                        <span class="compound-name-target">${compoundName}</span>
+                        ${compoundFormula ? `<span class="compound-formula-hint">${compoundFormula}</span>` : ''}
+                    </div>
+                </div>
+                ${compoundHint ? `
+                    <div class="compound-hint-badge">
+                        <iconify-icon icon="mdi:lightbulb-outline"></iconify-icon>
+                        <span>${compoundHint}</span>
+                    </div>
+                ` : ''}
+            </div>
+            
+            <!-- Área de selección mejorada -->
+            <div class="selection-area-improved" id="selectionBar">
+                <div class="selection-slots-container" id="selectionChips">
+                    ${renderSelectionSlots()}
                 </div>
             </div>
             
-            <!-- Grid de elementos - OCUPA TODO EL ESPACIO DISPONIBLE -->
+            <!-- Grid de elementos -->
             <div class="elements-fullscreen" id="elementsContainer">
                 <div class="elements-grid-optimized" id="elementsGrid"></div>
             </div>
@@ -632,6 +651,33 @@ function renderPlayingScreen() {
     
     setupElementsGrid();
     setupExitButton();
+}
+
+function renderSelectionSlots() {
+    let html = '';
+    for (let i = 0; i < maxSelections; i++) {
+        const element = selectedElements[i];
+        if (element) {
+            const elData = allElements[element];
+            html += `
+                <button class="selection-slot filled element-${elData?.group || 'nonmetal'}" onclick="removeSelectedElement(${i})">
+                    <span class="slot-symbol">${element}</span>
+                    <iconify-icon icon="mdi:close-circle" class="slot-remove"></iconify-icon>
+                </button>
+            `;
+        } else {
+            html += `
+                <div class="selection-slot empty">
+                    <iconify-icon icon="mdi:help"></iconify-icon>
+                </div>
+            `;
+        }
+        // Agregar signo + entre slots (excepto el último)
+        if (i < maxSelections - 1) {
+            html += `<span class="slot-plus">+</span>`;
+        }
+    }
+    return html;
 }
 
 window.confirmSelection = confirmSelection;
@@ -751,24 +797,10 @@ function updateSelectionUI() {
         }
     });
     
-    // Actualizar área de selección compacta
+    // Actualizar slots de selección
     const selectionChips = document.getElementById('selectionChips');
     if (selectionChips) {
-        if (selectedElements.length === 0) {
-            selectionChips.innerHTML = `<span class="selection-hint">Selecciona ${maxSelections} elementos</span>`;
-        } else {
-            const remaining = maxSelections - selectedElements.length;
-            selectionChips.innerHTML = `
-                <div class="selected-elements-row">
-                    ${selectedElements.map((el, i) => `
-                        <button class="chip-compact element-${allElements[el]?.group || 'nonmetal'}" onclick="removeSelectedElement(${i})">
-                            ${el}<iconify-icon icon="mdi:close" class="chip-remove"></iconify-icon>
-                        </button>
-                    `).join('')}
-                </div>
-                ${remaining > 0 ? `<span class="remaining-hint">Faltan ${remaining}</span>` : ''}
-            `;
-        }
+        selectionChips.innerHTML = renderSelectionSlots();
     }
     
     // Actualizar botón de confirmar grande
@@ -786,7 +818,7 @@ function updateSelectionUI() {
         } else {
             confirmBtn.innerHTML = `
                 <iconify-icon icon="mdi:flask-outline"></iconify-icon>
-                <span>Selecciona ${maxSelections - selectedElements.length} más</span>
+                <span>Faltan ${maxSelections - selectedElements.length} elementos</span>
             `;
         }
     }

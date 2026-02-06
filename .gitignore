@@ -1,0 +1,18 @@
+# Reglas y configuración local de editores (no subir al repo)
+.cursor/
+.kiro/
+
+# Sistema y editores
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Dependencias (si se añaden en el futuro)
+node_modules/
+
+# Logs y temporales
+*.log
+.env
+.env.local
