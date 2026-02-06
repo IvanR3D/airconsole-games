@@ -5,6 +5,12 @@
     <!-- AirConsole: viewport optimizado para TV (960x540 base) con escalado responsive -->
     <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <title>Laboratorio Químico - STEAM RD</title>
+    <!-- Preconnect para recursos externos -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Fuente legible para TV (reglas: fuentes grandes, alto contraste) -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <!-- AirConsole: Prevenir selección de texto y comportamientos táctiles no deseados -->
     <style>
         * {
@@ -49,19 +55,20 @@
     <link rel="stylesheet" href="screen-styles.css">
     <link rel="stylesheet" href="lab-animation.css">
 </head>
-<body class="font-sans overflow-hidden">
-    <!-- Fondo global con olas -->
-    <div class="global-bg">
+<body class="screen-shell overflow-hidden">
+    <!-- Fondo global con olas (AirConsole: legibilidad TV, safe area en #app) -->
+    <div class="global-bg" aria-hidden="true">
         <div class="global-blob-1"></div>
         <div class="global-blob-2"></div>
+        <div class="global-blob-3"></div>
         <div class="global-waves">
-            <div class="wave"></div>
-            <div class="wave"></div>
-            <div class="wave"></div>
+            <div class="wave wave-1"></div>
+            <div class="wave wave-2"></div>
+            <div class="wave wave-3"></div>
         </div>
     </div>
-    
-    <div class="w-screen h-screen flex flex-col relative" id="app"></div>
+
+    <main class="screen-main" id="app" role="main"></main>
     
     <!-- Raphael.js para animaciones vectoriales -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.3.0/raphael.min.js"></script>

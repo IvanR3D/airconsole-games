@@ -30,15 +30,25 @@ html, body {
     left: 0;
 }
 
+body.screen-shell {
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+
 body {
     background: #ffffff;
     color: #1a1a2e;
+    font-family: var(--font-family);
     /* AirConsole: Font-size base escalable para TV */
     font-size: clamp(12px, 1.5vw, 18px);
     position: relative;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
 }
 
-/* AirConsole: Contenedor principal que escala al viewport */
+/* AirConsole: Contenedor principal que escala al viewport (safe area en .screen) */
+.screen-main,
 #app {
     width: 100vw;
     height: 100vh;
@@ -46,6 +56,10 @@ body {
     max-height: 100%;
     overflow: hidden;
     position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
 }
 
 /* ============================================
@@ -85,6 +99,17 @@ body {
     animation: floatBlob2 25s ease-in-out infinite;
 }
 
+.global-blob-3 {
+    position: absolute;
+    top: 50%;
+    left: 30%;
+    width: 35%;
+    height: 35%;
+    background: radial-gradient(circle, rgba(115, 160, 63, 0.06) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: floatBlob1 22s ease-in-out infinite reverse;
+}
+
 .global-waves {
     position: absolute;
     bottom: 0;
@@ -102,8 +127,18 @@ body {
     width: 100vw;
     height: 100%;
     background-size: 100vw 100%;
-    background-repeat: no-repeat;
+    background-repeat: repeat-x;
     background-position: bottom center;
+    animation: waveShift 12s ease-in-out infinite;
+}
+
+.global-waves .wave-1 { animation-delay: 0s; }
+.global-waves .wave-2 { animation-delay: -4s; }
+.global-waves .wave-3 { animation-delay: -8s; }
+
+@keyframes waveShift {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(2vw); }
 }
 
 .global-waves .wave:nth-child(1) {
@@ -123,6 +158,9 @@ body {
    ============================================ */
 
 :root {
+    /* Tipografía: legibilidad en TV (reglas AirConsole) */
+    --font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+
     --spacing-xs: 0.25rem;
     --spacing-sm: 0.5rem;
     --spacing-md: 1rem;
