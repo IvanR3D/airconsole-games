@@ -284,18 +284,18 @@ body {
    ============================================ */
 .exit-btn-corner {
     position: absolute;
-    top: calc(var(--safe-top) + 8px);
-    right: 12px;
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
+    top: calc(var(--safe-top) + 4px);
+    right: 8px;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
     background: rgba(220, 38, 38, 0.1);
     border: none;
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--danger);
-    font-size: 22px;
+    font-size: 20px;
     cursor: pointer;
     z-index: 100;
 }
@@ -393,7 +393,7 @@ body {
    WIZARD DE CONFIGURACIÓN (Admin)
    ============================================ */
 .config-wizard-screen {
-    padding: var(--safe-top) max(16px, var(--safe-left)) max(16px, var(--safe-bottom)) max(16px, var(--safe-right)) !important;
+    padding: var(--safe-top) max(12px, var(--safe-left)) max(16px, var(--safe-bottom)) max(12px, var(--safe-right)) !important;
     justify-content: flex-start !important;
     align-items: stretch !important;
 }
@@ -404,38 +404,41 @@ body {
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: min(380px, 100%);
+    max-width: min(360px, calc(100% - 60px));
     min-width: 0;
     height: 100%;
+    max-height: calc(100vh - var(--safe-top) - 24px);
+    max-height: calc(100dvh - var(--safe-top) - 24px);
     overflow: hidden;
     margin: 0 auto;
+    padding-right: 4px;
 }
 
 /* Header */
 .wizard-header {
     flex-shrink: 0;
     text-align: center;
-    padding-bottom: 10px;
+    padding-bottom: 8px;
 }
 
 .admin-badge {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
+    gap: 5px;
+    padding: 5px 12px;
     border-radius: 22px;
     color: white;
     font-weight: 700;
-    font-size: 0.85rem;
-    margin-bottom: 10px;
+    font-size: clamp(0.75rem, 2vw, 0.85rem);
+    margin-bottom: 8px;
 }
 
 .admin-badge iconify-icon {
-    font-size: 18px;
+    font-size: clamp(14px, 3.5vw, 18px);
 }
 
 .admin-badge .crown {
-    font-size: 12px;
+    font-size: clamp(10px, 2.5vw, 12px);
     color: #fbbf24;
 }
 
@@ -447,8 +450,8 @@ body {
 }
 
 .step-dot {
-    width: 32px;
-    height: 32px;
+    width: clamp(26px, 7vw, 32px);
+    height: clamp(26px, 7vw, 32px);
     border-radius: 50%;
     background: var(--bg);
     border: 3px solid #d0d8e0;
@@ -456,7 +459,7 @@ body {
     align-items: center;
     justify-content: center;
     font-weight: 800;
-    font-size: 0.85rem;
+    font-size: clamp(0.7rem, 2vw, 0.85rem);
     color: var(--text-light);
     transition: all 0.2s;
 }
@@ -469,7 +472,7 @@ body {
 }
 
 .step-line {
-    width: 28px;
+    width: clamp(20px, 5vw, 28px);
     height: 3px;
     background: #d0d8e0;
     transition: all 0.2s;
@@ -488,19 +491,21 @@ body {
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
+    padding-bottom: 8px;
 }
 
 .wizard-step {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    padding: 6px 0;
+    gap: clamp(8px, 2vw, 12px);
+    padding: 4px 0;
     min-width: 0;
+    min-height: 0;
 }
 
 .step-title {
-    font-size: clamp(1rem, 3.5vw, 1.3rem);
+    font-size: clamp(0.95rem, 3.2vw, 1.2rem);
     font-weight: 800;
     color: var(--text);
     text-align: center;
@@ -512,7 +517,7 @@ body {
 .mode-cards {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: clamp(6px, 2vw, 10px);
+    gap: clamp(5px, 1.5vw, 8px);
     flex: 1;
     align-content: center;
     width: 100%;
@@ -522,7 +527,7 @@ body {
 .difficulty-cards {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: clamp(5px, 1.5vw, 8px);
+    gap: clamp(4px, 1.2vw, 6px);
     flex: 1;
     align-content: center;
     width: 100%;
@@ -534,8 +539,8 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: clamp(4px, 1.2vw, 8px);
-    padding: clamp(10px, 2.5vw, 16px) clamp(8px, 1.5vw, 12px);
+    gap: clamp(3px, 1vw, 6px);
+    padding: clamp(8px, 2vw, 14px) clamp(6px, 1.2vw, 10px);
     background: var(--bg);
     border: 3px solid #e0e8f0;
     border-radius: 14px;
@@ -550,13 +555,13 @@ body {
 }
 
 .option-card iconify-icon {
-    font-size: clamp(24px, 6vw, 30px);
+    font-size: clamp(22px, 5.5vw, 28px);
     color: var(--card-color);
 }
 
 .option-card span {
     font-weight: 700;
-    font-size: clamp(0.7rem, 2vw, 0.9rem);
+    font-size: clamp(0.65rem, 1.8vw, 0.85rem);
     color: var(--text);
     text-align: center;
     overflow: hidden;
@@ -575,7 +580,7 @@ body {
 .rounds-grid {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: clamp(4px, 1.5vw, 6px);
+    gap: clamp(3px, 1.2vw, 5px);
     width: 100%;
     min-width: 0;
 }
@@ -584,12 +589,12 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: clamp(8px, 2vw, 12px) clamp(4px, 1vw, 6px);
+    padding: clamp(6px, 1.5vw, 10px) clamp(3px, 0.8vw, 5px);
     background: var(--bg);
     border: 3px solid #e0e8f0;
     border-radius: 10px;
     font-weight: 800;
-    font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+    font-size: clamp(0.85rem, 2.2vw, 1rem);
     color: var(--text);
     cursor: pointer;
     transition: all 0.15s;
@@ -612,13 +617,13 @@ body {
 .summary-bar {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
     justify-content: center;
-    padding: 12px;
+    padding: clamp(8px, 2vw, 12px);
     background: var(--bg);
     border: 2px solid #e0e8f0;
     border-radius: 12px;
-    margin-top: 10px;
+    margin-top: 8px;
     width: 100%;
     min-width: 0;
     box-sizing: border-box;
@@ -627,14 +632,14 @@ body {
 .summary-bar span {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     font-weight: 700;
-    font-size: 0.85rem;
+    font-size: clamp(0.7rem, 2vw, 0.85rem);
     color: var(--text);
 }
 
 .summary-bar iconify-icon {
-    font-size: 18px;
+    font-size: clamp(14px, 3.5vw, 18px);
 }
 
 /* Navegación */
@@ -643,8 +648,9 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: 16px;
+    padding: 12px 0 8px 0;
     gap: 12px;
+    margin-top: auto;
 }
 
 .btn-back {
@@ -670,16 +676,17 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 14px 28px;
+    padding: 12px 24px;
     background: linear-gradient(135deg, var(--turquesa) 0%, var(--morado) 100%);
     border: none;
     border-radius: 28px;
     font-weight: 700;
-    font-size: 1rem;
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
     color: white;
     cursor: pointer;
     box-shadow: 0 4px 0 #065a6a;
     min-height: var(--btn-min);
+    flex-shrink: 0;
 }
 
 .btn-next:active {
@@ -693,16 +700,17 @@ body {
     justify-content: center;
     gap: 10px;
     flex: 1;
-    padding: 16px 32px;
+    padding: 14px 28px;
     background: linear-gradient(135deg, var(--verde) 0%, #5a8a2f 100%);
     border: none;
     border-radius: 28px;
     font-weight: 800;
-    font-size: 1.1rem;
+    font-size: clamp(1rem, 2.8vw, 1.1rem);
     color: white;
     cursor: pointer;
     box-shadow: 0 5px 0 #4a7a25;
-    min-height: 56px;
+    min-height: 54px;
+    flex-shrink: 0;
 }
 
 .btn-start:active {
@@ -1662,13 +1670,114 @@ body {
     align-items: center;
     text-align: center;
     padding: clamp(12px, 3vw, 20px);
-    gap: clamp(6px, 1.5vw, 12px);
+    gap: clamp(10px, 2.5vw, 18px);
     width: 100%;
     max-width: min(340px, 100%);
     min-width: 0;
 }
 
-/* Trofeo centrado con efecto glow */
+/* Sección del trofeo grande */
+.trophy-main-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(4px, 1vw, 8px);
+}
+
+.trophy-container-big {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.trophy-icon-big {
+    font-size: clamp(64px, 18vw, 100px);
+    filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.25));
+    position: relative;
+    z-index: 2;
+}
+
+.trophy-glow-big {
+    position: absolute;
+    width: clamp(90px, 22vw, 130px);
+    height: clamp(90px, 22vw, 130px);
+    border-radius: 50%;
+    opacity: 0.25;
+    filter: blur(20px);
+    z-index: 1;
+    animation: trophyPulse 2s ease-in-out infinite;
+}
+
+.rank-display-big {
+    font-size: clamp(2.5rem, 10vw, 4rem);
+    font-weight: 900;
+    line-height: 1;
+    text-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Sección jugador + puntos */
+.player-score-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(8px, 2vw, 14px);
+    flex-wrap: wrap;
+}
+
+.player-result-card-compact {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: clamp(8px, 2vw, 12px) clamp(12px, 3vw, 18px);
+    background: var(--bg);
+    border: 3px solid;
+    border-radius: 50px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+}
+
+.player-result-card-compact .player-avatar-end {
+    width: clamp(32px, 8vw, 44px);
+    height: clamp(32px, 8vw, 44px);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(16px, 4vw, 22px);
+    color: white;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.player-result-card-compact .player-name-end {
+    font-size: clamp(0.9rem, 3vw, 1.1rem);
+    font-weight: 800;
+    margin: 0;
+}
+
+.score-card-end-compact {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    padding: clamp(8px, 2vw, 12px) clamp(14px, 3.5vw, 22px);
+    background: linear-gradient(135deg, rgba(235, 130, 37, 0.12) 0%, rgba(235, 130, 37, 0.06) 100%);
+    border: 3px solid var(--naranja);
+    border-radius: 50px;
+}
+
+.score-card-end-compact .score-value {
+    font-size: clamp(1.3rem, 5vw, 1.8rem);
+    font-weight: 900;
+    color: var(--naranja);
+}
+
+.score-card-end-compact .score-label {
+    font-size: clamp(0.8rem, 2.5vw, 1rem);
+    font-weight: 700;
+    color: var(--naranja);
+    opacity: 0.8;
+}
+
+/* Trofeo centrado con efecto glow (legacy) */
 .trophy-container {
     position: relative;
     display: flex;
@@ -1700,7 +1809,7 @@ body {
     50% { transform: scale(1.1); opacity: 0.3; }
 }
 
-/* Posición grande */
+/* Posición grande (legacy) */
 .rank-display {
     font-size: clamp(2rem, 8vw, 3.5rem);
     font-weight: 900;
@@ -1708,7 +1817,7 @@ body {
     text-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
-/* Card del jugador */
+/* Card del jugador (legacy) */
 .player-result-card {
     display: flex;
     flex-direction: column;
@@ -1854,25 +1963,92 @@ body {
         justify-content: center;
         align-items: center;
         max-width: 100%;
-        gap: clamp(4px, 1.2vw, 10px);
-        padding: 4px 10px;
+        gap: clamp(6px, 1.5vw, 14px);
+        padding: 6px 12px;
     }
     
+    .trophy-main-section {
+        flex-direction: row;
+        gap: 8px;
+    }
+    
+    .trophy-container-big {
+        margin-bottom: 0;
+    }
+    
+    .trophy-icon-big {
+        font-size: clamp(40px, 10vh, 60px);
+    }
+    
+    .trophy-glow-big {
+        width: clamp(50px, 12vh, 70px);
+        height: clamp(50px, 12vh, 70px);
+    }
+    
+    .rank-display-big {
+        font-size: clamp(1.5rem, 6vh, 2.2rem);
+    }
+    
+    .rank-message {
+        display: none;
+    }
+    
+    .player-score-section {
+        gap: 8px;
+    }
+    
+    .player-result-card-compact {
+        padding: 6px 12px;
+    }
+    
+    .player-result-card-compact .player-avatar-end {
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
+    }
+    
+    .player-result-card-compact .player-name-end {
+        font-size: 0.85rem;
+    }
+    
+    .score-card-end-compact {
+        padding: 6px 14px;
+    }
+    
+    .score-card-end-compact .score-value {
+        font-size: clamp(1rem, 4vh, 1.4rem);
+    }
+    
+    .btn-play-again {
+        padding: 8px 18px;
+        min-height: 44px;
+        font-size: 0.85rem;
+    }
+    
+    .btn-play-again iconify-icon {
+        font-size: 18px;
+    }
+    
+    .waiting-admin {
+        font-size: 0.75rem;
+    }
+    
+    /* Legacy styles */
     .trophy-container {
         margin-bottom: 0;
     }
     
     .trophy-icon {
-        font-size: clamp(32px, 8vh, 44px);
+        font-size: clamp(36px, 9vh, 50px);
     }
     
     .trophy-glow {
-        width: clamp(40px, 9vh, 55px);
-        height: clamp(40px, 9vh, 55px);
+        width: clamp(45px, 10vh, 60px);
+        height: clamp(45px, 10vh, 60px);
     }
     
     .rank-display {
-        font-size: clamp(1.3rem, 5vh, 1.8rem);
+        font-size: clamp(1.5rem, 6vh, 2.2rem);
     }
     
     .player-result-card {
@@ -1907,26 +2083,7 @@ body {
         font-size: clamp(0.75rem, 2vh, 0.9rem);
     }
     
-    .btn-play-again {
-        max-width: none;
-        width: auto;
-        padding: 6px 16px;
-        margin-top: 0;
-        min-height: 44px;
-        font-size: 0.8rem;
-    }
-    
-    .btn-play-again iconify-icon {
-        font-size: 16px;
-    }
-    
-    .rank-message,
     .difficulty-badge-end {
         display: none;
-    }
-    
-    .waiting-admin {
-        font-size: 0.7rem;
-        margin-top: 0;
     }
 }

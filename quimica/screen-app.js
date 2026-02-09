@@ -1526,10 +1526,13 @@ function checkAllPlayersResults() {
     const anyCorrect = totalCorrect > 0;
     showLabAnimationInMixingZone(anyCorrect);
     
-    // Después de la animación del lab, mostrar la respuesta correcta
+    // Verificar si es la última ronda para mostrar la respuesta correcta
+    const isLastRound = currentRound >= totalRounds;
+    
+    // Después de la animación del lab, mostrar resultados
     setTimeout(() => {
-        showCorrectAnswer(anyCorrect, () => {
-            // Después de mostrar la respuesta, mostrar el ranking
+        // Solo mostrar la respuesta correcta al final de la partida
+        const showAnswerCallback = () => {
             setTimeout(() => {
                 if (currentGameMode === 'teams') {
                     const roundWinner = team1Correct > team2Correct ? 'team1' : 
@@ -1561,7 +1564,15 @@ function checkAllPlayersResults() {
                     });
                 }
             }, 500);
-        });
+        };
+        
+        if (isLastRound) {
+            // Última ronda: mostrar respuesta correcta antes del ranking final
+            showCorrectAnswer(anyCorrect, showAnswerCallback);
+        } else {
+            // Rondas intermedias: ir directo al ranking sin mostrar respuesta
+            showAnswerCallback();
+        }
     }, 2500); // Esperar a que termine la animación del lab
 }
 

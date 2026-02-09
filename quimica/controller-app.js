@@ -984,41 +984,34 @@ function renderEndScreen(data) {
             <div class="controller-bg"></div>
             
             <div class="end-screen-content">
-                <!-- Trofeo centrado -->
-                <div class="trophy-container">
-                    <iconify-icon icon="${getTrophyIcon(myRank)}" class="trophy-icon" style="color: ${getTrophyColor(myRank)};"></iconify-icon>
-                    ${myRank <= 3 ? `<div class="trophy-glow" style="background: ${getTrophyColor(myRank)};"></div>` : ''}
-                </div>
-                
-                <!-- Posición -->
-                <div class="rank-display" style="color: ${getTrophyColor(myRank)};">
-                    ${myRank}°
-                </div>
-                
-                <!-- Avatar y nombre -->
-                <div class="player-result-card" style="border-color: ${playerData.color};">
-                    <div class="player-avatar-end" style="background: ${playerData.color};">
-                        <iconify-icon icon="${playerData.icon}"></iconify-icon>
+                <!-- Trofeo grande centrado con posición -->
+                <div class="trophy-main-section">
+                    <div class="trophy-container-big">
+                        <iconify-icon icon="${getTrophyIcon(myRank)}" class="trophy-icon-big" style="color: ${getTrophyColor(myRank)};"></iconify-icon>
+                        ${myRank <= 3 ? `<div class="trophy-glow-big" style="background: ${getTrophyColor(myRank)};"></div>` : ''}
                     </div>
-                    <p class="player-name-end" style="color: ${playerData.color};">${playerData.name}</p>
+                    <div class="rank-display-big" style="color: ${getTrophyColor(myRank)};">
+                        ${myRank}°
+                    </div>
+                    <p class="rank-message">${rankMessages[Math.min(myRank - 1, 3)]}</p>
                 </div>
                 
-                <!-- Mensaje -->
-                <p class="rank-message">${rankMessages[Math.min(myRank - 1, 3)]}</p>
-                
-                <!-- Dificultad -->
-                <div class="difficulty-badge-end" style="color: ${difficultyConfig.color};">
-                    <iconify-icon icon="${difficultyConfig.icon}"></iconify-icon>
-                    ${difficultyConfig.name}
+                <!-- Jugador con puntos -->
+                <div class="player-score-section">
+                    <div class="player-result-card-compact" style="border-color: ${playerData.color};">
+                        <div class="player-avatar-end" style="background: ${playerData.color};">
+                            <iconify-icon icon="${playerData.icon}"></iconify-icon>
+                        </div>
+                        <span class="player-name-end" style="color: ${playerData.color};">${playerData.name}</span>
+                    </div>
+                    
+                    <div class="score-card-end-compact">
+                        <span class="score-value">${myFinalScore}</span>
+                        <span class="score-label">pts</span>
+                    </div>
                 </div>
                 
-                <!-- Puntuación -->
-                <div class="score-card-end">
-                    <span class="score-value">${myFinalScore}</span>
-                    <span class="score-label">pts</span>
-                </div>
-                
-                <!-- Botón admin -->
+                <!-- Botón jugar de nuevo -->
                 ${isAdmin ? `
                     <button class="btn-play-again" id="playAgainBtn">
                         <iconify-icon icon="mdi:refresh"></iconify-icon>
@@ -1041,14 +1034,14 @@ function renderEndScreen(data) {
     }
     
     if (window.anime) {
-        window.anime.animate('.trophy-icon', {
+        window.anime.animate('.trophy-icon-big', {
             scale: [0, 1.3, 1],
             rotate: [0, 15, -15, 0],
             duration: 800,
             easing: 'easeOutElastic(1, .5)'
         });
         
-        window.anime.animate('.player-result-card', {
+        window.anime.animate('.player-score-section', {
             scale: [0.8, 1],
             opacity: [0, 1],
             duration: 500,
@@ -1056,7 +1049,7 @@ function renderEndScreen(data) {
             easing: 'easeOutBack'
         });
         
-        window.anime.animate('.score-card-end', {
+        window.anime.animate('.btn-play-again', {
             translateY: [20, 0],
             opacity: [0, 1],
             duration: 400,
