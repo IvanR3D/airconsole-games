@@ -1539,7 +1539,7 @@ function checkAllPlayersResults() {
     showLabAnimationInMixingZone(anyCorrect);
     
     // Verificar si es la última ronda para mostrar la respuesta correcta
-    const isLastRound = currentRound >= totalRounds;
+    const isLastRound = roundNumber >= getMaxRounds();
     
     // Después de la animación del lab, mostrar resultados
     setTimeout(() => {
