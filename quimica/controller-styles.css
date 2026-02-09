@@ -1565,3 +1565,270 @@ body {
         border: 2px solid white;
     }
 }
+
+
+/* ============================================
+   PANTALLA DE RESULTADOS FINALES
+   AirConsole: Diseño responsivo y centrado
+   ============================================ */
+
+#endScreen {
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+.end-screen-content {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: clamp(16px, 4vw, 24px);
+    gap: clamp(8px, 2vw, 14px);
+    width: 100%;
+    max-width: min(360px, 100%);
+    min-width: 0;
+}
+
+/* Trofeo centrado con efecto glow */
+.trophy-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 4px;
+}
+
+.trophy-icon {
+    font-size: clamp(56px, 15vw, 80px);
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
+    position: relative;
+    z-index: 2;
+}
+
+.trophy-glow {
+    position: absolute;
+    width: clamp(80px, 20vw, 120px);
+    height: clamp(80px, 20vw, 120px);
+    border-radius: 50%;
+    opacity: 0.2;
+    filter: blur(20px);
+    z-index: 1;
+    animation: trophyPulse 2s ease-in-out infinite;
+}
+
+@keyframes trophyPulse {
+    0%, 100% { transform: scale(1); opacity: 0.2; }
+    50% { transform: scale(1.1); opacity: 0.3; }
+}
+
+/* Posición grande */
+.rank-display {
+    font-size: clamp(2.5rem, 10vw, 4rem);
+    font-weight: 900;
+    line-height: 1;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Card del jugador */
+.player-result-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: clamp(12px, 3vw, 18px);
+    background: var(--bg);
+    border: 3px solid;
+    border-radius: 20px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 200px;
+}
+
+.player-avatar-end {
+    width: clamp(48px, 12vw, 64px);
+    height: clamp(48px, 12vw, 64px);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(24px, 6vw, 32px);
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.player-name-end {
+    font-size: clamp(1rem, 3.5vw, 1.25rem);
+    font-weight: 800;
+    margin: 0;
+}
+
+/* Mensaje de ranking */
+.rank-message {
+    font-size: clamp(0.85rem, 2.5vw, 1rem);
+    color: var(--text-light);
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Badge de dificultad */
+.difficulty-badge-end {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: var(--bg);
+    border: 2px solid currentColor;
+    border-radius: 20px;
+    font-size: clamp(0.75rem, 2vw, 0.85rem);
+    font-weight: 700;
+    opacity: 0.9;
+}
+
+.difficulty-badge-end iconify-icon {
+    font-size: 16px;
+}
+
+/* Card de puntuación */
+.score-card-end {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 6px;
+    padding: clamp(14px, 3.5vw, 20px) clamp(24px, 6vw, 40px);
+    background: linear-gradient(135deg, rgba(235, 130, 37, 0.12) 0%, rgba(235, 130, 37, 0.06) 100%);
+    border: 3px solid var(--naranja);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 220px;
+}
+
+.score-value {
+    font-size: clamp(1.8rem, 7vw, 2.5rem);
+    font-weight: 900;
+    color: var(--naranja);
+}
+
+.score-label {
+    font-size: clamp(1rem, 3vw, 1.2rem);
+    font-weight: 700;
+    color: var(--naranja);
+    opacity: 0.8;
+}
+
+/* Botón jugar de nuevo */
+.btn-play-again {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 240px;
+    padding: clamp(14px, 3.5vw, 18px) clamp(24px, 5vw, 32px);
+    background: linear-gradient(135deg, var(--verde) 0%, #5a8a2f 100%);
+    border: none;
+    border-radius: 28px;
+    font-weight: 800;
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 5px 0 #4a7a25, 0 8px 20px rgba(115, 160, 63, 0.3);
+    margin-top: 8px;
+    min-height: var(--btn-optimal);
+}
+
+.btn-play-again:active {
+    transform: translateY(5px);
+    box-shadow: none;
+}
+
+.btn-play-again iconify-icon {
+    font-size: clamp(20px, 5vw, 24px);
+}
+
+/* Mensaje esperando admin */
+.waiting-admin {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: clamp(0.8rem, 2.2vw, 0.9rem);
+    color: var(--text-light);
+    font-weight: 600;
+    margin-top: 8px;
+}
+
+.waiting-admin iconify-icon {
+    font-size: 18px;
+    animation: sandTimer 1.5s ease-in-out infinite;
+}
+
+@keyframes sandTimer {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(180deg); }
+}
+
+/* Media queries para landscape */
+@media (orientation: landscape) and (max-height: 500px) {
+    .end-screen-content {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        max-width: 100%;
+        gap: clamp(8px, 2vw, 16px);
+        padding: 8px 16px;
+    }
+    
+    .trophy-container {
+        margin-bottom: 0;
+    }
+    
+    .trophy-icon {
+        font-size: clamp(40px, 10vh, 56px);
+    }
+    
+    .trophy-glow {
+        width: clamp(50px, 12vh, 70px);
+        height: clamp(50px, 12vh, 70px);
+    }
+    
+    .rank-display {
+        font-size: clamp(1.8rem, 8vh, 2.5rem);
+    }
+    
+    .player-result-card {
+        flex-direction: row;
+        padding: 10px 16px;
+        max-width: none;
+        width: auto;
+    }
+    
+    .player-avatar-end {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+    
+    .score-card-end {
+        padding: 10px 20px;
+        max-width: none;
+        width: auto;
+    }
+    
+    .score-value {
+        font-size: clamp(1.4rem, 5vh, 1.8rem);
+    }
+    
+    .btn-play-again {
+        max-width: none;
+        width: auto;
+        padding: 10px 24px;
+        margin-top: 0;
+    }
+    
+    .rank-message,
+    .difficulty-badge-end {
+        display: none;
+    }
+}

@@ -956,8 +956,21 @@ function renderEndScreen(data) {
     const myRank = data.players.findIndex(p => p.id === playerData.id) + 1;
     const myFinalScore = data.players.find(p => p.id === playerData.id)?.score || 0;
     
-    const rankIcons = ['mdi:medal-outline', 'mdi:medal-outline', 'mdi:medal-outline', 'mdi:medal-outline'];
-    const rankColors = ['#fbbf24', '#9ca3af', '#b45309', '#6b7280'];
+    // Trofeos para los 3 primeros puestos
+    const getTrophyIcon = (rank) => {
+        if (rank === 1) return 'mdi:trophy';
+        if (rank === 2) return 'mdi:trophy-outline';
+        if (rank === 3) return 'mdi:trophy-variant';
+        return 'mdi:medal-outline';
+    };
+    
+    const getTrophyColor = (rank) => {
+        if (rank === 1) return '#fbbf24'; // Oro
+        if (rank === 2) return '#9ca3af'; // Plata
+        if (rank === 3) return '#cd7f32'; // Bronce
+        return '#6b7280';
+    };
+    
     const rankMessages = [
         '¡Eres el mejor científico!',
         '¡Excelente trabajo!',
@@ -967,45 +980,53 @@ function renderEndScreen(data) {
     
     const app = document.getElementById('app');
     app.innerHTML = `
-        <div class="screen active flex-col items-center justify-center p-5 text-center" id="endScreen">
-            <div class="w-full max-w-sm">
-                <div class="text-6xl mb-4"><iconify-icon icon="${rankIcons[myRank - 1] || 'mdi:flask'}" style="color: ${rankColors[myRank - 1] || '#6b7280'};"></iconify-icon></div>
+        <div class="screen active" id="endScreen">
+            <div class="controller-bg"></div>
+            
+            <div class="end-screen-content">
+                <!-- Trofeo centrado -->
+                <div class="trophy-container">
+                    <iconify-icon icon="${getTrophyIcon(myRank)}" class="trophy-icon" style="color: ${getTrophyColor(myRank)};"></iconify-icon>
+                    ${myRank <= 3 ? `<div class="trophy-glow" style="background: ${getTrophyColor(myRank)};"></div>` : ''}
+                </div>
                 
-                <div class="text-5xl font-black mb-2" style="color: ${myRank === 1 ? '#f59e0b' : myRank === 2 ? '#9ca3af' : '#b45309'};">
+                <!-- Posición -->
+                <div class="rank-display" style="color: ${getTrophyColor(myRank)};">
                     ${myRank}°
                 </div>
                 
-                <div class="player-avatar mx-auto mb-4" style="background: ${playerData.color};">
-                    <iconify-icon icon="${playerData.icon}" style="color: white;"></iconify-icon>
+                <!-- Avatar y nombre -->
+                <div class="player-result-card" style="border-color: ${playerData.color};">
+                    <div class="player-avatar-end" style="background: ${playerData.color};">
+                        <iconify-icon icon="${playerData.icon}"></iconify-icon>
+                    </div>
+                    <p class="player-name-end" style="color: ${playerData.color};">${playerData.name}</p>
                 </div>
                 
-                <p class="text-xl font-bold mb-2" style="color: ${playerData.color};">${playerData.name}</p>
-                <p class="text-lg text-white/70 mb-2">${rankMessages[myRank - 1] || rankMessages[3]}</p>
+                <!-- Mensaje -->
+                <p class="rank-message">${rankMessages[Math.min(myRank - 1, 3)]}</p>
                 
-                <div class="difficulty-completed-sm mb-4" style="color: ${difficultyConfig.color};">
+                <!-- Dificultad -->
+                <div class="difficulty-badge-end" style="color: ${difficultyConfig.color};">
                     <iconify-icon icon="${difficultyConfig.icon}"></iconify-icon>
                     ${difficultyConfig.name}
                 </div>
                 
-                <div class="bg-lab-warning/20 border-2 border-lab-warning rounded-2xl py-4 px-6 mb-6">
-                    <p class="text-3xl font-black text-lab-warning">${myFinalScore} pts</p>
+                <!-- Puntuación -->
+                <div class="score-card-end">
+                    <span class="score-value">${myFinalScore}</span>
+                    <span class="score-label">pts</span>
                 </div>
                 
-                ${myRank === 1 ? `
-                    <div class="bg-lab-success/20 border-2 border-lab-success rounded-2xl py-3 px-5 mb-6">
-                        <iconify-icon icon="mdi:trophy" class="text-3xl text-lab-success"></iconify-icon>
-                        <p class="font-bold text-lab-success mt-2">¡GANADOR!</p>
-                    </div>
-                ` : ''}
-                
+                <!-- Botón admin -->
                 ${isAdmin ? `
-                    <button class="btn-primary w-full flex items-center justify-center gap-3" id="playAgainBtn">
-                        <iconify-icon icon="mdi:refresh" style="font-size: 24px;"></iconify-icon>
+                    <button class="btn-play-again" id="playAgainBtn">
+                        <iconify-icon icon="mdi:refresh"></iconify-icon>
                         JUGAR DE NUEVO
                     </button>
                 ` : `
-                    <p class="text-white/50 text-sm">
-                        <iconify-icon icon="mdi:timer-sand" class="mr-2"></iconify-icon>
+                    <p class="waiting-admin">
+                        <iconify-icon icon="mdi:timer-sand"></iconify-icon>
                         Esperando al admin...
                     </p>
                 `}
@@ -1020,10 +1041,27 @@ function renderEndScreen(data) {
     }
     
     if (window.anime) {
-        window.anime.animate('.player-avatar', {
-            scale: [0, 1.2, 1],
-            duration: 600,
+        window.anime.animate('.trophy-icon', {
+            scale: [0, 1.3, 1],
+            rotate: [0, 15, -15, 0],
+            duration: 800,
             easing: 'easeOutElastic(1, .5)'
+        });
+        
+        window.anime.animate('.player-result-card', {
+            scale: [0.8, 1],
+            opacity: [0, 1],
+            duration: 500,
+            delay: 300,
+            easing: 'easeOutBack'
+        });
+        
+        window.anime.animate('.score-card-end', {
+            translateY: [20, 0],
+            opacity: [0, 1],
+            duration: 400,
+            delay: 500,
+            easing: 'easeOutCubic'
         });
     }
 }

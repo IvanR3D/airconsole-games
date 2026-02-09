@@ -1526,44 +1526,127 @@ function checkAllPlayersResults() {
     const anyCorrect = totalCorrect > 0;
     showLabAnimationInMixingZone(anyCorrect);
     
-    // Esperar a que la animación se muestre antes de enviar resultados
+    // Después de la animación del lab, mostrar la respuesta correcta
     setTimeout(() => {
-        if (currentGameMode === 'teams') {
-            // Determinar qué equipo ganó la ronda
-            const roundWinner = team1Correct > team2Correct ? 'team1' : 
-                               team2Correct > team1Correct ? 'team2' : 'tie';
+        showCorrectAnswer(anyCorrect, () => {
+            // Después de mostrar la respuesta, mostrar el ranking
+            setTimeout(() => {
+                if (currentGameMode === 'teams') {
+                    const roundWinner = team1Correct > team2Correct ? 'team1' : 
+                                       team2Correct > team1Correct ? 'team2' : 'tie';
+                    showTeamResults(team1Correct, team2Correct, roundWinner, totalPoints);
+                    
+                    airconsole.broadcast({
+                        action: 'roundResult',
+                        gameMode: 'teams',
+                        compound: currentCompound,
+                        playerResults: playerResults,
+                        teams: teams,
+                        roundWinner: roundWinner,
+                        team1Correct: team1Correct,
+                        team2Correct: team2Correct,
+                        pointsAwarded: totalPoints
+                    });
+                } else {
+                    showIndividualResults(totalCorrect, totalPoints);
+                    
+                    airconsole.broadcast({
+                        action: 'roundResult',
+                        gameMode: 'individual',
+                        compound: currentCompound,
+                        playerResults: playerResults,
+                        players: players,
+                        totalCorrect: totalCorrect,
+                        pointsAwarded: totalPoints
+                    });
+                }
+            }, 500);
+        });
+    }, 2500); // Esperar a que termine la animación del lab
+}
+
+// Mostrar la respuesta correcta con animación
+function showCorrectAnswer(anyCorrect, callback) {
+    const inlineResults = document.getElementById('inlineResults');
+    const inlineContent = document.getElementById('inlineResultsContent');
+    
+    if (!inlineResults || !inlineContent) {
+        if (callback) callback();
+        return;
+    }
+    
+    // Construir la fórmula con los elementos en orden
+    const elementsHTML = currentCompound.elements.map((el, i) => {
+        const elementData = elements[el] || { symbol: el, group: 'nonmetal' };
+        return `<div class="answer-element element-${elementData.group}" style="animation-delay: ${i * 0.1}s">
+            <span class="symbol">${elementData.symbol}</span>
+        </div>`;
+    }).join('<span class="answer-plus">+</span>');
+    
+    inlineContent.innerHTML = `
+        <div class="correct-answer-reveal ${anyCorrect ? 'success' : 'error'}">
+            <div class="answer-label">
+                <iconify-icon icon="${anyCorrect ? 'mdi:check-circle' : 'mdi:close-circle'}"></iconify-icon>
+                <span>${anyCorrect ? '¡Correcto!' : 'Respuesta correcta:'}</span>
+            </div>
             
-            // Mostrar resultados de equipos
-            showTeamResults(team1Correct, team2Correct, roundWinner, totalPoints);
+            <div class="answer-compound">
+                <iconify-icon icon="${currentCompound.icon}" class="compound-icon"></iconify-icon>
+                <span class="compound-formula">${currentCompound.formula}</span>
+                <span class="compound-name">${currentCompound.name}</span>
+            </div>
             
-            // Broadcast resultados
-            airconsole.broadcast({
-                action: 'roundResult',
-                gameMode: 'teams',
-                compound: currentCompound,
-                playerResults: playerResults,
-                teams: teams,
-                roundWinner: roundWinner,
-                team1Correct: team1Correct,
-                team2Correct: team2Correct,
-                pointsAwarded: totalPoints
-            });
-        } else {
-            // Modo individual: mostrar resultados individuales
-            showIndividualResults(totalCorrect, totalPoints);
+            <div class="answer-elements-row">
+                ${elementsHTML}
+            </div>
             
-            // Broadcast resultados
-            airconsole.broadcast({
-                action: 'roundResult',
-                gameMode: 'individual',
-                compound: currentCompound,
-                playerResults: playerResults,
-                players: players,
-                totalCorrect: totalCorrect,
-                pointsAwarded: totalPoints
-            });
-        }
-    }, 2000); // 2 segundos para ver la animación
+            ${currentCompound.hint ? `
+                <div class="answer-hint">
+                    <iconify-icon icon="mdi:lightbulb"></iconify-icon>
+                    ${currentCompound.hint}
+                </div>
+            ` : ''}
+        </div>
+    `;
+    
+    inlineResults.classList.remove('hidden');
+    
+    // Animaciones
+    if (window.anime) {
+        window.anime.animate('.correct-answer-reveal', {
+            scale: [0.8, 1],
+            opacity: [0, 1],
+            duration: 400,
+            easing: 'easeOutBack'
+        });
+        
+        window.anime.animate('.answer-element', {
+            scale: [0, 1],
+            opacity: [0, 1],
+            delay: window.anime.stagger(100, {start: 300}),
+            duration: 300,
+            easing: 'easeOutBack'
+        });
+        
+        window.anime.animate('.compound-formula', {
+            scale: [0.5, 1.1, 1],
+            duration: 600,
+            delay: 200,
+            easing: 'easeOutElastic(1, .5)'
+        });
+    }
+    
+    // Sonido
+    if (anyCorrect) {
+        playSuccessSound();
+    } else {
+        playErrorSound();
+    }
+    
+    // Llamar al callback después de mostrar la respuesta
+    setTimeout(() => {
+        if (callback) callback();
+    }, 2500); // 2.5 segundos para ver la respuesta
 }
 
 // Función legacy para compatibilidad
@@ -2174,24 +2257,41 @@ function endGame() {
 function renderEndScreenIndividual(winner, sortedPlayers) {
     const app = document.getElementById('app');
     
+    // Función para obtener el trofeo según la posición
+    const getTrophyIcon = (rank) => {
+        if (rank === 1) return 'mdi:trophy';
+        if (rank === 2) return 'mdi:trophy-outline';
+        if (rank === 3) return 'mdi:trophy-variant';
+        return '';
+    };
+    
+    const getTrophyColor = (rank) => {
+        if (rank === 1) return '#fbbf24'; // Oro
+        if (rank === 2) return '#9ca3af'; // Plata
+        if (rank === 3) return '#cd7f32'; // Bronce
+        return '';
+    };
+    
     app.innerHTML = `
-        <div class="screen active flex-col items-center justify-center p-4 sm:p-6 lg:p-8 min-h-screen relative" id="endScreen">
+        <div class="screen active" id="endScreen">
             <div class="lab-bg"></div>
             <div id="confettiContainer" class="fixed inset-0 pointer-events-none z-50"></div>
             
-            <div class="relative z-10 text-center max-w-3xl w-full px-2">
-                <iconify-icon icon="mdi:trophy" class="text-5xl sm:text-6xl lg:text-8xl text-yellow-400 glow-orange mb-4 sm:mb-6 result-icon"></iconify-icon>
+            <div class="end-screen-container">
+                <!-- Trofeo principal centrado -->
+                <div class="main-trophy-container">
+                    <iconify-icon icon="mdi:trophy" class="main-trophy-icon result-icon"></iconify-icon>
+                    <div class="trophy-shine"></div>
+                </div>
                 
-                <h1 class="text-2xl sm:text-4xl lg:text-5xl font-black mb-2 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                    ¡Experimento Completado!
-                </h1>
+                <h1 class="end-title">¡Experimento Completado!</h1>
                 
-                <div class="difficulty-completed mb-4" style="color: ${difficultyConfig.color};">
+                <div class="difficulty-completed" style="color: ${difficultyConfig.color};">
                     <iconify-icon icon="${difficultyConfig.icon}"></iconify-icon>
                     Dificultad: ${difficultyConfig.name} (x${difficultyConfig.pointsMultiplier})
                 </div>
                 
-                <p class="text-base sm:text-lg lg:text-xl mb-4" style="color: var(--color-text-light);">El mejor científico del laboratorio es...</p>
+                <p class="winner-intro">El mejor científico del laboratorio es...</p>
                 
                 <div class="winner-individual-card" style="border-color: ${winner.color}; background: ${winner.color}20;">
                     <iconify-icon icon="mdi:crown" class="crown-icon" style="color: #fbbf24;"></iconify-icon>
@@ -2202,27 +2302,28 @@ function renderEndScreenIndividual(winner, sortedPlayers) {
                     <p class="winner-score">${winner.score} pts</p>
                 </div>
                 
-                <h3 class="text-lg font-bold mt-6 mb-3" style="color: var(--color-text);">
+                <h3 class="leaderboard-title">
                     <iconify-icon icon="mdi:podium"></iconify-icon> Clasificación Final
                 </h3>
                 
-                <div class="space-y-2 sm:space-y-3 mb-4" id="leaderboard">
+                <div class="leaderboard-list" id="leaderboard">
                     ${sortedPlayers.slice(0, 10).map((player, i) => `
                         <div class="leaderboard-item ${i === 0 ? 'first' : i === 1 ? 'second' : i === 2 ? 'third' : ''}">
-                            <div class="rank-badge ${i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : 'bg-white/10'}">${i + 1}</div>
+                            <div class="rank-badge ${i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : ''}">${i + 1}</div>
+                            ${i < 3 ? `<iconify-icon icon="${getTrophyIcon(i + 1)}" class="rank-trophy" style="color: ${getTrophyColor(i + 1)};"></iconify-icon>` : ''}
                             <div class="player-avatar" style="background: ${player.color};">
-                                <iconify-icon icon="${player.icon}" class="text-base sm:text-lg lg:text-xl"></iconify-icon>
+                                <iconify-icon icon="${player.icon}"></iconify-icon>
                             </div>
-                            <div class="flex-1 text-left min-w-0">
-                                <p class="font-bold text-sm sm:text-base lg:text-lg truncate">${player.name}</p>
+                            <div class="player-info">
+                                <p class="player-name">${player.name}</p>
                             </div>
                             <div class="score-badge">${player.score} pts</div>
                         </div>
                     `).join('')}
                 </div>
                 
-                <p style="color: var(--color-text-light);" class="text-xs sm:text-sm">
-                    <iconify-icon icon="mdi:information" class="mr-1"></iconify-icon>
+                <p class="admin-hint">
+                    <iconify-icon icon="mdi:information"></iconify-icon>
                     El Jugador 1 puede iniciar una nueva partida
                 </p>
             </div>
