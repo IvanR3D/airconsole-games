@@ -1615,7 +1615,7 @@ body {
 /* Ajustes para pantallas landscape */
 @media (max-height: 450px) and (orientation: landscape) {
     .intro-screen {
-        padding: 4px 16px;
+        padding: 4px 12px;
     }
     
     .intro-content {
@@ -1623,29 +1623,66 @@ body {
         flex-wrap: wrap;
         justify-content: center;
         align-content: center;
-        gap: 8px 16px;
+        gap: 6px 12px;
     }
     
     .intro-logo {
-        width: 40px;
-        height: 40px;
+        width: 36px;
+        height: 36px;
     }
     
     .intro-screen .intro-title {
-        font-size: 1.5rem;
+        font-size: 1.3rem;
     }
     
     .intro-screen .subtitle {
-        font-size: 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .formula-demo {
+        gap: 4px;
+    }
+    
+    .intro-element {
+        width: clamp(32px, 5vh, 50px) !important;
+        height: clamp(38px, 6vh, 60px) !important;
+    }
+    
+    .intro-element .symbol {
+        font-size: clamp(12px, 2.5vh, 20px) !important;
+    }
+    
+    .intro-compound {
+        padding: clamp(6px, 1vh, 12px) clamp(12px, 2vw, 24px) !important;
+        font-size: clamp(0.85rem, 2.5vh, 1.5rem) !important;
     }
     
     .difficulty-selector-compact {
         flex-direction: row;
+        gap: 6px;
+        padding: 4px 10px;
+    }
+    
+    .difficulty-hint,
+    .intro-description {
+        display: none;
+    }
+    
+    .player-slots-row {
+        gap: 4px;
+    }
+    
+    .intro-screen .player-slot {
+        width: clamp(28px, 5vh, 45px);
+        height: clamp(28px, 5vh, 45px);
+    }
+    
+    .intro-footer {
         gap: 8px;
     }
     
-    .difficulty-hint {
-        display: none;
+    .footer-item {
+        font-size: 0.55rem;
     }
 }
 
@@ -2597,18 +2634,44 @@ body {
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: center;
-        gap: 8px;
+        gap: 6px;
     }
     
     .inline-result-header {
         flex-direction: row;
         flex: 1;
-        min-width: 200px;
+        min-width: 180px;
+        padding: 8px 12px;
+        gap: 8px;
+    }
+    
+    .compound-inline iconify-icon {
+        font-size: clamp(1.3rem, 4vh, 2rem);
+    }
+    
+    .compound-inline .formula {
+        font-size: clamp(1.1rem, 3.5vh, 1.6rem);
+    }
+    
+    .compound-inline .name {
+        font-size: clamp(0.7rem, 2vh, 0.9rem);
+    }
+    
+    .correct-badge {
+        padding: 6px 12px;
+        font-size: clamp(0.7rem, 1.8vh, 0.85rem);
     }
     
     .inline-ranking {
         flex: 1;
-        min-width: 200px;
+        min-width: 180px;
+        padding: 8px 12px;
+    }
+    
+    .inline-ranking h4 {
+        font-size: clamp(0.7rem, 1.8vh, 0.85rem);
+        margin-bottom: 6px;
+        padding-bottom: 6px;
     }
     
     .ranking-list {
@@ -2619,7 +2682,19 @@ body {
     
     .ranking-item {
         flex: 1;
-        min-width: 120px;
+        min-width: 110px;
+        padding: 4px 8px;
+        font-size: clamp(0.65rem, 1.6vh, 0.8rem);
+    }
+    
+    .ranking-item .rank {
+        width: 16px;
+        font-size: clamp(0.7rem, 1.6vh, 0.8rem);
+    }
+    
+    .ranking-item .player-dot {
+        width: 10px;
+        height: 10px;
     }
 }
 
@@ -2787,14 +2862,15 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: clamp(16px, 3vw, 28px);
-    padding: clamp(20px, 4vw, 40px);
+    gap: clamp(8px, 2vw, 20px);
+    padding: clamp(12px, 2.5vw, 28px);
     background: white;
-    border-radius: clamp(16px, 3vw, 28px);
+    border-radius: clamp(12px, 2vw, 22px);
     border: 3px solid #e2e8f0;
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1);
-    max-width: 600px;
+    max-width: min(92%, 500px);
     width: 100%;
+    margin: 0 auto;
 }
 
 .correct-answer-reveal.success {
@@ -2816,8 +2892,8 @@ body {
 .answer-label {
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: clamp(1.1rem, 3vw, 1.5rem);
+    gap: 6px;
+    font-size: clamp(0.9rem, 2.2vw, 1.25rem);
     font-weight: 700;
 }
 
@@ -2830,24 +2906,24 @@ body {
 }
 
 .answer-label iconify-icon {
-    font-size: clamp(1.5rem, 4vw, 2.2rem);
+    font-size: clamp(1.1rem, 3vw, 1.75rem);
 }
 
 .answer-compound {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 
 .answer-compound .compound-icon {
-    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-size: clamp(1.75rem, 4.5vw, 3rem);
     color: var(--color-primary);
     filter: drop-shadow(0 4px 8px rgba(5, 149, 174, 0.25));
 }
 
 .answer-compound .compound-formula {
-    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-size: clamp(1.4rem, 3.5vw, 2.5rem);
     font-weight: 900;
     background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-primary) 100%);
     -webkit-background-clip: text;
@@ -2857,7 +2933,7 @@ body {
 }
 
 .answer-compound .compound-name {
-    font-size: clamp(1rem, 2.5vw, 1.4rem);
+    font-size: clamp(0.8rem, 2vw, 1.1rem);
     color: var(--color-text);
     font-weight: 600;
 }
@@ -2866,34 +2942,34 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: clamp(6px, 1.5vw, 12px);
+    gap: clamp(3px, 0.8vw, 8px);
     flex-wrap: wrap;
-    padding: clamp(12px, 2vw, 20px);
+    padding: clamp(8px, 1.2vw, 14px);
     background: rgba(0, 0, 0, 0.03);
-    border-radius: clamp(12px, 2vw, 18px);
+    border-radius: clamp(8px, 1.2vw, 14px);
     width: 100%;
 }
 
 .answer-element {
-    width: clamp(45px, 8vw, 65px);
-    height: clamp(45px, 8vw, 65px);
-    border-radius: clamp(10px, 1.5vw, 14px);
+    width: clamp(32px, 6vw, 48px);
+    height: clamp(32px, 6vw, 48px);
+    border-radius: clamp(6px, 1vw, 10px);
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     font-weight: 800;
-    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2), 0 6px 16px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.15);
     animation: elementReveal 0.4s ease-out backwards;
 }
 
 .answer-element .symbol {
-    font-size: clamp(1.2rem, 3vw, 1.8rem);
+    font-size: clamp(0.85rem, 2.2vw, 1.3rem);
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .answer-plus {
-    font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+    font-size: clamp(0.85rem, 1.8vw, 1.2rem);
     font-weight: 800;
     color: var(--color-text-light);
     opacity: 0.6;
@@ -2902,18 +2978,18 @@ body {
 .answer-hint {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: clamp(10px, 1.5vw, 14px) clamp(16px, 2.5vw, 24px);
+    gap: 5px;
+    padding: clamp(6px, 1vw, 10px) clamp(10px, 1.8vw, 18px);
     background: rgba(235, 130, 37, 0.1);
     border: 1px solid rgba(235, 130, 37, 0.3);
     border-radius: 50px;
-    font-size: clamp(0.85rem, 2vw, 1rem);
+    font-size: clamp(0.7rem, 1.6vw, 0.9rem);
     font-weight: 600;
     color: var(--color-warning);
 }
 
 .answer-hint iconify-icon {
-    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    font-size: clamp(0.8rem, 1.8vw, 1rem);
 }
 
 @keyframes elementReveal {
@@ -2937,6 +3013,66 @@ body {
 .answer-element.element-transition { background: linear-gradient(135deg, #8b6d5c 0%, #7a5c4b 100%); }
 .answer-element.element-metalloid { background: linear-gradient(135deg, #9a8a6a 0%, #897959 100%); }
 
+/* Responsive para correct-answer-reveal en landscape */
+@media (max-height: 500px) and (orientation: landscape) {
+    .correct-answer-reveal {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: clamp(6px, 1.5vw, 12px);
+        padding: clamp(8px, 1.5vw, 16px);
+        max-width: 95%;
+    }
+    
+    .answer-label {
+        font-size: clamp(0.8rem, 2vh, 1rem);
+    }
+    
+    .answer-label iconify-icon {
+        font-size: clamp(0.9rem, 2.5vh, 1.3rem);
+    }
+    
+    .answer-compound {
+        flex-direction: row;
+        gap: 8px;
+    }
+    
+    .answer-compound .compound-icon {
+        font-size: clamp(1.3rem, 4vh, 2rem);
+    }
+    
+    .answer-compound .compound-formula {
+        font-size: clamp(1.1rem, 3.5vh, 1.8rem);
+    }
+    
+    .answer-compound .compound-name {
+        font-size: clamp(0.7rem, 2vh, 0.9rem);
+    }
+    
+    .answer-elements-row {
+        padding: 6px 10px;
+        gap: 4px;
+    }
+    
+    .answer-element {
+        width: clamp(26px, 5vh, 38px);
+        height: clamp(26px, 5vh, 38px);
+    }
+    
+    .answer-element .symbol {
+        font-size: clamp(0.7rem, 2vh, 1rem);
+    }
+    
+    .answer-plus {
+        font-size: clamp(0.7rem, 1.8vh, 0.9rem);
+    }
+    
+    .answer-hint {
+        padding: 4px 10px;
+        font-size: clamp(0.6rem, 1.5vh, 0.75rem);
+    }
+}
+
 
 /* ============================================
    PANTALLA DE RESULTADOS FINALES - SCREEN
@@ -2946,7 +3082,9 @@ body {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    padding: clamp(16px, 3vw, 32px) !important;
+    padding: clamp(12px, 2.5vw, 24px) !important;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .end-screen-container {
@@ -2957,8 +3095,8 @@ body {
     align-items: center;
     text-align: center;
     width: 100%;
-    max-width: 700px;
-    gap: clamp(8px, 1.5vw, 16px);
+    max-width: 650px;
+    gap: clamp(6px, 1.2vw, 14px);
 }
 
 /* Trofeo principal centrado */
@@ -2967,21 +3105,21 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: clamp(8px, 1.5vw, 16px);
+    margin-bottom: clamp(4px, 1vw, 12px);
 }
 
 .main-trophy-icon {
-    font-size: clamp(4rem, 12vw, 7rem);
+    font-size: clamp(3rem, 10vw, 6rem);
     color: #fbbf24;
-    filter: drop-shadow(0 8px 24px rgba(251, 191, 36, 0.4));
+    filter: drop-shadow(0 6px 20px rgba(251, 191, 36, 0.4));
     position: relative;
     z-index: 2;
 }
 
 .trophy-shine {
     position: absolute;
-    width: clamp(100px, 20vw, 160px);
-    height: clamp(100px, 20vw, 160px);
+    width: clamp(80px, 16vw, 140px);
+    height: clamp(80px, 16vw, 140px);
     background: radial-gradient(circle, rgba(251, 191, 36, 0.3) 0%, transparent 70%);
     border-radius: 50%;
     z-index: 1;
@@ -2995,7 +3133,7 @@ body {
 
 /* Título */
 .end-title {
-    font-size: clamp(1.5rem, 5vw, 3rem);
+    font-size: clamp(1.3rem, 4.5vw, 2.5rem);
     font-weight: 900;
     background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #ea580c 100%);
     -webkit-background-clip: text;
@@ -3010,18 +3148,18 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    font-size: clamp(0.8rem, 2vw, 1rem);
+    gap: 6px;
+    font-size: clamp(0.75rem, 1.8vw, 0.95rem);
     font-weight: 600;
 }
 
 .difficulty-completed iconify-icon {
-    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    font-size: clamp(0.9rem, 2.2vw, 1.2rem);
 }
 
 /* Intro del ganador */
 .winner-intro {
-    font-size: clamp(0.9rem, 2.2vw, 1.2rem);
+    font-size: clamp(0.8rem, 2vw, 1.1rem);
     color: var(--color-text-light);
     margin: 0;
 }
@@ -3032,41 +3170,41 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: clamp(8px, 1.5vw, 12px);
-    padding: clamp(16px, 3vw, 28px);
+    gap: clamp(6px, 1.2vw, 10px);
+    padding: clamp(12px, 2.5vw, 24px);
     border: 3px solid;
-    border-radius: clamp(16px, 3vw, 24px);
-    min-width: clamp(160px, 30vw, 220px);
+    border-radius: clamp(14px, 2.5vw, 22px);
+    min-width: clamp(140px, 28vw, 200px);
 }
 
 .crown-icon {
     position: absolute;
-    top: clamp(-16px, -3vw, -24px);
-    font-size: clamp(1.5rem, 4vw, 2.2rem);
+    top: clamp(-14px, -2.5vw, -20px);
+    font-size: clamp(1.3rem, 3.5vw, 2rem);
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
 .winner-avatar {
-    width: clamp(48px, 10vw, 72px);
-    height: clamp(48px, 10vw, 72px);
-    border-radius: clamp(12px, 2vw, 18px);
+    width: clamp(40px, 9vw, 64px);
+    height: clamp(40px, 9vw, 64px);
+    border-radius: clamp(10px, 1.8vw, 16px);
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: clamp(1.5rem, 4vw, 2.2rem);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    font-size: clamp(1.3rem, 3.5vw, 2rem);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
 }
 
 .winner-name {
-    font-size: clamp(1.1rem, 3vw, 1.5rem);
+    font-size: clamp(1rem, 2.5vw, 1.4rem);
     font-weight: 800;
     color: var(--color-text);
     margin: 0;
 }
 
 .winner-score {
-    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    font-size: clamp(0.9rem, 2.2vw, 1.2rem);
     font-weight: 700;
     color: var(--color-success);
     margin: 0;
@@ -3077,11 +3215,11 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    gap: 6px;
+    font-size: clamp(0.9rem, 2.2vw, 1.2rem);
     font-weight: 700;
     color: var(--color-text);
-    margin: clamp(12px, 2vw, 20px) 0 clamp(8px, 1.5vw, 14px) 0;
+    margin: clamp(8px, 1.5vw, 16px) 0 clamp(6px, 1.2vw, 12px) 0;
 }
 
 .leaderboard-title iconify-icon {
@@ -3092,26 +3230,26 @@ body {
 .leaderboard-list {
     display: flex;
     flex-direction: column;
-    gap: clamp(6px, 1vw, 10px);
+    gap: clamp(4px, 0.8vw, 8px);
     width: 100%;
-    max-width: 500px;
+    max-width: 480px;
 }
 
 .leaderboard-item {
     display: flex;
     align-items: center;
-    gap: clamp(8px, 1.5vw, 14px);
-    padding: clamp(8px, 1.5vw, 14px) clamp(12px, 2vw, 18px);
+    gap: clamp(6px, 1.2vw, 12px);
+    padding: clamp(6px, 1.2vw, 12px) clamp(10px, 1.8vw, 16px);
     background: white;
     border: 2px solid #e2e8f0;
-    border-radius: clamp(10px, 1.5vw, 14px);
+    border-radius: clamp(8px, 1.2vw, 12px);
     transition: all 0.2s;
 }
 
 .leaderboard-item.first {
     background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, white 100%);
     border-color: #fbbf24;
-    box-shadow: 0 4px 16px rgba(251, 191, 36, 0.2);
+    box-shadow: 0 3px 12px rgba(251, 191, 36, 0.2);
 }
 
 .leaderboard-item.second {
@@ -3126,14 +3264,14 @@ body {
 
 /* Badge de ranking */
 .rank-badge {
-    width: clamp(28px, 5vw, 36px);
-    height: clamp(28px, 5vw, 36px);
+    width: clamp(24px, 4.5vw, 32px);
+    height: clamp(24px, 4.5vw, 32px);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 800;
-    font-size: clamp(0.8rem, 1.8vw, 1rem);
+    font-size: clamp(0.7rem, 1.6vw, 0.9rem);
     color: white;
     background: #94a3b8;
     flex-shrink: 0;
@@ -3141,35 +3279,35 @@ body {
 
 .rank-badge.gold {
     background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-    box-shadow: 0 2px 8px rgba(251, 191, 36, 0.4);
+    box-shadow: 0 2px 6px rgba(251, 191, 36, 0.4);
 }
 
 .rank-badge.silver {
     background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
-    box-shadow: 0 2px 8px rgba(156, 163, 175, 0.4);
+    box-shadow: 0 2px 6px rgba(156, 163, 175, 0.4);
 }
 
 .rank-badge.bronze {
     background: linear-gradient(135deg, #cd7f32 0%, #a0522d 100%);
-    box-shadow: 0 2px 8px rgba(205, 127, 50, 0.4);
+    box-shadow: 0 2px 6px rgba(205, 127, 50, 0.4);
 }
 
 /* Trofeo en el ranking */
 .rank-trophy {
-    font-size: clamp(1.2rem, 3vw, 1.6rem);
+    font-size: clamp(1rem, 2.5vw, 1.4rem);
     flex-shrink: 0;
 }
 
 /* Avatar en el leaderboard */
 .leaderboard-item .player-avatar {
-    width: clamp(32px, 6vw, 44px);
-    height: clamp(32px, 6vw, 44px);
-    border-radius: clamp(8px, 1.2vw, 12px);
+    width: clamp(28px, 5.5vw, 40px);
+    height: clamp(28px, 5.5vw, 40px);
+    border-radius: clamp(6px, 1vw, 10px);
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    font-size: clamp(0.9rem, 2.2vw, 1.2rem);
     flex-shrink: 0;
 }
 
@@ -3181,7 +3319,7 @@ body {
 }
 
 .player-info .player-name {
-    font-size: clamp(0.85rem, 2vw, 1.1rem);
+    font-size: clamp(0.75rem, 1.8vw, 1rem);
     font-weight: 700;
     color: var(--color-text);
     margin: 0;
@@ -3192,11 +3330,11 @@ body {
 
 /* Badge de puntuación */
 .score-badge {
-    padding: clamp(4px, 0.8vw, 8px) clamp(10px, 1.8vw, 16px);
+    padding: clamp(3px, 0.6vw, 6px) clamp(8px, 1.5vw, 14px);
     background: linear-gradient(135deg, rgba(235, 130, 37, 0.15) 0%, rgba(235, 130, 37, 0.08) 100%);
     border: 2px solid var(--color-warning);
     border-radius: 50px;
-    font-size: clamp(0.75rem, 1.8vw, 0.95rem);
+    font-size: clamp(0.65rem, 1.5vw, 0.85rem);
     font-weight: 700;
     color: var(--color-warning);
     flex-shrink: 0;
@@ -3207,24 +3345,25 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    font-size: clamp(0.7rem, 1.5vw, 0.85rem);
+    gap: 5px;
+    font-size: clamp(0.65rem, 1.4vw, 0.8rem);
     color: var(--color-text-light);
-    margin-top: clamp(8px, 1.5vw, 14px);
+    margin-top: clamp(6px, 1.2vw, 12px);
 }
 
 .admin-hint iconify-icon {
-    font-size: clamp(0.9rem, 2vw, 1.1rem);
+    font-size: clamp(0.8rem, 1.8vw, 1rem);
 }
 
-/* Media query para pantallas pequeñas */
-@media (max-height: 500px) {
+/* Media query para pantallas pequeñas (landscape) */
+@media (max-height: 480px) {
     .end-screen-container {
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: center;
+        align-items: center;
         max-width: 100%;
-        gap: clamp(8px, 1.5vw, 16px);
+        gap: clamp(4px, 1vw, 10px);
     }
     
     .main-trophy-container {
@@ -3232,33 +3371,42 @@ body {
     }
     
     .main-trophy-icon {
-        font-size: clamp(2.5rem, 8vh, 4rem);
+        font-size: clamp(1.8rem, 6vh, 3rem);
     }
     
     .trophy-shine {
-        width: clamp(60px, 12vh, 90px);
-        height: clamp(60px, 12vh, 90px);
+        width: clamp(40px, 8vh, 70px);
+        height: clamp(40px, 8vh, 70px);
     }
     
     .end-title {
-        font-size: clamp(1.2rem, 4vh, 1.8rem);
+        font-size: clamp(0.9rem, 3vh, 1.4rem);
     }
     
     .winner-individual-card {
         flex-direction: row;
-        padding: 10px 16px;
+        padding: 6px 12px;
         min-width: auto;
+        gap: 8px;
     }
     
     .crown-icon {
         position: static;
-        font-size: 1.2rem;
+        font-size: 1rem;
     }
     
     .winner-avatar {
-        width: 40px;
-        height: 40px;
-        font-size: 1.2rem;
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+    }
+    
+    .winner-name {
+        font-size: 0.85rem;
+    }
+    
+    .winner-score {
+        font-size: 0.8rem;
     }
     
     .leaderboard-list {
@@ -3266,16 +3414,44 @@ body {
         flex-wrap: wrap;
         justify-content: center;
         max-width: 100%;
+        gap: 4px;
     }
     
     .leaderboard-item {
         flex: 0 0 auto;
-        min-width: 150px;
+        min-width: 130px;
+        padding: 4px 10px;
+    }
+    
+    .leaderboard-item .player-avatar {
+        width: 24px;
+        height: 24px;
+        font-size: 0.8rem;
+    }
+    
+    .rank-badge {
+        width: 20px;
+        height: 20px;
+        font-size: 0.6rem;
+    }
+    
+    .rank-trophy {
+        font-size: 0.9rem;
+    }
+    
+    .player-info .player-name {
+        font-size: 0.7rem;
+    }
+    
+    .score-badge {
+        padding: 2px 6px;
+        font-size: 0.6rem;
     }
     
     .difficulty-completed,
     .winner-intro,
-    .admin-hint {
+    .admin-hint,
+    .leaderboard-title {
         display: none;
     }
 }

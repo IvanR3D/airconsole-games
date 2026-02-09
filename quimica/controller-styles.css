@@ -309,7 +309,7 @@ body {
    PANTALLA DE ESPERA (No admin)
    ============================================ */
 #waitingScreen {
-    gap: 16px;
+    gap: clamp(10px, 2.5vw, 16px);
 }
 
 .waiting-content {
@@ -319,26 +319,26 @@ body {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    padding: 20px;
-    gap: 12px;
+    padding: clamp(12px, 3vw, 20px);
+    gap: clamp(8px, 2vw, 12px);
     max-width: 100%;
     min-width: 0;
 }
 
 .player-avatar-big {
-    width: 72px;
-    height: 72px;
-    border-radius: 18px;
+    width: clamp(56px, 14vw, 72px);
+    height: clamp(56px, 14vw, 72px);
+    border-radius: clamp(14px, 3.5vw, 18px);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 36px;
+    font-size: clamp(28px, 7vw, 36px);
     color: white;
     box-shadow: 0 6px 20px rgba(0,0,0,0.2);
 }
 
 .player-name {
-    font-size: 1.5rem;
+    font-size: clamp(1.1rem, 4vw, 1.5rem);
     font-weight: 800;
     margin: 0;
 }
@@ -355,37 +355,38 @@ body {
 .config-badge {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 14px;
+    gap: 5px;
+    padding: clamp(6px, 1.5vw, 8px) clamp(10px, 2.5vw, 14px);
     background: var(--bg);
     border: 2px solid #e0e8f0;
     border-radius: 20px;
-    font-size: clamp(0.75rem, 2.2vw, 0.85rem);
+    font-size: clamp(0.7rem, 2vw, 0.85rem);
     font-weight: 700;
     color: var(--text);
     min-width: 0;
 }
 
 .config-badge iconify-icon {
-    font-size: 18px;
+    font-size: clamp(14px, 3.5vw, 18px);
     color: var(--turquesa);
 }
 
 .waiting-status {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 16px 24px;
+    gap: clamp(8px, 2vw, 10px);
+    padding: clamp(12px, 3vw, 16px) clamp(18px, 4vw, 24px);
     background: rgba(5, 149, 174, 0.1);
     border: 2px solid var(--turquesa);
     border-radius: 24px;
     color: var(--turquesa);
     font-weight: 700;
-    margin-top: 12px;
+    font-size: clamp(0.85rem, 2.5vw, 1rem);
+    margin-top: clamp(8px, 2vw, 12px);
 }
 
 .waiting-status iconify-icon {
-    font-size: 28px;
+    font-size: clamp(22px, 5.5vw, 28px);
 }
 
 /* ============================================
@@ -403,37 +404,38 @@ body {
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: min(400px, 100%);
+    max-width: min(380px, 100%);
     min-width: 0;
     height: 100%;
     overflow: hidden;
+    margin: 0 auto;
 }
 
 /* Header */
 .wizard-header {
     flex-shrink: 0;
     text-align: center;
-    padding-bottom: 12px;
+    padding-bottom: 10px;
 }
 
 .admin-badge {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    border-radius: 24px;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 22px;
     color: white;
     font-weight: 700;
-    font-size: 0.9rem;
-    margin-bottom: 12px;
+    font-size: 0.85rem;
+    margin-bottom: 10px;
 }
 
 .admin-badge iconify-icon {
-    font-size: 20px;
+    font-size: 18px;
 }
 
 .admin-badge .crown {
-    font-size: 14px;
+    font-size: 12px;
     color: #fbbf24;
 }
 
@@ -445,8 +447,8 @@ body {
 }
 
 .step-dot {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     background: var(--bg);
     border: 3px solid #d0d8e0;
@@ -454,7 +456,7 @@ body {
     align-items: center;
     justify-content: center;
     font-weight: 800;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: var(--text-light);
     transition: all 0.2s;
 }
@@ -463,12 +465,12 @@ body {
     background: var(--turquesa);
     border-color: var(--turquesa);
     color: white;
-    box-shadow: 0 4px 12px rgba(5, 149, 174, 0.4);
+    box-shadow: 0 3px 10px rgba(5, 149, 174, 0.4);
 }
 
 .step-line {
-    width: 32px;
-    height: 4px;
+    width: 28px;
+    height: 3px;
     background: #d0d8e0;
     transition: all 0.2s;
 }
@@ -492,13 +494,13 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    padding: 8px 0;
+    gap: 12px;
+    padding: 6px 0;
     min-width: 0;
 }
 
 .step-title {
-    font-size: clamp(1.1rem, 4vw, 1.4rem);
+    font-size: clamp(1rem, 3.5vw, 1.3rem);
     font-weight: 800;
     color: var(--text);
     text-align: center;
@@ -510,7 +512,7 @@ body {
 .mode-cards {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: clamp(8px, 2.5vw, 12px);
+    gap: clamp(6px, 2vw, 10px);
     flex: 1;
     align-content: center;
     width: 100%;
@@ -520,7 +522,7 @@ body {
 .difficulty-cards {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: clamp(6px, 2vw, 10px);
+    gap: clamp(5px, 1.5vw, 8px);
     flex: 1;
     align-content: center;
     width: 100%;
@@ -532,11 +534,11 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: clamp(6px, 1.5vw, 10px);
-    padding: clamp(12px, 3vw, 20px) clamp(10px, 2vw, 16px);
+    gap: clamp(4px, 1.2vw, 8px);
+    padding: clamp(10px, 2.5vw, 16px) clamp(8px, 1.5vw, 12px);
     background: var(--bg);
     border: 3px solid #e0e8f0;
-    border-radius: 16px;
+    border-radius: 14px;
     cursor: pointer;
     transition: all 0.15s;
     min-height: var(--btn-optimal);
@@ -548,13 +550,13 @@ body {
 }
 
 .option-card iconify-icon {
-    font-size: 32px;
+    font-size: clamp(24px, 6vw, 30px);
     color: var(--card-color);
 }
 
 .option-card span {
     font-weight: 700;
-    font-size: clamp(0.8rem, 2.2vw, 0.95rem);
+    font-size: clamp(0.7rem, 2vw, 0.9rem);
     color: var(--text);
     text-align: center;
     overflow: hidden;
@@ -572,8 +574,8 @@ body {
 /* Rondas: grid que envuelve según ancho (sin scroll horizontal) */
 .rounds-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(70px, 100%), 1fr));
-    gap: clamp(6px, 2vw, 8px);
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: clamp(4px, 1.5vw, 6px);
     width: 100%;
     min-width: 0;
 }
@@ -582,12 +584,12 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: clamp(10px, 2.5vw, 14px) clamp(6px, 1.5vw, 8px);
+    padding: clamp(8px, 2vw, 12px) clamp(4px, 1vw, 6px);
     background: var(--bg);
     border: 3px solid #e0e8f0;
-    border-radius: 12px;
+    border-radius: 10px;
     font-weight: 800;
-    font-size: clamp(1rem, 3vw, 1.2rem);
+    font-size: clamp(0.9rem, 2.5vw, 1.1rem);
     color: var(--text);
     cursor: pointer;
     transition: all 0.15s;
@@ -610,13 +612,13 @@ body {
 .summary-bar {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 10px;
     justify-content: center;
-    padding: 14px;
+    padding: 12px;
     background: var(--bg);
     border: 2px solid #e0e8f0;
-    border-radius: 14px;
-    margin-top: 12px;
+    border-radius: 12px;
+    margin-top: 10px;
     width: 100%;
     min-width: 0;
     box-sizing: border-box;
@@ -1367,25 +1369,34 @@ body {
 /* Móviles pequeños (iPhone SE, etc.) */
 @media (max-width: 360px) {
     .option-card {
-        padding: 14px 10px;
-        min-height: 85px;
+        padding: 12px 8px;
+        min-height: 75px;
+        gap: 4px;
     }
     
-    .option-card iconify-icon { font-size: 26px; }
-    .option-card span { font-size: 0.85rem; }
+    .option-card iconify-icon { font-size: 22px; }
+    .option-card span { font-size: 0.75rem; }
     
-    .rounds-grid { gap: 6px; }
-    .rounds-btn { padding: 12px 6px; font-size: 1rem; }
+    .rounds-grid { gap: 4px; }
+    .rounds-btn { padding: 10px 4px; font-size: 0.9rem; min-height: 40px; }
     
-    .elements-grid-optimized { gap: 8px; }
+    .elements-grid-optimized { gap: 6px; }
     .element-btn-large { 
-        min-height: 54px; 
-        max-width: 72px;
+        min-height: 52px; 
+        max-width: 68px;
     }
-    .element-btn-large .symbol { font-size: 16px; }
+    .element-btn-large .symbol { font-size: 15px; }
     .element-btn-large .name { font-size: 6px; }
     
-    .confirm-btn-large { height: 64px; }
+    .confirm-btn-large { height: 62px; }
+    
+    .step-dot { width: 28px; height: 28px; font-size: 0.75rem; }
+    .step-line { width: 22px; }
+    
+    .wizard-nav { gap: 8px; }
+    .btn-back { width: 44px; height: 44px; }
+    .btn-next { padding: 10px 20px; font-size: 0.9rem; }
+    .btn-start { padding: 12px 22px; font-size: 0.95rem; min-height: 52px; }
 }
 
 /* Móviles grandes (iPhone Pro Max, etc.) */
@@ -1435,31 +1446,55 @@ body {
         padding-top: 40px !important; 
     }
     
-    .wizard-header { padding-bottom: 8px; }
-    .admin-badge { padding: 6px 12px; font-size: 0.8rem; margin-bottom: 8px; }
+    /* Waiting screen en landscape */
+    #waitingScreen { gap: 8px; }
+    .waiting-content { 
+        flex-direction: row; 
+        flex-wrap: wrap; 
+        justify-content: center;
+        padding: 8px 16px;
+        gap: 10px;
+    }
+    .player-avatar-big { width: 48px; height: 48px; font-size: 24px; border-radius: 12px; }
+    .player-name { font-size: 1rem; }
+    .config-badges { gap: 6px; }
+    .config-badge { padding: 5px 10px; font-size: 0.7rem; }
+    .config-badge iconify-icon { font-size: 14px; }
+    .waiting-status { padding: 10px 16px; font-size: 0.8rem; }
+    .waiting-status iconify-icon { font-size: 20px; }
     
-    .step-dot { width: 30px; height: 30px; font-size: 0.8rem; }
-    .step-line { width: 24px; height: 3px; }
+    .wizard-header { padding-bottom: 6px; }
+    .admin-badge { padding: 5px 10px; font-size: 0.75rem; margin-bottom: 6px; }
     
-    .step-title { font-size: 1.1rem; }
+    .step-dot { width: 26px; height: 26px; font-size: 0.75rem; }
+    .step-line { width: 20px; height: 2px; }
     
-    .mode-cards { gap: 10px; }
-    .difficulty-cards { gap: 8px; }
+    .step-title { font-size: 1rem; }
+    
+    .mode-cards { gap: 8px; }
+    .difficulty-cards { gap: 6px; }
     
     .option-card {
-        padding: 12px 10px;
-        min-height: 70px;
-        gap: 6px;
+        padding: 10px 8px;
+        min-height: 60px;
+        gap: 4px;
     }
     
-    .option-card iconify-icon { font-size: 24px; }
-    .option-card span { font-size: 0.8rem; }
+    .option-card iconify-icon { font-size: 22px; }
+    .option-card span { font-size: 0.75rem; }
     
-    .rounds-btn { padding: 10px 6px; font-size: 1rem; }
+    .rounds-grid { gap: 4px; }
+    .rounds-btn { padding: 8px 4px; font-size: 0.9rem; min-height: 38px; }
     
-    .wizard-nav { padding-top: 10px; }
-    .btn-next { padding: 10px 22px; font-size: 0.9rem; }
-    .btn-start { padding: 12px 24px; font-size: 1rem; min-height: 50px; }
+    .wizard-nav { padding-top: 8px; gap: 8px; }
+    .btn-back { width: 42px; height: 42px; font-size: 18px; }
+    .btn-next { padding: 8px 18px; font-size: 0.85rem; min-height: 42px; }
+    .btn-start { padding: 10px 20px; font-size: 0.95rem; min-height: 46px; }
+    .btn-start iconify-icon { font-size: 20px; }
+    
+    .summary-bar { padding: 8px 10px; gap: 8px; margin-top: 6px; }
+    .summary-bar span { font-size: 0.75rem; }
+    .summary-bar iconify-icon { font-size: 14px; }
     
     /* Header compuesto en landscape */
     .compound-objective-header {
@@ -1533,6 +1568,48 @@ body {
     }
 }
 
+/* AirConsole: Landscape muy compacto (max-height: 400px) */
+@media (orientation: landscape) and (max-height: 400px) {
+    :root { 
+        --safe-top: 35px; 
+    }
+    
+    .screen.active,
+    .view.active { 
+        padding-top: 35px; 
+    }
+    
+    .wizard-header { padding-bottom: 4px; }
+    .admin-badge { padding: 4px 8px; font-size: 0.7rem; margin-bottom: 4px; }
+    
+    .step-dot { width: 22px; height: 22px; font-size: 0.65rem; }
+    .step-line { width: 16px; height: 2px; }
+    
+    .step-title { font-size: 0.9rem; }
+    
+    .option-card {
+        padding: 8px 6px;
+        min-height: 50px;
+        gap: 3px;
+    }
+    
+    .option-card iconify-icon { font-size: 18px; }
+    .option-card span { font-size: 0.65rem; }
+    
+    .rounds-grid { gap: 3px; }
+    .rounds-btn { padding: 6px 3px; font-size: 0.8rem; min-height: 34px; }
+    
+    .wizard-nav { padding-top: 6px; gap: 6px; }
+    .btn-back { width: 38px; height: 38px; font-size: 16px; }
+    .btn-next { padding: 6px 14px; font-size: 0.8rem; min-height: 38px; }
+    .btn-start { padding: 8px 16px; font-size: 0.85rem; min-height: 40px; }
+    .btn-start iconify-icon { font-size: 18px; }
+    
+    .summary-bar { padding: 6px 8px; gap: 6px; margin-top: 4px; }
+    .summary-bar span { font-size: 0.65rem; }
+    .summary-bar iconify-icon { font-size: 12px; }
+}
+
 /* AirConsole: Safe area para dispositivos con notch */
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
     .confirm-btn-large {
@@ -1584,10 +1661,10 @@ body {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    padding: clamp(16px, 4vw, 24px);
-    gap: clamp(8px, 2vw, 14px);
+    padding: clamp(12px, 3vw, 20px);
+    gap: clamp(6px, 1.5vw, 12px);
     width: 100%;
-    max-width: min(360px, 100%);
+    max-width: min(340px, 100%);
     min-width: 0;
 }
 
@@ -1597,23 +1674,23 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
 }
 
 .trophy-icon {
-    font-size: clamp(56px, 15vw, 80px);
-    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
+    font-size: clamp(48px, 12vw, 72px);
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.2));
     position: relative;
     z-index: 2;
 }
 
 .trophy-glow {
     position: absolute;
-    width: clamp(80px, 20vw, 120px);
-    height: clamp(80px, 20vw, 120px);
+    width: clamp(70px, 16vw, 100px);
+    height: clamp(70px, 16vw, 100px);
     border-radius: 50%;
     opacity: 0.2;
-    filter: blur(20px);
+    filter: blur(16px);
     z-index: 1;
     animation: trophyPulse 2s ease-in-out infinite;
 }
@@ -1625,10 +1702,10 @@ body {
 
 /* Posición grande */
 .rank-display {
-    font-size: clamp(2.5rem, 10vw, 4rem);
+    font-size: clamp(2rem, 8vw, 3.5rem);
     font-weight: 900;
     line-height: 1;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 /* Card del jugador */
@@ -1636,37 +1713,37 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
-    padding: clamp(12px, 3vw, 18px);
+    gap: 6px;
+    padding: clamp(10px, 2.5vw, 16px);
     background: var(--bg);
     border: 3px solid;
-    border-radius: 20px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    border-radius: 18px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
     width: 100%;
-    max-width: 200px;
+    max-width: 180px;
 }
 
 .player-avatar-end {
-    width: clamp(48px, 12vw, 64px);
-    height: clamp(48px, 12vw, 64px);
-    border-radius: 16px;
+    width: clamp(40px, 10vw, 56px);
+    height: clamp(40px, 10vw, 56px);
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: clamp(24px, 6vw, 32px);
+    font-size: clamp(20px, 5vw, 28px);
     color: white;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .player-name-end {
-    font-size: clamp(1rem, 3.5vw, 1.25rem);
+    font-size: clamp(0.9rem, 3vw, 1.15rem);
     font-weight: 800;
     margin: 0;
 }
 
 /* Mensaje de ranking */
 .rank-message {
-    font-size: clamp(0.85rem, 2.5vw, 1rem);
+    font-size: clamp(0.75rem, 2.2vw, 0.9rem);
     color: var(--text-light);
     font-weight: 600;
     margin: 0;
@@ -1676,18 +1753,18 @@ body {
 .difficulty-badge-end {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
+    gap: 5px;
+    padding: 5px 12px;
     background: var(--bg);
     border: 2px solid currentColor;
-    border-radius: 20px;
-    font-size: clamp(0.75rem, 2vw, 0.85rem);
+    border-radius: 18px;
+    font-size: clamp(0.7rem, 1.8vw, 0.8rem);
     font-weight: 700;
     opacity: 0.9;
 }
 
 .difficulty-badge-end iconify-icon {
-    font-size: 16px;
+    font-size: 14px;
 }
 
 /* Card de puntuación */
@@ -1695,23 +1772,23 @@ body {
     display: flex;
     align-items: baseline;
     justify-content: center;
-    gap: 6px;
-    padding: clamp(14px, 3.5vw, 20px) clamp(24px, 6vw, 40px);
+    gap: 5px;
+    padding: clamp(12px, 3vw, 18px) clamp(20px, 5vw, 36px);
     background: linear-gradient(135deg, rgba(235, 130, 37, 0.12) 0%, rgba(235, 130, 37, 0.06) 100%);
     border: 3px solid var(--naranja);
-    border-radius: 20px;
+    border-radius: 18px;
     width: 100%;
-    max-width: 220px;
+    max-width: 200px;
 }
 
 .score-value {
-    font-size: clamp(1.8rem, 7vw, 2.5rem);
+    font-size: clamp(1.5rem, 6vw, 2.2rem);
     font-weight: 900;
     color: var(--naranja);
 }
 
 .score-label {
-    font-size: clamp(1rem, 3vw, 1.2rem);
+    font-size: clamp(0.9rem, 2.5vw, 1.1rem);
     font-weight: 700;
     color: var(--naranja);
     opacity: 0.8;
@@ -1722,29 +1799,29 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
     width: 100%;
-    max-width: 240px;
-    padding: clamp(14px, 3.5vw, 18px) clamp(24px, 5vw, 32px);
+    max-width: 220px;
+    padding: clamp(12px, 3vw, 16px) clamp(20px, 4vw, 28px);
     background: linear-gradient(135deg, var(--verde) 0%, #5a8a2f 100%);
     border: none;
-    border-radius: 28px;
+    border-radius: 26px;
     font-weight: 800;
-    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    font-size: clamp(0.85rem, 2.2vw, 0.95rem);
     color: white;
     cursor: pointer;
-    box-shadow: 0 5px 0 #4a7a25, 0 8px 20px rgba(115, 160, 63, 0.3);
-    margin-top: 8px;
+    box-shadow: 0 4px 0 #4a7a25, 0 6px 16px rgba(115, 160, 63, 0.3);
+    margin-top: 6px;
     min-height: var(--btn-optimal);
 }
 
 .btn-play-again:active {
-    transform: translateY(5px);
+    transform: translateY(4px);
     box-shadow: none;
 }
 
 .btn-play-again iconify-icon {
-    font-size: clamp(20px, 5vw, 24px);
+    font-size: clamp(18px, 4vw, 22px);
 }
 
 /* Mensaje esperando admin */
@@ -1752,15 +1829,15 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    font-size: clamp(0.8rem, 2.2vw, 0.9rem);
+    gap: 6px;
+    font-size: clamp(0.75rem, 2vw, 0.85rem);
     color: var(--text-light);
     font-weight: 600;
-    margin-top: 8px;
+    margin-top: 6px;
 }
 
 .waiting-admin iconify-icon {
-    font-size: 18px;
+    font-size: 16px;
     animation: sandTimer 1.5s ease-in-out infinite;
 }
 
@@ -1769,15 +1846,16 @@ body {
     50% { transform: rotate(180deg); }
 }
 
-/* Media queries para landscape */
-@media (orientation: landscape) and (max-height: 500px) {
+/* Media queries para landscape - End Screen */
+@media (orientation: landscape) and (max-height: 450px) {
     .end-screen-content {
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: center;
+        align-items: center;
         max-width: 100%;
-        gap: clamp(8px, 2vw, 16px);
-        padding: 8px 16px;
+        gap: clamp(4px, 1.2vw, 10px);
+        padding: 4px 10px;
     }
     
     .trophy-container {
@@ -1785,50 +1863,70 @@ body {
     }
     
     .trophy-icon {
-        font-size: clamp(40px, 10vh, 56px);
+        font-size: clamp(32px, 8vh, 44px);
     }
     
     .trophy-glow {
-        width: clamp(50px, 12vh, 70px);
-        height: clamp(50px, 12vh, 70px);
+        width: clamp(40px, 9vh, 55px);
+        height: clamp(40px, 9vh, 55px);
     }
     
     .rank-display {
-        font-size: clamp(1.8rem, 8vh, 2.5rem);
+        font-size: clamp(1.3rem, 5vh, 1.8rem);
     }
     
     .player-result-card {
         flex-direction: row;
-        padding: 10px 16px;
+        padding: 6px 12px;
         max-width: none;
         width: auto;
+        gap: 8px;
     }
     
     .player-avatar-end {
-        width: 40px;
-        height: 40px;
-        font-size: 20px;
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+    }
+    
+    .player-name-end {
+        font-size: 0.85rem;
     }
     
     .score-card-end {
-        padding: 10px 20px;
+        padding: 6px 14px;
         max-width: none;
         width: auto;
     }
     
     .score-value {
-        font-size: clamp(1.4rem, 5vh, 1.8rem);
+        font-size: clamp(1rem, 4vh, 1.4rem);
+    }
+    
+    .score-label {
+        font-size: clamp(0.75rem, 2vh, 0.9rem);
     }
     
     .btn-play-again {
         max-width: none;
         width: auto;
-        padding: 10px 24px;
+        padding: 6px 16px;
         margin-top: 0;
+        min-height: 44px;
+        font-size: 0.8rem;
+    }
+    
+    .btn-play-again iconify-icon {
+        font-size: 16px;
     }
     
     .rank-message,
     .difficulty-badge-end {
         display: none;
+    }
+    
+    .waiting-admin {
+        font-size: 0.7rem;
+        margin-top: 0;
     }
 }
