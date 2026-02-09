@@ -535,6 +535,7 @@ function setupDifficultyListeners() {
             difficultyConfig = DIFFICULTY_CONFIG[currentDifficulty];
             document.querySelectorAll('.option-card[data-difficulty]').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
+            sendMessage({ action: 'setDifficulty', difficulty: currentDifficulty });
             if (navigator.vibrate) navigator.vibrate(30);
         });
     });
@@ -1081,13 +1082,49 @@ function handleGameStateUpdate(data) {
         if (scoreEl) scoreEl.textContent = myScore;
     }
     
-    if (data.difficulty) {
+    let configChanged = false;
+    
+    if (data.difficulty && data.difficulty !== currentDifficulty) {
         currentDifficulty = data.difficulty;
         difficultyConfig = DIFFICULTY_CONFIG[data.difficulty] || DIFFICULTY_CONFIG.easy;
+        configChanged = true;
     }
     
-    if (data.maxRounds) {
+    if (data.maxRounds && data.maxRounds !== maxRounds) {
         maxRounds = data.maxRounds;
+        selectedRounds = data.maxRounds;
+        configChanged = true;
+    }
+    
+    if (data.gameMode && data.gameMode !== currentGameMode) {
+        currentGameMode = data.gameMode;
+        configChanged = true;
+    }
+    
+    // Si cambió la configuración y estamos en pantalla de espera, actualizar UI
+    if (configChanged && !isAdmin && document.getElementById('waitingScreen')) {
+        updateWaitingScreenConfig();
+    }
+}
+
+// Actualizar la configuración mostrada en la pantalla de espera (para no-admins)
+function updateWaitingScreenConfig() {
+    const badges = document.querySelector('.config-badges');
+    if (badges) {
+        badges.innerHTML = `
+            <span class="config-badge">
+                <iconify-icon icon="${GAME_MODES[currentGameMode].icon}"></iconify-icon>
+                ${GAME_MODES[currentGameMode].name}
+            </span>
+            <span class="config-badge">
+                <iconify-icon icon="${difficultyConfig.icon}"></iconify-icon>
+                ${difficultyConfig.name}
+            </span>
+            <span class="config-badge" id="roundsDisplay">
+                <iconify-icon icon="mdi:counter"></iconify-icon>
+                ${selectedRounds || maxRounds || 8}
+            </span>
+        `;
     }
 }
 

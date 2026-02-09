@@ -392,6 +392,14 @@ function init() {
                     });
                 }
                 break;
+            case 'setDifficulty':
+                // Solo el admin puede cambiar la dificultad
+                if (players[from]?.isAdmin && data.difficulty) {
+                    setDifficulty(data.difficulty);
+                    updateDifficultyDisplay(data.difficulty);
+                    broadcastGameState();
+                }
+                break;
             case 'adminNextRound':
                 // Solo el admin puede avanzar a la siguiente ronda
                 if (players[from]?.isAdmin) {
@@ -960,25 +968,18 @@ function handlePlayerJoin(device_id) {
 }
 
 // Validar si los elementos seleccionados son correctos
-// Comparamos contando la cantidad de cada elemento (el orden no importa en química)
+// Validación por orden exacto - el jugador debe seleccionar los elementos en el orden correcto
 function validateElementSelection(playerElements, requiredElements) {
     if (playerElements.length !== requiredElements.length) return false;
     
-    // Contar elementos del jugador
-    const playerCounts = {};
-    playerElements.forEach(el => playerCounts[el] = (playerCounts[el] || 0) + 1);
+    // Comparar elemento por elemento en orden
+    for (let i = 0; i < requiredElements.length; i++) {
+        if (playerElements[i] !== requiredElements[i]) {
+            return false;
+        }
+    }
     
-    // Contar elementos requeridos
-    const requiredCounts = {};
-    requiredElements.forEach(el => requiredCounts[el] = (requiredCounts[el] || 0) + 1);
-    
-    // Comparar que tengan los mismos elementos en las mismas cantidades
-    const playerKeys = Object.keys(playerCounts);
-    const requiredKeys = Object.keys(requiredCounts);
-    
-    if (playerKeys.length !== requiredKeys.length) return false;
-    
-    return playerKeys.every(key => playerCounts[key] === requiredCounts[key]);
+    return true;
 }
 
 function getAvailableElements() {
