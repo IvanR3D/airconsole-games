@@ -417,6 +417,18 @@ function init() {
             case 'playerLeave':
                 handlePlayerLeave(from);
                 break;
+            case 'setMuted':
+                if (data.muted === true) {
+                    stopBackgroundMusic();
+                } else if (data.muted === false) {
+                    playBackgroundMusic();
+                }
+                const musicBtn = document.getElementById('musicToggle');
+                if (musicBtn) {
+                    const ico = musicBtn.querySelector('iconify-icon');
+                    if (ico) ico.setAttribute('icon', data.muted ? 'mdi:volume-off' : 'mdi:volume-high');
+                }
+                break;
         }
     };
 }

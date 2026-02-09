@@ -297,8 +297,12 @@ function goutte_anim(e, dec) {
   first();
 }
 
-// Animación de gradiente
+// Animación de gradiente (botella se llena en ~2s para que la animación acabe antes del card)
 function gradient_anim(e) {
+  gradient_anim_level = 0;
+  const stepMs = 40;
+  const stepCount = 50;
+  let step = 0;
   const timerGradient = setInterval(() => {
     if (!labAnimationRunning) {
       clearInterval(timerGradient);
@@ -306,20 +310,20 @@ function gradient_anim(e) {
     }
     
     try {
-      const gradient = '90-' + colorGd + '-' + colorGd + ':' + gradient_anim_level + '-#fff:' + (gradient_anim_level + 1) + '#fff';
+      const level = Math.min(100, Math.round((step / stepCount) * 100));
+      const gradient = '90-' + colorGd + '-' + colorGd + ':' + level + '-#fff:' + (level + 1) + '#fff';
       e.animate({fill: gradient}, 0);
+      gradient_anim_level = level;
       
-      if (gradient_anim_pause) {
-        gradient_anim_level++;
-      }
-      
-      if (gradient_anim_level === 100) {
+      step++;
+      if (step >= stepCount || level >= 100) {
+        gradient_anim_level = 100;
         clearInterval(timerGradient);
       }
     } catch (err) {
       clearInterval(timerGradient);
     }
-  }, 100);
+  }, stepMs);
 }
 
 // Animación de balón 3

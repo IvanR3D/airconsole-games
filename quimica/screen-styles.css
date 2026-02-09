@@ -115,20 +115,22 @@ body {
     bottom: 0;
     left: 0;
     right: 0;
-    width: 100vw;
+    width: 100%;
+    min-width: 100vw;
     height: 180px;
     overflow: hidden;
 }
 
+/* Olas más anchas y desplazadas a la izquierda para evitar recorte en el borde izquierdo */
 .global-waves .wave {
     position: absolute;
     bottom: 0;
-    left: 0;
-    width: 100vw;
+    left: -10vw;
+    width: 120vw;
     height: 100%;
     background-size: 100vw 100%;
     background-repeat: repeat-x;
-    background-position: bottom center;
+    background-position: bottom left;
     animation: waveShift 12s ease-in-out infinite;
 }
 
@@ -2304,6 +2306,9 @@ body {
     -webkit-backdrop-filter: blur(12px);
     border-radius: inherit;
     z-index: 15;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
 }
 
 .inline-results-container.hidden {
@@ -2312,10 +2317,12 @@ body {
 
 .inline-results-content {
     width: 100%;
-    max-width: 480px;
+    max-width: min(480px, 100%);
+    min-width: 0;
     display: flex;
     flex-direction: column;
     gap: clamp(10px, 1.8vw, 18px);
+    flex-shrink: 0;
 }
 
 /* Header de resultado inline */
@@ -2870,9 +2877,12 @@ body {
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1);
     max-width: min(94%, 480px);
     width: 100%;
+    min-width: 0;
     margin: 0 auto;
     max-height: calc(100vh - 120px);
     overflow-y: auto;
+    overflow-x: hidden;
+    box-sizing: border-box;
 }
 
 .correct-answer-reveal.success {

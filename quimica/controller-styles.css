@@ -56,10 +56,10 @@ body {
    COLORES STEAM RD - Paleta Consistente
    ============================================ */
 :root {
-    /* AirConsole (reglas): Safe area y tamaños de botón */
-    --airconsole-safe-top: 50px;
-    --safe-top: max(env(safe-area-inset-top), 50px);
-    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    /* AirConsole (reglas): Safe area - logo no debe cortar el badge (respetar ~60px arriba) */
+    --airconsole-safe-top: 60px;
+    --safe-top: max(env(safe-area-inset-top), 60px);
+    --safe-bottom: max(env(safe-area-inset-bottom), 20px);
     --safe-left: env(safe-area-inset-left, 0px);
     --safe-right: env(safe-area-inset-right, 0px);
     
@@ -284,10 +284,10 @@ body {
    ============================================ */
 .exit-btn-corner {
     position: absolute;
-    top: calc(var(--safe-top) + 4px);
-    right: 8px;
-    width: 40px;
-    height: 40px;
+    top: calc(var(--safe-top) + 2px);
+    right: 6px;
+    width: 38px;
+    height: 38px;
     border-radius: 10px;
     background: rgba(220, 38, 38, 0.1);
     border: none;
@@ -295,7 +295,7 @@ body {
     align-items: center;
     justify-content: center;
     color: var(--danger);
-    font-size: 20px;
+    font-size: 18px;
     cursor: pointer;
     z-index: 100;
 }
@@ -393,9 +393,10 @@ body {
    WIZARD DE CONFIGURACIÓN (Admin)
    ============================================ */
 .config-wizard-screen {
-    padding: var(--safe-top) max(12px, var(--safe-left)) max(16px, var(--safe-bottom)) max(12px, var(--safe-right)) !important;
+    padding: var(--safe-top) max(12px, var(--safe-left)) var(--safe-bottom) max(12px, var(--safe-right)) !important;
     justify-content: flex-start !important;
     align-items: stretch !important;
+    box-sizing: border-box !important;
 }
 
 .wizard-container {
@@ -404,41 +405,42 @@ body {
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: min(360px, calc(100% - 60px));
+    max-width: min(340px, calc(100% - 56px));
     min-width: 0;
     height: 100%;
-    max-height: calc(100vh - var(--safe-top) - 24px);
-    max-height: calc(100dvh - var(--safe-top) - 24px);
+    max-height: calc(100vh - var(--safe-top) - var(--safe-bottom));
+    max-height: calc(100dvh - var(--safe-top) - var(--safe-bottom));
     overflow: hidden;
     margin: 0 auto;
-    padding-right: 4px;
+    box-sizing: border-box;
 }
 
-/* Header */
+/* Header - espacio bajo logo AirConsole para no cortar badge */
 .wizard-header {
     flex-shrink: 0;
     text-align: center;
-    padding-bottom: 8px;
+    padding-bottom: 6px;
+    margin-top: 2px;
 }
 
 .admin-badge {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    padding: 5px 12px;
+    gap: 4px;
+    padding: 4px 10px;
     border-radius: 22px;
     color: white;
     font-weight: 700;
-    font-size: clamp(0.75rem, 2vw, 0.85rem);
-    margin-bottom: 8px;
+    font-size: clamp(0.7rem, 1.8vw, 0.8rem);
+    margin-bottom: 6px;
 }
 
 .admin-badge iconify-icon {
-    font-size: clamp(14px, 3.5vw, 18px);
+    font-size: clamp(12px, 3vw, 16px);
 }
 
 .admin-badge .crown {
-    font-size: clamp(10px, 2.5vw, 12px);
+    font-size: clamp(9px, 2.2vw, 11px);
     color: #fbbf24;
 }
 
@@ -450,8 +452,8 @@ body {
 }
 
 .step-dot {
-    width: clamp(26px, 7vw, 32px);
-    height: clamp(26px, 7vw, 32px);
+    width: clamp(24px, 6vw, 30px);
+    height: clamp(24px, 6vw, 30px);
     border-radius: 50%;
     background: var(--bg);
     border: 3px solid #d0d8e0;
@@ -459,7 +461,7 @@ body {
     align-items: center;
     justify-content: center;
     font-weight: 800;
-    font-size: clamp(0.7rem, 2vw, 0.85rem);
+    font-size: clamp(0.65rem, 1.8vw, 0.8rem);
     color: var(--text-light);
     transition: all 0.2s;
 }
@@ -472,7 +474,7 @@ body {
 }
 
 .step-line {
-    width: clamp(20px, 5vw, 28px);
+    width: clamp(18px, 4.5vw, 24px);
     height: 3px;
     background: #d0d8e0;
     transition: all 0.2s;
@@ -491,21 +493,20 @@ body {
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
-    padding-bottom: 8px;
 }
 
 .wizard-step {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: clamp(8px, 2vw, 12px);
-    padding: 4px 0;
+    gap: clamp(6px, 1.5vw, 10px);
+    padding: 2px 0;
     min-width: 0;
     min-height: 0;
 }
 
 .step-title {
-    font-size: clamp(0.95rem, 3.2vw, 1.2rem);
+    font-size: clamp(0.9rem, 3vw, 1.1rem);
     font-weight: 800;
     color: var(--text);
     text-align: center;
@@ -539,14 +540,14 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: clamp(3px, 1vw, 6px);
-    padding: clamp(8px, 2vw, 14px) clamp(6px, 1.2vw, 10px);
+    gap: clamp(2px, 0.8vw, 5px);
+    padding: clamp(6px, 1.5vw, 12px) clamp(4px, 1vw, 8px);
     background: var(--bg);
     border: 3px solid #e0e8f0;
-    border-radius: 14px;
+    border-radius: 12px;
     cursor: pointer;
     transition: all 0.15s;
-    min-height: var(--btn-optimal);
+    min-height: var(--btn-min);
     min-width: 0;
 }
 
@@ -555,13 +556,13 @@ body {
 }
 
 .option-card iconify-icon {
-    font-size: clamp(22px, 5.5vw, 28px);
+    font-size: clamp(20px, 5vw, 26px);
     color: var(--card-color);
 }
 
 .option-card span {
     font-weight: 700;
-    font-size: clamp(0.65rem, 1.8vw, 0.85rem);
+    font-size: clamp(0.6rem, 1.6vw, 0.8rem);
     color: var(--text);
     text-align: center;
     overflow: hidden;
@@ -580,7 +581,7 @@ body {
 .rounds-grid {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: clamp(3px, 1.2vw, 5px);
+    gap: clamp(3px, 1vw, 5px);
     width: 100%;
     min-width: 0;
 }
@@ -589,17 +590,17 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: clamp(6px, 1.5vw, 10px) clamp(3px, 0.8vw, 5px);
+    padding: clamp(6px, 1.2vw, 8px) clamp(2px, 0.6vw, 4px);
     background: var(--bg);
     border: 3px solid #e0e8f0;
-    border-radius: 10px;
+    border-radius: 8px;
     font-weight: 800;
-    font-size: clamp(0.85rem, 2.2vw, 1rem);
+    font-size: clamp(0.8rem, 2vw, 0.95rem);
     color: var(--text);
     cursor: pointer;
     transition: all 0.15s;
-    min-height: var(--btn-min);
-    min-width: var(--btn-min);
+    min-height: 38px;
+    min-width: 38px;
 }
 
 .rounds-btn:active {
@@ -617,13 +618,13 @@ body {
 .summary-bar {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
     justify-content: center;
-    padding: clamp(8px, 2vw, 12px);
+    padding: clamp(6px, 1.5vw, 10px);
     background: var(--bg);
     border: 2px solid #e0e8f0;
     border-radius: 12px;
-    margin-top: 8px;
+    margin-top: 6px;
     width: 100%;
     min-width: 0;
     box-sizing: border-box;
@@ -632,39 +633,42 @@ body {
 .summary-bar span {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
     font-weight: 700;
-    font-size: clamp(0.7rem, 2vw, 0.85rem);
+    font-size: clamp(0.65rem, 1.8vw, 0.8rem);
     color: var(--text);
 }
 
 .summary-bar iconify-icon {
-    font-size: clamp(14px, 3.5vw, 18px);
+    font-size: clamp(12px, 3vw, 16px);
 }
 
-/* Navegación */
+/* Navegación - siempre visible, respetando safe area */
 .wizard-nav {
     flex-shrink: 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 0 8px 0;
+    padding: 10px 0 0 0;
+    padding-bottom: env(safe-area-inset-bottom, 0);
     gap: 12px;
     margin-top: auto;
+    min-height: 56px;
 }
 
 .btn-back {
-    width: 48px;
-    height: 48px;
+    width: 46px;
+    height: 46px;
     border-radius: 50%;
     background: var(--bg);
     border: 2px solid #d0d8e0;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 22px;
+    font-size: 20px;
     color: var(--text-light);
     cursor: pointer;
+    flex-shrink: 0;
 }
 
 .btn-back:active {
@@ -676,17 +680,18 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 12px 24px;
+    padding: 10px 18px 12px;
     background: linear-gradient(135deg, var(--turquesa) 0%, var(--morado) 100%);
     border: none;
     border-radius: 28px;
     font-weight: 700;
-    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    font-size: clamp(0.85rem, 2.2vw, 0.95rem);
     color: white;
     cursor: pointer;
     box-shadow: 0 4px 0 #065a6a;
-    min-height: var(--btn-min);
+    min-height: 44px;
     flex-shrink: 0;
+    box-sizing: border-box;
 }
 
 .btn-next:active {
@@ -700,26 +705,27 @@ body {
     justify-content: center;
     gap: 10px;
     flex: 1;
-    padding: 14px 28px;
+    padding: 10px 20px 12px;
     background: linear-gradient(135deg, var(--verde) 0%, #5a8a2f 100%);
     border: none;
     border-radius: 28px;
     font-weight: 800;
-    font-size: clamp(1rem, 2.8vw, 1.1rem);
+    font-size: clamp(0.9rem, 2.2vw, 1rem);
     color: white;
     cursor: pointer;
-    box-shadow: 0 5px 0 #4a7a25;
-    min-height: 54px;
+    box-shadow: 0 4px 0 #4a7a25;
+    min-height: 48px;
     flex-shrink: 0;
+    box-sizing: border-box;
 }
 
 .btn-start:active {
-    transform: translateY(5px);
+    transform: translateY(4px);
     box-shadow: none;
 }
 
 .btn-start iconify-icon {
-    font-size: 24px;
+    font-size: 22px;
 }
 
 
@@ -757,6 +763,33 @@ body {
 .exit-btn-corner-small:active {
     background: rgba(220, 38, 38, 0.15);
     color: var(--danger);
+}
+
+/* Botón audio en controller (igual que en screen) */
+.music-toggle-controller {
+    position: absolute;
+    top: calc(max(var(--safe-top), 50px) + 6px);
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    min-width: var(--btn-min);
+    min-height: var(--btn-min);
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.08);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-light);
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 100;
+    touch-action: manipulation;
+}
+
+.music-toggle-controller:active {
+    background: rgba(5, 149, 174, 0.2);
+    color: var(--turquesa);
 }
 
 /* ============================================
@@ -1245,6 +1278,25 @@ body {
     margin-bottom: 14px;
 }
 
+/* Solo respuesta correcta (sin ícono correcto/incorrecto) */
+.result-correct-only {
+    text-align: center;
+    margin-bottom: 14px;
+}
+
+.result-label-correct {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--turquesa);
+    margin-bottom: 8px;
+}
+
+.result-hint-small {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    margin-top: 6px;
+}
+
 .result-answer {
     font-size: 0.9rem;
     color: var(--text-light);
@@ -1573,6 +1625,13 @@ body {
         width: 34px;
         height: 34px;
         font-size: 18px;
+    }
+    
+    .music-toggle-controller {
+        width: 34px;
+        height: 34px;
+        font-size: 18px;
+        top: calc(40px + 4px);
     }
 }
 
@@ -1931,6 +1990,80 @@ body {
 
 .btn-play-again iconify-icon {
     font-size: clamp(18px, 4vw, 22px);
+}
+
+/* Puntuación final de todos los jugadores (elegir ganador) */
+.final-ranking-controller {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin-top: 6px;
+}
+
+.final-ranking-title {
+    font-size: clamp(0.85rem, 2.2vw, 1rem);
+    font-weight: 800;
+    color: var(--text);
+    margin: 0 0 8px 0;
+    text-align: center;
+}
+
+.final-ranking-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 35vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 4px 0;
+}
+
+.final-ranking-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: var(--bg);
+    border: 2px solid #e0e8f0;
+    border-radius: 12px;
+    font-size: clamp(0.8rem, 2vw, 0.9rem);
+}
+
+.final-ranking-item.is-you {
+    border-color: var(--turquesa);
+    background: rgba(5, 149, 174, 0.08);
+}
+
+.final-rank {
+    font-weight: 800;
+    color: var(--text-light);
+    min-width: 28px;
+}
+
+.final-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.final-name {
+    flex: 1;
+    font-weight: 700;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.final-score {
+    font-weight: 800;
+    color: var(--naranja);
 }
 
 /* Mensaje esperando admin */

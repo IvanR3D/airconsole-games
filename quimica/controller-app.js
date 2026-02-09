@@ -587,9 +587,14 @@ function renderPlayingScreen() {
         <div class="screen active playing-screen-optimized" id="playingScreen">
             <div class="controller-bg"></div>
             
-            <!-- Botón salir discreto en esquina superior izquierda -->
+            <!-- Botón salir en esquina superior izquierda -->
             <button class="exit-btn-corner-small" id="exitGameBtn" title="Salir">
                 <iconify-icon icon="mdi:close"></iconify-icon>
+            </button>
+            
+            <!-- Botón audio (igual que en screen) -->
+            <button class="music-toggle-controller" id="musicToggleController" title="Silenciar / Sonido">
+                <iconify-icon icon="mdi:volume-high"></iconify-icon>
             </button>
             
             <!-- Header con objetivo del compuesto -->
@@ -652,6 +657,7 @@ function renderPlayingScreen() {
     
     setupElementsGrid();
     setupExitButton();
+    setupMusicToggleController();
 }
 
 function renderSelectionSlots() {
@@ -682,6 +688,19 @@ function renderSelectionSlots() {
 }
 
 window.confirmSelection = confirmSelection;
+
+function setupMusicToggleController() {
+    const btn = document.getElementById('musicToggleController');
+    if (!btn) return;
+    let isMuted = false;
+    btn.addEventListener('click', () => {
+        isMuted = !isMuted;
+        sendMessage({ action: 'setMuted', muted: isMuted });
+        const icon = btn.querySelector('iconify-icon');
+        if (icon) icon.setAttribute('icon', isMuted ? 'mdi:volume-off' : 'mdi:volume-high');
+        if (navigator.vibrate) navigator.vibrate(20);
+    });
+}
 
 function setupExitButton() {
     const exitBtn = document.getElementById('exitGameBtn');
@@ -953,10 +972,11 @@ function playMelody(frequencies, noteDuration, volume) {
 }
 
 function renderEndScreen(data) {
-    const myRank = data.players.findIndex(p => p.id === playerData.id) + 1;
-    const myFinalScore = data.players.find(p => p.id === playerData.id)?.score || 0;
+    const playersList = Array.isArray(data.players) ? data.players : Object.values(data.players || {});
+    const sortedPlayers = playersList.slice().sort((a, b) => (b.score || 0) - (a.score || 0));
+    const myRank = sortedPlayers.findIndex(p => p.id === playerData.id) + 1;
+    const myFinalScore = sortedPlayers.find(p => p.id === playerData.id)?.score || 0;
     
-    // Trofeos para los 3 primeros puestos
     const getTrophyIcon = (rank) => {
         if (rank === 1) return 'mdi:trophy';
         if (rank === 2) return 'mdi:trophy-outline';
@@ -965,9 +985,9 @@ function renderEndScreen(data) {
     };
     
     const getTrophyColor = (rank) => {
-        if (rank === 1) return '#fbbf24'; // Oro
-        if (rank === 2) return '#9ca3af'; // Plata
-        if (rank === 3) return '#cd7f32'; // Bronce
+        if (rank === 1) return '#fbbf24';
+        if (rank === 2) return '#9ca3af';
+        if (rank === 3) return '#cd7f32';
         return '#6b7280';
     };
     
@@ -984,7 +1004,6 @@ function renderEndScreen(data) {
             <div class="controller-bg"></div>
             
             <div class="end-screen-content">
-                <!-- Trofeo grande centrado con posición -->
                 <div class="trophy-main-section">
                     <div class="trophy-container-big">
                         <iconify-icon icon="${getTrophyIcon(myRank)}" class="trophy-icon-big" style="color: ${getTrophyColor(myRank)};"></iconify-icon>
@@ -996,7 +1015,6 @@ function renderEndScreen(data) {
                     <p class="rank-message">${rankMessages[Math.min(myRank - 1, 3)]}</p>
                 </div>
                 
-                <!-- Jugador con puntos -->
                 <div class="player-score-section">
                     <div class="player-result-card-compact" style="border-color: ${playerData.color};">
                         <div class="player-avatar-end" style="background: ${playerData.color};">
@@ -1004,14 +1022,29 @@ function renderEndScreen(data) {
                         </div>
                         <span class="player-name-end" style="color: ${playerData.color};">${playerData.name}</span>
                     </div>
-                    
                     <div class="score-card-end-compact">
                         <span class="score-value">${myFinalScore}</span>
                         <span class="score-label">pts</span>
                     </div>
                 </div>
                 
-                <!-- Botón jugar de nuevo -->
+                <!-- Puntuación de todos los jugadores (elegir ganador) -->
+                <div class="final-ranking-controller">
+                    <h3 class="final-ranking-title">Puntuación final</h3>
+                    <div class="final-ranking-list">
+                        ${sortedPlayers.map((p, i) => `
+                            <div class="final-ranking-item ${p.id === playerData.id ? 'is-you' : ''}">
+                                <span class="final-rank">${i + 1}°</span>
+                                <div class="final-avatar" style="background: ${p.color};">
+                                    <iconify-icon icon="${p.icon || 'mdi:account'}"></iconify-icon>
+                                </div>
+                                <span class="final-name">${p.name}</span>
+                                <span class="final-score">${p.score || 0} pts</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                
                 ${isAdmin ? `
                     <button class="btn-play-again" id="playAgainBtn">
                         <iconify-icon icon="mdi:refresh"></iconify-icon>
@@ -1203,84 +1236,41 @@ function handleRoundResult(data) {
     
     if (!overlay || !content) return;
     
-    // Actualizar puntuación del jugador
     if (data.players && data.players[playerData?.id]) {
         myScore = data.players[playerData.id].score;
     }
     
-    // Determinar si ESTE jugador acertó
     const myResult = data.playerResults && data.playerResults[playerData?.id];
     const isCorrect = myResult ? myResult.isCorrect : false;
     
-    if (isCorrect) {
-        playSound('success');
-        
-        content.innerHTML = `
-            <div class="result-big">
-                <div class="result-icon-big success">
-                    <iconify-icon icon="mdi:check-circle"></iconify-icon>
-                </div>
-                <div class="confetti-burst" id="miniConfetti"></div>
-            </div>
-            <h2 class="result-title success">¡Correcto!</h2>
+    if (isCorrect) playSound('success');
+    else playSound('error');
+    
+    if (navigator.vibrate) navigator.vibrate(isCorrect ? [100, 50, 100] : [200, 100, 200]);
+    
+    // Solo mostrar la respuesta correcta (fórmula, nombre, hint)
+    content.innerHTML = `
+        <div class="result-correct-only">
+            <p class="result-label-correct">✔ Respuesta correcta:</p>
             <p class="result-formula">${data.compound.formula}</p>
             <p class="result-name">${data.compound.name}</p>
-            ${isAdmin ? `
-                <button class="btn-next-round" id="nextRoundBtn">
-                    <iconify-icon icon="mdi:arrow-right"></iconify-icon>
-                    Siguiente
-                </button>
-            ` : `
-                <p class="result-waiting">
-                    <iconify-icon icon="mdi:timer-sand"></iconify-icon>
-                    Esperando...
-                </p>
-            `}
-        `;
-        
-        createMiniConfetti();
-        if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-    } else {
-        playSound('error');
-        
-        content.innerHTML = `
-            <div class="result-big">
-                <div class="result-icon-big error shake-animation">
-                    <iconify-icon icon="mdi:close-circle"></iconify-icon>
-                </div>
-                <div class="error-x-burst" id="errorBurst"></div>
-            </div>
-            <h2 class="result-title error">¡Incorrecto!</h2>
-            <p class="result-formula">${data.compound.formula}</p>
-            <p class="result-answer">Era: ${data.compound.elements.join(' + ')}</p>
-            ${isAdmin ? `
-                <button class="btn-next-round" id="nextRoundBtn">
-                    <iconify-icon icon="mdi:arrow-right"></iconify-icon>
-                    Siguiente
-                </button>
-            ` : `
-                <p class="result-waiting">
-                    <iconify-icon icon="mdi:timer-sand"></iconify-icon>
-                    Esperando...
-                </p>
-            `}
-        `;
-        
-        createErrorBurst();
-        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-    }
+            ${data.compound.hint ? `<p class="result-hint-small">${data.compound.hint}</p>` : ''}
+        </div>
+        ${isAdmin ? `
+            <button class="btn-next-round" id="nextRoundBtn">
+                <iconify-icon icon="mdi:arrow-right"></iconify-icon>
+                Siguiente
+            </button>
+        ` : `
+            <p class="result-waiting">
+                <iconify-icon icon="mdi:timer-sand"></iconify-icon>
+                Esperando...
+            </p>
+        `}
+    `;
     
     overlay.classList.add('active');
     
-    if (window.anime) {
-        window.anime.animate('.result-icon-big', {
-            scale: [0, 1.3, 1],
-            duration: 500,
-            easing: 'easeOutElastic(1, .5)'
-        });
-    }
-    
-    // Botón siguiente para admin
     if (isAdmin) {
         setTimeout(() => {
             const nextBtn = document.getElementById('nextRoundBtn');
