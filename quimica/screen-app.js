@@ -1682,7 +1682,7 @@ function checkCompound() {
     checkAllPlayersResults();
 }
 
-// Mostrar resultados individuales
+// Mostrar resultados individuales - SIMPLIFICADO (solo compuesto y aciertos)
 function showIndividualResults(totalCorrect, pointsAwarded) {
     const inlineResults = document.getElementById('inlineResults');
     const inlineContent = document.getElementById('inlineResultsContent');
@@ -1690,8 +1690,6 @@ function showIndividualResults(totalCorrect, pointsAwarded) {
     if (!inlineResults || !inlineContent) return;
     
     const totalPlayers = Object.keys(players).length;
-    const sortedPlayers = Object.values(players).sort((a, b) => b.score - a.score);
-    const topPlayers = sortedPlayers.slice(0, 5);
     
     inlineContent.innerHTML = `
         <div class="inline-result-header ${totalCorrect > 0 ? 'success' : 'error'}">
@@ -1705,28 +1703,9 @@ function showIndividualResults(totalCorrect, pointsAwarded) {
                 <span>${totalCorrect}/${totalPlayers} acertaron</span>
             </div>
         </div>
-        
-        <div class="inline-ranking">
-            <h4><iconify-icon icon="mdi:podium"></iconify-icon> Ranking Actual</h4>
-            <div class="ranking-list">
-                ${topPlayers.map((p, i) => `
-                    <div class="ranking-item ${playerResults[p.id]?.isCorrect ? 'correct' : ''}">
-                        <span class="rank">${i + 1}</span>
-                        <div class="player-dot" style="background: ${p.color};"></div>
-                        <span class="name">${p.name}</span>
-                        <span class="score">${p.score} pts</span>
-                    </div>
-                `).join('')}
-            </div>
-        </div>
-        
-        <div class="inline-points-info">
-            <iconify-icon icon="mdi:information"></iconify-icon>
-            +${pointsAwarded} puntos por respuesta correcta
-        </div>
     `;
     
-    // Mostrar resultados encima de la animación (sin ocultarla)
+    // Mostrar resultados
     inlineResults.classList.remove('hidden');
     
     // Animación de entrada
@@ -1736,12 +1715,6 @@ function showIndividualResults(totalCorrect, pointsAwarded) {
             opacity: [0, 1],
             duration: 400,
             easing: 'easeOutBack'
-        });
-        window.anime.animate('.ranking-item', {
-            translateX: [-20, 0],
-            opacity: [0, 1],
-            delay: window.anime.stagger(80, {start: 200}),
-            duration: 300
         });
     }
     
@@ -1756,7 +1729,7 @@ function showIndividualResults(totalCorrect, pointsAwarded) {
     scheduleNextRound();
 }
 
-// Mostrar resultados por equipos
+// Mostrar resultados por equipos - SIMPLIFICADO
 function showTeamResults(team1Correct, team2Correct, roundWinner, pointsAwarded) {
     const inlineResults = document.getElementById('inlineResults');
     const inlineContent = document.getElementById('inlineResultsContent');
@@ -1768,20 +1741,16 @@ function showTeamResults(team1Correct, team2Correct, roundWinner, pointsAwarded)
     const totalTeam1 = teams.team1.players.length;
     const totalTeam2 = teams.team2.players.length;
     const anyCorrect = team1Correct > 0 || team2Correct > 0;
+    const totalCorrect = team1Correct + team2Correct;
+    const totalPlayers = totalTeam1 + totalTeam2;
     
     let winnerHTML = '';
     if (roundWinner === 'team1') {
-        winnerHTML = `<div class="round-winner-inline" style="--winner-color: ${team1Config.color};">
-            <iconify-icon icon="mdi:trophy"></iconify-icon> ¡${team1Config.name} gana!
-        </div>`;
+        winnerHTML = `<span style="color: ${team1Config.color}; font-weight: 700;">${team1Config.name} gana</span>`;
     } else if (roundWinner === 'team2') {
-        winnerHTML = `<div class="round-winner-inline" style="--winner-color: ${team2Config.color};">
-            <iconify-icon icon="mdi:trophy"></iconify-icon> ¡${team2Config.name} gana!
-        </div>`;
+        winnerHTML = `<span style="color: ${team2Config.color}; font-weight: 700;">${team2Config.name} gana</span>`;
     } else {
-        winnerHTML = `<div class="round-winner-inline" style="--winner-color: #9ca3af;">
-            <iconify-icon icon="mdi:scale-balance"></iconify-icon> ¡Empate!
-        </div>`;
+        winnerHTML = `<span style="color: #9ca3af; font-weight: 700;">Empate</span>`;
     }
     
     inlineContent.innerHTML = `
@@ -1791,40 +1760,17 @@ function showTeamResults(team1Correct, team2Correct, roundWinner, pointsAwarded)
                 <span class="formula">${currentCompound.formula}</span>
                 <span class="name">${currentCompound.name}</span>
             </div>
-            ${winnerHTML}
-        </div>
-        
-        <div class="teams-inline-row">
-            <div class="team-inline-card" style="--team-color: ${team1Config.color};">
-                <iconify-icon icon="${team1Config.icon}"></iconify-icon>
-                <span class="team-name">${team1Config.name}</span>
-                <div class="team-correct">
-                    <iconify-icon icon="mdi:check-circle"></iconify-icon>
-                    ${team1Correct}/${totalTeam1}
-                </div>
-                <span class="team-score">${teams.team1.score} pts</span>
+            <div class="correct-badge ${anyCorrect ? 'success' : 'error'}">
+                <iconify-icon icon="${anyCorrect ? 'mdi:check-circle' : 'mdi:close-circle'}"></iconify-icon>
+                <span>${totalCorrect}/${totalPlayers} acertaron</span>
             </div>
-            
-            <div class="vs-inline">VS</div>
-            
-            <div class="team-inline-card" style="--team-color: ${team2Config.color};">
-                <iconify-icon icon="${team2Config.icon}"></iconify-icon>
-                <span class="team-name">${team2Config.name}</span>
-                <div class="team-correct">
-                    <iconify-icon icon="mdi:check-circle"></iconify-icon>
-                    ${team2Correct}/${totalTeam2}
-                </div>
-                <span class="team-score">${teams.team2.score} pts</span>
+            <div style="font-size: 0.85rem; margin-top: 4px;">
+                ${winnerHTML}
             </div>
-        </div>
-        
-        <div class="inline-points-info">
-            <iconify-icon icon="mdi:information"></iconify-icon>
-            +${pointsAwarded} puntos por respuesta correcta
         </div>
     `;
     
-    // Mostrar resultados encima de la animación (sin ocultarla)
+    // Mostrar resultados
     inlineResults.classList.remove('hidden');
     
     // Animación de entrada
@@ -1832,13 +1778,6 @@ function showTeamResults(team1Correct, team2Correct, roundWinner, pointsAwarded)
         window.anime.animate('.inline-result-header', {
             translateY: [-20, 0],
             opacity: [0, 1],
-            duration: 400,
-            easing: 'easeOutBack'
-        });
-        window.anime.animate('.team-inline-card', {
-            scale: [0.8, 1],
-            opacity: [0, 1],
-            delay: window.anime.stagger(150, {start: 200}),
             duration: 400,
             easing: 'easeOutBack'
         });
