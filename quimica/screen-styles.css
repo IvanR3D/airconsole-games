@@ -117,21 +117,24 @@ body {
     right: 0;
     width: 100%;
     min-width: 100vw;
-    height: 180px;
+    height: clamp(120px, 20vh, 180px);
+    max-height: 25vh;
     overflow: hidden;
+    z-index: 0;
 }
 
-/* Olas más anchas y desplazadas a la izquierda para evitar recorte en el borde izquierdo */
+/* Olas más anchas y desplazadas para evitar recorte - mejoradas */
 .global-waves .wave {
     position: absolute;
     bottom: 0;
-    left: -10vw;
-    width: 120vw;
+    left: -5vw;
+    width: 110vw;
     height: 100%;
     background-size: 100vw 100%;
     background-repeat: repeat-x;
-    background-position: bottom left;
-    animation: waveShift 12s ease-in-out infinite;
+    background-position: bottom center;
+    animation: waveShift 15s ease-in-out infinite;
+    opacity: 0.9;
 }
 
 .global-waves .wave-1 { animation-delay: 0s; }
@@ -144,15 +147,18 @@ body {
 }
 
 .global-waves .wave:nth-child(1) {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath fill='%230595AE' fill-opacity='0.15' d='M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,138.7C672,128,768,160,864,181.3C960,203,1056,213,1152,197.3C1248,181,1344,139,1392,117.3L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath fill='%230595AE' fill-opacity='0.12' d='M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,138.7C672,128,768,160,864,181.3C960,203,1056,213,1152,197.3C1248,181,1344,139,1392,117.3L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+    z-index: 3;
 }
 
 .global-waves .wave:nth-child(2) {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath fill='%23AB3D8B' fill-opacity='0.1' d='M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,218.7C672,235,768,245,864,234.7C960,224,1056,192,1152,181.3C1248,171,1344,181,1392,186.7L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath fill='%23AB3D8B' fill-opacity='0.08' d='M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,218.7C672,235,768,245,864,234.7C960,224,1056,192,1152,181.3C1248,171,1344,181,1392,186.7L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+    z-index: 2;
 }
 
 .global-waves .wave:nth-child(3) {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath fill='%2373A03F' fill-opacity='0.08' d='M0,96L48,112C96,128,192,160,288,165.3C384,171,480,149,576,149.3C672,149,768,171,864,165.3C960,160,1056,128,1152,122.7C1248,117,1344,139,1392,149.3L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath fill='%2373A03F' fill-opacity='0.06' d='M0,96L48,112C96,128,192,160,288,165.3C384,171,480,149,576,149.3C672,149,768,171,864,165.3C960,160,1056,128,1152,122.7C1248,117,1344,139,1392,149.3L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+    z-index: 1;
 }
 
 /* ============================================
@@ -1948,59 +1954,69 @@ body {
    ============================================ */
 
 .winner-team-card {
-    padding: 24px 32px;
-    border-radius: 20px;
-    border: 3px solid;
-    margin: 20px auto;
-    max-width: 350px;
+    padding: clamp(10px, 2vw, 16px);
+    border-radius: clamp(12px, 2vw, 18px);
+    border: 2px solid;
+    margin: clamp(6px, 1.2vw, 12px) auto;
+    max-width: min(350px, 90%);
     text-align: center;
+    flex-shrink: 0;
 }
 
 .winner-team-card h2 {
-    font-size: var(--font-xl);
+    font-size: clamp(0.9rem, 2vw, 1.3rem);
     font-weight: 800;
-    margin: 12px 0;
+    margin: clamp(4px, 0.8vw, 8px) 0;
 }
 
 .team-final-score {
-    font-size: 2rem;
+    font-size: clamp(1.2rem, 3vw, 1.8rem);
     font-weight: 800;
     color: var(--color-warning);
+    margin: 0;
 }
 
 .teams-final-comparison {
     display: flex;
     align-items: stretch;
     justify-content: center;
-    gap: 16px;
-    margin: 20px 0;
+    gap: clamp(8px, 1.5vw, 12px);
+    margin: clamp(6px, 1.2vw, 12px) 0;
+    flex-shrink: 0;
+    width: 100%;
+    max-width: 100%;
 }
 
 .team-final-card {
     flex: 1;
-    max-width: 180px;
-    padding: 16px;
-    border-radius: 16px;
+    max-width: min(180px, 45%);
+    padding: clamp(8px, 1.5vw, 12px);
+    border-radius: clamp(10px, 1.5vw, 14px);
     border: 2px solid;
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(4px, 0.8vw, 6px);
 }
 
 .team-final-card h3 {
-    font-size: var(--font-base);
+    font-size: clamp(0.75rem, 1.6vw, 1rem);
     font-weight: 600;
-    margin: 8px 0;
+    margin: 0;
 }
 
 .team-final-card .team-score {
-    font-size: var(--font-lg);
+    font-size: clamp(0.9rem, 2vw, 1.2rem);
     font-weight: 700;
     color: var(--color-warning);
+    margin: 0;
 }
 
 .team-final-card .team-players-count {
-    font-size: var(--font-xs);
+    font-size: clamp(0.65rem, 1.4vw, 0.8rem);
     color: var(--color-text-light);
-    margin-top: 4px;
+    margin: 0;
 }
 
 .vs-final {
@@ -2008,9 +2024,11 @@ body {
     align-items: center;
     justify-content: center;
     font-weight: 800;
-    font-size: var(--font-lg);
+    font-size: clamp(0.85rem, 1.8vw, 1.1rem);
     color: var(--color-text-light);
-    opacity: 0.4;
+    opacity: 0.5;
+    flex-shrink: 0;
+    padding: 0 clamp(4px, 0.8vw, 8px);
 }
 
 @media (max-width: 500px) {
@@ -3101,9 +3119,14 @@ body {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    padding: clamp(12px, 2.5vw, 24px) !important;
-    overflow-y: auto;
-    overflow-x: hidden;
+    padding: clamp(8px, 1.5vw, 16px) !important;
+    overflow: hidden !important;
+    overflow-y: hidden !important;
+    overflow-x: hidden !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    max-height: 100vh !important;
+    max-height: 100dvh !important;
 }
 
 .end-screen-container {
@@ -3114,32 +3137,39 @@ body {
     align-items: center;
     text-align: center;
     width: 100%;
-    max-width: 650px;
-    gap: clamp(6px, 1.2vw, 14px);
+    max-width: min(650px, 95vw);
+    gap: clamp(3px, 0.8vw, 8px);
+    max-height: calc(100vh - 32px);
+    max-height: calc(100dvh - 32px);
+    overflow: hidden;
+    justify-content: flex-start;
+    padding: clamp(4px, 1vw, 8px) 0;
+    box-sizing: border-box;
 }
 
-/* Trofeo principal centrado */
+/* Trofeo principal centrado - más compacto */
 .main-trophy-container {
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: clamp(4px, 1vw, 12px);
+    margin-bottom: clamp(2px, 0.5vw, 6px);
+    flex-shrink: 0;
 }
 
 .main-trophy-icon {
-    font-size: clamp(3rem, 10vw, 6rem);
+    font-size: clamp(2rem, 6vw, 3.5rem);
     color: #fbbf24;
-    filter: drop-shadow(0 6px 20px rgba(251, 191, 36, 0.4));
+    filter: drop-shadow(0 4px 12px rgba(251, 191, 36, 0.4));
     position: relative;
     z-index: 2;
 }
 
 .trophy-shine {
     position: absolute;
-    width: clamp(80px, 16vw, 140px);
-    height: clamp(80px, 16vw, 140px);
-    background: radial-gradient(circle, rgba(251, 191, 36, 0.3) 0%, transparent 70%);
+    width: clamp(50px, 10vw, 90px);
+    height: clamp(50px, 10vw, 90px);
+    background: radial-gradient(circle, rgba(251, 191, 36, 0.25) 0%, transparent 70%);
     border-radius: 50%;
     z-index: 1;
     animation: trophyShine 3s ease-in-out infinite;
@@ -3150,119 +3180,129 @@ body {
     50% { transform: scale(1.2); opacity: 0.8; }
 }
 
-/* Título */
+/* Título - más compacto */
 .end-title {
-    font-size: clamp(1.3rem, 4.5vw, 2.5rem);
+    font-size: clamp(1rem, 3vw, 1.8rem);
     font-weight: 900;
     background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #ea580c 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     margin: 0;
-    line-height: 1.2;
+    line-height: 1.1;
+    flex-shrink: 0;
 }
 
-/* Dificultad completada */
+/* Dificultad completada - más compacto */
 .difficulty-completed {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    font-size: clamp(0.75rem, 1.8vw, 0.95rem);
+    gap: 4px;
+    font-size: clamp(0.65rem, 1.5vw, 0.8rem);
     font-weight: 600;
+    flex-shrink: 0;
+    margin: 0;
 }
 
 .difficulty-completed iconify-icon {
     font-size: clamp(0.9rem, 2.2vw, 1.2rem);
 }
 
-/* Intro del ganador */
+/* Intro del ganador - más compacto */
 .winner-intro {
-    font-size: clamp(0.8rem, 2vw, 1.1rem);
+    font-size: clamp(0.7rem, 1.6vw, 0.9rem);
     color: var(--color-text-light);
     margin: 0;
+    flex-shrink: 0;
 }
 
-/* Card del ganador */
+/* Card del ganador - más compacto */
 .winner-individual-card {
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: clamp(6px, 1.2vw, 10px);
-    padding: clamp(12px, 2.5vw, 24px);
-    border: 3px solid;
-    border-radius: clamp(14px, 2.5vw, 22px);
-    min-width: clamp(140px, 28vw, 200px);
+    gap: clamp(4px, 0.8vw, 6px);
+    padding: clamp(8px, 1.5vw, 14px);
+    border: 2px solid;
+    border-radius: clamp(12px, 2vw, 18px);
+    min-width: clamp(120px, 24vw, 180px);
+    flex-shrink: 0;
 }
 
 .crown-icon {
     position: absolute;
-    top: clamp(-14px, -2.5vw, -20px);
-    font-size: clamp(1.3rem, 3.5vw, 2rem);
+    top: clamp(-10px, -2vw, -14px);
+    font-size: clamp(1rem, 2.5vw, 1.5rem);
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
 .winner-avatar {
-    width: clamp(40px, 9vw, 64px);
-    height: clamp(40px, 9vw, 64px);
-    border-radius: clamp(10px, 1.8vw, 16px);
+    width: clamp(32px, 7vw, 48px);
+    height: clamp(32px, 7vw, 48px);
+    border-radius: clamp(8px, 1.5vw, 12px);
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: clamp(1.3rem, 3.5vw, 2rem);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+    font-size: clamp(1rem, 2.5vw, 1.5rem);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
 }
 
 .winner-name {
-    font-size: clamp(1rem, 2.5vw, 1.4rem);
+    font-size: clamp(0.85rem, 2vw, 1.1rem);
     font-weight: 800;
     color: var(--color-text);
     margin: 0;
 }
 
 .winner-score {
-    font-size: clamp(0.9rem, 2.2vw, 1.2rem);
+    font-size: clamp(0.8rem, 1.8vw, 1rem);
     font-weight: 700;
     color: var(--color-success);
     margin: 0;
 }
 
-/* Título del leaderboard */
+/* Título del leaderboard - más compacto */
 .leaderboard-title {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    font-size: clamp(0.9rem, 2.2vw, 1.2rem);
+    gap: 4px;
+    font-size: clamp(0.75rem, 1.8vw, 1rem);
     font-weight: 700;
     color: var(--color-text);
-    margin: clamp(8px, 1.5vw, 16px) 0 clamp(6px, 1.2vw, 12px) 0;
+    margin: clamp(4px, 0.8vw, 8px) 0 clamp(3px, 0.6vw, 6px) 0;
+    flex-shrink: 0;
 }
 
 .leaderboard-title iconify-icon {
     color: var(--color-warning);
 }
 
-/* Lista del leaderboard */
+/* Lista del leaderboard - sin scroll, todo debe caber */
 .leaderboard-list {
     display: flex;
     flex-direction: column;
-    gap: clamp(4px, 0.8vw, 8px);
+    gap: clamp(2px, 0.5vw, 4px);
     width: 100%;
     max-width: 480px;
+    overflow: hidden;
+    flex-shrink: 1;
+    min-height: 0;
 }
 
 .leaderboard-item {
     display: flex;
     align-items: center;
-    gap: clamp(6px, 1.2vw, 12px);
-    padding: clamp(6px, 1.2vw, 12px) clamp(10px, 1.8vw, 16px);
+    gap: clamp(4px, 0.8vw, 8px);
+    padding: clamp(4px, 0.8vw, 8px) clamp(8px, 1.2vw, 12px);
     background: white;
     border: 2px solid #e2e8f0;
-    border-radius: clamp(8px, 1.2vw, 12px);
+    border-radius: clamp(6px, 1vw, 10px);
     transition: all 0.2s;
+    flex-shrink: 0;
 }
 
 .leaderboard-item.first {
@@ -3281,16 +3321,16 @@ body {
     border-color: #cd7f32;
 }
 
-/* Badge de ranking */
+/* Badge de ranking - más compacto */
 .rank-badge {
-    width: clamp(24px, 4.5vw, 32px);
-    height: clamp(24px, 4.5vw, 32px);
+    width: clamp(20px, 3.5vw, 28px);
+    height: clamp(20px, 3.5vw, 28px);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 800;
-    font-size: clamp(0.7rem, 1.6vw, 0.9rem);
+    font-size: clamp(0.65rem, 1.4vw, 0.8rem);
     color: white;
     background: #94a3b8;
     flex-shrink: 0;
@@ -3311,22 +3351,22 @@ body {
     box-shadow: 0 2px 6px rgba(205, 127, 50, 0.4);
 }
 
-/* Trofeo en el ranking */
+/* Trofeo en el ranking - más compacto */
 .rank-trophy {
-    font-size: clamp(1rem, 2.5vw, 1.4rem);
+    font-size: clamp(0.85rem, 2vw, 1.1rem);
     flex-shrink: 0;
 }
 
-/* Avatar en el leaderboard */
+/* Avatar en el leaderboard - más compacto */
 .leaderboard-item .player-avatar {
-    width: clamp(28px, 5.5vw, 40px);
-    height: clamp(28px, 5.5vw, 40px);
-    border-radius: clamp(6px, 1vw, 10px);
+    width: clamp(24px, 4.5vw, 32px);
+    height: clamp(24px, 4.5vw, 32px);
+    border-radius: clamp(5px, 0.8vw, 8px);
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: clamp(0.9rem, 2.2vw, 1.2rem);
+    font-size: clamp(0.75rem, 1.8vw, 1rem);
     flex-shrink: 0;
 }
 
@@ -3338,7 +3378,7 @@ body {
 }
 
 .player-info .player-name {
-    font-size: clamp(0.75rem, 1.8vw, 1rem);
+    font-size: clamp(0.7rem, 1.6vw, 0.9rem);
     font-weight: 700;
     color: var(--color-text);
     margin: 0;
@@ -3347,27 +3387,28 @@ body {
     white-space: nowrap;
 }
 
-/* Badge de puntuación */
+/* Badge de puntuación - más compacto */
 .score-badge {
-    padding: clamp(3px, 0.6vw, 6px) clamp(8px, 1.5vw, 14px);
+    padding: clamp(2px, 0.5vw, 4px) clamp(6px, 1.2vw, 10px);
     background: linear-gradient(135deg, rgba(235, 130, 37, 0.15) 0%, rgba(235, 130, 37, 0.08) 100%);
     border: 2px solid var(--color-warning);
     border-radius: 50px;
-    font-size: clamp(0.65rem, 1.5vw, 0.85rem);
+    font-size: clamp(0.6rem, 1.3vw, 0.75rem);
     font-weight: 700;
     color: var(--color-warning);
     flex-shrink: 0;
 }
 
-/* Hint del admin */
+/* Hint del admin - más compacto */
 .admin-hint {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 5px;
-    font-size: clamp(0.65rem, 1.4vw, 0.8rem);
+    gap: 4px;
+    font-size: clamp(0.6rem, 1.2vw, 0.75rem);
     color: var(--color-text-light);
-    margin-top: clamp(6px, 1.2vw, 12px);
+    margin-top: clamp(3px, 0.6vw, 6px);
+    flex-shrink: 0;
 }
 
 .admin-hint iconify-icon {

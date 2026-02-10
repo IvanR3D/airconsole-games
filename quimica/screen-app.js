@@ -827,16 +827,14 @@ function renderEndScreen(winningTeam, sortedPlayers) {
     }
     
     app.innerHTML = `
-        <div class="screen active flex-col items-center justify-center p-4 sm:p-6 lg:p-8 min-h-screen relative" id="endScreen">
+        <div class="screen active" id="endScreen">
             <div class="lab-bg"></div>
             <div id="confettiContainer" class="fixed inset-0 pointer-events-none z-50"></div>
             
-            <div class="relative z-10 text-center max-w-4xl w-full px-2">
-                <h1 class="text-2xl sm:text-4xl lg:text-5xl font-black mb-2 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                    ¡Experimento Completado!
-                </h1>
+            <div class="end-screen-container">
+                <h1 class="end-title">¡Experimento Completado!</h1>
                 
-                <div class="difficulty-completed mb-4" style="color: ${difficultyConfig.color};">
+                <div class="difficulty-completed" style="color: ${difficultyConfig.color};">
                     <iconify-icon icon="${difficultyConfig.icon}"></iconify-icon>
                     Dificultad: ${difficultyConfig.name} (x${difficultyConfig.pointsMultiplier})
                 </div>
@@ -846,43 +844,44 @@ function renderEndScreen(winningTeam, sortedPlayers) {
                 <!-- Comparación de equipos -->
                 <div class="teams-final-comparison">
                     <div class="team-final-card" style="border-color: ${team1Config.color}; background: ${team1Config.bgColor};">
-                        <iconify-icon icon="${team1Config.icon}" style="color: ${team1Config.color}; font-size: 2rem;"></iconify-icon>
-                        <h3 style="color: ${team1Config.color};">${team1Config.name}</h3>
-                        <p class="team-score">${teams.team1.score} pts</p>
-                        <p class="team-players-count">${teams.team1.players.length} jugadores</p>
+                        <iconify-icon icon="${team1Config.icon}" style="color: ${team1Config.color}; font-size: clamp(1.2rem, 3vw, 1.8rem);"></iconify-icon>
+                        <h3 style="color: ${team1Config.color}; font-size: clamp(0.8rem, 1.8vw, 1.1rem); margin: 0;">${team1Config.name}</h3>
+                        <p class="team-score" style="font-size: clamp(0.9rem, 2vw, 1.2rem); margin: 2px 0;">${teams.team1.score} pts</p>
+                        <p class="team-players-count" style="font-size: clamp(0.65rem, 1.4vw, 0.8rem); margin: 0;">${teams.team1.players.length} jugadores</p>
                     </div>
                     
-                    <div class="vs-final">VS</div>
+                    <div class="vs-final" style="font-size: clamp(0.9rem, 2vw, 1.2rem);">VS</div>
                     
                     <div class="team-final-card" style="border-color: ${team2Config.color}; background: ${team2Config.bgColor};">
-                        <iconify-icon icon="${team2Config.icon}" style="color: ${team2Config.color}; font-size: 2rem;"></iconify-icon>
-                        <h3 style="color: ${team2Config.color};">${team2Config.name}</h3>
-                        <p class="team-score">${teams.team2.score} pts</p>
-                        <p class="team-players-count">${teams.team2.players.length} jugadores</p>
+                        <iconify-icon icon="${team2Config.icon}" style="color: ${team2Config.color}; font-size: clamp(1.2rem, 3vw, 1.8rem);"></iconify-icon>
+                        <h3 style="color: ${team2Config.color}; font-size: clamp(0.8rem, 1.8vw, 1.1rem); margin: 0;">${team2Config.name}</h3>
+                        <p class="team-score" style="font-size: clamp(0.9rem, 2vw, 1.2rem); margin: 2px 0;">${teams.team2.score} pts</p>
+                        <p class="team-players-count" style="font-size: clamp(0.65rem, 1.4vw, 0.8rem); margin: 0;">${teams.team2.players.length} jugadores</p>
                     </div>
                 </div>
                 
-                <!-- Top jugadores -->
-                <h3 class="text-lg font-bold mt-6 mb-3" style="color: var(--color-text);">
-                    <iconify-icon icon="mdi:podium"></iconify-icon> Mejores Científicos
+                <!-- Top 3 jugadores -->
+                <h3 class="leaderboard-title">
+                    <iconify-icon icon="mdi:podium"></iconify-icon> Top 3 Científicos
                 </h3>
-                <div class="space-y-2 sm:space-y-3 mb-4" id="leaderboard">
-                    ${sortedPlayers.slice(0, 5).map((player, i) => `
+                <div class="leaderboard-list" id="leaderboard">
+                    ${sortedPlayers.slice(0, 3).map((player, i) => `
                         <div class="leaderboard-item ${i === 0 ? 'first' : i === 1 ? 'second' : i === 2 ? 'third' : ''}">
-                            <div class="rank-badge ${i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : 'bg-white/10'}">${i + 1}</div>
+                            <div class="rank-badge ${i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : ''}">${i + 1}</div>
+                            <iconify-icon icon="${i === 0 ? 'mdi:trophy' : i === 1 ? 'mdi:trophy-outline' : 'mdi:trophy-variant'}" class="rank-trophy" style="color: ${i === 0 ? '#fbbf24' : i === 1 ? '#9ca3af' : '#cd7f32'};"></iconify-icon>
                             <div class="player-avatar" style="background: ${player.color};">
-                                <iconify-icon icon="mdi:flask" class="text-base sm:text-lg lg:text-xl"></iconify-icon>
+                                <iconify-icon icon="${player.icon || 'mdi:flask'}"></iconify-icon>
                             </div>
-                            <div class="flex-1 text-left min-w-0">
-                                <p class="font-bold text-sm sm:text-base lg:text-lg truncate">${player.name}</p>
+                            <div class="player-info">
+                                <p class="player-name">${player.name}</p>
                             </div>
                             <div class="score-badge">${player.score} pts</div>
                         </div>
                     `).join('')}
                 </div>
                 
-                <p style="color: var(--color-text-light);" class="text-xs sm:text-sm">
-                    <iconify-icon icon="mdi:information" class="mr-1"></iconify-icon>
+                <p class="admin-hint">
+                    <iconify-icon icon="mdi:information"></iconify-icon>
                     El Jugador 1 puede iniciar una nueva partida
                 </p>
             </div>
@@ -982,15 +981,39 @@ function handlePlayerJoin(device_id) {
 // Validar si los elementos seleccionados son correctos
 // Validación por orden exacto - el jugador debe seleccionar los elementos en el orden correcto
 function validateElementSelection(playerElements, requiredElements) {
-    if (playerElements.length !== requiredElements.length) return false;
+    // Validación estricta: debe tener exactamente la misma cantidad y el mismo orden
+    if (!Array.isArray(playerElements) || !Array.isArray(requiredElements)) {
+        console.log('❌ Validación fallida: no son arrays', { playerElements, requiredElements });
+        return false;
+    }
     
-    // Comparar elemento por elemento en orden
+    if (playerElements.length !== requiredElements.length) {
+        console.log('❌ Validación fallida: longitudes diferentes', {
+            playerLength: playerElements.length,
+            requiredLength: requiredElements.length,
+            playerElements,
+            requiredElements
+        });
+        return false;
+    }
+    
+    // Comparar elemento por elemento en orden EXACTO
     for (let i = 0; i < requiredElements.length; i++) {
         if (playerElements[i] !== requiredElements[i]) {
+            console.log('❌ Validación fallida: orden incorrecto en posición', i, {
+                playerElement: playerElements[i],
+                requiredElement: requiredElements[i],
+                playerElements,
+                requiredElements
+            });
             return false;
         }
     }
     
+    console.log('✅ Validación correcta:', {
+        playerElements,
+        requiredElements
+    });
     return true;
 }
 
@@ -1428,12 +1451,23 @@ function handleElementSelection(device_id, elementsArray) {
     if (!playerSelections[device_id]) return;
     if (playerSelections[device_id].hasSelected) return;
     
-    // Guardar selección individual del jugador
-    playerSelections[device_id].hasSelected = true;
-    playerSelections[device_id].elements = elementsArray;
+    // Asegurar que elementsArray es un array y mantener el orden exacto
+    if (!Array.isArray(elementsArray)) {
+        console.error('❌ elementsArray no es un array:', elementsArray);
+        return;
+    }
     
-    // Verificar si la respuesta individual es correcta
-    // Comparamos contando la cantidad de cada elemento (el orden no importa en química)
+    // Guardar selección individual del jugador (mantener orden exacto)
+    playerSelections[device_id].hasSelected = true;
+    playerSelections[device_id].elements = [...elementsArray]; // Copia para mantener orden
+    
+    console.log('🔍 Validando selección:', {
+        device_id,
+        playerElements: elementsArray,
+        requiredElements: currentCompound.elements
+    });
+    
+    // Verificar si la respuesta individual es correcta (ORDEN EXACTO requerido)
     const isCorrect = validateElementSelection(elementsArray, currentCompound.elements);
     
     playerSelections[device_id].isCorrect = isCorrect;
@@ -1588,88 +1622,59 @@ function checkAllPlayersResults() {
     }, 2500); // Esperar a que termine la animación del lab
 }
 
-// Mostrar la respuesta correcta con animación
+// Mostrar SOLO la respuesta correcta (sin cards superpuestos, sin estilos complejos)
 function showCorrectAnswer(anyCorrect, callback) {
-    const inlineResults = document.getElementById('inlineResults');
-    const inlineContent = document.getElementById('inlineResultsContent');
+    const mixingZone = document.getElementById('mixingZone');
     
-    if (!inlineResults || !inlineContent) {
+    if (!mixingZone) {
         if (callback) callback();
         return;
     }
     
-    // Construir la fórmula con los elementos en orden
-    const elementsHTML = currentCompound.elements.map((el, i) => {
-        const elementData = elements[el] || { symbol: el, group: 'nonmetal' };
-        return `<div class="answer-element element-${elementData.group}" style="animation-delay: ${i * 0.1}s">
-            <span class="symbol">${elementData.symbol}</span>
-        </div>`;
-    }).join('<span class="answer-plus">+</span>');
+    // Crear modal simple dentro del div de animación
+    const existingModal = document.getElementById('simpleAnswerModal');
+    if (existingModal) existingModal.remove();
     
-    inlineContent.innerHTML = `
-        <div class="correct-answer-reveal ${anyCorrect ? 'success' : 'error'}">
-            <div class="answer-label">
-                <iconify-icon icon="${anyCorrect ? 'mdi:check-circle' : 'mdi:close-circle'}"></iconify-icon>
-                <span>${anyCorrect ? '¡Correcto!' : 'Respuesta correcta:'}</span>
-            </div>
-            
-            <div class="answer-compound">
-                <iconify-icon icon="${currentCompound.icon}" class="compound-icon"></iconify-icon>
-                <span class="compound-formula">${currentCompound.formula}</span>
-                <span class="compound-name">${currentCompound.name}</span>
-            </div>
-            
-            <div class="answer-elements-row">
-                ${elementsHTML}
-            </div>
-            
-            ${currentCompound.hint ? `
-                <div class="answer-hint">
-                    <iconify-icon icon="mdi:lightbulb"></iconify-icon>
-                    ${currentCompound.hint}
-                </div>
-            ` : ''}
+    const modal = document.createElement('div');
+    modal.id = 'simpleAnswerModal';
+    modal.style.cssText = `
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(8px);
+        z-index: 20;
+        padding: 20px;
+        box-sizing: border-box;
+    `;
+    
+    modal.innerHTML = `
+        <div style="text-align: center; max-width: 90%;">
+            <p style="font-size: 1.1rem; font-weight: 700; color: #0595AE; margin-bottom: 12px;">
+                Respuesta correcta:
+            </p>
+            <p style="font-size: 1.8rem; font-weight: 900; color: #AB3D8B; margin-bottom: 8px;">
+                ${currentCompound.formula}
+            </p>
+            <p style="font-size: 1rem; font-weight: 600; color: #1a1a2e; margin-bottom: 8px;">
+                ${currentCompound.name}
+            </p>
+            <p style="font-size: 0.9rem; color: #5a6a7a; margin-top: 12px;">
+                ${currentCompound.elements.join(' + ')}
+            </p>
         </div>
     `;
     
-    inlineResults.classList.remove('hidden');
-    
-    // Animaciones
-    if (window.anime) {
-        window.anime.animate('.correct-answer-reveal', {
-            scale: [0.8, 1],
-            opacity: [0, 1],
-            duration: 400,
-            easing: 'easeOutBack'
-        });
-        
-        window.anime.animate('.answer-element', {
-            scale: [0, 1],
-            opacity: [0, 1],
-            delay: window.anime.stagger(100, {start: 300}),
-            duration: 300,
-            easing: 'easeOutBack'
-        });
-        
-        window.anime.animate('.compound-formula', {
-            scale: [0.5, 1.1, 1],
-            duration: 600,
-            delay: 200,
-            easing: 'easeOutElastic(1, .5)'
-        });
-    }
-    
-    // Sonido
-    if (anyCorrect) {
-        playSuccessSound();
-    } else {
-        playErrorSound();
-    }
+    mixingZone.appendChild(modal);
     
     // Llamar al callback después de mostrar la respuesta
     setTimeout(() => {
+        if (modal && modal.parentNode) modal.remove();
         if (callback) callback();
-    }, 2500); // 2.5 segundos para ver la respuesta
+    }, 2500);
 }
 
 // Función legacy para compatibilidad
@@ -2330,10 +2335,10 @@ function renderEndScreenIndividual(winner, sortedPlayers) {
                 </h3>
                 
                 <div class="leaderboard-list" id="leaderboard">
-                    ${sortedPlayers.slice(0, 10).map((player, i) => `
+                    ${sortedPlayers.slice(0, 3).map((player, i) => `
                         <div class="leaderboard-item ${i === 0 ? 'first' : i === 1 ? 'second' : i === 2 ? 'third' : ''}">
                             <div class="rank-badge ${i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : ''}">${i + 1}</div>
-                            ${i < 3 ? `<iconify-icon icon="${getTrophyIcon(i + 1)}" class="rank-trophy" style="color: ${getTrophyColor(i + 1)};"></iconify-icon>` : ''}
+                            <iconify-icon icon="${getTrophyIcon(i + 1)}" class="rank-trophy" style="color: ${getTrophyColor(i + 1)};"></iconify-icon>
                             <div class="player-avatar" style="background: ${player.color};">
                                 <iconify-icon icon="${player.icon}"></iconify-icon>
                             </div>

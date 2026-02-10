@@ -849,7 +849,16 @@ function confirmSelection() {
     
     hasSelectedThisRound = true;
     
-    sendMessage({ action: 'selectElements', elements: [...selectedElements] });
+    // Asegurar que se envía el array en el orden exacto (copia para mantener orden)
+    const elementsToSend = [...selectedElements];
+    
+    console.log('📤 Enviando selección:', {
+        elements: elementsToSend,
+        length: elementsToSend.length,
+        order: elementsToSend.join(' -> ')
+    });
+    
+    sendMessage({ action: 'selectElements', elements: elementsToSend });
     
     playSound('confirm');
     
@@ -1028,20 +1037,28 @@ function renderEndScreen(data) {
                     </div>
                 </div>
                 
-                <!-- Puntuación de todos los jugadores (elegir ganador) -->
+                <!-- Tu posición en el ranking completo -->
                 <div class="final-ranking-controller">
-                    <h3 class="final-ranking-title">Puntuación final</h3>
+                    <div class="final-ranking-title">
+                        <iconify-icon icon="mdi:podium"></iconify-icon>
+                        <span>Tu posición: <strong style="color: var(--turquesa);">${myRank}°</strong> de ${sortedPlayers.length}</span>
+                    </div>
                     <div class="final-ranking-list">
-                        ${sortedPlayers.map((p, i) => `
-                            <div class="final-ranking-item ${p.id === playerData.id ? 'is-you' : ''}">
+                        ${sortedPlayers.map((p, i) => {
+                            const isYou = p.id === playerData.id;
+                            const isTop3 = i < 3;
+                            return `
+                            <div class="final-ranking-item ${isYou ? 'is-you' : ''} ${isTop3 ? 'is-top3' : ''}">
                                 <span class="final-rank">${i + 1}°</span>
+                                ${isTop3 ? `<iconify-icon icon="${getTrophyIcon(i + 1)}" class="final-trophy" style="color: ${getTrophyColor(i + 1)};"></iconify-icon>` : '<span class="final-trophy-spacer"></span>'}
                                 <div class="final-avatar" style="background: ${p.color};">
                                     <iconify-icon icon="${p.icon || 'mdi:account'}"></iconify-icon>
                                 </div>
-                                <span class="final-name">${p.name}</span>
+                                <span class="final-name">${p.name}${isYou ? ' <strong>(Tú)</strong>' : ''}</span>
                                 <span class="final-score">${p.score || 0} pts</span>
                             </div>
-                        `).join('')}
+                        `;
+                        }).join('')}
                     </div>
                 </div>
                 

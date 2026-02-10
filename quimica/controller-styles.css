@@ -56,10 +56,10 @@ body {
    COLORES STEAM RD - Paleta Consistente
    ============================================ */
 :root {
-    /* AirConsole (reglas): Safe area - logo no debe cortar el badge (respetar ~60px arriba) */
-    --airconsole-safe-top: 60px;
-    --safe-top: max(env(safe-area-inset-top), 60px);
-    --safe-bottom: max(env(safe-area-inset-bottom), 20px);
+    /* AirConsole (reglas): Safe area - logo no debe cortar el badge (respetar ~70px arriba) */
+    --airconsole-safe-top: 70px;
+    --safe-top: max(env(safe-area-inset-top), 70px);
+    --safe-bottom: max(env(safe-area-inset-bottom), 24px);
     --safe-left: env(safe-area-inset-left, 0px);
     --safe-right: env(safe-area-inset-right, 0px);
     
@@ -420,7 +420,8 @@ body {
     flex-shrink: 0;
     text-align: center;
     padding-bottom: 6px;
-    margin-top: 2px;
+    margin-top: 8px;
+    padding-top: 4px;
 }
 
 .admin-badge {
@@ -432,7 +433,8 @@ body {
     color: white;
     font-weight: 700;
     font-size: clamp(0.7rem, 1.8vw, 0.8rem);
-    margin-bottom: 6px;
+    margin-bottom: 8px;
+    margin-top: 4px;
 }
 
 .admin-badge iconify-icon {
@@ -649,11 +651,13 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 0 0 0;
-    padding-bottom: env(safe-area-inset-bottom, 0);
+    padding: 10px max(8px, var(--safe-left)) var(--safe-bottom) max(8px, var(--safe-right));
     gap: 12px;
     margin-top: auto;
-    min-height: 56px;
+    min-height: 60px;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
 }
 
 .btn-back {
@@ -680,18 +684,20 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 18px 12px;
+    padding: 10px 16px;
     background: linear-gradient(135deg, var(--turquesa) 0%, var(--morado) 100%);
     border: none;
     border-radius: 28px;
     font-weight: 700;
-    font-size: clamp(0.85rem, 2.2vw, 0.95rem);
+    font-size: clamp(0.8rem, 2vw, 0.9rem);
     color: white;
     cursor: pointer;
     box-shadow: 0 4px 0 #065a6a;
     min-height: 44px;
     flex-shrink: 0;
     box-sizing: border-box;
+    max-width: calc(100% - 60px);
+    white-space: nowrap;
 }
 
 .btn-next:active {
@@ -705,18 +711,20 @@ body {
     justify-content: center;
     gap: 10px;
     flex: 1;
-    padding: 10px 20px 12px;
+    padding: 10px 16px;
     background: linear-gradient(135deg, var(--verde) 0%, #5a8a2f 100%);
     border: none;
     border-radius: 28px;
     font-weight: 800;
-    font-size: clamp(0.9rem, 2.2vw, 1rem);
+    font-size: clamp(0.85rem, 2vw, 0.95rem);
     color: white;
     cursor: pointer;
     box-shadow: 0 4px 0 #4a7a25;
     min-height: 48px;
     flex-shrink: 0;
     box-sizing: border-box;
+    max-width: 100%;
+    white-space: nowrap;
 }
 
 .btn-start:active {
@@ -2001,21 +2009,38 @@ body {
 }
 
 .final-ranking-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
     font-size: clamp(0.85rem, 2.2vw, 1rem);
     font-weight: 800;
     color: var(--text);
     margin: 0 0 8px 0;
     text-align: center;
+    padding: clamp(8px, 1.5vw, 12px);
+    background: rgba(5, 149, 174, 0.12);
+    border: 2px solid var(--turquesa);
+    border-radius: 12px;
+    flex-shrink: 0;
+}
+
+.final-ranking-title iconify-icon {
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    color: var(--turquesa);
 }
 
 .final-ranking-list {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    max-height: 35vh;
+    gap: clamp(3px, 0.6vw, 5px);
+    max-height: calc(100vh - 50vh);
+    max-height: calc(100dvh - 50vh);
     overflow-y: auto;
+    overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     padding: 4px 0;
+    width: 100%;
 }
 
 .final-ranking-item {
@@ -2031,13 +2056,36 @@ body {
 
 .final-ranking-item.is-you {
     border-color: var(--turquesa);
-    background: rgba(5, 149, 174, 0.08);
+    background: rgba(5, 149, 174, 0.15);
+    border-width: 3px;
+    box-shadow: 0 0 0 2px rgba(5, 149, 174, 0.2);
+    font-weight: 800;
+}
+
+.final-ranking-item.is-top3 {
+    border-width: 2.5px;
+}
+
+.final-ranking-item.is-top3.is-you {
+    border-width: 3px;
 }
 
 .final-rank {
     font-weight: 800;
     color: var(--text-light);
-    min-width: 28px;
+    min-width: 32px;
+    text-align: center;
+}
+
+.final-trophy {
+    flex-shrink: 0;
+    margin: 0 2px;
+    font-size: clamp(16px, 3.5vw, 20px);
+}
+
+.final-trophy-spacer {
+    width: clamp(16px, 3.5vw, 20px);
+    flex-shrink: 0;
 }
 
 .final-avatar {
@@ -2059,6 +2107,11 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.final-name strong {
+    color: var(--turquesa);
+    font-weight: 900;
 }
 
 .final-score {
