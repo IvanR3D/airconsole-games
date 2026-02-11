@@ -397,16 +397,16 @@ function setupCategories() {
         geography: '#73A03F'
     };
     
-    // Icon mapping - same as controller for unified design
-    const categoryIcons = {
-        general: 'mdi:earth',
-        science: 'mdi:microscope',
-        mathematics: 'mdi:compass-outline',
-        robotics: 'mdi:robot-outline',
-        chemistry: 'mdi:flask-outline',
-        technology: 'mdi:laptop',
-        history: 'mdi:book-open-outline',
-        geography: 'mdi:map-outline'
+    // Image mapping - using local webp assets
+    const categoryImages = {
+        general: '../assets/images/globo.webp',
+        science: '../assets/images/microscopio.webp',
+        mathematics: '../assets/images/calculadora.webp',
+        robotics: '../assets/images/programacion.webp',
+        chemistry: '../assets/images/estructura quimica.webp',
+        technology: '../assets/images/programacion.webp',
+        history: '../assets/images/libro.webp',
+        geography: '../assets/images/planeta.webp'
     };
     
     Object.entries(categories).forEach(([key, category], index) => {
@@ -422,7 +422,7 @@ function setupCategories() {
         
         card.innerHTML = `
             <div class="mb-3 sm:mb-4">
-                <iconify-icon icon="${categoryIcons[key]}" class="category-icon" style="color: #9CA3AF;"></iconify-icon>
+                <img src="${categoryImages[key]}" alt="${category.name}" class="category-icon-img" style="filter: grayscale(100%) opacity(0.5);">
             </div>
             <div class="text-base sm:text-lg lg:text-xl font-bold category-name" style="color: #6B7280;">
                 ${category.name}
@@ -444,9 +444,9 @@ function setupCategories() {
                 }
                 c.style.background = '#F9FAFB';
                 c.style.borderColor = '#E5E7EB';
-                const icon = c.querySelector('.category-icon');
+                const icon = c.querySelector('.category-icon-img');
                 const text = c.querySelector('.category-name');
-                if (icon) icon.style.color = '#9CA3AF';
+                if (icon) icon.style.filter = 'grayscale(100%) opacity(0.5)';
                 if (text) text.style.color = '#6B7280';
             });
             
@@ -460,9 +460,9 @@ function setupCategories() {
             const selectedColor = card.dataset.categoryColor;
             card.style.background = selectedColor;
             card.style.borderColor = selectedColor;
-            const icon = card.querySelector('.category-icon');
+            const icon = card.querySelector('.category-icon-img');
             const text = card.querySelector('.category-name');
-            if (icon) icon.style.color = '#FFFFFF';
+            if (icon) icon.style.filter = 'brightness(0) invert(1)';
             if (text) text.style.color = '#FFFFFF';
             
             // Update selected category
@@ -474,7 +474,7 @@ function setupCategories() {
             
             // Animate icon with anime.js (reduced height)
             if (anime && anime.animate) {
-                anime.animate(card.querySelector('.category-icon'), {
+                anime.animate(card.querySelector('.category-icon-img'), {
                     scale: [1, 1.2, 0.95, 1.05, 1],
                     duration: 700,
                     ease: 'easeOutElastic(1, .6)'
@@ -518,97 +518,7 @@ function createStarBurst(element) {
 function createBackgroundParticles(category) {
     const container = document.getElementById('bgParticles');
     if (!container) return;
-    
     container.innerHTML = '';
-    
-    // Colores para partículas - mismo que controller
-    const colorMap = {
-        general: ['#0595AE', '#73A03F', '#EB8225', '#AB3D8B'],
-        science: ['#73A03F', '#0595AE', '#EB8225'],
-        mathematics: ['#6366F1', '#8B5CF6', '#A78BFA'],
-        robotics: ['#AB3D8B', '#EB8225', '#0595AE'],
-        chemistry: ['#EB8225', '#F59E0B', '#F97316'],
-        technology: ['#0D9488', '#14B8A6', '#2DD4BF'],
-        history: ['#B45309', '#D97706', '#F59E0B'],
-        geography: ['#2563EB', '#3B82F6', '#60A5FA']
-    };
-    
-    // Outline icons for each category
-    const iconMap = {
-        general: ['mdi:earth-outline', 'mdi:lightbulb-outline', 'mdi:star-outline', 'mdi:book-outline', 'mdi:school-outline'],
-        science: ['mdi:microscope', 'mdi:test-tube-outline', 'mdi:dna', 'mdi:atom-variant', 'mdi:leaf-outline', 'mdi:bacteria-outline'],
-        mathematics: ['mdi:compass-outline', 'mdi:calculator-variant-outline', 'mdi:chart-line', 'mdi:function-variant', 'mdi:pi', 'mdi:sigma'],
-        robotics: ['mdi:robot-outline', 'mdi:cog-outline', 'mdi:chip', 'mdi:memory', 'mdi:robot-industrial-outline', 'mdi:robot-happy-outline'],
-        chemistry: ['mdi:flask-outline', 'mdi:beaker-outline', 'mdi:molecule', 'mdi:atom', 'mdi:water-outline', 'mdi:fire'],
-        technology: ['mdi:laptop', 'mdi:cellphone', 'mdi:code-tags', 'mdi:wifi', 'mdi:cloud-outline', 'mdi:lan'],
-        history: ['mdi:book-open-outline', 'mdi:castle', 'mdi:crown-outline', 'mdi:sword', 'mdi:scroll-text-outline', 'mdi:pyramid'],
-        geography: ['mdi:map-outline', 'mdi:compass-outline', 'mdi:mountain', 'mdi:waves', 'mdi:island', 'mdi:pine-tree']
-    };
-    
-    const colors = colorMap[category] || colorMap.general;
-    const icons = iconMap[category] || iconMap.general;
-    
-    // Icon sizes: small, medium, large, extra-large
-    const sizes = [
-        { min: 30, max: 45, opacity: 0.15 },   // small
-        { min: 50, max: 70, opacity: 0.18 },   // medium
-        { min: 75, max: 100, opacity: 0.22 },  // large
-        { min: 110, max: 150, opacity: 0.25 }  // extra-large
-    ];
-    
-    // Create soft colored blob particles (background)
-    for (let i = 0; i < 12; i++) {
-        const particle = document.createElement('div');
-        const size = Math.random() * 150 + 80;
-        const color = colors[Math.floor(Math.random() * colors.length)];
-        
-        particle.className = 'particle';
-        particle.style.width = size + 'px';
-        particle.style.height = size + 'px';
-        particle.style.borderRadius = '50%';
-        particle.style.background = `${color}15`; // 15 = ~8% opacity in hex
-        particle.style.left = Math.random() * 100 + '%';
-        particle.style.top = Math.random() * 100 + '%';
-        particle.style.animationDelay = Math.random() * 5 + 's';
-        particle.style.animationDuration = (Math.random() * 20 + 20) + 's';
-        particle.style.filter = 'blur(40px)';
-        particle.style.opacity = '0.15';
-        
-        container.appendChild(particle);
-    }
-    
-    // Create floating outline icons with varied sizes
-    for (let i = 0; i < 25; i++) {
-        const iconEl = document.createElement('iconify-icon');
-        const icon = icons[Math.floor(Math.random() * icons.length)];
-        const color = colors[Math.floor(Math.random() * colors.length)];
-        const sizeConfig = sizes[Math.floor(Math.random() * sizes.length)];
-        const iconSize = Math.random() * (sizeConfig.max - sizeConfig.min) + sizeConfig.min;
-        
-        iconEl.setAttribute('icon', icon);
-        iconEl.className = 'particle icon-particle';
-        iconEl.style.color = `${color}40`; // 40 = ~25% opacity in hex
-        iconEl.style.fontSize = iconSize + 'px';
-        iconEl.style.left = Math.random() * 100 + '%';
-        iconEl.style.top = Math.random() * 100 + '%';
-        iconEl.style.animationDelay = Math.random() * 5 + 's';
-        iconEl.style.animationDuration = (Math.random() * 25 + 25) + 's';
-        iconEl.style.opacity = sizeConfig.opacity.toString();
-        iconEl.style.position = 'absolute';
-        
-        container.appendChild(iconEl);
-    }
-    
-    // Animate particles entrance with anime.js
-    if (anime && anime.animate && anime.stagger) {
-        anime.animate('.particle', {
-            opacity: [0, 0.15],
-            scale: [0, 1],
-            duration: 1000,
-            delay: anime.stagger(30),
-            ease: 'outElastic(1, .8)'
-        });
-    }
 }
 
 function updatePlayersDisplay() {
