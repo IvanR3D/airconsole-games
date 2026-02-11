@@ -8,18 +8,18 @@ html, body {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background: #FFFFFF;
+    background-color: #3d2318;
 }
 
 body {
     transition: background 0.5s ease;
-    background: #FFFFFF;
+    background: url('../assets/images/Pizarra%20.webp') center center / cover no-repeat fixed;
 }
 
-/* Category backgrounds - Clean white with colored particles */
-/* Playing screen - White background */
+/* Category backgrounds - Pizarra background */
+/* Playing screen - Pizarra background */
 #playingScreen {
-    background: #FFFFFF !important;
+    background: transparent !important;
 }
 body.cat-science,
 body.cat-mathematics,
@@ -29,7 +29,7 @@ body.cat-technology,
 body.cat-history,
 body.cat-geography,
 body.cat-default { 
-    background: #FFFFFF;
+    background: transparent;
     position: relative;
 }
 

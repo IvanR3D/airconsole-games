@@ -32,10 +32,10 @@
     </script>
     <link rel="stylesheet" href="screen-styles.css">
 </head>
-<body class="cat-default font-sans text-steam-negro overflow-hidden">
+<body class="cat-default font-sans text-steam-negro overflow-hidden" style="background: url('../assets/images/Pizarra-optimized.webp') center center / 100% 100% no-repeat fixed !important;">
     <div class="w-screen h-screen flex flex-col relative">
         <!-- INTRO SCREEN -->
-        <div class="screen intro-screen active flex-col items-center justify-center p-4 sm:p-6 lg:p-10 bg-white min-h-screen relative overflow-hidden" id="introScreen">
+        <div class="screen intro-screen active flex-col items-center justify-center p-4 sm:p-6 lg:p-10 min-h-screen relative overflow-hidden" id="introScreen">
             <!-- Background Icons Pattern -->
             <div class="absolute inset-0 grid grid-cols-8 grid-rows-6 gap-8 p-8 opacity-10" style="z-index: 0;">
                 <iconify-icon icon="mdi:math-compass" style="font-size: 3rem; color: #0595AE;"></iconify-icon>
@@ -97,7 +97,7 @@
             <div class="relative z-10 text-center max-w-4xl w-full px-4">
                 <!-- Logo -->
                 <div class="mb-8">
-                    <img src="../LogoSteamRD-Color.webp" alt="STEAM RD Logo" class="w-48 h-48 sm:w-56 sm:h-56 mx-auto mb-6" style="filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1));">
+                    <img src="../assets/images/LogoSteamRD-Color.webp" alt="STEAM RD Logo" class="w-48 h-48 sm:w-56 sm:h-56 mx-auto mb-6" style="filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1));">
                 </div>
                 
                 <!-- Title -->
@@ -115,7 +115,7 @@
         </div>
 
         <!-- WAITING SCREEN -->
-        <div class="screen waiting-screen flex-col items-center justify-center p-4 sm:p-6 lg:p-10 min-h-screen relative overflow-hidden bg-white" id="waitingScreen">
+        <div class="screen waiting-screen flex-col items-center justify-center p-4 sm:p-6 lg:p-10 min-h-screen relative overflow-hidden" id="waitingScreen">
             <!-- Animated background removed -->
             
             <!-- Content -->
@@ -178,7 +178,7 @@
         </div>
 
         <!-- CATEGORY SCREEN -->
-        <div class="screen flex-col p-4 sm:p-6 lg:p-8 h-screen overflow-hidden relative bg-white" id="categoryScreen">
+        <div class="screen flex-col p-4 sm:p-6 lg:p-8 h-screen overflow-hidden relative" id="categoryScreen">
             <!-- Animated Background Particles (soft colored blobs) -->
             <div class="bg-particles" id="bgParticles"></div>
             
@@ -222,7 +222,7 @@
         </div>
 
         <!-- PLAYING SCREEN -->
-        <div class="screen flex-col h-full" id="playingScreen" style="background: #FFFFFF;">
+        <div class="screen flex-col h-full" id="playingScreen">
             <!-- Timer Bar Header -->
             <div class="relative p-4 sm:p-6" style="background: rgba(255, 255, 255, 0.95); box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
                 <div class="flex items-center justify-center gap-6">
@@ -256,7 +256,7 @@
         </div>
 
         <!-- END SCREEN -->
-        <div class="screen flex-col items-center justify-center p-4 sm:p-6 lg:p-10 overflow-y-auto bg-white" id="endScreen">
+        <div class="screen flex-col items-center justify-center p-4 sm:p-6 lg:p-10 overflow-y-auto" id="endScreen">
             <h2 class="text-xl sm:text-2xl lg:text-3xl text-steam-turquesa mb-4 sm:mb-6 lg:mb-8 font-bold">Juego Terminado!</h2>
             <div class="winner-bounce text-center mb-4 sm:mb-6 lg:mb-8" id="winnerSection"></div>
             <div class="flex flex-col gap-2 sm:gap-3 max-w-xs sm:max-w-md lg:max-w-lg w-full mb-4 sm:mb-6 lg:mb-8" id="podium"></div>
@@ -269,8 +269,8 @@
             </div>
         </div>
 
-        <!-- Sound toggle -->
-        <div class="absolute bottom-3 sm:bottom-5 right-3 sm:right-5 text-2xl sm:text-3xl cursor-pointer opacity-70 hover:opacity-100 transition-opacity z-50" id="soundToggle">🔊</div>
+        <!-- Sound toggle (hidden) -->
+        <div class="absolute bottom-3 sm:bottom-5 right-3 sm:right-5 text-2xl sm:text-3xl cursor-pointer opacity-70 hover:opacity-100 transition-opacity z-50 hidden" id="soundToggle">🔊</div>
         
         <!-- Confetti container -->
         <div class="fixed top-0 left-0 w-full h-full pointer-events-none z-[1000] overflow-hidden" id="confettiContainer"></div>
