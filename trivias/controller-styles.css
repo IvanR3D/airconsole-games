@@ -5,6 +5,39 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+/* Tipografía tipo tiza (chalk) */
+.chalk-font,
+.chalk-font input,
+.chalk-font button,
+.chalk-font p,
+.chalk-font span,
+.chalk-font div,
+.chalk-font h1,
+.chalk-font h2,
+.chalk-font h3,
+.chalk-font label {
+    font-family: 'Architects Daughter', 'Caveat', cursive, sans-serif;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Efecto tiza suave para texto */
+.chalk-font .chalk-texture,
+.chalk-font h1,
+.chalk-font h2,
+.chalk-font .font-black,
+.chalk-font .font-bold {
+    text-shadow: 
+        0 1px 1px rgba(255, 255, 255, 0.15),
+        0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* Chalkboard safe area - contenido siempre dentro del fondo verde, lejos del borde marrón */
+.chalkboard-safe-area {
+    padding: clamp(1rem, 8vw, 2.5rem);
+    box-sizing: border-box;
+}
+
 html, body {
     width: 100%;
     height: 100%;
@@ -155,22 +188,45 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: #f9fafb;
-    border: 2px solid #e5e7eb;
+    background: #F5F7F5;
+    border: 2px solid #D4E0D4;
     border-radius: 0.75rem;
     gap: 0.25rem;
     cursor: pointer;
     touch-action: manipulation;
     transition: all 0.15s ease;
+    box-shadow: 0 2px 6px rgba(34, 64, 34, 0.06);
 }
 
 .category-btn:active {
     transform: scale(0.95);
 }
 
+.category-btn .category-icon,
+.category-btn .category-icon-img {
+    transition: filter 0.2s ease;
+}
+
+.category-btn .category-icon-img {
+    width: clamp(2rem, 5vw, 2.5rem);
+    height: clamp(2rem, 5vw, 2.5rem);
+    min-width: 2rem;
+    min-height: 2rem;
+    object-fit: contain;
+}
+
+/* Unselected: iconos bien visibles sobre fondo claro (contraste alto) */
+.category-btn:not(.selected) .category-icon-img {
+    filter: brightness(0.45) saturate(1.1) contrast(1.2) drop-shadow(0 2px 4px rgba(34, 64, 34, 0.25));
+}
+
+.category-btn.selected .category-icon-img {
+    filter: brightness(0) invert(1) drop-shadow(0 1px 4px rgba(0, 0, 0, 0.2));
+}
+
 .category-btn .category-icon {
     font-size: 1.5rem;
-    color: #9CA3AF;
+    color: #6B7B6B;
 }
 
 .category-btn .category-name {
@@ -178,7 +234,7 @@ body {
     line-height: 1.2;
     text-align: center;
     font-weight: 600;
-    color: #6B7280;
+    color: #5a6b5a;
 }
 
 .category-btn.selected {

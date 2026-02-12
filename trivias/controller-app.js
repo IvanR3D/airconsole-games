@@ -31,6 +31,7 @@ let selectedCategory = 'general';
 let selectedQuestionCount = 10;
 let hasJoined = false;
 let currentStep = 1;
+let questionReceivedAt = 0; // Momento en que este controlador recibe la pregunta (reloj local)
 
 const domCache = {};
 
@@ -196,16 +197,17 @@ function setupCategoryGrid() {
         btn.dataset.color = btnColor;
         
         if (isSelected) {
+            btn.classList.add('selected');
             btn.style.background = btnColor;
-            btn.style.border = '2px solid ' + btnColor;
+            btn.style.borderColor = btnColor;
         } else {
-            btn.style.background = '#F9FAFB';
-            btn.style.border = '2px solid #E5E7EB';
+            btn.style.background = '';
+            btn.style.borderColor = '';
         }
         
         btn.innerHTML = `
-            <img src="${categoryImages[key]}" alt="${cat.name}" class="category-icon-img mb-1" style="filter: ${isSelected ? 'brightness(0) invert(1)' : 'grayscale(100%) opacity(0.5)'};">
-            <div class="category-name text-xs font-bold" style="color: ${isSelected ? '#FFFFFF' : '#6B7280'};">${cat.name}</div>
+            <img src="${categoryImages[key]}" alt="${cat.name}" class="category-icon-img mb-1">
+            <div class="category-name text-xs font-bold" style="color: ${isSelected ? '#FFFFFF' : ''};">${cat.name}</div>
         `;
         btn.addEventListener('click', () => selectCategory(key));
         grid.appendChild(btn);
@@ -440,24 +442,27 @@ function selectCategory(category) {
         const isSelected = btnCategory === category;
         
         if (isSelected) {
+            btn.classList.add('selected');
             btn.style.background = btnColor;
             btn.style.borderColor = btnColor;
         } else {
-            btn.style.background = '#F9FAFB';
-            btn.style.borderColor = '#E5E7EB';
+            btn.classList.remove('selected');
+            btn.style.background = '';
+            btn.style.borderColor = '';
         }
         
-        const icon = btn.querySelector('.category-icon-img');
         const text = btn.querySelector('.category-name');
-        if (icon) icon.style.filter = isSelected ? 'brightness(0) invert(1)' : 'grayscale(100%) opacity(0.5)';
-        if (text) text.style.color = isSelected ? '#FFFFFF' : '#6B7280';
+        if (text) text.style.color = isSelected ? '#FFFFFF' : '';
         
-        if (isSelected && icon && anime && anime.animate) {
-            anime.animate(icon, {
-                scale: [1, 1.2, 0.95, 1.05, 1],
-                duration: 700,
-                ease: 'easeOutElastic(1, .6)'
-            });
+        if (isSelected) {
+            const icon = btn.querySelector('.category-icon-img');
+            if (icon && anime && anime.animate) {
+                anime.animate(icon, {
+                    scale: [1, 1.2, 0.95, 1.05, 1],
+                    duration: 700,
+                    ease: 'easeOutElastic(1, .6)'
+                });
+            }
         }
     });
     
@@ -492,17 +497,17 @@ function updateSelectedCategory(category) {
         const isSelected = btnCategory === category;
         
         if (isSelected) {
+            btn.classList.add('selected');
             btn.style.background = btnColor;
             btn.style.borderColor = btnColor;
         } else {
-            btn.style.background = '#F9FAFB';
-            btn.style.borderColor = '#E5E7EB';
+            btn.classList.remove('selected');
+            btn.style.background = '';
+            btn.style.borderColor = '';
         }
         
-        const icon = btn.querySelector('.category-icon-img');
         const text = btn.querySelector('.category-name');
-        if (icon) icon.style.filter = isSelected ? 'brightness(0) invert(1)' : 'grayscale(100%) opacity(0.5)';
-        if (text) text.style.color = isSelected ? '#FFFFFF' : '#6B7280';
+        if (text) text.style.color = isSelected ? '#FFFFFF' : '';
     });
     
     // Update background particles (admin and waiting screens)
@@ -530,6 +535,7 @@ function handleGameStart(data) {
 }
 
 function handleShowQuestion(data) {
+    questionReceivedAt = Date.now(); // Cada controlador mide desde que recibe la pregunta (evita desincronización de relojes)
     if (domCache.questionIndicator) {
         domCache.questionIndicator.textContent = `Pregunta ${data.questionIndex + 1} de ${data.totalQuestions}`;
     }
@@ -537,6 +543,7 @@ function handleShowQuestion(data) {
 }
 
 function handleNextQuestion(data) {
+    questionReceivedAt = Date.now();
     if (domCache.questionIndicator) {
         domCache.questionIndicator.textContent = `Pregunta ${data.question.index + 1} de ${data.question.total}`;
     }
@@ -547,10 +554,13 @@ function selectAnswer(optionIndex) {
     if (hasAnswered) return;
     hasAnswered = true;
     
+    // Usar tiempo medido en este dispositivo (evita problemas con relojes desincronizados TV vs teléfono)
+    const timeElapsed = Math.max(0, Date.now() - questionReceivedAt);
+    
     sendMessage({
         action: 'answer',
         option: optionIndex,
-        timestamp: Date.now()
+        timeElapsed: timeElapsed
     });
     
     if (domCache.answerButtons) {

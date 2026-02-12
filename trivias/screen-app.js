@@ -338,7 +338,7 @@ function init() {
             startGame();
             
         } else if (data.action === 'answer' && gameState === 'playing') {
-            handleAnswer(deviceId, data.option, data.timestamp);
+            handleAnswer(deviceId, data.option, data.timeElapsed);
             
         } else if (data.action === 'playAgain' && deviceId === adminDeviceId) {
             resetGame();
@@ -415,16 +415,14 @@ function setupCategories() {
         
         card.className = 'category-card rounded-2xl sm:rounded-3xl p-4 sm:p-5 lg:p-6 text-center cursor-pointer transition-all relative power-up';
         card.style.animationDelay = `${index * 0.1}s`;
-        card.style.background = '#F9FAFB';
-        card.style.borderColor = '#E5E7EB';
         card.dataset.category = key;
         card.dataset.categoryColor = categoryColor;
         
         card.innerHTML = `
             <div class="mb-3 sm:mb-4">
-                <img src="${categoryImages[key]}" alt="${category.name}" class="category-icon-img" style="filter: grayscale(100%) opacity(0.5);">
+                <img src="${categoryImages[key]}" alt="${category.name}" class="category-icon-img">
             </div>
-            <div class="text-base sm:text-lg lg:text-xl font-bold category-name" style="color: #6B7280;">
+            <div class="text-base sm:text-lg lg:text-xl font-bold category-name" style="color: #5a6b5a;">
                 ${category.name}
             </div>
             <div class="selection-check absolute top-2 right-2 w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 bg-white/90 hidden items-center justify-center text-sm font-bold" style="border-color: ${categoryColor}; color: ${categoryColor};">
@@ -442,12 +440,10 @@ function setupCategories() {
                     check.classList.add('hidden');
                     check.classList.remove('flex');
                 }
-                c.style.background = '#F9FAFB';
-                c.style.borderColor = '#E5E7EB';
-                const icon = c.querySelector('.category-icon-img');
+                c.style.background = '';
+                c.style.borderColor = '';
                 const text = c.querySelector('.category-name');
-                if (icon) icon.style.filter = 'grayscale(100%) opacity(0.5)';
-                if (text) text.style.color = '#6B7280';
+                if (text) text.style.color = '#5a6b5a';
             });
             
             // Add selection to clicked card - fondo del color de la categoría
@@ -460,9 +456,7 @@ function setupCategories() {
             const selectedColor = card.dataset.categoryColor;
             card.style.background = selectedColor;
             card.style.borderColor = selectedColor;
-            const icon = card.querySelector('.category-icon-img');
             const text = card.querySelector('.category-name');
-            if (icon) icon.style.filter = 'brightness(0) invert(1)';
             if (text) text.style.color = '#FFFFFF';
             
             // Update selected category
@@ -847,21 +841,22 @@ function updateTimerDisplay() {
     }
 }
 
-function handleAnswer(playerId, optionIndex, timestamp) {
+function handleAnswer(playerId, optionIndex, timeElapsed) {
     // Ignorar si ya se mostraron los resultados o el jugador ya respondió
     if (resultsShown || answers[playerId] || players[playerId]?.disconnected) return;
 
-    const timeElapsed = timestamp - questionStartTime;
+    // timeElapsed viene del controlador (medido con su reloj local) para evitar desincronización entre dispositivos
+    const elapsed = typeof timeElapsed === 'number' && !isNaN(timeElapsed) ? Math.max(0, timeElapsed) : 20000;
     const isCorrect = optionIndex === gameQuestions[currentQuestion].correct;
 
     answers[playerId] = {
         option: optionIndex,
         correct: isCorrect,
-        time: timeElapsed
+        time: elapsed
     };
 
     if (isCorrect) {
-        const points = Math.max(100, Math.floor(1000 - (timeElapsed / 20)));
+        const points = Math.max(100, Math.floor(1000 - (elapsed / 20)));
         players[playerId].score += points;
         playSound('correct');
         

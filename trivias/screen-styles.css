@@ -4,6 +4,39 @@
     box-sizing: border-box;
 }
 
+/* Tipografía tipo tiza (chalk) */
+.chalk-font,
+.chalk-font input,
+.chalk-font button,
+.chalk-font p,
+.chalk-font span,
+.chalk-font div,
+.chalk-font h1,
+.chalk-font h2,
+.chalk-font h3,
+.chalk-font label {
+    font-family: 'Architects Daughter', 'Caveat', cursive, sans-serif;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Efecto tiza suave para texto sobre fondos oscuros/claros */
+.chalk-font .chalk-texture,
+.chalk-font h1,
+.chalk-font h2,
+.chalk-font .font-black,
+.chalk-font .font-bold {
+    text-shadow: 
+        0 1px 1px rgba(255, 255, 255, 0.15),
+        0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* Chalkboard safe area - contenido siempre dentro del fondo verde, lejos del borde marrón */
+.chalkboard-safe-area {
+    padding: clamp(4%, 6vw, 10%);
+    box-sizing: border-box;
+}
+
 html, body {
     width: 100%;
     height: 100%;
@@ -180,15 +213,25 @@ body.cat-default {
     object-fit: contain;
     display: inline-block;
     transition: all 0.3s ease;
-    filter: grayscale(100%) opacity(0.5);
 }
 
-/* Unselected: gris como en el controller (#F9FAFB, #E5E7EB, icon/text gris) */
+/* Unselected: iconos bien visibles sobre fondo claro (contraste alto) */
+.category-card:not(.selected) .category-icon-img {
+    filter: brightness(0.45) saturate(1.1) contrast(1.2) drop-shadow(0 2px 4px rgba(34, 64, 34, 0.25));
+}
+
+/* Selected: iconos blancos con brillo tipo tiza */
+.category-card.selected .category-icon-img {
+    filter: brightness(0) invert(1) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.2));
+}
+
+/* Unselected: tarjetas con ligero tono que armoniza con la pizarra verde */
 .category-card {
     position: relative;
     overflow: hidden;
-    background: #F9FAFB;
-    border: 2px solid #E5E7EB;
+    background: #F5F7F5;
+    border: 2px solid #D4E0D4;
+    box-shadow: 0 2px 8px rgba(34, 64, 34, 0.08);
 }
 
 .category-card:not(.selected):hover {
@@ -632,9 +675,9 @@ body.cat-default {
 .intro-edu-icon:nth-child(7) { animation-delay: 3s; }
 
 .intro-title {
-    font-family: 'Segoe UI', 'Arial Rounded MT Bold', sans-serif;
-    font-weight: 900;
-    letter-spacing: -0.02em;
+    font-family: 'Architects Daughter', 'Caveat', cursive, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.01em;
 }
 
 /* Logo animation - Gaming style */
