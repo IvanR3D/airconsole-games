@@ -71,6 +71,7 @@ function init() {
     cacheDom();
 
     airconsole.onReady = function() {
+        showScreen('join'); // Mostrar pantalla inicial al cargar el controlador
         setupCategoryGrid();
         setupAnswerButtons();
         setupStepNavigation();
