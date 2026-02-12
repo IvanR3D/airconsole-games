@@ -37,17 +37,17 @@
 <body class="text-steam-negro chalk-font" style="background: url('../assets/images/Pizarra-optimized.webp') center center / 100% 100% no-repeat fixed !important;">
     <div class="w-full h-full min-h-0 flex flex-col chalkboard-safe-area" style="height: 100vh; height: 100dvh;">
         
-        <!-- JOIN SCREEN -->
-        <div class="screen active flex-col items-center justify-center text-center gap-4" id="joinScreen">
-            <div class="w-full max-w-sm mx-auto">
-                <img src="../assets/images/LogoSteamRD-Color.webp" alt="STEAM RD Logo" class="w-16 h-16 mx-auto mb-3 object-contain">
+        <!-- JOIN SCREEN - compacto para evitar scroll (AirConsole) -->
+        <div class="screen active flex-col items-center justify-center text-center gap-2 sm:gap-3" id="joinScreen">
+            <div class="w-full max-w-sm mx-auto px-1">
+                <img src="../assets/images/LogoSteamRD-Color.webp" alt="STEAM RD Logo" class="w-12 h-12 sm:w-14 sm:h-14 mx-auto mb-2 object-contain">
                 
-                <h1 class="text-2xl font-black mb-4 text-steam-turquesa">TRIVIA</h1>
+                <h1 class="text-xl sm:text-2xl font-black mb-2 sm:mb-3 text-steam-turquesa">TRIVIA</h1>
                 
-                <div class="space-y-2 mb-4">
-                    <div class="rounded-xl p-3 chalk-box" style="background: transparent; border: 2px solid rgba(255,255,255,0.7);">
-                        <div class="flex items-center gap-3">
-                            <div class="text-xl">🎯</div>
+                <div class="space-y-1.5 sm:space-y-2 mb-2 sm:mb-3">
+                    <div class="rounded-xl p-2 sm:p-2.5 chalk-box" style="background: transparent; border: 2px solid rgba(255,255,255,0.7);">
+                        <div class="flex items-center gap-2">
+                            <div class="text-lg sm:text-xl flex-shrink-0">🎯</div>
                             <div class="text-left">
                                 <h3 class="font-bold text-xs text-white/95">Pon a prueba tus conocimientos</h3>
                                 <p class="text-xs text-white/75">Responde preguntas de diferentes categorías</p>
@@ -55,9 +55,9 @@
                         </div>
                     </div>
                     
-                    <div class="rounded-xl p-3 chalk-box" style="background: transparent; border: 2px solid rgba(255,255,255,0.7);">
-                        <div class="flex items-center gap-3">
-                            <div class="text-xl">👥</div>
+                    <div class="rounded-xl p-2 sm:p-2.5 chalk-box" style="background: transparent; border: 2px solid rgba(255,255,255,0.7);">
+                        <div class="flex items-center gap-2">
+                            <div class="text-lg sm:text-xl flex-shrink-0">👥</div>
                             <div class="text-left">
                                 <h3 class="font-bold text-xs text-white/95">Juega con amigos</h3>
                                 <p class="text-xs text-white/75">Hasta 32 jugadores pueden competir</p>
@@ -65,9 +65,9 @@
                         </div>
                     </div>
                     
-                    <div class="rounded-xl p-3 chalk-box" style="background: transparent; border: 2px solid rgba(255,255,255,0.7);">
-                        <div class="flex items-center gap-3">
-                            <div class="text-xl">⚡</div>
+                    <div class="rounded-xl p-2 sm:p-2.5 chalk-box" style="background: transparent; border: 2px solid rgba(255,255,255,0.7);">
+                        <div class="flex items-center gap-2">
+                            <div class="text-lg sm:text-xl flex-shrink-0">⚡</div>
                             <div class="text-left">
                                 <h3 class="font-bold text-xs text-white/95">Responde rápido</h3>
                                 <p class="text-xs text-white/75">Gana más puntos por velocidad</p>
@@ -162,7 +162,7 @@
 
                 <!-- STEP 1: Category Selection -->
                 <div class="step-content active" id="step1">
-                    <h2 class="text-xs sm:text-sm font-black text-center mb-1.5 flex-shrink-0 text-steam-turquesa">Elige una Categoría</h2>
+                    <h2 class="text-sm sm:text-base font-black text-center mb-1.5 flex-shrink-0 text-steam-turquesa">Elige una Categoría</h2>
                     <div id="categoryScrollContainer" class="min-h-0">
                         <div id="categoryGrid"></div>
                     </div>
@@ -186,14 +186,14 @@
                             </div>
                             <button class="w-12 h-12 rounded-full text-white font-bold text-xl flex items-center justify-center shadow-md active:scale-95 transition-transform chalk-btn" style="background: rgba(115,160,63,0.85); border: 2px solid #73A03F;" id="increaseQuestions">+</button>
                         </div>
-                        <p class="text-center text-xs text-white/70">Mínimo 5 - Máximo 50</p>
+                        <p class="text-center text-sm text-white/70">Mínimo 5 - Máximo 50</p>
                     </div>
 
                     <div class="rounded-lg p-3 mb-4 chalk-box flex items-center gap-3" style="background: transparent; border: 2px solid #0595AE;">
                         <iconify-icon id="selectedCatIcon" icon="mdi:earth" class="text-2xl text-steam-turquesa"></iconify-icon>
                         <div>
-                            <div class="text-xs text-white/70">Categoría</div>
-                            <div class="font-bold text-sm text-steam-turquesa" id="selectedCatName">General</div>
+                            <div class="text-sm text-white/70">Categoría</div>
+                            <div class="font-bold text-base text-steam-turquesa" id="selectedCatName">General</div>
                         </div>
                     </div>
                     

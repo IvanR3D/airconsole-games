@@ -207,7 +207,8 @@ function setupCategoryGrid() {
         
         btn.innerHTML = `
             <img src="${categoryImages[key]}" alt="${cat.name}" class="category-icon-img mb-1">
-            <div class="category-name text-xs font-bold">${cat.name}</div>
+            <div class="category-name font-bold">${cat.name}</div>
+            <div class="selection-check" style="border-color: ${btnColor};">✓</div>
         `;
         btn.addEventListener('click', () => selectCategory(key));
         grid.appendChild(btn);
@@ -443,11 +444,11 @@ function selectCategory(category) {
         
         if (isSelected) {
             btn.classList.add('selected');
-            btn.style.background = btnColor;
+            btn.style.background = 'transparent';
             btn.style.borderColor = btnColor;
         } else {
             btn.classList.remove('selected');
-            btn.style.background = '';
+            btn.style.background = 'transparent';
             btn.style.borderColor = '';
         }
         
@@ -498,11 +499,11 @@ function updateSelectedCategory(category) {
         
         if (isSelected) {
             btn.classList.add('selected');
-            btn.style.background = btnColor;
+            btn.style.background = 'transparent';
             btn.style.borderColor = btnColor;
         } else {
             btn.classList.remove('selected');
-            btn.style.background = '';
+            btn.style.background = 'transparent';
             btn.style.borderColor = '';
         }
         

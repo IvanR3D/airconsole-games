@@ -1,15 +1,20 @@
+/* AirConsole: Prevenir selección y highlight táctil */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
-/* Variables chalk - coherente con screen */
+/* Variables chalk + AirConsole safe areas */
 :root {
     --chalk-white: rgba(255, 255, 255, 0.92);
     --chalk-white-soft: rgba(255, 255, 255, 0.78);
     --chalk-border: 2px solid var(--chalk-white);
+    --airconsole-safe-top: max(50px, env(safe-area-inset-top, 0px));
+    --airconsole-safe-bottom: max(16px, env(safe-area-inset-bottom, 0px));
 }
 
 /* Tipografía global tipo tiza */
@@ -40,29 +45,42 @@
         0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
-/* Chalkboard safe area - lejos de bordes marrones */
+/* Chalkboard safe area - contenido fuera de los bordes marrones de la pizarra */
 .chalkboard-safe-area {
-    padding: clamp(0.5rem, 5vw, 2rem);
+    padding: var(--airconsole-safe-top) clamp(1rem, 8vw, 2.5rem) var(--airconsole-safe-bottom);
+    padding-left: max(clamp(1rem, 8vw, 2.5rem), env(safe-area-inset-left, 0px));
+    padding-right: max(clamp(1rem, 8vw, 2.5rem), env(safe-area-inset-right, 0px));
     box-sizing: border-box;
-    max-width: 100%;
-    overflow: hidden;
+    max-width: 100vw;
+    overflow-x: hidden;
 }
 
 @media (max-height: 600px) {
     .chalkboard-safe-area {
-        padding: clamp(0.4rem, 3vw, 1rem);
+        padding-top: max(40px, env(safe-area-inset-top, 0px));
+    }
+    #playingScreen {
+        padding-top: max(1.5rem, env(safe-area-inset-top, 0px));
     }
 }
 
 html, body {
     width: 100%;
+    max-width: 100vw;
     height: 100%;
     overflow: hidden;
+    overflow-x: hidden;
     background-color: #3d2318;
 }
 
+/* AirConsole: Contenedor fijo para evitar scroll/bounce en móvil */
 body {
+    position: fixed;
+    top: 0;
+    left: 0;
     touch-action: manipulation;
+    overscroll-behavior: none;
+    -webkit-font-smoothing: antialiased;
     background: url('../assets/images/Pizarra%20.webp') center center / cover no-repeat fixed;
 }
 
@@ -89,9 +107,45 @@ body {
     opacity: 1;
 }
 
-/* Playing screen: extra top spacing so AirConsole UI doesn't overlap */
+/* Join screen: permitir scroll si es necesario en pantallas muy cortas */
+#joinScreen {
+    justify-content: flex-start;
+    padding-top: max(0.5rem, env(safe-area-inset-top, 0px));
+}
+
+@media (min-height: 500px) {
+    #joinScreen {
+        justify-content: center;
+    }
+}
+
+/* AirConsole: Espacio para logo (~50px) - evitar que UI tape contenido */
 #playingScreen {
-    padding-top: max(2.5rem, calc(env(safe-area-inset-top, 0px) + 1.5rem));
+    padding-top: max(2.5rem, calc(env(safe-area-inset-top, 0px) + 2rem));
+}
+
+/* Cuando está activa: layout flex para evitar scroll y que respuestas se adapten */
+#playingScreen.active {
+    overflow: hidden;
+    min-height: 0;
+    flex: 1;
+}
+
+/* Header y footer fijos para que el grid de respuestas use el espacio restante */
+#playingScreen > .text-left,
+#playingScreen > .text-center {
+    flex-shrink: 0;
+}
+
+#playingScreen .text-center.mb-3 {
+    margin-bottom: clamp(0.5rem, 1.5vh, 0.75rem);
+}
+
+/* AirConsole: Botones táctiles mínimo 44px (accesibilidad) */
+.chalk-btn,
+.chalk-answer-btn,
+#joinBtn {
+    min-height: 44px;
 }
 
 /* ========================================
@@ -129,7 +183,7 @@ body {
 }
 
 .step-text {
-    font-size: 0.625rem;
+    font-size: clamp(0.85rem, 2.5vw, 1rem);
     color: rgba(255, 255, 255, 0.6);
     font-weight: 600;
     transition: all 0.3s ease;
@@ -156,15 +210,15 @@ body {
 
 /* Texto legible - Pregunta X de Y, Selecciona tu respuesta (font más legible para UI) */
 .chalk-readable {
-    font-family: 'Architects Daughter', 'Caveat Brush', cursive;
-    font-size: 1.2rem;
+    font-family: 'Caveat Brush', 'Architects Daughter', cursive;
+    font-size: clamp(1.15rem, 4vw, 1.5rem);
     color: rgba(255, 255, 255, 0.95);
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     letter-spacing: 0.02em;
 }
 
 .chalk-subtitle {
-    font-size: 1rem;
+    font-size: clamp(1rem, 3.5vw, 1.25rem);
     color: rgba(255, 255, 255, 0.9);
 }
 
@@ -173,6 +227,14 @@ body {
     background: transparent !important;
     border: 2px solid rgba(255, 255, 255, 0.75);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Playing screen: tarjeta más compacta en pantallas cortas */
+@media (max-height: 600px) {
+    #playingScreen .chalk-player-card-mini {
+        padding: 0.5rem 0.75rem;
+        margin-top: 0.5rem;
+    }
 }
 
 .chalk-score-badge {
@@ -250,6 +312,7 @@ body {
 }
 
 .category-btn {
+    position: relative;
     min-height: clamp(52px, 14vh, 70px);
     padding: 0.5rem 0.35rem;
     display: flex;
@@ -268,6 +331,10 @@ body {
 
 .category-btn:active {
     transform: scale(0.95);
+}
+
+.category-btn:not(.selected):hover:active {
+    transform: translateY(-2px) scale(0.95);
 }
 
 .category-btn .category-icon,
@@ -298,20 +365,57 @@ body {
 }
 
 .category-btn .category-name {
-    font-size: clamp(0.55rem, 2vw, 0.7rem);
+    font-size: clamp(0.85rem, 3.5vw, 1.15rem);
     line-height: 1.2;
     text-align: center;
     font-weight: 600;
     color: var(--chalk-white-soft);
 }
 
+/* Hover: igual que screen (translateY, scale icono) */
+.category-btn:not(.selected):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.category-btn:not(.selected):hover .category-icon-img {
+    transform: scale(1.08);
+}
+
+.category-btn .category-icon-img {
+    transition: transform 0.2s ease;
+}
+
 .category-btn.selected {
     border-width: 3px;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
 }
 
 .category-btn.selected .category-icon,
 .category-btn.selected .category-name {
     color: var(--chalk-white);
+}
+
+/* Checkmark de selección - mismo estilo que screen */
+.category-btn .selection-check {
+    position: absolute;
+    top: 0.35rem;
+    right: 0.35rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 50%;
+    border: 2px solid;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.95);
+    background: transparent;
+}
+
+.category-btn.selected .selection-check {
+    display: flex;
 }
 
 /* Category scroll container */
@@ -328,17 +432,18 @@ body {
 .answer-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    gap: 0.5rem;
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    gap: clamp(0.35rem, 1.5vw, 0.5rem);
     flex: 1;
+    min-height: 0;
 }
 
 .answer-btn {
-    font-size: clamp(1.5rem, 6vw, 2.5rem);
+    font-size: clamp(1.25rem, 5vw, 2.5rem);
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 0;
+    min-height: clamp(44px, 12vh, 70px);
 }
 
 .answer-btn::before {

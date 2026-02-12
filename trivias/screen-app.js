@@ -422,7 +422,7 @@ function setupCategories() {
             <div class="mb-1 sm:mb-2">
                 <img src="${categoryImages[key]}" alt="${category.name}" class="category-icon-img">
             </div>
-            <div class="text-sm sm:text-base lg:text-lg font-bold category-name leading-tight">
+            <div class="text-base sm:text-lg lg:text-xl font-bold category-name leading-tight">
                 ${category.name}
             </div>
             <div class="selection-check absolute top-2 right-2 w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 hidden items-center justify-center text-sm font-bold" style="background: transparent; border-color: ${categoryColor}; color: rgba(255,255,255,0.95);">
@@ -718,6 +718,7 @@ function displayOptions(question) {
     
     const letters = ['A', 'B', 'C', 'D'];
     const categoryColor = categoryColors[selectedCategory] || '#0595AE';
+    const correctIndex = question.correct;
     
     const fragment = document.createDocumentFragment();
     question.options.forEach((option, index) => {
@@ -727,6 +728,7 @@ function displayOptions(question) {
         card.className = 'option-card flex items-center rounded-2xl overflow-hidden border-3 shadow-lg transition-all cursor-pointer hover:scale-105 relative chalk-option';
         card.style.borderColor = 'rgba(255,255,255,0.9)';
         card.dataset.index = index;
+        card.dataset.correct = index === correctIndex ? 'true' : 'false';
         
         // Letter badge - estilo chalk
         const badge = document.createElement('div');
@@ -753,17 +755,15 @@ function startTimer() {
     clearInterval(timer);
     timeLeft = 20;
     
-    // Resetear la barra al 100% instantáneamente (sin transición)
+    // Usar animación CSS para que la barra se vacíe suavemente en 20 segundos
     const timerBar = document.getElementById('timerBar');
     if (timerBar) {
-        timerBar.classList.remove('animating', 'warning', 'danger');
-        timerBar.style.transition = 'none';
+        timerBar.classList.remove('draining', 'warning', 'danger');
+        timerBar.style.animation = 'none';
         timerBar.style.width = '100%';
-        // Forzar reflow para aplicar el cambio inmediatamente
-        timerBar.offsetHeight;
-        // Restaurar la transición después de que la barra esté al 100%
-        timerBar.style.transition = '';
-        timerBar.classList.add('animating');
+        timerBar.offsetHeight; // Forzar reflow
+        timerBar.style.animation = ''; // Permitir que la clase aplique la animación
+        timerBar.classList.add('draining');
     }
     
     updateTimerDisplay();
@@ -771,13 +771,14 @@ function startTimer() {
     timer = setInterval(() => {
         timeLeft--;
         updateTimerDisplay();
-        updateProgressBar();
+        updateProgressBarStyles();
         
         if (timeLeft <= 5) {
             playSound('tick');
         }
         
         if (timeLeft <= 0 && !resultsShown) {
+            stopTimerAnimation();
             resultsShown = true;
             clearInterval(timer);
             showResults();
@@ -785,17 +786,19 @@ function startTimer() {
     }, 1000);
 }
 
-function updateProgressBar() {
+function stopTimerAnimation() {
+    const timerBar = document.getElementById('timerBar');
+    if (timerBar) {
+        timerBar.style.animationPlayState = 'paused';
+    }
+}
+
+function updateProgressBarStyles() {
     const timerBar = document.getElementById('timerBar');
     
     if (timerBar) {
-        const percentage = (timeLeft / 20) * 100;
-        timerBar.style.width = percentage + '%';
-        
-        // Remove all classes first
         timerBar.classList.remove('warning', 'danger');
         
-        // Add appropriate class based on time
         if (timeLeft <= 5) {
             timerBar.classList.add('danger');
         } else if (timeLeft <= 10) {
@@ -810,19 +813,19 @@ function updateTimerDisplay() {
     
     circle.textContent = timeLeft;
     
-    // Change color based on time left
+    // Change color based on time left - fondos sólidos y visibles sobre la pizarra
     if (timeLeft <= 5) {
         circle.style.background = '#E53935';
-        circle.style.boxShadow = '0 4px 12px rgba(229, 57, 53, 0.4)';
+        circle.style.boxShadow = '0 0 0 4px rgba(0,0,0,0.25), 0 4px 20px rgba(229, 57, 53, 0.6), inset 0 1px 0 rgba(255,255,255,0.25)';
         circle.classList.add('timer-danger');
     } else if (timeLeft <= 10) {
         circle.style.background = '#FFA726';
-        circle.style.boxShadow = '0 4px 12px rgba(255, 167, 38, 0.4)';
+        circle.style.boxShadow = '0 0 0 4px rgba(0,0,0,0.25), 0 4px 20px rgba(255, 167, 38, 0.6), inset 0 1px 0 rgba(255,255,255,0.25)';
         circle.classList.add('timer-warning');
         circle.classList.remove('timer-danger');
     } else {
         circle.style.background = '#0595AE';
-        circle.style.boxShadow = '0 4px 12px rgba(5, 149, 174, 0.3)';
+        circle.style.boxShadow = '0 0 0 4px rgba(0,0,0,0.25), 0 4px 20px rgba(5, 149, 174, 0.6), inset 0 1px 0 rgba(255,255,255,0.25)';
         circle.classList.remove('timer-warning', 'timer-danger');
     }
 }
@@ -869,6 +872,7 @@ function handleAnswer(playerId, optionIndex, timeElapsed) {
     if (answersCount >= activePlayers.length && !resultsShown) {
         resultsShown = true;
         clearInterval(timer);
+        stopTimerAnimation();
         setTimeout(() => showResults(), 800);
     }
 }
