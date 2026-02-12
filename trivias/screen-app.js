@@ -159,19 +159,15 @@ function setCategoryBackground(category) {
 
 function startIntroLoadingAnimation() {
     stopIntroLoadingAnimation();
-    const percentEl = document.getElementById('introPercent');
     const progressBar = document.getElementById('introProgress');
-    if (!percentEl) return;
-    let count = 0;
-    if (progressBar) progressBar.style.width = '0%';
-    percentEl.textContent = '0';
-    const stepMs = 25; // 100 steps in 2.5s
-    introLoadingInterval = setInterval(() => {
-        count++;
-        if (count > 100) count = 0;
-        percentEl.textContent = count;
-        if (progressBar) progressBar.style.width = count + '%';
-    }, stepMs);
+    if (progressBar) {
+        progressBar.style.transition = 'width 1.2s ease-out';
+        progressBar.style.width = '0%';
+        progressBar.offsetHeight; // fuerza reflow
+        requestAnimationFrame(() => {
+            progressBar.style.width = '100%';
+        });
+    }
 }
 
 function stopIntroLoadingAnimation() {
@@ -604,17 +600,17 @@ function updatePlayersStatus() {
         const cardColors = ['#0595AE', '#73A03F', '#EB8225', '#AB3D8B'];
         const cardColor = cardColors[index % cardColors.length];
         
-        // Footer card - estilo chalk, sin fondo blanco
+        // Footer card - estilo chalk, layout horizontal (avatar | nombre | pts)
         const footerCard = document.createElement('div');
-        footerCard.className = 'flex flex-col items-center gap-2 rounded-xl py-3 px-4 transition-all chalk-footer-card';
+        footerCard.className = 'flex flex-row items-center gap-3 rounded-xl py-2 px-4 transition-all chalk-footer-card';
         footerCard.style.background = 'transparent';
         footerCard.style.border = `2px solid ${player.disconnected ? 'rgba(255,255,255,0.3)' : cardColor}`;
-        footerCard.style.minWidth = 'clamp(80px, 12vw, 120px)';
+        footerCard.style.minWidth = 'clamp(140px, 22vw, 200px)';
         footerCard.style.opacity = player.disconnected ? '0.5' : '1';
         
         // Avatar
         const footerAvatar = document.createElement('div');
-        footerAvatar.className = 'w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center relative';
+        footerAvatar.className = 'w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center relative flex-shrink-0';
         footerAvatar.style.background = player.disconnected ? '#BDBDBD' : player.color;
         footerAvatar.style.border = `3px solid ${player.disconnected ? '#9E9E9E' : '#fff'}`;
         footerAvatar.style.boxShadow = player.disconnected ? 'none' : `0 2px 8px ${cardColor}44`;
@@ -631,14 +627,14 @@ function updatePlayersStatus() {
         
         // Name
         const footerName = document.createElement('div');
-        footerName.className = 'font-bold text-xs sm:text-sm truncate text-center';
+        footerName.className = 'font-bold text-xs sm:text-sm truncate flex-1 min-w-0';
         footerName.style.color = player.disconnected ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.95)';
         footerName.textContent = player.name;
         footerCard.appendChild(footerName);
         
         // Score - badge tipo chalk
         const score = document.createElement('div');
-        score.className = 'text-sm sm:text-base font-bold px-2 py-1 rounded-lg';
+        score.className = 'text-sm sm:text-base font-bold px-2 py-1 rounded-lg flex-shrink-0';
         score.style.background = player.disconnected ? 'rgba(255,255,255,0.2)' : cardColor;
         score.style.border = `1px solid ${player.disconnected ? 'rgba(255,255,255,0.3)' : cardColor}`;
         score.style.color = '#fff';
@@ -1012,16 +1008,21 @@ function endGame() {
         .filter(p => !p.disconnected)
         .sort((a, b) => b.score - a.score);
     
+    const medalSvg = (color) => `<svg class="medal-icon" viewBox="0 0 64 80" xmlns="http://www.w3.org/2000/svg"><path d="M32 4 L38 4 L44 20 L44 44 C44 58 38 64 32 64 C26 64 20 58 20 44 L20 20 Z" fill="${color}" stroke="${color}" stroke-width="2" opacity="0.95"/><circle cx="32" cy="32" r="12" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2"/><path d="M24 4 L32 0 L40 4" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round"/></svg>`;
+    const goldMedal = medalSvg('#FFD700');
+    const silverMedal = medalSvg('#C0C0C0');
+    const bronzeMedal = medalSvg('#CD7F32');
+
     const winnerSection = document.getElementById('winnerSection');
     if (sortedPlayers.length > 0) {
         const winner = sortedPlayers[0];
         winnerSection.innerHTML = `
-            <div class="text-3xl sm:text-5xl lg:text-6xl mb-2 sm:mb-4">1er Lugar</div>
-            <div class="flex justify-center mb-2 sm:mb-4">
+            <div class="medal-trophy mb-2 sm:mb-4">${goldMedal}</div>
+            <div class="flex justify-center mb-2 sm:mb-4 medal-avatar-wrap">
                 <div class="player-avatar-visual-large" style="background-color: ${winner.color};"></div>
             </div>
-            <div class="text-xl sm:text-2xl lg:text-3xl font-bold text-steam-naranja">${winner.name}</div>
-            <div class="text-base sm:text-lg lg:text-xl text-steam-verde mt-1 sm:mt-2">${winner.score} puntos</div>
+            <div class="chalk-title text-xl sm:text-2xl lg:text-3xl font-bold text-steam-naranja">${winner.name}</div>
+            <div class="chalk-body text-base sm:text-lg lg:text-xl text-steam-verde mt-1 sm:mt-2">${winner.score} puntos</div>
         `;
         
         playSound('victory');
@@ -1031,21 +1032,22 @@ function endGame() {
     const podium = document.getElementById('podium');
     podium.innerHTML = '';
     
-    const medals = ['1ro', '2do', '3ro'];
-    const podiumBorders = ['#EB8225', 'rgba(255,255,255,0.6)', '#F9A825'];
+    const podiumMedals = [goldMedal, silverMedal, bronzeMedal];
+    const podiumBorders = ['#FFD700', '#C0C0C0', '#CD7F32'];
     
     sortedPlayers.forEach((player, index) => {
         const item = document.createElement('div');
-        item.className = 'flex items-center justify-between p-2 sm:p-3 lg:p-4 rounded-lg sm:rounded-xl lg:rounded-2xl border-2 sm:border-[3px] shadow-md chalk-box';
+        item.className = 'podium-item flex items-center justify-between p-2 sm:p-3 lg:p-4 rounded-lg sm:rounded-xl lg:rounded-2xl border-2 sm:border-[3px] shadow-md chalk-box';
         item.style.background = 'transparent';
         item.style.borderColor = podiumBorders[index] || 'rgba(255,255,255,0.5)';
+        const medalIcon = podiumMedals[index] || `<span class="chalk-body text-lg font-bold" style="color: rgba(255,255,255,0.95);">#${index + 1}</span>`;
         item.innerHTML = `
             <div class="flex items-center gap-2 sm:gap-3 lg:gap-4">
-                <span class="text-lg sm:text-xl lg:text-2xl font-bold" style="color: rgba(255,255,255,0.95);">${medals[index] || `#${index + 1}`}</span>
+                <span class="medal-slot flex items-center justify-center">${medalIcon}</span>
                 <div class="player-avatar-visual" style="background-color: ${player.color};"></div>
-                <span class="text-sm sm:text-base lg:text-lg font-bold" style="color: rgba(255,255,255,0.95);">${player.name}</span>
+                <span class="chalk-body text-sm sm:text-base lg:text-lg font-bold" style="color: rgba(255,255,255,0.95);">${player.name}</span>
             </div>
-            <span class="text-base sm:text-lg lg:text-xl font-bold" style="color: #0595AE;">${player.score} pts</span>
+            <span class="chalk-body text-base sm:text-lg lg:text-xl font-bold" style="color: #0595AE;">${player.score} pts</span>
         `;
         podium.appendChild(item);
     });

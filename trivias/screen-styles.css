@@ -36,6 +36,10 @@
     font-family: 'Cabin Sketch', cursive, sans-serif;
 }
 
+.chalk-font .chalk-body {
+    font-family: 'Caveat Brush', cursive, sans-serif;
+}
+
 /* Efecto tiza para texto */
 .chalk-font .chalk-texture,
 .chalk-font h1,
@@ -169,13 +173,34 @@ body.cat-default {
     transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
 }
 
-.timer-circle-standalone:hover,
-#playingScreen .timer-circle-standalone:hover {
+/* Hover acorde al estado del timer (turquesa, naranja o rojo según segundos) */
+.timer-circle-standalone:not(.timer-warning):not(.timer-danger):hover,
+#playingScreen .timer-circle-standalone:not(.timer-warning):not(.timer-danger):hover {
     background: #07b8d9 !important;
     box-shadow: 
         0 0 0 4px rgba(0, 0, 0, 0.25),
         0 4px 24px rgba(5, 149, 174, 0.8),
         0 0 20px rgba(7, 184, 217, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.timer-circle-standalone.timer-warning:hover,
+#playingScreen .timer-circle-standalone.timer-warning:hover {
+    background: #ffb74d !important;
+    box-shadow: 
+        0 0 0 4px rgba(0, 0, 0, 0.25),
+        0 4px 24px rgba(255, 167, 38, 0.8),
+        0 0 20px rgba(255, 183, 77, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.timer-circle-standalone.timer-danger:hover,
+#playingScreen .timer-circle-standalone.timer-danger:hover {
+    background: #ef5350 !important;
+    box-shadow: 
+        0 0 0 4px rgba(0, 0, 0, 0.25),
+        0 4px 24px rgba(229, 57, 53, 0.8),
+        0 0 20px rgba(239, 83, 80, 0.5),
         inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
@@ -352,42 +377,24 @@ body.cat-default {
     }
 }
 
-/* Option cards (playing screen): estilo chalk, sin fondo sólido */
+/* Option cards (playing screen): estilo chalk, sin fondo sólido.
+   Sin hover: el screen es display-only, no hay interacción con mouse. */
+#optionsGrid {
+    pointer-events: none;
+}
+
 .option-card {
     background: transparent !important;
     border: var(--chalk-border) !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
-    transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease !important;
+    transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease !important;
 }
 
 .option-card .option-badge {
     background: transparent !important;
     border-right: var(--chalk-border-soft) !important;
     color: var(--chalk-white) !important;
-    transition: background 0.2s ease, border-color 0.2s ease !important;
-}
-
-/* Hover: verde = correcto, rojo = incorrecto (antes de mostrar resultados) */
-.option-card[data-correct="true"]:hover:not(.option-correct):not(.option-incorrect) {
-    background: rgba(115, 160, 63, 0.25) !important;
-    border-color: #73A03F !important;
-    box-shadow: 0 0 20px rgba(115, 160, 63, 0.4) !important;
-}
-
-.option-card[data-correct="true"]:hover:not(.option-correct):not(.option-incorrect) .option-badge {
-    background: rgba(115, 160, 63, 0.35) !important;
-    border-right-color: #73A03F !important;
-}
-
-.option-card[data-correct="false"]:hover:not(.option-correct):not(.option-incorrect) {
-    background: rgba(229, 57, 53, 0.25) !important;
-    border-color: #E53935 !important;
-    box-shadow: 0 0 20px rgba(229, 57, 53, 0.4) !important;
-}
-
-.option-card[data-correct="false"]:hover:not(.option-correct):not(.option-incorrect) .option-badge {
-    background: rgba(229, 57, 53, 0.35) !important;
-    border-right-color: #E53935 !important;
+    transition: background 0.3s ease, border-color 0.3s ease !important;
 }
 
 /* Option cards (playing screen): prevent top edge clipping */
@@ -532,26 +539,28 @@ body.cat-default {
 .option-correct { animation: correctPop 0.3s ease; }
 .option-incorrect { animation: incorrectShake 0.3s ease; }
 
-/* Backgrounds para respuesta correcta e incorrecta elegida por jugadores */
+/* Estilo resultado: verde = correcta, rojo = incorrecta (mismo look que el hover, sin interacción) */
 .option-card.option-correct {
-    background: rgba(115, 160, 63, 0.45) !important;
+    background: rgba(115, 160, 63, 0.35) !important;
+    border-width: 3px !important;
     border-color: #73A03F !important;
-    box-shadow: 0 0 20px rgba(115, 160, 63, 0.4) !important;
+    box-shadow: 0 0 24px rgba(115, 160, 63, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
 }
 
 .option-card.option-correct .option-badge {
-    background: rgba(115, 160, 63, 0.7) !important;
+    background: rgba(115, 160, 63, 0.5) !important;
     border-right-color: #73A03F !important;
 }
 
 .option-card.option-incorrect {
-    background: rgba(229, 57, 53, 0.45) !important;
+    background: rgba(229, 57, 53, 0.35) !important;
+    border-width: 3px !important;
     border-color: #E53935 !important;
-    box-shadow: 0 0 20px rgba(229, 57, 53, 0.4) !important;
+    box-shadow: 0 0 24px rgba(229, 57, 53, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
 }
 
 .option-card.option-incorrect .option-badge {
-    background: rgba(229, 57, 53, 0.7) !important;
+    background: rgba(229, 57, 53, 0.5) !important;
     border-right-color: #E53935 !important;
 }
 
@@ -734,9 +743,27 @@ body.cat-default {
     letter-spacing: 2px;
 }
 
-.loading-text .percentage {
+/* Puntos animados: aparecen uno a uno . → .. → ... luego desaparecen uno a uno */
+.loading-dots {
     display: inline-block;
-    min-width: 45px;
+}
+
+.loading-dots .dot {
+    display: inline-block;
+    opacity: 0;
+    animation: dotWave 2s ease-in-out infinite;
+}
+
+.loading-dots .dot:nth-child(1) { animation-delay: 0s; }
+.loading-dots .dot:nth-child(2) { animation-delay: 0.33s; }
+.loading-dots .dot:nth-child(3) { animation-delay: 0.66s; }
+
+@keyframes dotWave {
+    0% { opacity: 0; }
+    15% { opacity: 1; }
+    50% { opacity: 1; }
+    65% { opacity: 0; }
+    100% { opacity: 0; }
 }
 
 /* Glassmorphism card - Clean style */
@@ -1021,4 +1048,85 @@ body.cat-default {
     box-shadow: 
         0 30px 80px rgba(0, 0, 0, 0.12),
         0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+/* ========================================
+   END SCREEN - Resultados con estilo chic
+   ======================================== */
+#endScreen .end-title {
+    font-family: 'Cabin Sketch', cursive, sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-shadow: 
+        0 2px 4px rgba(0, 0, 0, 0.25),
+        0 0 20px rgba(5, 149, 174, 0.3);
+}
+
+#endScreen .chalk-body {
+    font-family: 'Caveat Brush', cursive, sans-serif;
+}
+
+/* Medalla trofeo - oro grande para el ganador */
+.medal-trophy {
+    width: clamp(64px, 15vw, 96px);
+    height: clamp(64px, 15vw, 96px);
+    margin: 0 auto;
+    animation: medalAppear 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.medal-trophy .medal-icon {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 4px 12px rgba(255, 215, 0, 0.5));
+}
+
+.medal-slot {
+    width: clamp(36px, 8vw, 48px);
+    height: clamp(36px, 8vw, 48px);
+    flex-shrink: 0;
+}
+
+.medal-slot .medal-icon {
+    width: 100%;
+    height: 100%;
+}
+
+@keyframes medalAppear {
+    0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.medal-avatar-wrap {
+    animation: avatarPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s backwards;
+}
+
+@keyframes avatarPop {
+    0% { transform: scale(0); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Podium items - entrada escalonada */
+.podium-item {
+    animation: podiumSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+
+.podium-item:nth-child(1) { animation-delay: 0.1s; }
+.podium-item:nth-child(2) { animation-delay: 0.25s; }
+.podium-item:nth-child(3) { animation-delay: 0.4s; }
+.podium-item:nth-child(n+4) { animation-delay: 0.55s; }
+
+@keyframes podiumSlideIn {
+    0% { transform: translateX(-30px); opacity: 0; }
+    100% { transform: translateX(0); opacity: 1; }
+}
+
+/* Título "Juego Terminado" con animación de entrada */
+#endScreen.active .end-title {
+    animation: titleReveal 0.6s ease-out forwards;
+}
+
+@keyframes titleReveal {
+    0% { opacity: 0; transform: translateY(-20px); }
+    100% { opacity: 1; transform: translateY(0); }
 }

@@ -55,7 +55,9 @@
                     <div class="progress chalk-font">
                         <div class="progress-value" id="introProgress"></div>
                     </div>
-                    <p class="loading-text chalk-font mt-5" id="introLoadingText">CARGANDO <span class="percentage" id="introPercent">0</span>%</p>
+                    <p class="loading-text chalk-font mt-5" id="introLoadingText">
+                        Esperando jugadores<span class="loading-dots"><span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></span>
+                    </p>
                 </div>
             </div>
         </div>
@@ -199,15 +201,15 @@
         </div>
 
         <!-- END SCREEN -->
-        <div class="screen flex-col items-center justify-center p-4 sm:p-6 lg:p-10 overflow-y-auto" id="endScreen">
-            <h2 class="text-xl sm:text-2xl lg:text-3xl text-steam-turquesa mb-4 sm:mb-6 lg:mb-8 font-bold">Juego Terminado!</h2>
+        <div class="screen flex-col items-center justify-center p-4 sm:p-6 lg:p-10 overflow-y-auto chalk-font" id="endScreen">
+            <h2 class="end-title chalk-title text-xl sm:text-2xl lg:text-3xl text-steam-turquesa mb-4 sm:mb-6 lg:mb-8 font-bold">Juego Terminado!</h2>
             <div class="winner-bounce text-center mb-4 sm:mb-6 lg:mb-8" id="winnerSection"></div>
             <div class="flex flex-col gap-2 sm:gap-3 max-w-xs sm:max-w-md lg:max-w-lg w-full mb-4 sm:mb-6 lg:mb-8" id="podium"></div>
             
             <!-- Footer con mensaje de espera y botón Quit Game -->
             <div class="flex flex-col gap-4 items-center w-full max-w-xs sm:max-w-md">
                 <div class="rounded-xl sm:rounded-2xl py-3 sm:py-4 lg:py-5 px-4 sm:px-6 lg:px-8 text-center animate-pulse w-full chalk-box" style="background: transparent; border: 2px solid #EB8225;">
-                    <p class="text-steam-naranja text-sm sm:text-base lg:text-lg font-bold">Esperando que el Jugador 1 decida...</p>
+                    <p class="chalk-body text-steam-naranja text-sm sm:text-base lg:text-lg font-bold">Esperando que el Jugador 1 decida...</p>
                 </div>
             </div>
         </div>

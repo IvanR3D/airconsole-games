@@ -8,13 +8,19 @@
     user-select: none;
 }
 
-/* Variables chalk + AirConsole safe areas */
+/* Variables chalk + AirConsole safe areas - contenido dentro de la pizarra */
 :root {
     --chalk-white: rgba(255, 255, 255, 0.92);
     --chalk-white-soft: rgba(255, 255, 255, 0.78);
     --chalk-border: 2px solid var(--chalk-white);
-    --airconsole-safe-top: max(50px, env(safe-area-inset-top, 0px));
-    --airconsole-safe-bottom: max(16px, env(safe-area-inset-bottom, 0px));
+    /* AirConsole: respetar notch + margen mínimo para no tocar bordes marrones */
+    --airconsole-safe-top: max(env(safe-area-inset-top, 0px), 12px);
+    --airconsole-safe-bottom: max(env(safe-area-inset-bottom, 0px), 12px);
+    --airconsole-safe-left: max(env(safe-area-inset-left, 0px), 12px);
+    --airconsole-safe-right: max(env(safe-area-inset-right, 0px), 12px);
+    /* Margen pizarra: contenido nunca toca bordes marrones/negros */
+    --pizarra-margin: clamp(4%, 5vw, 8%);
+    --pizarra-margin-min: 14px;
 }
 
 /* Tipografía: Caveat Brush para cuerpo, Cabin Sketch para títulos */
@@ -49,11 +55,12 @@
         0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
-/* Chalkboard safe area - contenido fuera de los bordes marrones de la pizarra */
+/* Chalkboard safe area - TODO el contenido DENTRO de la pizarra, sin tocar bordes marrones/negros */
 .chalkboard-safe-area {
-    padding: var(--airconsole-safe-top) clamp(1rem, 8vw, 2.5rem) var(--airconsole-safe-bottom);
-    padding-left: max(clamp(1rem, 8vw, 2.5rem), env(safe-area-inset-left, 0px));
-    padding-right: max(clamp(1rem, 8vw, 2.5rem), env(safe-area-inset-right, 0px));
+    padding-top: max(var(--airconsole-safe-top), var(--pizarra-margin), var(--pizarra-margin-min));
+    padding-bottom: max(var(--airconsole-safe-bottom), var(--pizarra-margin), var(--pizarra-margin-min));
+    padding-left: max(var(--airconsole-safe-left), var(--pizarra-margin), var(--pizarra-margin-min));
+    padding-right: max(var(--airconsole-safe-right), var(--pizarra-margin), var(--pizarra-margin-min));
     box-sizing: border-box;
     max-width: 100vw;
     overflow-x: hidden;
@@ -61,23 +68,18 @@
 
 @media (max-height: 600px) {
     .chalkboard-safe-area {
-        padding-top: max(36px, env(safe-area-inset-top, 0px));
-        padding-bottom: max(10px, env(safe-area-inset-bottom, 0px));
-    }
-    #playingScreen {
-        padding-top: max(1.5rem, env(safe-area-inset-top, 0px));
+        padding-top: max(var(--airconsole-safe-top), 3%, 14px);
+        padding-bottom: max(var(--airconsole-safe-bottom), 3%, 14px);
     }
 }
 
-/* Pantallas muy cortas: más espacio para contenido */
+/* Pantallas muy cortas: mantener margen mínimo para bordes */
 @media (max-height: 500px) {
     .chalkboard-safe-area {
-        padding-top: max(32px, env(safe-area-inset-top, 0px));
-        padding-bottom: max(8px, env(safe-area-inset-bottom, 0px));
-    }
-    #playingScreen {
-        padding-top: max(1rem, env(safe-area-inset-top, 0px));
-        padding-bottom: 0.35rem;
+        padding-top: max(var(--airconsole-safe-top), 2.5%, 12px);
+        padding-bottom: max(var(--airconsole-safe-bottom), 2.5%, 12px);
+        padding-left: max(var(--airconsole-safe-left), 3%, 12px);
+        padding-right: max(var(--airconsole-safe-right), 3%, 12px);
     }
 }
 
@@ -102,7 +104,7 @@ body {
 }
 
 /* ========================================
-   SCREENS - Mobile First
+   SCREENS - Mobile First, AirConsole compliant
    ======================================== */
 .screen {
     display: none;
@@ -111,11 +113,15 @@ body {
     flex: 1 1 0;
     min-height: 0;
     width: 100%;
-    padding: 0.75rem;
-    padding-top: max(0.75rem, env(safe-area-inset-top, 0px));
-    padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+    padding: clamp(0.5rem, 2vw, 1rem);
+    padding-top: max(clamp(0.5rem, 2vh, 1rem), env(safe-area-inset-top, 0px));
+    padding-bottom: max(clamp(0.5rem, 2vh, 1rem), env(safe-area-inset-bottom, 0px));
+    padding-left: max(clamp(0.5rem, 2vw, 1rem), env(safe-area-inset-left, 0px));
+    padding-right: max(clamp(0.5rem, 2vw, 1rem), env(safe-area-inset-right, 0px));
     overflow-y: auto;
     overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    box-sizing: border-box;
 }
 
 .screen.active {
@@ -123,12 +129,30 @@ body {
     opacity: 1;
 }
 
-/* Join screen: usa todo el espacio disponible, sin acortar */
+/* Join: contenido dentro de pizarra */
 #joinScreen {
-    justify-content: center;
+    overflow: hidden;
+    min-height: 0;
+}
+
+.join-header {
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    padding-top: max(0.5rem, env(safe-area-inset-top, 0px));
-    overflow-y: auto;
+    gap: 0.25rem;
+}
+
+.join-logo {
+    width: clamp(2.5rem, 10vw, 3.5rem);
+    height: clamp(2.5rem, 10vw, 3.5rem);
+}
+
+.join-title {
+    line-height: 1;
+}
+
+.join-rules {
+    overflow: hidden;
 }
 
 /* Waiting screen: permitir scroll para que la categoría seleccionada sea visible en pantallas cortas */
@@ -162,26 +186,29 @@ body {
     filter: brightness(0) invert(1) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
-/* Pantallas muy cortas: reducir espaciados para que quepa todo sin scroll */
-@media (max-height: 600px) {
-    #joinScreen {
-        padding-top: max(0.25rem, env(safe-area-inset-top, 0px));
-        padding-bottom: max(0.25rem, env(safe-area-inset-bottom, 0px));
-    }
-    #joinScreen .mb-2 { margin-bottom: 0.25rem !important; }
-    #joinScreen .mb-3 { margin-bottom: 0.35rem !important; }
-    #joinScreen [class*="space-y"] > * + * { margin-top: 0.15rem !important; }
-    #joinScreen .rounded-xl { padding: 0.35rem 0.5rem !important; }
-    #joinScreen #joinBtn { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
+@media (max-height: 500px) {
+    .join-rules { overflow-y: auto; -webkit-overflow-scrolling: touch; }
 }
 
-/* AirConsole: Espacio para logo (~50px) - evitar que UI tape contenido */
+/* Pantallas muy cortas: join screen más compacto */
+@media (max-height: 600px) {
+    .join-logo { width: 2.25rem; height: 2.25rem; }
+    .join-title { font-size: 1.25rem; }
+    .join-rules { gap: 0.4rem; }
+    .join-rule-card { padding: 0.4rem 0.5rem !important; }
+    .join-rule-card h3 { font-size: 0.75rem !important; }
+    .join-rule-card p { font-size: 0.65rem !important; }
+    #joinBtn { padding-top: 0.65rem !important; padding-bottom: 0.65rem !important; font-size: 0.9rem !important; }
+}
+
+/* Playing screen: margen inferior extra para tarjeta jugador (no tocar bordes) */
 #playingScreen {
-    padding-top: max(2.5rem, calc(env(safe-area-inset-top, 0px) + 2rem));
+    padding-top: max(1rem, env(safe-area-inset-top, 0px));
+    padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
     overflow: hidden;
 }
 
-/* Espaciado entre elementos de la pantalla de juego */
+/* Espaciado entre elementos - responsivo */
 .playing-screen-spaced {
     gap: clamp(0.5rem, 2vh, 1rem);
 }
@@ -288,25 +315,26 @@ body {
     color: rgba(255, 255, 255, 0.95);
 }
 
-/* Tarjeta jugador en playing - estilo chalk, sin fondo blanco */
+/* Tarjeta jugador en playing - estilo chalk, margen inferior para no tocar bordes */
 .chalk-player-card-mini {
     background: transparent !important;
     border: 2px solid rgba(255, 255, 255, 0.75);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* Playing screen: compactar todo en pantallas cortas para evitar overflow/scroll */
+/* Playing screen: responsivo, botones 44px mínimo (AirConsole accesibilidad) */
 @media (max-height: 600px) {
     #playingScreen .chalk-player-card-mini {
         padding: 0.5rem 0.75rem;
         margin-top: 0.5rem;
     }
     #playingScreen .answer-grid {
-        min-height: clamp(80px, 20vh, 140px);
-        grid-template-rows: repeat(2, minmax(clamp(40px, 10vh, 60px), 1fr));
+        min-height: clamp(88px, 20vh, 140px);
+        grid-template-rows: repeat(2, minmax(44px, 1fr));
     }
     #playingScreen .answer-btn {
-        min-height: clamp(40px, 10vh, 60px);
+        min-height: 44px;
         font-size: clamp(1.25rem, 5vw, 2rem);
     }
     #playingScreen .text-center.mb-3 {
@@ -319,10 +347,10 @@ body {
 }
 @media (max-height: 500px) {
     #playingScreen .answer-grid {
-        min-height: clamp(70px, 18vh, 100px);
+        min-height: 88px;
     }
     #playingScreen .answer-btn {
-        min-height: clamp(36px, 9vh, 50px);
+        min-height: 44px;
     }
 }
 
@@ -368,11 +396,12 @@ body {
     -webkit-overflow-scrolling: touch;
 }
 
-/* Category Select Screen - wizard container, min-height para flex scroll */
+/* Category Select Screen - wizard, contenido en pizarra */
 #categorySelectScreen {
     min-height: 0;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 #categorySelectScreen > .relative {
@@ -381,6 +410,7 @@ body {
     flex: 1;
     min-height: 0;
     height: 100%;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* ========================================
@@ -404,7 +434,7 @@ body {
 
 .category-btn {
     position: relative;
-    min-height: clamp(52px, 14vh, 70px);
+    min-height: clamp(60px, 18vh, 80px);
     padding: 0.5rem 0.35rem;
     display: flex;
     flex-direction: column;
@@ -434,10 +464,10 @@ body {
 }
 
 .category-btn .category-icon-img {
-    width: clamp(1.5rem, 4.5vw, 2.5rem);
-    height: clamp(1.5rem, 4.5vw, 2.5rem);
-    min-width: 1.5rem;
-    min-height: 1.5rem;
+    width: clamp(2rem, 7vw, 3.5rem);
+    height: clamp(2rem, 7vw, 3.5rem);
+    min-width: 2rem;
+    min-height: 2rem;
     object-fit: contain;
 }
 
@@ -689,12 +719,14 @@ body {
 }
 
 /* ========================================
-   RESULT OVERLAY
+   RESULT OVERLAY - dentro de safe area
    ======================================== */
 #resultOverlay {
     position: fixed;
     inset: 0;
     z-index: 50;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    box-sizing: border-box;
 }
 
 #resultOverlay.hidden {

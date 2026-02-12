@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#3d2318">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>STEAM Trivia - Control</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.airconsole.com/api/airconsole-1.8.0.js"></script>
@@ -37,56 +40,57 @@
 <body class="text-steam-negro chalk-font" style="background: url('../assets/images/Pizarra-optimized.webp') center center / 100% 100% no-repeat fixed !important;">
     <div class="w-full h-full min-h-0 flex flex-col chalkboard-safe-area" style="height: 100vh; height: 100dvh;">
         
-        <!-- JOIN SCREEN - usa todo el espacio disponible, sin scroll innecesario -->
-        <div class="screen active flex-col items-center justify-center text-center gap-1 sm:gap-2" id="joinScreen">
-            <div class="w-full max-w-sm mx-auto px-1 shrink min-h-0 flex flex-col items-center justify-center">
-                <img src="../assets/images/LogoSteamRD-Color.webp" alt="STEAM RD Logo" class="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-1 sm:mb-2 object-contain flex-shrink-0">
-                
-                <h1 class="text-lg sm:text-xl font-black mb-1 sm:mb-2 text-steam-turquesa">TRIVIA</h1>
-                
-                <div class="space-y-1 sm:space-y-1.5 mb-1.5 sm:mb-2">
-                    <div class="rounded-xl p-2 sm:p-2.5 chalk-box" style="background: transparent; border: 2px solid rgba(255,255,255,0.7);">
-                        <div class="flex items-center gap-2">
-                            <div class="text-lg sm:text-xl flex-shrink-0">🎯</div>
-                            <div class="text-left">
-                                <h3 class="font-bold text-xs text-white/95">Pon a prueba tus conocimientos</h3>
-                                <p class="text-xs text-white/75">Responde preguntas de diferentes categorías</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="rounded-xl p-2 sm:p-2.5 chalk-box" style="background: transparent; border: 2px solid rgba(255,255,255,0.7);">
-                        <div class="flex items-center gap-2">
-                            <div class="text-lg sm:text-xl flex-shrink-0">👥</div>
-                            <div class="text-left">
-                                <h3 class="font-bold text-xs text-white/95">Juega con amigos</h3>
-                                <p class="text-xs text-white/75">Hasta 32 jugadores pueden competir</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="rounded-xl p-2 sm:p-2.5 chalk-box" style="background: transparent; border: 2px solid rgba(255,255,255,0.7);">
-                        <div class="flex items-center gap-2">
-                            <div class="text-lg sm:text-xl flex-shrink-0">⚡</div>
-                            <div class="text-left">
-                                <h3 class="font-bold text-xs text-white/95">Responde rápido</h3>
-                                <p class="text-xs text-white/75">Gana más puntos por velocidad</p>
-                            </div>
+        <!-- JOIN SCREEN - sin scroll, usa todo el espacio, logo+trivia+rules cerca, aprovecha bordes -->
+        <div class="screen flex-col items-center justify-between text-center join-screen-layout" id="joinScreen">
+            <!-- Logo + TRIVIA (juntos, compactos) -->
+            <div class="join-header flex-shrink-0">
+                <img src="../assets/images/LogoSteamRD-Color.webp" alt="STEAM RD Logo" class="join-logo object-contain">
+                <h1 class="text-xl sm:text-2xl font-black text-steam-turquesa join-title">TRIVIA</h1>
+                <p class="text-xs text-steam-morado font-semibold -mt-1">Fundación STEAM RD</p>
+            </div>
+            
+            <!-- Reglas (flex-1 para ocupar espacio central, scroll solo si es necesario) -->
+            <div class="join-rules flex-1 min-h-0 flex flex-col justify-center gap-2 sm:gap-3 w-full max-w-sm px-1">
+                <div class="rounded-xl p-2.5 sm:p-3 chalk-box join-rule-card" style="background: transparent; border: 2px solid rgba(255,255,255,0.7);">
+                    <div class="flex items-center gap-2">
+                        <div class="text-xl sm:text-2xl flex-shrink-0">🎯</div>
+                        <div class="text-left">
+                            <h3 class="font-bold text-sm text-white/95">Pon a prueba tus conocimientos</h3>
+                            <p class="text-xs text-white/75">Responde preguntas de diferentes categorías</p>
                         </div>
                     </div>
                 </div>
-                
-                <button class="text-white py-3 px-6 text-base font-black rounded-full w-full shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-3 chalk-btn" style="background: rgba(115,160,63,0.85); border: 2px solid #73A03F;" id="joinBtn">
+                <div class="rounded-xl p-2.5 sm:p-3 chalk-box join-rule-card" style="background: transparent; border: 2px solid rgba(255,255,255,0.7);">
+                    <div class="flex items-center gap-2">
+                        <div class="text-xl sm:text-2xl flex-shrink-0">👥</div>
+                        <div class="text-left">
+                            <h3 class="font-bold text-sm text-white/95">Juega con amigos</h3>
+                            <p class="text-xs text-white/75">Hasta 32 jugadores pueden competir</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="rounded-xl p-2.5 sm:p-3 chalk-box join-rule-card" style="background: transparent; border: 2px solid rgba(255,255,255,0.7);">
+                    <div class="flex items-center gap-2">
+                        <div class="text-xl sm:text-2xl flex-shrink-0">⚡</div>
+                        <div class="text-left">
+                            <h3 class="font-bold text-sm text-white/95">Responde rápido</h3>
+                            <p class="text-xs text-white/75">Gana más puntos por velocidad</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Botón + mensajes -->
+            <div class="join-footer flex-shrink-0 w-full max-w-sm px-1">
+                <button class="text-white py-3.5 px-6 text-base font-black rounded-full w-full shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-3 chalk-btn" style="background: rgba(115,160,63,0.85); border: 2px solid #73A03F;" id="joinBtn">
                     <iconify-icon icon="mdi:gamepad-variant" class="text-2xl"></iconify-icon>
                     UNIRSE AL JUEGO
                 </button>
-                
-                <div class="rounded-2xl py-3 px-4 pulse hidden items-center gap-3 mt-4 chalk-box" style="background: transparent; border: 2px solid #73A03F;" id="connectingMsg">
+                <div class="rounded-2xl py-3 px-4 pulse hidden items-center gap-3 mt-3 chalk-box" style="background: transparent; border: 2px solid #73A03F;" id="connectingMsg">
                     <div class="w-5 h-5 border-2 border-steam-verde border-t-transparent rounded-full animate-spin"></div>
                     <span class="font-bold text-steam-verde">Conectando...</span>
                 </div>
-                
-                <div class="rounded-2xl py-3 px-4 hidden items-center gap-3 mt-4 chalk-box" style="background: rgba(229,57,53,0.15); border: 2px solid #E53935;" id="errorMsg">
+                <div class="rounded-2xl py-3 px-4 hidden items-center gap-3 mt-3 chalk-box" style="background: rgba(229,57,53,0.15); border: 2px solid #E53935;" id="errorMsg">
                     <div class="text-2xl">⚠</div>
                     <div class="text-left">
                         <p class="font-bold text-sm" style="color: #E53935;">Juego Lleno</p>
