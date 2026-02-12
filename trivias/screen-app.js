@@ -51,6 +51,7 @@ let soundEnabled = true;
 let adminDeviceId = null;
 let resultsShown = false; // Evita mostrar resultados múltiples veces
 let backgroundMusic = null;
+let introLoadingInterval = null;
 
 const domCache = {};
 
@@ -156,9 +157,34 @@ function setCategoryBackground(category) {
     document.body.className = 'cat-' + (categories[category]?.color || 'default') + ' font-sans text-steam-negro overflow-hidden';
 }
 
+function startIntroLoadingAnimation() {
+    stopIntroLoadingAnimation();
+    const percentEl = document.getElementById('introPercent');
+    const progressBar = document.getElementById('introProgress');
+    if (!percentEl) return;
+    let count = 0;
+    if (progressBar) progressBar.style.width = '0%';
+    percentEl.textContent = '0';
+    const stepMs = 25; // 100 steps in 2.5s
+    introLoadingInterval = setInterval(() => {
+        count++;
+        if (count > 100) count = 0;
+        percentEl.textContent = count;
+        if (progressBar) progressBar.style.width = count + '%';
+    }, stepMs);
+}
+
+function stopIntroLoadingAnimation() {
+    if (introLoadingInterval) {
+        clearInterval(introLoadingInterval);
+        introLoadingInterval = null;
+    }
+}
+
 function init() {
     airconsole = new AirConsole({ max_players: MAX_PLAYERS });
     cacheDomElements();
+    startIntroLoadingAnimation();
     
     // Initialize background music (screen is display-only, no click interaction - music starts on init/player join)
     backgroundMusic = document.getElementById('backgroundMusic');
@@ -1064,6 +1090,9 @@ function exitToCategories() {
 }
 
 function showScreen(screen) {
+    if (screen !== 'intro') {
+        stopIntroLoadingAnimation();
+    }
     document.querySelectorAll('.screen').forEach(s => {
         s.classList.remove('active');
     });
@@ -1071,6 +1100,9 @@ function showScreen(screen) {
     const targetScreen = document.getElementById(screen + 'Screen');
     if (targetScreen) {
         targetScreen.classList.add('active');
+    }
+    if (screen === 'intro') {
+        startIntroLoadingAnimation();
     }
 }
 

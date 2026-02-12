@@ -51,11 +51,11 @@
                     TRIVIA
                 </h1>
                 <!-- Loading Bar Container -->
-                <div class="max-w-md mx-auto">
-                    <p class="text-lg sm:text-xl font-bold mb-4 loading-text chalk-font" style="color: rgba(255,255,255,0.95);">Esperando Jugadores...</p>
-                    <div class="w-full h-6 rounded-full overflow-hidden relative chalk-loading-track">
-                        <div class="h-full rounded-full loading-bar chalk-loading-fill"></div>
+                <div class="loader-container max-w-md mx-auto">
+                    <div class="progress chalk-font">
+                        <div class="progress-value" id="introProgress"></div>
                     </div>
+                    <p class="loading-text chalk-font mt-5" id="introLoadingText">CARGANDO <span class="percentage" id="introPercent">0</span>%</p>
                 </div>
             </div>
         </div>
@@ -147,7 +147,7 @@
                 <!-- Categories Grid - scrollable, responsivo -->
                 <div class="flex-1 min-h-0 flex flex-col overflow-hidden">
                     <div class="category-scroll-container overflow-y-auto overflow-x-hidden" id="categoryScrollContainer">
-                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4 max-w-6xl w-full mx-auto pt-2 pb-2" id="categoryGrid"></div>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4 max-w-6xl w-full mx-auto pt-4 pb-2" id="categoryGrid"></div>
                     </div>
                 </div>
                 

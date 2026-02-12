@@ -333,9 +333,10 @@ body.cat-default {
     50% { transform: translateY(-4px); }
 }
 
-/* Scroll categorías - responsivo, min-height para flex */
+/* Scroll categorías - responsivo, min-height para flex.
+   padding-top extra para que el hover (translateY -2px) no corte las primeras filas */
 .category-scroll-container {
-    padding-top: 2px;
+    padding-top: 10px;
     padding-bottom: 2px;
     min-height: 0;
     flex: 1 1 0;
@@ -662,74 +663,80 @@ body.cat-default {
     animation: shimmer 3s ease-in-out infinite;
 }
 
-/* Barra de carga - espiral que gira (estilo chalk) */
-.chalk-loading-track {
+/* Barra de carga - Intro */
+.loader-container {
+    text-align: center;
+}
+
+.progress {
+    background: rgba(255, 255, 255, 0.1);
+    justify-content: flex-start;
+    border-radius: 100px;
+    align-items: center;
     position: relative;
-    background: rgba(0, 0, 0, 0.5) !important;
-    border: 3px solid rgba(255, 255, 255, 0.3) !important;
-    box-shadow: 
-        inset 0 2px 4px rgba(0, 0, 0, 0.3),
-        0 1px 0 rgba(255, 255, 255, 0.08);
+    padding: 0 5px;
+    display: flex;
+    height: clamp(32px, 5vh, 40px);
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    animation: progressTrackPulse 2s ease-in-out infinite;
 }
 
-/* Espiral girando - conic gradient que rota */
-.chalk-loading-fill {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 250%;
-    height: 250%;
-    min-width: 300px;
-    min-height: 300px;
-    transform-origin: center center;
-    transform: translate(-50%, -50%);
-    background: repeating-conic-gradient(
-        from 0deg,
-        rgba(255, 255, 255, 0.95) 0deg 36deg,
-        rgba(25, 25, 25, 0.9) 36deg 72deg
-    ) !important;
-    animation: chalkSpiralRotate 1.4s linear infinite;
-    box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
-}
-
-.chalk-loading-fill::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(
-        ellipse 80% 50% at 50% 50%,
-        transparent 0%,
-        rgba(255, 255, 255, 0.08) 50%,
-        transparent 100%
-    );
-    animation: chalkShimmerOverlay 1.8s ease-in-out infinite;
-    border-radius: inherit;
-    pointer-events: none;
-}
-
-@keyframes chalkSpiralRotate {
-    from { transform: translate(-50%, -50%) rotate(0deg); }
-    to { transform: translate(-50%, -50%) rotate(360deg); }
-}
-
-@keyframes chalkShimmerOverlay {
-    0% { opacity: 0; }
-    50% { opacity: 1; }
-    100% { opacity: 0; }
-}
-
-@keyframes loadingPulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.6; }
-}
-
-.loading-bar {
+.progress-value {
+    border-radius: 100px;
+    height: clamp(24px, 4vh, 30px);
+    width: 0;
+    background: linear-gradient(90deg, #fff 0%, rgba(255, 255, 255, 0.95) 50%, #fff 100%);
+    box-shadow: 0 10px 40px -10px rgba(255, 255, 255, 0.8);
+    transition: width 0.15s ease-out;
     position: relative;
     overflow: hidden;
 }
 
+/* Shimmer animado sobre la barra de progreso */
+.progress-value::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.6),
+        transparent
+    );
+    animation: progressShimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes progressTrackPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.1); }
+    50% { box-shadow: 0 0 20px 2px rgba(255, 255, 255, 0.08); }
+}
+
+@keyframes progressShimmer {
+    0% { left: -100%; opacity: 0; }
+    50% { opacity: 1; }
+    100% { left: 200%; opacity: 0; }
+}
+
 .loading-text {
-    animation: loadingPulse 1.5s ease-in-out infinite;
+    margin-top: 20px;
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 18px;
+    text-shadow:
+        2px 2px 3px rgba(0, 0, 0, 0.5),
+        0 0 5px rgba(255, 255, 255, 0.2);
+    letter-spacing: 2px;
+}
+
+.loading-text .percentage {
+    display: inline-block;
+    min-width: 45px;
 }
 
 /* Glassmorphism card - Clean style */

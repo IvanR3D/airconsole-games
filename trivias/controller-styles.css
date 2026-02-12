@@ -75,6 +75,10 @@
         padding-top: max(32px, env(safe-area-inset-top, 0px));
         padding-bottom: max(8px, env(safe-area-inset-bottom, 0px));
     }
+    #playingScreen {
+        padding-top: max(1rem, env(safe-area-inset-top, 0px));
+        padding-bottom: 0.35rem;
+    }
 }
 
 html, body {
@@ -127,9 +131,11 @@ body {
     overflow-y: auto;
 }
 
-/* Waiting screen: sin scrollbar, contenido adaptado al viewport */
+/* Waiting screen: permitir scroll para que la categoría seleccionada sea visible en pantallas cortas */
 #waitingScreen {
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
     padding: clamp(0.5rem, 2vh, 0.75rem);
 }
 
@@ -172,6 +178,7 @@ body {
 /* AirConsole: Espacio para logo (~50px) - evitar que UI tape contenido */
 #playingScreen {
     padding-top: max(2.5rem, calc(env(safe-area-inset-top, 0px) + 2rem));
+    overflow: hidden;
 }
 
 /* Espaciado entre elementos de la pantalla de juego */
@@ -179,10 +186,9 @@ body {
     gap: clamp(0.5rem, 2vh, 1rem);
 }
 
-/* Cuando está activa: layout flex para evitar scroll y que respuestas se adapten */
+/* Cuando está activa: layout flex sin scroll - contenido adaptado al viewport */
 #playingScreen.active {
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: hidden;
     min-height: 0;
     flex: 1;
     display: flex;
@@ -197,6 +203,8 @@ body {
 
 #playingScreen .text-center.mb-3 {
     margin-bottom: clamp(0.5rem, 1.5vh, 0.75rem);
+    padding-top: 0.15rem;
+    min-height: 0;
 }
 
 /* AirConsole: Botones táctiles mínimo 44px (accesibilidad) */
@@ -287,11 +295,34 @@ body {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Playing screen: tarjeta más compacta en pantallas cortas */
+/* Playing screen: compactar todo en pantallas cortas para evitar overflow/scroll */
 @media (max-height: 600px) {
     #playingScreen .chalk-player-card-mini {
         padding: 0.5rem 0.75rem;
         margin-top: 0.5rem;
+    }
+    #playingScreen .answer-grid {
+        min-height: clamp(80px, 20vh, 140px);
+        grid-template-rows: repeat(2, minmax(clamp(40px, 10vh, 60px), 1fr));
+    }
+    #playingScreen .answer-btn {
+        min-height: clamp(40px, 10vh, 60px);
+        font-size: clamp(1.25rem, 5vw, 2rem);
+    }
+    #playingScreen .text-center.mb-3 {
+        margin-bottom: 0.35rem;
+        padding-top: 0.15rem;
+    }
+    #playingScreen .chalk-readable, #playingScreen .chalk-subtitle {
+        font-size: clamp(1rem, 3.5vw, 1.35rem);
+    }
+}
+@media (max-height: 500px) {
+    #playingScreen .answer-grid {
+        min-height: clamp(70px, 18vh, 100px);
+    }
+    #playingScreen .answer-btn {
+        min-height: clamp(36px, 9vh, 50px);
     }
 }
 
@@ -333,8 +364,8 @@ body {
     flex: 1 1 0;
     min-height: 0;
     overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
     overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* Category Select Screen - wizard container, min-height para flex scroll */
@@ -359,12 +390,14 @@ body {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 0.4rem;
+    padding-top: 0.5rem;
     padding-bottom: 0.4rem;
 }
 
 @media (min-width: 400px) {
     #categoryGrid {
         gap: 0.5rem;
+        padding-top: 0.5rem;
         padding-bottom: 0.5rem;
     }
 }
@@ -474,14 +507,6 @@ body {
 
 .category-btn.selected .selection-check {
     display: flex;
-}
-
-/* Category scroll container */
-#categoryScrollContainer {
-    flex: 1;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    min-height: 150px;
 }
 
 /* ========================================

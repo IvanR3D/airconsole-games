@@ -97,10 +97,10 @@
         </div>
 
         <!-- WAITING SCREEN (Non-admin) -->
-        <div class="screen flex-col items-center justify-center text-center" id="waitingScreen">
+        <div class="screen flex-col items-center justify-start text-center min-h-0" id="waitingScreen">
             <div class="bg-particles" id="waitingControllerBgParticles"></div>
             
-            <div class="relative z-10 w-full max-w-sm mx-auto">
+            <div class="relative z-10 w-full max-w-sm mx-auto py-4">
                 <div class="mb-6">
                     <div class="mx-auto mb-4 w-16 h-16 rounded-full flex items-center justify-center border-4 shadow-lg" style="border-color: rgba(255,255,255,0.9); background: rgba(5,149,174,0.5);" id="playerAvatar">
                         <iconify-icon icon="mdi:gamepad-variant" class="text-3xl text-white"></iconify-icon>
@@ -114,7 +114,7 @@
                     <p class="text-base font-black text-steam-verde">Esperando que inicie el juego...</p>
                 </div>
                 
-                <div id="nonAdminWaiting">
+                <div id="nonAdminWaiting" class="pb-6">
                     <p class="text-sm mb-4 text-white/80">El Jugador 1 está configurando la partida</p>
                     <div class="rounded-2xl p-4 chalk-box hidden" style="background: transparent; border: 2px solid #0595AE;" id="selectedCategoryDisplay">
                         <img id="selectedCategoryEmoji" src="../assets/images/globo.webp" alt="" class="w-12 h-12 mx-auto mb-2 object-contain category-icon-img">
@@ -169,7 +169,7 @@
                     <div id="categoryScrollContainer" class="min-h-0">
                         <div id="categoryGrid"></div>
                     </div>
-                    <div class="pt-2 flex-shrink-0">
+                    <div class="pt-2 pb-5 sm:pb-6 flex-shrink-0">
                         <button class="text-white py-3 px-4 text-sm font-black rounded-full w-full shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2 chalk-btn" style="background: rgba(5,149,174,0.85); border: 2px solid #0595AE;" id="nextStep1Btn">
                             Siguiente
                             <iconify-icon icon="mdi:arrow-right"></iconify-icon>
@@ -200,7 +200,7 @@
                         </div>
                     </div>
                     
-                    <div class="flex gap-3 mt-auto">
+                    <div class="flex gap-3 mt-auto pb-5 sm:pb-6">
                         <button class="flex-1 py-3 px-4 text-sm font-bold rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2 chalk-btn-outline" style="background: transparent; border: 2px solid rgba(255,255,255,0.6); color: rgba(255,255,255,0.95);" id="prevStep2Btn">
                             <iconify-icon icon="mdi:arrow-left"></iconify-icon>
                             Atrás
@@ -232,7 +232,7 @@
                         </div>
                     </div>
                     
-                    <div class="mt-auto">
+                    <div class="mt-auto pb-5 sm:pb-6">
                         <button class="py-3 px-4 text-sm font-bold rounded-full w-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2 mb-3 chalk-btn-outline" style="background: transparent; border: 2px solid rgba(255,255,255,0.6); color: rgba(255,255,255,0.95);" id="prevStep3Btn">
                             <iconify-icon icon="mdi:arrow-left"></iconify-icon>
                             Atrás
