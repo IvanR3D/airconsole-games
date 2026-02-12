@@ -67,11 +67,14 @@ function sendMessage(msg) {
 }
 
 function init() {
+    // Mostrar join screen inmediatamente - no esperar a AirConsole (evita pantalla en blanco)
+    showScreen('join');
+    
     airconsole = new AirConsole();
     cacheDom();
 
     airconsole.onReady = function() {
-        showScreen('join'); // Mostrar pantalla inicial al cargar el controlador
+        showScreen('join'); // Asegurar que join esté visible cuando AirConsole esté listo
         setupCategoryGrid();
         setupAnswerButtons();
         setupStepNavigation();

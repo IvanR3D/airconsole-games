@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#3d2318">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -10,8 +10,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.airconsole.com/api/airconsole-1.8.0.js"></script>
     <script type="module">
-        import { animate, stagger } from 'https://esm.sh/animejs';
-        window.anime = { animate, stagger };
+        import('https://esm.sh/animejs').then(m => { window.anime = m; }).catch(() => { window.anime = {}; });
     </script>
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <script>
@@ -32,7 +31,12 @@
             }
         }
     </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <style>
+/* Crítico: visible sin depender de CSS externo - evita pantalla en blanco en AirConsole */
+.screen { display: none; }
+.screen.active { display: flex !important; opacity: 1 !important; }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cabin+Sketch:wght@400;700&family=Caveat+Brush&family=Architects+Daughter&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="controller-styles.css">
@@ -45,12 +49,12 @@
             <!-- Logo + TRIVIA (juntos, compactos) -->
             <div class="join-header flex-shrink-0">
                 <img src="../assets/images/LogoSteamRD-Color.webp" alt="STEAM RD Logo" class="join-logo object-contain">
-                <h1 class="text-xl sm:text-2xl font-black text-steam-turquesa join-title">TRIVIA</h1>
-                <p class="text-xs text-steam-morado font-semibold -mt-1">Fundación STEAM RD</p>
+                <h1 class="font-black join-title">TRIVIA</h1>
+                <p class="font-semibold -mt-1 join-subtitle">Fundación STEAM RD</p>
             </div>
             
-            <!-- Reglas (flex-1 para ocupar espacio central, scroll solo si es necesario) -->
-            <div class="join-rules flex-1 min-h-0 flex flex-col justify-center gap-2 sm:gap-3 w-full max-w-sm px-1">
+            <!-- Reglas (flex-1 para ocupar espacio central, ancho fluido según dispositivo) -->
+            <div class="join-rules flex-1 min-h-0 flex flex-col justify-center gap-2 sm:gap-3 w-full px-1">
                 <div class="rounded-xl p-2.5 sm:p-3 chalk-box join-rule-card" style="background: transparent; border: 2px solid rgba(255,255,255,0.7);">
                     <div class="flex items-center gap-2">
                         <div class="text-xl sm:text-2xl flex-shrink-0">🎯</div>
@@ -81,7 +85,7 @@
             </div>
             
             <!-- Botón + mensajes -->
-            <div class="join-footer flex-shrink-0 w-full max-w-sm px-1">
+            <div class="join-footer flex-shrink-0 w-full px-1">
                 <button class="text-white py-3.5 px-6 text-base font-black rounded-full w-full shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-3 chalk-btn" style="background: rgba(115,160,63,0.85); border: 2px solid #73A03F;" id="joinBtn">
                     <iconify-icon icon="mdi:gamepad-variant" class="text-2xl"></iconify-icon>
                     UNIRSE AL JUEGO
@@ -104,9 +108,9 @@
         <div class="screen flex-col items-center justify-start text-center min-h-0" id="waitingScreen">
             <div class="bg-particles" id="waitingControllerBgParticles"></div>
             
-            <div class="relative z-10 w-full max-w-sm mx-auto py-4">
+            <div class="relative z-10 w-full mx-auto py-4 waiting-content">
                 <div class="mb-6">
-                    <div class="mx-auto mb-4 w-16 h-16 rounded-full flex items-center justify-center border-4 shadow-lg" style="border-color: rgba(255,255,255,0.9); background: rgba(5,149,174,0.5);" id="playerAvatar">
+                    <div class="mx-auto mb-4 rounded-full flex items-center justify-center border-4 shadow-lg" style="border-color: rgba(255,255,255,0.9); background: rgba(5,149,174,0.5);" id="playerAvatar">
                         <iconify-icon icon="mdi:gamepad-variant" class="text-3xl text-white"></iconify-icon>
                     </div>
                     <div class="text-lg font-black text-steam-turquesa" id="playerNameDisplay"></div>
@@ -132,7 +136,7 @@
         <div class="screen flex-col" id="categorySelectScreen">
             <div class="bg-particles" id="controllerBgParticles"></div>
             
-            <div class="relative z-10 flex flex-col flex-1 min-h-0 w-full max-w-md mx-auto h-full">
+            <div class="relative z-10 flex flex-col flex-1 min-h-0 w-full mx-auto h-full wizard-content">
                 <!-- Admin Badge - compacto -->
                 <div class="flex justify-between items-center mb-2 flex-shrink-0">
                     <div class="inline-flex items-center gap-1 rounded-full py-1 px-2 shadow-md chalk-box" style="background: transparent; border: 2px solid #EB8225;">
@@ -141,7 +145,7 @@
                             <iconify-icon icon="mdi:crown" class="text-xs text-white"></iconify-icon>
                         </div>
                     </div>
-                    <button type="button" class="w-10 h-10 rounded-full flex items-center justify-center chalk-box active:scale-95 transition-transform" style="background: transparent; border: 2px solid rgba(255,255,255,0.6);" id="soundToggleBtn" title="Sonido">
+                    <button type="button" class="rounded-full flex items-center justify-center chalk-box active:scale-95 transition-transform" style="background: transparent; border: 2px solid rgba(255,255,255,0.6);" id="soundToggleBtn" title="Sonido">
                         <span class="text-xl" id="soundToggleIcon">🔊</span>
                     </button>
                 </div>
@@ -258,7 +262,7 @@
                     <iconify-icon icon="mdi:exit-to-app" class="text-lg"></iconify-icon>
                     SALIR
                 </button>
-                <button type="button" class="w-10 h-10 rounded-full flex items-center justify-center chalk-box active:scale-95 transition-transform" style="background: transparent; border: 2px solid rgba(255,255,255,0.6);" id="soundToggleBtnPlaying" title="Sonido">
+                <button type="button" class="rounded-full flex items-center justify-center chalk-box active:scale-95 transition-transform" style="background: transparent; border: 2px solid rgba(255,255,255,0.6);" id="soundToggleBtnPlaying" title="Sonido">
                     <span class="text-xl" id="soundToggleIconPlaying">🔊</span>
                 </button>
             </div>

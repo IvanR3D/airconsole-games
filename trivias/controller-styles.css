@@ -13,14 +13,19 @@
     --chalk-white: rgba(255, 255, 255, 0.92);
     --chalk-white-soft: rgba(255, 255, 255, 0.78);
     --chalk-border: 2px solid var(--chalk-white);
-    /* AirConsole: respetar notch + margen mínimo para no tocar bordes marrones */
+    /* AirConsole: respetar notch + margen mínimo (reglas .cursor/rules) */
     --airconsole-safe-top: max(env(safe-area-inset-top, 0px), 12px);
     --airconsole-safe-bottom: max(env(safe-area-inset-bottom, 0px), 12px);
     --airconsole-safe-left: max(env(safe-area-inset-left, 0px), 12px);
     --airconsole-safe-right: max(env(safe-area-inset-right, 0px), 12px);
+    /* AirConsole: botones mínimo 44px, óptimo 60px (accesibilidad táctil) */
+    --btn-min-size: 44px;
+    --btn-optimal-size: 60px;
     /* Margen pizarra: contenido nunca toca bordes marrones/negros */
     --pizarra-margin: clamp(4%, 5vw, 8%);
     --pizarra-margin-min: 14px;
+    /* Contenedor máximo: fluido para PC/laptop/tablet/teléfono */
+    --container-max: clamp(280px, 92vw, 420px);
 }
 
 /* Tipografía: Caveat Brush para cuerpo, Cabin Sketch para títulos */
@@ -143,41 +148,89 @@ body {
 }
 
 .join-logo {
-    width: clamp(2.5rem, 10vw, 3.5rem);
-    height: clamp(2.5rem, 10vw, 3.5rem);
+    width: clamp(2.5rem, min(10vw, 12vh), 4rem);
+    height: clamp(2.5rem, min(10vw, 12vh), 4rem);
 }
 
 .join-title {
     line-height: 1;
+    color: #FFFFFF !important;
+    font-size: clamp(2rem, min(7vw, 8vh), 3.5rem);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.join-subtitle {
+    color: #FFFFFF !important;
+    font-size: clamp(1.05rem, min(4vw, 4vh), 1.5rem);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
 }
 
 .join-rules {
     overflow: hidden;
+    max-width: var(--container-max);
 }
 
-/* Waiting screen: permitir scroll para que la categoría seleccionada sea visible en pantallas cortas */
+.join-footer {
+    max-width: var(--container-max);
+}
+
+/* Tarjetas de reglas - tipografía fluida */
+.join-rule-card h3 {
+    font-size: clamp(0.8rem, 3.5vw, 1rem);
+}
+
+.join-rule-card p {
+    font-size: clamp(0.7rem, 2.8vw, 0.85rem);
+}
+
+/* Waiting screen: permitir scroll, ancho fluido */
 #waitingScreen {
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
-    padding: clamp(0.5rem, 2vh, 0.75rem);
+    padding: clamp(0.5rem, 2vh, 1rem);
 }
 
-/* Waiting screen - compacto en pantallas cortas */
+.waiting-content {
+    max-width: var(--container-max);
+}
+
+#waitingScreen #playerAvatar {
+    width: clamp(3rem, 15vw, 4rem);
+    height: clamp(3rem, 15vw, 4rem);
+    min-width: 3rem;
+    min-height: 3rem;
+}
+
+#waitingScreen .bounce-anim {
+    font-size: clamp(2rem, 8vw, 3rem);
+}
+
+#waitingScreen #playerNameDisplay {
+    font-size: clamp(0.95rem, 4vw, 1.25rem);
+}
+
+#waitingScreen .chalk-box p {
+    font-size: clamp(0.9rem, 3.5vw, 1.1rem);
+}
+
+/* Waiting screen - compacto en landscape */
 @media (max-height: 600px) {
-    #waitingScreen .mb-6 { margin-bottom: 0.75rem !important; }
-    #waitingScreen .mb-4 { margin-bottom: 0.5rem !important; }
-    #waitingScreen .w-16.h-16 { width: 3rem !important; height: 3rem !important; }
-    #waitingScreen .text-5xl { font-size: 2rem !important; }
-    #waitingScreen .my-4 { margin-top: 0.5rem !important; margin-bottom: 0.5rem !important; }
-    #waitingScreen .py-4 { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
-    #waitingScreen .px-6 { padding-left: 1rem !important; padding-right: 1rem !important; }
-    #waitingScreen .mb-4 { margin-bottom: 0.5rem !important; }
-    #waitingScreen .p-4 { padding: 0.5rem !important; }
+    #waitingScreen .mb-6 { margin-bottom: clamp(0.5rem, 2vh, 0.75rem) !important; }
+    #waitingScreen .mb-4 { margin-bottom: 0.4rem !important; }
+    #waitingScreen #playerAvatar { width: 2.75rem !important; height: 2.75rem !important; }
+    #waitingScreen .bounce-anim { font-size: 1.75rem !important; }
+    #waitingScreen .my-4 { margin: clamp(0.35rem, 1.5vh, 0.5rem) 0 !important; }
+    #waitingScreen .py-4, #waitingScreen .px-6 { padding: clamp(0.4rem, 1.5vh, 0.6rem) !important; }
+    #waitingScreen .chalk-box p { font-size: 0.85rem !important; }
 }
 @media (max-height: 500px) {
-    #waitingScreen .mb-6 { margin-bottom: 0.5rem !important; }
-    #waitingScreen .text-5xl { font-size: 1.5rem !important; }
+    #waitingScreen .mb-6 { margin-bottom: 0.4rem !important; }
+    #waitingScreen .bounce-anim { font-size: 1.5rem !important; }
+}
+
+@media (max-width: 360px) {
+    .waiting-content { padding-left: 0.5rem; padding-right: 0.5rem; }
 }
 
 /* Icono de categoría seleccionada - mismo estilo chalk que el screen */
@@ -190,15 +243,77 @@ body {
     .join-rules { overflow-y: auto; -webkit-overflow-scrolling: touch; }
 }
 
-/* Pantallas muy cortas: join screen más compacto */
+/* Pantallas muy cortas (landscape): join screen compacto */
 @media (max-height: 600px) {
-    .join-logo { width: 2.25rem; height: 2.25rem; }
-    .join-title { font-size: 1.25rem; }
-    .join-rules { gap: 0.4rem; }
-    .join-rule-card { padding: 0.4rem 0.5rem !important; }
-    .join-rule-card h3 { font-size: 0.75rem !important; }
-    .join-rule-card p { font-size: 0.65rem !important; }
-    #joinBtn { padding-top: 0.65rem !important; padding-bottom: 0.65rem !important; font-size: 0.9rem !important; }
+    .join-logo { width: clamp(2rem, 8vw, 2.5rem); height: clamp(2rem, 8vw, 2.5rem); }
+    .join-title { font-size: clamp(1.6rem, min(6vw, 7vh), 2.25rem); }
+    .join-subtitle { font-size: clamp(0.95rem, min(3.5vw, 4vh), 1.2rem); }
+    .join-rules { gap: clamp(0.25rem, 1vh, 0.4rem); }
+    .join-rule-card { padding: clamp(0.35rem, 1.5vw, 0.5rem) !important; }
+    .join-rule-card h3 { font-size: clamp(0.7rem, 2.5vw, 0.8rem) !important; }
+    .join-rule-card p { font-size: clamp(0.6rem, 2.2vw, 0.7rem) !important; }
+    #joinBtn { 
+        min-height: var(--btn-min-size) !important; 
+        padding: clamp(0.5rem, 2vh, 0.75rem) 1rem !important; 
+        font-size: clamp(0.85rem, 3.5vw, 0.95rem) !important; 
+    }
+}
+
+/* Teléfonos muy estrechos (320px típico) */
+@media (max-width: 360px) {
+    :root { --container-max: 100%; }
+    .join-header { gap: 0.15rem; }
+    .join-rules, .join-footer { padding: 0 0.25rem; }
+    .join-title { font-size: clamp(1.85rem, 8vw, 2.5rem); }
+    .join-subtitle { font-size: clamp(1rem, 4.5vw, 1.25rem); }
+}
+
+/* Tablets (600px+) */
+@media (min-width: 600px) {
+    :root { --container-max: min(90vw, 480px); }
+    .join-rules, .join-footer { max-width: var(--container-max); }
+    .join-logo { width: clamp(3rem, 6vw, 4rem); height: clamp(3rem, 6vw, 4rem); }
+    .join-title { font-size: clamp(2.5rem, 5vw, 3.5rem); }
+    .join-subtitle { font-size: clamp(1.2rem, 3vw, 1.5rem); }
+    .join-rule-card { padding: clamp(0.5rem, 1.5vw, 0.75rem) !important; }
+    .join-rule-card h3 { font-size: clamp(0.9rem, 1.8vw, 1rem) !important; }
+    .join-rule-card p { font-size: clamp(0.75rem, 1.6vw, 0.85rem) !important; }
+    #joinBtn { padding: clamp(0.65rem, 2vh, 0.9rem) 1.5rem !important; font-size: clamp(0.95rem, 2vw, 1.1rem) !important; }
+}
+
+/* Laptops (1024px+) */
+@media (min-width: 1024px) {
+    :root { --container-max: min(85vw, 560px); }
+    .chalkboard-safe-area { padding: clamp(1.5rem, 3vw, 2.5rem); }
+    .screen { padding: clamp(1rem, 2vw, 1.5rem); }
+    .join-logo { width: clamp(3.5rem, 5vw, 5rem); height: clamp(3.5rem, 5vw, 5rem); }
+    .join-title { font-size: clamp(2.75rem, 4.5vw, 4rem); }
+    .join-subtitle { font-size: clamp(1.25rem, 2vw, 1.6rem); }
+    .join-rule-card h3 { font-size: clamp(1rem, 1.5vw, 1.15rem) !important; }
+    .join-rule-card p { font-size: clamp(0.85rem, 1.2vw, 0.95rem) !important; }
+    #joinBtn { padding: 0.9rem 2rem !important; font-size: 1.1rem !important; }
+    .answer-btn { font-size: clamp(1.5rem, 2.5vw, 2.25rem); }
+    .answer-grid { gap: 0.75rem; min-height: clamp(140px, 35vh, 260px); }
+    .chalk-readable { font-size: clamp(1.25rem, 2vw, 1.5rem); }
+    .chalk-subtitle { font-size: clamp(1rem, 1.6vw, 1.2rem); }
+    .chalk-player-card-mini { padding: 0.6rem 1rem; font-size: clamp(0.9rem, 1.2vw, 1rem); }
+    .wizard-content { max-width: min(90vw, 640px); }
+    .waiting-content { max-width: var(--container-max); }
+}
+
+/* Desktop / PC (1280px+) */
+@media (min-width: 1280px) {
+    :root { --container-max: min(80vw, 600px); }
+    .chalkboard-safe-area { padding: clamp(2rem, 4vw, 3rem); }
+    .join-title { font-size: clamp(3rem, 4vw, 4.5rem); }
+    .join-subtitle { font-size: clamp(1.35rem, 1.8vw, 1.75rem); }
+}
+
+/* Pantallas grandes (1536px+) */
+@media (min-width: 1536px) {
+    :root { --container-max: min(75vw, 680px); }
+    .join-title { font-size: clamp(3.5rem, 4.5vw, 5rem); }
+    .join-subtitle { font-size: clamp(1.5rem, 2vw, 1.9rem); }
 }
 
 /* Playing screen: margen inferior extra para tarjeta jugador (no tocar bordes) */
@@ -234,11 +349,24 @@ body {
     min-height: 0;
 }
 
-/* AirConsole: Botones táctiles mínimo 44px (accesibilidad) */
+/* AirConsole: Botones táctiles mínimo 44px, óptimo 60px (reglas .cursor) */
 .chalk-btn,
-.chalk-answer-btn,
 #joinBtn {
-    min-height: 44px;
+    min-height: var(--btn-min-size);
+}
+
+.chalk-answer-btn {
+    min-height: var(--btn-min-size);
+    min-width: var(--btn-min-size);
+}
+
+/* Botones de icono (sonido): mínimo 44px táctil */
+#soundToggleBtn,
+#soundToggleBtnPlaying {
+    min-width: var(--btn-min-size) !important;
+    min-height: var(--btn-min-size) !important;
+    width: var(--btn-optimal-size);
+    height: var(--btn-optimal-size);
 }
 
 /* ========================================
@@ -276,10 +404,19 @@ body {
 }
 
 .step-text {
-    font-size: clamp(1rem, 3vw, 1.2rem);
+    font-size: clamp(0.85rem, 2.8vw, 1.15rem);
     color: rgba(255, 255, 255, 0.85);
     font-weight: 600;
     transition: all 0.3s ease;
+}
+
+/* Botones +/- preguntas: mínimo 44px táctil */
+#decreaseQuestions,
+#increaseQuestions {
+    min-width: var(--btn-min-size);
+    min-height: var(--btn-min-size);
+    width: var(--btn-optimal-size);
+    height: var(--btn-optimal-size);
 }
 
 .step-label-item.active .step-text {
@@ -304,14 +441,14 @@ body {
 /* Texto legible - Pregunta X de Y, Selecciona tu respuesta (font más legible para UI) */
 .chalk-readable {
     font-family: 'Caveat Brush', 'Architects Daughter', cursive;
-    font-size: clamp(1.35rem, 4.5vw, 1.75rem);
+    font-size: clamp(1.15rem, min(4.5vw, 4vh), 1.65rem);
     color: rgba(255, 255, 255, 0.98);
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     letter-spacing: 0.02em;
 }
 
 .chalk-subtitle {
-    font-size: clamp(1.15rem, 4vw, 1.4rem);
+    font-size: clamp(0.95rem, min(3.8vw, 3.5vh), 1.3rem);
     color: rgba(255, 255, 255, 0.95);
 }
 
@@ -396,21 +533,24 @@ body {
     -webkit-overflow-scrolling: touch;
 }
 
-/* Category Select Screen - wizard, contenido en pizarra */
-#categorySelectScreen {
+/* Category Select Screen - wizard, contenido en pizarra (solo cuando .active) */
+#categorySelectScreen.active {
     min-height: 0;
     display: flex;
     flex-direction: column;
     overflow: hidden;
 }
 
-#categorySelectScreen > .relative {
+#categorySelectScreen > .relative,
+.wizard-content {
     display: flex;
     flex-direction: column;
     flex: 1;
     min-height: 0;
     height: 100%;
     padding-bottom: env(safe-area-inset-bottom, 0px);
+    max-width: var(--container-max);
+    width: 100%;
 }
 
 /* ========================================
@@ -419,23 +559,39 @@ body {
 #categoryGrid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 0.4rem;
-    padding-top: 0.5rem;
-    padding-bottom: 0.4rem;
+    gap: clamp(0.35rem, 2vw, 0.6rem);
+    padding: clamp(0.4rem, 1.5vw, 0.6rem) 0;
 }
 
-@media (min-width: 400px) {
+@media (max-width: 360px) {
+    #categoryGrid { gap: 0.3rem; padding: 0.35rem 0; }
+}
+
+@media (min-width: 768px) {
     #categoryGrid {
-        gap: 0.5rem;
-        padding-top: 0.5rem;
-        padding-bottom: 0.5rem;
+        grid-template-columns: repeat(4, 1fr);
+        gap: clamp(0.4rem, 1vw, 0.75rem);
+    }
+}
+
+@media (min-width: 1024px) {
+    #categoryGrid {
+        gap: 0.75rem;
+        padding: 0.75rem 0;
+    }
+    .category-btn .category-icon-img {
+        width: clamp(2.5rem, 4vw, 3.5rem);
+        height: clamp(2.5rem, 4vw, 3.5rem);
+    }
+    .category-btn .category-name {
+        font-size: clamp(1rem, 1.5vw, 1.2rem);
     }
 }
 
 .category-btn {
     position: relative;
-    min-height: clamp(60px, 18vh, 80px);
-    padding: 0.5rem 0.35rem;
+    min-height: max(clamp(56px, 15vh, 80px), var(--btn-min-size));
+    padding: clamp(0.35rem, 1.5vw, 0.5rem);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -545,18 +701,18 @@ body {
 .answer-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(2, minmax(clamp(44px, 12vh, 70px), 1fr));
-    gap: clamp(0.35rem, 1.5vw, 0.5rem);
+    grid-template-rows: repeat(2, minmax(var(--btn-min-size), 1fr));
+    gap: clamp(0.4rem, 2vw, 0.8rem);
     flex: 1;
-    min-height: clamp(120px, 28vh, 180px);
+    min-height: clamp(120px, 30vh, 240px);
 }
 
 .answer-btn {
-    font-size: clamp(1.5rem, 5.5vw, 2.8rem);
+    font-size: clamp(1.35rem, min(5vw, 6vh), 2.5rem);
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: clamp(44px, 12vh, 70px);
+    min-height: var(--btn-min-size);
 }
 
 .answer-btn::before {
@@ -584,8 +740,8 @@ body {
    AVATARS - Responsive
    ======================================== */
 .player-avatar-visual {
-    width: clamp(3rem, 15vw, 4.5rem);
-    height: clamp(3rem, 15vw, 4.5rem);
+    width: clamp(3rem, min(15vw, 12vh), 5rem);
+    height: clamp(3rem, min(15vw, 12vh), 5rem);
     border-radius: 0.75rem;
     position: relative;
     box-shadow: 0 4px 15px rgba(0,0,0,0.25);
@@ -603,8 +759,10 @@ body {
 }
 
 .player-avatar-visual-small {
-    width: 2rem;
-    height: 2rem;
+    width: clamp(2rem, min(6vw, 5vh), 3rem);
+    height: clamp(2rem, min(6vw, 5vh), 3rem);
+    min-width: 2rem;
+    min-height: 2rem;
     border-radius: 0.5rem;
     position: relative;
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
@@ -737,6 +895,47 @@ body {
 #resultContent {
     word-break: break-word;
     color: rgba(255, 255, 255, 0.95);
+}
+
+/* End screen - responsive para todos los dispositivos */
+#endScreen #finalRank {
+    font-size: clamp(2.5rem, min(12vw, 10vh), 4.5rem);
+}
+
+#endScreen #finalMessage {
+    font-size: clamp(1rem, min(4vw, 3.5vh), 1.35rem);
+}
+
+#endScreen #finalScore {
+    font-size: clamp(1.1rem, min(4.5vw, 4vh), 1.5rem);
+}
+
+@media (max-height: 500px) {
+    #endScreen { gap: clamp(0.5rem, 2vh, 1rem) !important; }
+    #endScreen .player-avatar-visual { width: clamp(3rem, 12vw, 4rem); height: clamp(3rem, 12vw, 4rem); }
+}
+
+@media (min-width: 1024px) {
+    #endScreen #finalRank { font-size: clamp(3rem, 4vw, 4.5rem); }
+    #endScreen #finalMessage { font-size: clamp(1.15rem, 1.5vw, 1.35rem); }
+    #endScreen #finalScore { font-size: clamp(1.25rem, 1.6vw, 1.5rem); }
+    #endScreen .player-avatar-visual { width: clamp(4rem, 6vw, 5rem); height: clamp(4rem, 6vw, 5rem); }
+}
+
+/* Desktop: cursor pointer y hover para ratón */
+@media (min-width: 1024px) {
+    .chalk-btn, .answer-btn, .category-btn {
+        cursor: pointer;
+    }
+    .chalk-btn:hover:not(:disabled), .answer-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+    }
+}
+
+/* Respetar preferencia de movimiento reducido (reglas .cursor) */
+@media (prefers-reduced-motion: reduce) {
+    .screen, .step-content, .chalk-btn, .answer-btn { transition-duration: 0.01ms; }
+    .bounce-anim, .pulse, .pop-in { animation-duration: 0.01ms; }
 }
 
 /* ========================================
