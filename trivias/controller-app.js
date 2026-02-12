@@ -198,16 +198,16 @@ function setupCategoryGrid() {
         
         if (isSelected) {
             btn.classList.add('selected');
-            btn.style.background = btnColor;
+            btn.style.background = 'transparent';
             btn.style.borderColor = btnColor;
         } else {
-            btn.style.background = '';
+            btn.style.background = 'transparent';
             btn.style.borderColor = '';
         }
         
         btn.innerHTML = `
             <img src="${categoryImages[key]}" alt="${cat.name}" class="category-icon-img mb-1">
-            <div class="category-name text-xs font-bold" style="color: ${isSelected ? '#FFFFFF' : ''};">${cat.name}</div>
+            <div class="category-name text-xs font-bold">${cat.name}</div>
         `;
         btn.addEventListener('click', () => selectCategory(key));
         grid.appendChild(btn);

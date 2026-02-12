@@ -5,8 +5,16 @@
     -webkit-tap-highlight-color: transparent;
 }
 
-/* Tipografía tipo tiza (chalk) */
+/* Variables chalk - coherente con screen */
+:root {
+    --chalk-white: rgba(255, 255, 255, 0.92);
+    --chalk-white-soft: rgba(255, 255, 255, 0.78);
+    --chalk-border: 2px solid var(--chalk-white);
+}
+
+/* Tipografía global tipo tiza */
 .chalk-font,
+.chalk-font *,
 .chalk-font input,
 .chalk-font button,
 .chalk-font p,
@@ -21,21 +29,23 @@
     -webkit-font-smoothing: antialiased;
 }
 
-/* Efecto tiza suave para texto */
+/* Efecto tiza para texto */
 .chalk-font .chalk-texture,
 .chalk-font h1,
 .chalk-font h2,
 .chalk-font .font-black,
 .chalk-font .font-bold {
     text-shadow: 
-        0 1px 1px rgba(255, 255, 255, 0.15),
-        0 2px 4px rgba(0, 0, 0, 0.08);
+        0 1px 1px rgba(255, 255, 255, 0.12),
+        0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
-/* Chalkboard safe area - contenido siempre dentro del fondo verde, lejos del borde marrón */
+/* Chalkboard safe area - lejos de bordes marrones */
 .chalkboard-safe-area {
-    padding: clamp(1rem, 8vw, 2.5rem);
+    padding: clamp(1.25rem, 10vw, 3rem);
     box-sizing: border-box;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 html, body {
@@ -99,13 +109,13 @@ body {
     width: 0.75rem;
     height: 0.75rem;
     border-radius: 50%;
-    background: #e5e7eb;
+    background: rgba(255, 255, 255, 0.3);
     transition: all 0.3s ease;
 }
 
 .step-label-item.active .step-dot {
     background: #0595AE;
-    box-shadow: 0 0 0 3px rgba(5, 149, 174, 0.2);
+    box-shadow: 0 0 0 3px rgba(5, 149, 174, 0.3);
 }
 
 .step-label-item.completed .step-dot {
@@ -114,7 +124,7 @@ body {
 
 .step-text {
     font-size: 0.625rem;
-    color: #6b7280;
+    color: rgba(255, 255, 255, 0.6);
     font-weight: 600;
     transition: all 0.3s ease;
 }
@@ -126,6 +136,16 @@ body {
 
 .step-label-item.completed .step-text {
     color: #73A03F;
+}
+
+/* Chalk box, buttons - controller */
+.chalk-box {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.chalk-btn:disabled,
+.chalk-answer-btn:disabled {
+    opacity: 0.5;
 }
 
 /* ========================================
@@ -188,14 +208,14 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: #F5F7F5;
-    border: 2px solid #D4E0D4;
+    background: transparent;
+    border: var(--chalk-border);
     border-radius: 0.75rem;
     gap: 0.25rem;
     cursor: pointer;
     touch-action: manipulation;
     transition: all 0.15s ease;
-    box-shadow: 0 2px 6px rgba(34, 64, 34, 0.06);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .category-btn:active {
@@ -215,9 +235,9 @@ body {
     object-fit: contain;
 }
 
-/* Unselected: iconos bien visibles sobre fondo claro (contraste alto) */
+/* Iconos estilo chalk sobre pizarra */
 .category-btn:not(.selected) .category-icon-img {
-    filter: brightness(0.45) saturate(1.1) contrast(1.2) drop-shadow(0 2px 4px rgba(34, 64, 34, 0.25));
+    filter: brightness(0) invert(1) opacity(0.85) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
 .category-btn.selected .category-icon-img {
@@ -226,7 +246,7 @@ body {
 
 .category-btn .category-icon {
     font-size: 1.5rem;
-    color: #6B7B6B;
+    color: var(--chalk-white-soft);
 }
 
 .category-btn .category-name {
@@ -234,16 +254,16 @@ body {
     line-height: 1.2;
     text-align: center;
     font-weight: 600;
-    color: #5a6b5a;
+    color: var(--chalk-white-soft);
 }
 
 .category-btn.selected {
-    border-color: currentColor;
+    border-width: 3px;
 }
 
 .category-btn.selected .category-icon,
 .category-btn.selected .category-name {
-    color: white;
+    color: var(--chalk-white);
 }
 
 /* Category scroll container */
@@ -448,6 +468,7 @@ body {
 
 #resultContent {
     word-break: break-word;
+    color: rgba(255, 255, 255, 0.95);
 }
 
 /* ========================================

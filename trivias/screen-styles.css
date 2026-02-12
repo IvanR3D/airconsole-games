@@ -4,8 +4,19 @@
     box-sizing: border-box;
 }
 
-/* Tipografía tipo tiza (chalk) */
+/* ========================================
+   VARIABLES - Estética pizarra / chalk
+   ======================================== */
+:root {
+    --chalk-white: rgba(255, 255, 255, 0.92);
+    --chalk-white-soft: rgba(255, 255, 255, 0.78);
+    --chalk-border: 2px solid var(--chalk-white);
+    --chalk-border-soft: 2px solid var(--chalk-white-soft);
+}
+
+/* Tipografía global tipo tiza (chalk) - aplica a todo el proyecto trivias */
 .chalk-font,
+.chalk-font *,
 .chalk-font input,
 .chalk-font button,
 .chalk-font p,
@@ -14,27 +25,30 @@
 .chalk-font h1,
 .chalk-font h2,
 .chalk-font h3,
-.chalk-font label {
+.chalk-font label,
+.chalk-font a {
     font-family: 'Architects Daughter', 'Caveat', cursive, sans-serif;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
 }
 
-/* Efecto tiza suave para texto sobre fondos oscuros/claros */
+/* Efecto tiza para texto */
 .chalk-font .chalk-texture,
 .chalk-font h1,
 .chalk-font h2,
 .chalk-font .font-black,
 .chalk-font .font-bold {
     text-shadow: 
-        0 1px 1px rgba(255, 255, 255, 0.15),
-        0 2px 4px rgba(0, 0, 0, 0.08);
+        0 1px 1px rgba(255, 255, 255, 0.12),
+        0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
-/* Chalkboard safe area - contenido siempre dentro del fondo verde, lejos del borde marrón */
+/* Chalkboard safe area - contenido dentro del área verde, lejos de los bordes marrones */
 .chalkboard-safe-area {
-    padding: clamp(4%, 6vw, 10%);
+    padding: clamp(5%, 8vw, 12%);
     box-sizing: border-box;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 html, body {
@@ -66,14 +80,14 @@ body.cat-default {
     position: relative;
 }
 
-/* Timer bar with arrow effect */
+/* Timer bar - sobre pizarra */
 .timer-bar-container {
     position: relative;
     height: 28px;
-    background: #E0E0E0;
+    background: rgba(255, 255, 255, 0.2);
     border-radius: 14px;
     overflow: visible;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .timer-bar {
@@ -103,7 +117,8 @@ body.cat-default {
     width: 55px;
     height: 55px;
     border-radius: 50%;
-    background: #0595AE;
+    background: rgba(5, 149, 174, 0.9);
+    border: 2px solid rgba(255, 255, 255, 0.5);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -112,7 +127,6 @@ body.cat-default {
     color: white;
     box-shadow: 0 4px 15px rgba(5, 149, 174, 0.4);
     flex-shrink: 0;
-    border: 3px solid rgba(255, 255, 255, 0.3);
 }
 
 /* Animated background particles - Soft colored blobs */
@@ -215,28 +229,28 @@ body.cat-default {
     transition: all 0.3s ease;
 }
 
-/* Unselected: iconos bien visibles sobre fondo claro (contraste alto) */
+/* Unselected: iconos estilo tiza clara sobre pizarra */
 .category-card:not(.selected) .category-icon-img {
-    filter: brightness(0.45) saturate(1.1) contrast(1.2) drop-shadow(0 2px 4px rgba(34, 64, 34, 0.25));
+    filter: brightness(0) invert(1) opacity(0.85) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
-/* Selected: iconos blancos con brillo tipo tiza */
+/* Selected: iconos tiza blanca con brillo */
 .category-card.selected .category-icon-img {
     filter: brightness(0) invert(1) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.2));
 }
 
-/* Unselected: tarjetas con ligero tono que armoniza con la pizarra verde */
+/* Tarjetas estilo chalk - sin background sólido, borde tipo tiza */
 .category-card {
     position: relative;
     overflow: hidden;
-    background: #F5F7F5;
-    border: 2px solid #D4E0D4;
-    box-shadow: 0 2px 8px rgba(34, 64, 34, 0.08);
+    background: transparent;
+    border: var(--chalk-border);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .category-card:not(.selected):hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
 .category-card:not(.selected):hover .category-icon {
@@ -244,11 +258,21 @@ body.cat-default {
 }
 
 .category-card.selected {
-    box-shadow: 0 4px 12px rgba(5, 149, 174, 0.2);
+    border-width: 3px;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
 }
 
 .category-card.selected .category-icon {
     animation: iconFloat 2s ease-in-out infinite;
+}
+
+/* Texto categoría: tiza sobre pizarra */
+.category-card .category-name {
+    color: var(--chalk-white-soft) !important;
+}
+
+.category-card.selected .category-name {
+    color: var(--chalk-white) !important;
 }
 
 @keyframes iconFloat {
@@ -262,6 +286,19 @@ body.cat-default {
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain;
     scrollbar-width: thin;
+}
+
+/* Option cards (playing screen): estilo chalk, sin fondo sólido */
+.option-card {
+    background: transparent !important;
+    border: var(--chalk-border) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+.option-card .option-badge {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border-right: var(--chalk-border-soft) !important;
+    color: var(--chalk-white) !important;
 }
 
 /* Option cards (playing screen): prevent top edge clipping */
@@ -678,6 +715,22 @@ body.cat-default {
     font-family: 'Architects Daughter', 'Caveat', cursive, sans-serif;
     font-weight: 700;
     letter-spacing: -0.01em;
+}
+
+/* Chalk player cards - espera de jugadores */
+.chalk-player-card {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Cajas genéricas estilo chalk */
+.chalk-box {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Timer bar - estilo chalk sobre pizarra */
+.timer-bar-container {
+    background: rgba(255, 255, 255, 0.2) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 /* Logo animation - Gaming style */

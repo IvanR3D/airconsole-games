@@ -422,17 +422,17 @@ function setupCategories() {
             <div class="mb-3 sm:mb-4">
                 <img src="${categoryImages[key]}" alt="${category.name}" class="category-icon-img">
             </div>
-            <div class="text-base sm:text-lg lg:text-xl font-bold category-name" style="color: #5a6b5a;">
+            <div class="text-base sm:text-lg lg:text-xl font-bold category-name">
                 ${category.name}
             </div>
-            <div class="selection-check absolute top-2 right-2 w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 bg-white/90 hidden items-center justify-center text-sm font-bold" style="border-color: ${categoryColor}; color: ${categoryColor};">
+            <div class="selection-check absolute top-2 right-2 w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 hidden items-center justify-center text-sm font-bold" style="background: transparent; border-color: ${categoryColor}; color: rgba(255,255,255,0.95);">
                 ✓
             </div>
         `;
 
         // Add click handler with animation
         card.addEventListener('click', () => {
-            // Remove selection from all cards - vuelven a fondo claro
+            // Remove selection from all cards - estilo chalk
             document.querySelectorAll('.category-card').forEach(c => {
                 c.classList.remove('selected', 'scale-105');
                 const check = c.querySelector('.selection-check');
@@ -442,11 +442,9 @@ function setupCategories() {
                 }
                 c.style.background = '';
                 c.style.borderColor = '';
-                const text = c.querySelector('.category-name');
-                if (text) text.style.color = '#5a6b5a';
             });
             
-            // Add selection to clicked card - fondo del color de la categoría
+            // Add selection - borde chalk en color de categoría, sin fondo
             card.classList.add('selected', 'scale-105');
             const check = card.querySelector('.selection-check');
             if (check) {
@@ -454,10 +452,8 @@ function setupCategories() {
                 check.classList.add('flex');
             }
             const selectedColor = card.dataset.categoryColor;
-            card.style.background = selectedColor;
+            card.style.background = 'transparent';
             card.style.borderColor = selectedColor;
-            const text = card.querySelector('.category-name');
-            if (text) text.style.color = '#FFFFFF';
             
             // Update selected category
             selectedCategory = key;
@@ -525,15 +521,10 @@ function updatePlayersDisplay() {
         const card = document.createElement('div');
         const cardColor = playerColors[index % playerColors.length];
         
-        card.className = 'bg-white rounded-2xl py-4 px-5 flex items-center gap-3 shadow-lg transition-all hover:scale-105 relative overflow-hidden';
-        
-        if (player.disconnected) {
-            card.style.background = '#f3f4f6';
-            card.style.border = '2px solid #d1d5db';
-            card.style.opacity = '0.6';
-        } else {
-            card.style.border = `3px solid ${cardColor}`;
-        }
+        card.className = 'chalk-player-card rounded-2xl py-4 px-5 flex items-center gap-3 transition-all hover:scale-105 relative overflow-hidden';
+        card.style.background = 'transparent';
+        card.style.border = `2px solid ${player.disconnected ? 'rgba(255,255,255,0.35)' : cardColor}`;
+        if (player.disconnected) card.style.opacity = '0.6';
         
         // Avatar
         const avatar = document.createElement('div');
@@ -554,8 +545,8 @@ function updatePlayersDisplay() {
         const info = document.createElement('div');
         info.className = 'flex-1 min-w-0';
         info.innerHTML = `
-            <div class="text-base sm:text-lg font-black truncate" style="color: ${player.disconnected ? '#6b7280' : '#010101'};">${player.name}</div>
-            <div class="text-xs sm:text-sm font-bold" style="color: ${player.disconnected ? '#9ca3af' : cardColor};">
+            <div class="text-base sm:text-lg font-black truncate" style="color: ${player.disconnected ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.95)'};">${player.name}</div>
+            <div class="text-xs sm:text-sm font-bold" style="color: ${player.disconnected ? 'rgba(255,255,255,0.4)' : cardColor};">
                 ${player.disconnected ? 'Desconectado' : (player.isAdmin ? '👑 Admin' : '✓ Conectado')}
             </div>
         `;
@@ -595,11 +586,12 @@ function updatePlayersStatus() {
         const cardColors = ['#0595AE', '#73A03F', '#EB8225', '#AB3D8B'];
         const cardColor = cardColors[index % cardColors.length];
         
-        // Footer card (with score)
+        // Footer card - estilo chalk
         const footerCard = document.createElement('div');
-        footerCard.className = 'flex flex-col items-center gap-2 bg-white rounded-xl py-3 px-4 transition-all border-3';
-        footerCard.style.borderColor = player.disconnected ? '#E0E0E0' : cardColor;
-        footerCard.style.boxShadow = player.disconnected ? 'none' : `0 2px 8px ${cardColor}33`;
+        footerCard.className = 'flex flex-col items-center gap-2 rounded-xl py-3 px-4 transition-all chalk-box';
+        footerCard.style.background = 'transparent';
+        footerCard.style.border = `2px solid ${player.disconnected ? 'rgba(255,255,255,0.3)' : cardColor}`;
+        footerCard.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
         footerCard.style.minWidth = 'clamp(80px, 12vw, 120px)';
         footerCard.style.opacity = player.disconnected ? '0.5' : '1';
         
@@ -623,14 +615,15 @@ function updatePlayersStatus() {
         // Name
         const footerName = document.createElement('div');
         footerName.className = 'font-bold text-xs sm:text-sm truncate text-center';
-        footerName.style.color = player.disconnected ? '#9E9E9E' : '#424242';
+        footerName.style.color = player.disconnected ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.95)';
         footerName.textContent = player.name;
         footerCard.appendChild(footerName);
         
-        // Score
+        // Score - badge tipo chalk
         const score = document.createElement('div');
         score.className = 'text-sm sm:text-base font-bold px-2 py-1 rounded-lg';
-        score.style.background = player.disconnected ? '#E0E0E0' : cardColor;
+        score.style.background = player.disconnected ? 'rgba(255,255,255,0.2)' : cardColor;
+        score.style.border = `1px solid ${player.disconnected ? 'rgba(255,255,255,0.3)' : cardColor}`;
         score.style.color = '#fff';
         score.textContent = `${player.score} pts`;
         footerCard.appendChild(score);
@@ -732,29 +725,23 @@ function displayOptions(question) {
         const card = document.createElement('div');
         const letter = letters[index];
         
-        card.className = 'option-card flex items-center rounded-2xl overflow-hidden border-3 shadow-lg transition-all cursor-pointer hover:scale-105 relative';
-        card.style.background = categoryColor;
-        card.style.borderColor = categoryColor;
-        card.style.boxShadow = `0 4px 15px ${categoryColor}66`;
+        card.className = 'option-card flex items-center rounded-2xl overflow-hidden border-3 shadow-lg transition-all cursor-pointer hover:scale-105 relative chalk-option';
+        card.style.borderColor = 'rgba(255,255,255,0.9)';
         card.dataset.index = index;
         
-        // Letter badge - cuadrado oscuro a la izquierda
+        // Letter badge - estilo chalk
         const badge = document.createElement('div');
-        badge.className = 'flex items-center justify-center text-lg sm:text-2xl lg:text-3xl font-black flex-shrink-0 relative z-10';
+        badge.className = 'option-badge flex items-center justify-center text-lg sm:text-2xl lg:text-3xl font-black flex-shrink-0 relative z-10';
         badge.style.width = 'clamp(60px, 10vw, 90px)';
         badge.style.height = 'clamp(60px, 10vw, 90px)';
-        badge.style.background = categoryColor;
-        badge.style.filter = 'brightness(0.7)';
-        badge.style.color = '#fff';
-        badge.style.textShadow = '0 2px 4px rgba(0,0,0,0.3)';
         badge.textContent = letter;
         card.appendChild(badge);
         
-        // Option text
+        // Option text - estilo chalk
         const text = document.createElement('div');
         text.className = 'flex-1 p-3 sm:p-4 lg:p-5 text-sm sm:text-base lg:text-lg font-bold relative z-10';
-        text.style.color = '#fff';
-        text.style.textShadow = '0 2px 4px rgba(0,0,0,0.3)';
+        text.style.color = 'rgba(255,255,255,0.95)';
+        text.style.textShadow = '0 1px 2px rgba(0,0,0,0.2)';
         text.textContent = option;
         card.appendChild(text);
         
@@ -905,14 +892,14 @@ function showResults() {
         existingIndicators.forEach(ind => ind.remove());
         
         if (index === question.correct) {
-            // Respuesta correcta - Verde
-            opt.style.background = '#00cc66';
-            opt.style.borderColor = '#00cc66';
-            opt.style.boxShadow = '0 0 30px rgba(0, 204, 102, 0.6), 0 4px 15px rgba(0, 204, 102, 0.4)';
+            // Respuesta correcta - borde chalk verde
+            opt.style.background = 'rgba(0, 204, 102, 0.15)';
+            opt.style.borderColor = '#73A03F';
+            opt.style.boxShadow = '0 0 20px rgba(115, 160, 63, 0.3)';
             opt.classList.add('option-correct');
             
             if (badge) {
-                badge.style.background = '#009944';
+                badge.style.background = 'rgba(115, 160, 63, 0.4)';
                 badge.style.color = '#fff';
             }
             
@@ -928,14 +915,14 @@ function showResults() {
         } else {
             const wasSelected = Object.values(answers).some(a => a.option === index);
             if (wasSelected) {
-                // Tu respuesta incorrecta - Rojo
-                opt.style.background = '#ff4444';
-                opt.style.borderColor = '#ff4444';
-                opt.style.boxShadow = '0 0 30px rgba(255, 68, 68, 0.6), 0 4px 15px rgba(255, 68, 68, 0.4)';
+                // Tu respuesta incorrecta - borde chalk rojo
+                opt.style.background = 'rgba(229, 57, 53, 0.15)';
+                opt.style.borderColor = '#E53935';
+                opt.style.boxShadow = '0 0 20px rgba(229, 57, 53, 0.3)';
                 opt.classList.add('option-incorrect');
                 
                 if (badge) {
-                    badge.style.background = '#cc3333';
+                    badge.style.background = 'rgba(229, 57, 53, 0.4)';
                     badge.style.color = '#fff';
                 }
                 
@@ -949,14 +936,14 @@ function showResults() {
                     textDiv.appendChild(indicator);
                 }
             } else {
-                // No seleccionada - Gris
-                opt.style.background = '#9E9E9E';
-                opt.style.borderColor = '#9E9E9E';
-                opt.style.boxShadow = '0 2px 8px rgba(158, 158, 158, 0.3)';
+                // No seleccionada - chalk tenue
+                opt.style.background = 'transparent';
+                opt.style.borderColor = 'rgba(255,255,255,0.4)';
+                opt.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
                 
                 if (badge) {
-                    badge.style.background = '#757575';
-                    badge.style.color = '#fff';
+                    badge.style.background = 'rgba(255,255,255,0.08)';
+                    badge.style.color = 'rgba(255,255,255,0.6)';
                 }
             }
         }
@@ -1023,18 +1010,20 @@ function endGame() {
     podium.innerHTML = '';
     
     const medals = ['1ro', '2do', '3ro'];
-    const podiumBg = ['bg-gradient-to-r from-yellow-100 to-amber-100 border-steam-naranja', 'bg-gradient-to-r from-gray-100 to-gray-200 border-gray-400', 'bg-gradient-to-r from-orange-100 to-amber-100 border-orange-400'];
+    const podiumBorders = ['#EB8225', 'rgba(255,255,255,0.6)', '#F9A825'];
     
     sortedPlayers.forEach((player, index) => {
         const item = document.createElement('div');
-        item.className = `flex items-center justify-between p-2 sm:p-3 lg:p-4 rounded-lg sm:rounded-xl lg:rounded-2xl border-2 sm:border-[3px] shadow-md ${podiumBg[index] || 'bg-white border-gray-200'}`;
+        item.className = 'flex items-center justify-between p-2 sm:p-3 lg:p-4 rounded-lg sm:rounded-xl lg:rounded-2xl border-2 sm:border-[3px] shadow-md chalk-box';
+        item.style.background = 'transparent';
+        item.style.borderColor = podiumBorders[index] || 'rgba(255,255,255,0.5)';
         item.innerHTML = `
             <div class="flex items-center gap-2 sm:gap-3 lg:gap-4">
-                <span class="text-lg sm:text-xl lg:text-2xl font-bold">${medals[index] || `#${index + 1}`}</span>
+                <span class="text-lg sm:text-xl lg:text-2xl font-bold" style="color: rgba(255,255,255,0.95);">${medals[index] || `#${index + 1}`}</span>
                 <div class="player-avatar-visual" style="background-color: ${player.color};"></div>
-                <span class="text-sm sm:text-base lg:text-lg font-bold">${player.name}</span>
+                <span class="text-sm sm:text-base lg:text-lg font-bold" style="color: rgba(255,255,255,0.95);">${player.name}</span>
             </div>
-            <span class="text-base sm:text-lg lg:text-xl font-bold text-steam-turquesa">${player.score} pts</span>
+            <span class="text-base sm:text-lg lg:text-xl font-bold" style="color: #0595AE;">${player.score} pts</span>
         `;
         podium.appendChild(item);
     });

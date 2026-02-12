@@ -45,52 +45,52 @@
                 <h1 class="text-2xl font-black mb-4 text-steam-turquesa">TRIVIA</h1>
                 
                 <div class="space-y-2 mb-4">
-                    <div class="bg-white border-2 border-gray-200 rounded-xl p-3">
+                    <div class="rounded-xl p-3 chalk-box" style="background: transparent; border: 2px solid rgba(255,255,255,0.7);">
                         <div class="flex items-center gap-3">
                             <div class="text-xl">🎯</div>
                             <div class="text-left">
-                                <h3 class="font-bold text-xs text-gray-800">Pon a prueba tus conocimientos</h3>
-                                <p class="text-xs text-gray-600">Responde preguntas de diferentes categorías</p>
+                                <h3 class="font-bold text-xs text-white/95">Pon a prueba tus conocimientos</h3>
+                                <p class="text-xs text-white/75">Responde preguntas de diferentes categorías</p>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="bg-white border-2 border-gray-200 rounded-xl p-3">
+                    <div class="rounded-xl p-3 chalk-box" style="background: transparent; border: 2px solid rgba(255,255,255,0.7);">
                         <div class="flex items-center gap-3">
                             <div class="text-xl">👥</div>
                             <div class="text-left">
-                                <h3 class="font-bold text-xs text-gray-800">Juega con amigos</h3>
-                                <p class="text-xs text-gray-600">Hasta 32 jugadores pueden competir</p>
+                                <h3 class="font-bold text-xs text-white/95">Juega con amigos</h3>
+                                <p class="text-xs text-white/75">Hasta 32 jugadores pueden competir</p>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="bg-white border-2 border-gray-200 rounded-xl p-3">
+                    <div class="rounded-xl p-3 chalk-box" style="background: transparent; border: 2px solid rgba(255,255,255,0.7);">
                         <div class="flex items-center gap-3">
                             <div class="text-xl">⚡</div>
                             <div class="text-left">
-                                <h3 class="font-bold text-xs text-gray-800">Responde rápido</h3>
-                                <p class="text-xs text-gray-600">Gana más puntos por velocidad</p>
+                                <h3 class="font-bold text-xs text-white/95">Responde rápido</h3>
+                                <p class="text-xs text-white/75">Gana más puntos por velocidad</p>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <button class="bg-steam-verde text-white py-3 px-6 text-base font-black rounded-full w-full shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-3" id="joinBtn">
+                <button class="text-white py-3 px-6 text-base font-black rounded-full w-full shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-3 chalk-btn" style="background: rgba(115,160,63,0.85); border: 2px solid #73A03F;" id="joinBtn">
                     <iconify-icon icon="mdi:gamepad-variant" class="text-2xl"></iconify-icon>
                     UNIRSE AL JUEGO
                 </button>
                 
-                <div class="bg-green-50 border-2 border-steam-verde rounded-2xl py-3 px-4 pulse hidden items-center gap-3 mt-4" id="connectingMsg">
+                <div class="rounded-2xl py-3 px-4 pulse hidden items-center gap-3 mt-4 chalk-box" style="background: transparent; border: 2px solid #73A03F;" id="connectingMsg">
                     <div class="w-5 h-5 border-2 border-steam-verde border-t-transparent rounded-full animate-spin"></div>
                     <span class="font-bold text-steam-verde">Conectando...</span>
                 </div>
                 
-                <div class="bg-red-50 border-2 border-red-500 rounded-2xl py-3 px-4 hidden items-center gap-3 mt-4" id="errorMsg">
+                <div class="rounded-2xl py-3 px-4 hidden items-center gap-3 mt-4 chalk-box" style="background: rgba(229,57,53,0.15); border: 2px solid #E53935;" id="errorMsg">
                     <div class="text-2xl">⚠</div>
                     <div class="text-left">
-                        <p class="font-bold text-red-600 text-sm">Juego Lleno</p>
-                        <p class="text-xs text-gray-600">Ya hay 4 jugadores conectados</p>
+                        <p class="font-bold text-sm" style="color: #E53935;">Juego Lleno</p>
+                        <p class="text-xs text-white/80">Ya hay 4 jugadores conectados</p>
                     </div>
                 </div>
             </div>
@@ -102,7 +102,7 @@
             
             <div class="relative z-10 w-full max-w-sm mx-auto">
                 <div class="mb-6">
-                    <div class="mx-auto mb-4 w-16 h-16 rounded-full flex items-center justify-center border-4 border-white shadow-lg" id="playerAvatar">
+                    <div class="mx-auto mb-4 w-16 h-16 rounded-full flex items-center justify-center border-4 shadow-lg" style="border-color: rgba(255,255,255,0.9); background: rgba(5,149,174,0.5);" id="playerAvatar">
                         <iconify-icon icon="mdi:gamepad-variant" class="text-3xl text-white"></iconify-icon>
                     </div>
                     <div class="text-lg font-black text-steam-turquesa" id="playerNameDisplay"></div>
@@ -110,13 +110,13 @@
                 
                 <iconify-icon icon="mdi:timer-sand" class="bounce-anim text-5xl text-steam-turquesa"></iconify-icon>
                 
-                <div class="bg-green-50 border-2 border-steam-verde rounded-2xl py-4 px-6 my-4 shadow-lg">
+                <div class="rounded-2xl py-4 px-6 my-4 shadow-lg chalk-box" style="background: transparent; border: 2px solid #73A03F;">
                     <p class="text-base font-black text-steam-verde">Esperando que inicie el juego...</p>
                 </div>
                 
                 <div id="nonAdminWaiting">
-                    <p class="text-sm mb-4 text-gray-600">El Jugador 1 está configurando la partida</p>
-                    <div class="bg-blue-50 rounded-2xl p-4 border-2 border-steam-turquesa hidden" id="selectedCategoryDisplay">
+                    <p class="text-sm mb-4 text-white/80">El Jugador 1 está configurando la partida</p>
+                    <div class="rounded-2xl p-4 chalk-box hidden" style="background: transparent; border: 2px solid #0595AE;" id="selectedCategoryDisplay">
                         <div class="text-4xl mb-2" id="selectedCategoryEmoji">🌍</div>
                         <div class="text-lg font-black text-steam-turquesa" id="selectedCategoryName">General</div>
                     </div>
@@ -131,7 +131,7 @@
             <div class="relative z-10 flex flex-col flex-1 min-h-0 w-full max-w-md mx-auto h-full">
                 <!-- Admin Badge - izquierda -->
                 <div class="flex justify-start mb-3 flex-shrink-0">
-                    <div class="inline-flex items-center gap-1 bg-orange-50 border-2 border-steam-naranja rounded-full py-1 px-2 shadow-md">
+                    <div class="inline-flex items-center gap-1 rounded-full py-1 px-2 shadow-md chalk-box" style="background: transparent; border: 2px solid #EB8225;">
                         <iconify-icon icon="mdi:crown" class="text-steam-naranja"></iconify-icon>
                         <div class="w-6 h-6 rounded-full flex items-center justify-center border-2 border-white shadow-sm" id="adminAvatar">
                             <iconify-icon icon="mdi:crown" class="text-xs text-white"></iconify-icon>
@@ -140,7 +140,7 @@
                 </div>
 
                 <!-- Progress Bar -->
-                <div class="w-full bg-gray-200 h-2 rounded-full mb-3 overflow-hidden flex-shrink-0">
+                <div class="w-full h-2 rounded-full mb-3 overflow-hidden flex-shrink-0 chalk-progress" style="background: rgba(255,255,255,0.2);">
                     <div id="wizardProgress" class="h-full bg-steam-turquesa transition-all duration-300" style="width: 33.33%"></div>
                 </div>
 
@@ -148,15 +148,15 @@
                 <div class="flex items-center justify-between mb-3 flex-shrink-0">
                     <div class="step-label-item active" data-step="1">
                         <span class="step-dot"></span>
-                        <span class="step-text">Categoría</span>
+                        <span class="step-text chalk-step-text">Categoría</span>
                     </div>
                     <div class="step-label-item" data-step="2">
                         <span class="step-dot"></span>
-                        <span class="step-text">Preguntas</span>
+                        <span class="step-text chalk-step-text">Preguntas</span>
                     </div>
                     <div class="step-label-item" data-step="3">
                         <span class="step-dot"></span>
-                        <span class="step-text">Iniciar</span>
+                        <span class="step-text chalk-step-text">Iniciar</span>
                     </div>
                 </div>
 
@@ -167,7 +167,7 @@
                         <div id="categoryGrid"></div>
                     </div>
                     <div class="pt-3 flex-shrink-0">
-                        <button class="bg-steam-turquesa text-white py-3 px-4 text-sm font-black rounded-full w-full shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2" id="nextStep1Btn">
+                        <button class="text-white py-3 px-4 text-sm font-black rounded-full w-full shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2 chalk-btn" style="background: rgba(5,149,174,0.85); border: 2px solid #0595AE;" id="nextStep1Btn">
                             Siguiente
                             <iconify-icon icon="mdi:arrow-right"></iconify-icon>
                         </button>
@@ -178,31 +178,31 @@
                 <div class="step-content" id="step2">
                     <h2 class="text-base font-black text-center mb-4 text-steam-turquesa">¿Cuántas Preguntas?</h2>
                     
-                    <div class="bg-gray-50 rounded-xl p-4 mb-4 border-2 border-gray-200">
+                    <div class="rounded-xl p-4 mb-4 chalk-box" style="background: transparent; border: 2px solid rgba(255,255,255,0.5);">
                         <div class="flex items-center justify-center gap-4 mb-3">
-                            <button class="w-12 h-12 rounded-full bg-steam-morado text-white font-bold text-xl flex items-center justify-center shadow-md active:scale-95 transition-transform" id="decreaseQuestions">-</button>
-                            <div class="bg-white rounded-lg px-6 py-3 border-2 border-steam-turquesa min-w-[5rem] text-center">
+                            <button class="w-12 h-12 rounded-full text-white font-bold text-xl flex items-center justify-center shadow-md active:scale-95 transition-transform chalk-btn" style="background: rgba(171,61,139,0.85); border: 2px solid #AB3D8B;" id="decreaseQuestions">-</button>
+                            <div class="rounded-lg px-6 py-3 min-w-[5rem] text-center chalk-box" style="background: transparent; border: 2px solid #0595AE;">
                                 <span class="text-3xl font-black text-steam-turquesa" id="questionCountValue">10</span>
                             </div>
-                            <button class="w-12 h-12 rounded-full bg-steam-verde text-white font-bold text-xl flex items-center justify-center shadow-md active:scale-95 transition-transform" id="increaseQuestions">+</button>
+                            <button class="w-12 h-12 rounded-full text-white font-bold text-xl flex items-center justify-center shadow-md active:scale-95 transition-transform chalk-btn" style="background: rgba(115,160,63,0.85); border: 2px solid #73A03F;" id="increaseQuestions">+</button>
                         </div>
-                        <p class="text-center text-xs text-gray-500">Mínimo 5 - Máximo 50</p>
+                        <p class="text-center text-xs text-white/70">Mínimo 5 - Máximo 50</p>
                     </div>
 
-                    <div class="bg-blue-50 rounded-lg p-3 mb-4 border-2 border-steam-turquesa flex items-center gap-3">
+                    <div class="rounded-lg p-3 mb-4 chalk-box flex items-center gap-3" style="background: transparent; border: 2px solid #0595AE;">
                         <iconify-icon id="selectedCatIcon" icon="mdi:earth" class="text-2xl text-steam-turquesa"></iconify-icon>
                         <div>
-                            <div class="text-xs text-gray-500">Categoría</div>
+                            <div class="text-xs text-white/70">Categoría</div>
                             <div class="font-bold text-sm text-steam-turquesa" id="selectedCatName">General</div>
                         </div>
                     </div>
                     
                     <div class="flex gap-3 mt-auto">
-                        <button class="flex-1 bg-gray-200 text-gray-700 py-3 px-4 text-sm font-bold rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2" id="prevStep2Btn">
+                        <button class="flex-1 py-3 px-4 text-sm font-bold rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2 chalk-btn-outline" style="background: transparent; border: 2px solid rgba(255,255,255,0.6); color: rgba(255,255,255,0.95);" id="prevStep2Btn">
                             <iconify-icon icon="mdi:arrow-left"></iconify-icon>
                             Atrás
                         </button>
-                        <button class="flex-1 bg-steam-turquesa text-white py-3 px-4 text-sm font-black rounded-full shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2" id="nextStep2Btn">
+                        <button class="flex-1 text-white py-3 px-4 text-sm font-black rounded-full shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2 chalk-btn" style="background: rgba(5,149,174,0.85); border: 2px solid #0595AE;" id="nextStep2Btn">
                             Siguiente
                             <iconify-icon icon="mdi:arrow-right"></iconify-icon>
                         </button>
@@ -213,29 +213,29 @@
                 <div class="step-content" id="step3">
                     <h2 class="text-base font-black text-center mb-4 text-steam-turquesa">¿Todo listo?</h2>
                     
-                    <div class="bg-gradient-to-br from-blue-50 to-green-50 rounded-xl p-4 mb-4 border-2 border-steam-verde">
+                    <div class="rounded-xl p-4 mb-4 chalk-box" style="background: transparent; border: 2px solid #73A03F;">
                         <div class="text-center mb-3">
                             <iconify-icon id="finalCatIcon" icon="mdi:earth" class="text-4xl text-steam-turquesa"></iconify-icon>
                         </div>
                         <div class="space-y-2">
-                            <div class="flex justify-between items-center bg-white rounded-lg p-3">
-                                <span class="text-gray-600 text-sm">Categoría</span>
+                            <div class="flex justify-between items-center rounded-lg p-3 chalk-box" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.3);">
+                                <span class="text-white/80 text-sm">Categoría</span>
                                 <span class="font-bold text-steam-turquesa" id="finalCatName">General</span>
                             </div>
-                            <div class="flex justify-between items-center bg-white rounded-lg p-3">
-                                <span class="text-gray-600 text-sm">Preguntas</span>
+                            <div class="flex justify-between items-center rounded-lg p-3 chalk-box" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.3);">
+                                <span class="text-white/80 text-sm">Preguntas</span>
                                 <span class="font-bold text-steam-naranja" id="finalQuestionCount">10</span>
                             </div>
                         </div>
                     </div>
                     
                     <div class="mt-auto">
-                        <button class="bg-gray-200 text-gray-700 py-3 px-4 text-sm font-bold rounded-full w-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2 mb-3" id="prevStep3Btn">
+                        <button class="py-3 px-4 text-sm font-bold rounded-full w-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2 mb-3 chalk-btn-outline" style="background: transparent; border: 2px solid rgba(255,255,255,0.6); color: rgba(255,255,255,0.95);" id="prevStep3Btn">
                             <iconify-icon icon="mdi:arrow-left"></iconify-icon>
                             Atrás
                         </button>
                         
-                        <button class="bg-steam-verde text-white py-4 px-4 text-base font-black rounded-full w-full shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2 btn-3d btn-verde" id="startGameBtn">
+                        <button class="text-white py-4 px-4 text-base font-black rounded-full w-full shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2 btn-3d btn-verde chalk-btn" style="background: rgba(115,160,63,0.9); border: 2px solid #73A03F;" id="startGameBtn">
                             <iconify-icon icon="mdi:rocket-launch" class="text-xl"></iconify-icon>
                             ¡INICIAR JUEGO!
                         </button>
@@ -247,7 +247,7 @@
         <!-- PLAYING SCREEN: extra top padding for AirConsole UI (see controller-styles.css) -->
         <div class="screen flex-col playing-screen-spaced" id="playingScreen">
             <div class="text-left mb-3 hidden" id="adminExitContainer">
-                <button class="bg-red-500 text-white py-2 px-4 text-sm font-bold rounded-full shadow-md active:scale-95 transition-transform inline-flex items-center gap-2" id="exitGameBtn">
+                <button class="text-white py-2 px-4 text-sm font-bold rounded-full shadow-md active:scale-95 transition-transform inline-flex items-center gap-2 chalk-btn" style="background: rgba(229,57,53,0.85); border: 2px solid #E53935;" id="exitGameBtn">
                     <iconify-icon icon="mdi:exit-to-app" class="text-lg"></iconify-icon>
                     SALIR
                 </button>
@@ -255,23 +255,23 @@
             
             <div class="text-center mb-3">
                 <div class="text-sm text-steam-turquesa font-bold mb-1" id="questionIndicator">Pregunta 1 de 5</div>
-                <p class="text-base">Selecciona tu respuesta:</p>
+                <p class="text-base text-white/90">Selecciona tu respuesta:</p>
             </div>
 
             <div class="answer-grid" id="answerGrid">
-                <button class="answer-btn bg-steam-verde rounded-xl font-bold text-white relative btn-3d btn-verde" data-option="0">A</button>
-                <button class="answer-btn bg-steam-morado rounded-xl font-bold text-white relative btn-3d btn-morado" data-option="1">B</button>
-                <button class="answer-btn bg-steam-turquesa rounded-xl font-bold text-white relative btn-3d btn-turquesa" data-option="2">C</button>
-                <button class="answer-btn bg-steam-naranja rounded-xl font-bold text-white relative btn-3d btn-naranja" data-option="3">D</button>
+                <button class="answer-btn rounded-xl font-bold text-white relative btn-3d btn-verde chalk-answer-btn" style="background: rgba(115,160,63,0.75); border: 2px solid #73A03F;" data-option="0">A</button>
+                <button class="answer-btn rounded-xl font-bold text-white relative btn-3d btn-morado chalk-answer-btn" style="background: rgba(171,61,139,0.75); border: 2px solid #AB3D8B;" data-option="1">B</button>
+                <button class="answer-btn rounded-xl font-bold text-white relative btn-3d btn-turquesa chalk-answer-btn" style="background: rgba(5,149,174,0.75); border: 2px solid #0595AE;" data-option="2">C</button>
+                <button class="answer-btn rounded-xl font-bold text-white relative btn-3d btn-naranja chalk-answer-btn" style="background: rgba(235,130,37,0.75); border: 2px solid #EB8225;" data-option="3">D</button>
             </div>
 
-            <div class="flex items-center gap-3 bg-gray-100 p-3 rounded-lg mt-3 border-2 border-gray-200 flex-shrink-0">
+            <div class="flex items-center gap-3 p-3 rounded-lg mt-3 flex-shrink-0 chalk-box" style="background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.4);">
                 <div class="player-avatar-visual-small" id="miniAvatar"></div>
                 <div class="flex-1 min-w-0">
                     <div class="font-bold text-sm truncate" id="miniName"></div>
-                    <div class="text-xs text-gray-500" id="miniRank">Rank 1</div>
+                    <div class="text-xs text-white/70" id="miniRank">Rank 1</div>
                 </div>
-                <div class="bg-steam-naranja text-white py-1 px-3 rounded-lg font-bold text-sm" id="miniScore">0</div>
+                <div class="text-white py-1 px-3 rounded-lg font-bold text-sm chalk-box" style="background: rgba(235,130,37,0.8); border: 1px solid #EB8225;" id="miniScore">0</div>
             </div>
         </div>
 
@@ -282,11 +282,11 @@
             <p class="text-lg font-bold text-steam-turquesa" id="finalMessage">Felicidades!</p>
             <div class="text-xl font-bold text-steam-verde" id="finalScore">0 puntos</div>
             <button class="bg-steam-morado text-white py-3 px-6 text-base font-bold rounded-full btn-3d btn-morado hidden" id="playAgainBtn">JUGAR DE NUEVO</button>
-            <p class="text-sm text-gray-600" id="waitingNextText">Esperando al Jugador 1...</p>
+            <p class="text-sm text-white/80" id="waitingNextText">Esperando al Jugador 1...</p>
         </div>
 
         <!-- RESULT OVERLAY -->
-        <div class="bg-white/95 hidden items-center justify-center p-4" id="resultOverlay">
+        <div class="hidden items-center justify-center p-4 chalk-overlay" style="background: rgba(0,0,0,0.6);" id="resultOverlay">
             <div class="text-center pop-in" id="resultContent">
                 <div class="text-5xl mb-3">✓</div>
                 <div class="text-xl font-bold mb-2">Correcto!</div>

@@ -53,7 +53,7 @@
                 <!-- Loading Bar Container -->
                 <div class="max-w-md mx-auto">
                     <p class="text-lg sm:text-xl font-bold mb-4 text-steam-verde loading-text">Esperando Jugadores...</p>
-                    <div class="w-full h-6 bg-gray-200 rounded-full overflow-hidden shadow-inner relative">
+                    <div class="w-full h-6 rounded-full overflow-hidden relative chalk-loading-track" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3);">
                         <div class="h-full bg-gradient-to-r from-steam-verde via-green-400 to-steam-verde rounded-full loading-bar"></div>
                     </div>
                 </div>
@@ -69,7 +69,7 @@
                 <!-- Header -->
                 <div class="mb-6 sm:mb-8 lg:mb-10 text-center float-up">
                     <div class="flex justify-center mb-4 sm:mb-5">
-                        <div class="inline-flex items-center gap-2 bg-white border-3 rounded-full py-3 px-6 shadow-lg" style="border-color: #0595AE;">
+                        <div class="inline-flex items-center gap-2 rounded-full py-3 px-6 chalk-box" style="background: transparent; border: 2px solid rgba(255,255,255,0.9);">
                             <span class="font-black text-xl sm:text-2xl text-steam-turquesa">S</span>
                             <span class="font-black text-xl sm:text-2xl text-steam-naranja">T</span>
                             <span class="font-black text-xl sm:text-2xl text-steam-verde">E</span>
@@ -83,7 +83,7 @@
                 
                 <!-- Status Message -->
                 <div class="mb-8 sm:mb-10 text-center float-up" style="animation-delay: 0.2s;">
-                    <div class="inline-flex items-center gap-3 bg-green-50 border-3 rounded-full py-4 px-8 shadow-lg" style="border-color: #73A03F;">
+                    <div class="inline-flex items-center gap-3 rounded-full py-4 px-8 chalk-box" style="background: transparent; border: 2px solid #73A03F;">
                         <div class="w-4 h-4 rounded-full pulse-anim bg-steam-verde"></div>
                         <h2 class="text-xl sm:text-2xl lg:text-3xl font-black text-steam-verde">Esperando Jugadores</h2>
                     </div>
@@ -91,9 +91,9 @@
                 
                 <!-- Instructions -->
                 <div class="text-center mb-8 sm:mb-10 float-up max-w-md mx-auto" style="animation-delay: 0.3s;">
-                    <div class="bg-blue-50 rounded-2xl py-4 px-6 border-2 border-steam-turquesa">
+                    <div class="rounded-2xl py-4 px-6 chalk-box" style="background: transparent; border: 2px solid #0595AE;">
                         <p class="text-base sm:text-lg lg:text-xl font-bold mb-2 text-steam-turquesa">📱 Escanea el código QR</p>
-                        <p class="text-sm sm:text-base text-gray-600">Usa tu teléfono para unirte al juego</p>
+                        <p class="text-sm sm:text-base text-white/80">Usa tu teléfono para unirte al juego</p>
                     </div>
                 </div>
                 
@@ -140,7 +140,7 @@
                     </div>
                     
                     <!-- Title with crown -->
-                    <div class="inline-flex items-center gap-3 bg-white border-3 border-steam-turquesa rounded-full py-3 px-6 shadow-lg">
+                    <div class="inline-flex items-center gap-3 rounded-full py-3 px-6 chalk-box" style="background: transparent; border: 2px solid rgba(255,255,255,0.9);">
                         <iconify-icon icon="mdi:crown" style="font-size: clamp(1.5rem, 4vw, 2rem); color: #EB8225;"></iconify-icon>
                         <span class="font-black text-base sm:text-lg text-steam-turquesa">JUGADOR 1: ELIGE TU DESAFÍO</span>
                         <iconify-icon icon="mdi:gamepad-variant" style="font-size: clamp(1.5rem, 4vw, 2rem); color: #AB3D8B;"></iconify-icon>
@@ -170,7 +170,7 @@
         <!-- PLAYING SCREEN -->
         <div class="screen flex-col h-full" id="playingScreen">
             <!-- Timer Bar Header -->
-            <div class="relative p-4 sm:p-6" style="background: rgba(255, 255, 255, 0.95); box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+            <div class="relative p-4 sm:p-6 chalk-header" style="background: transparent; border-bottom: 2px solid rgba(255,255,255,0.25);">
                 <div class="flex items-center justify-center gap-6">
                     <!-- Barra de tiempo -->
                     <div class="timer-bar-container" style="width: 60%;">
@@ -188,13 +188,13 @@
                 
                 <div class="flex-1 flex flex-col items-center justify-center relative z-10 pt-4">
                     <div class="text-sm sm:text-base lg:text-lg mb-2 sm:mb-3 lg:mb-4 font-bold text-steam-turquesa" id="questionNumber">Pregunta 1 de 5</div>
-                    <h2 class="responsive-question text-center max-w-xs sm:max-w-2xl lg:max-w-4xl leading-tight mb-4 sm:mb-6 lg:mb-10 text-gray-800" id="questionText" style="text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);">Cual es la capital de Francia?</h2>
+                    <h2 class="responsive-question text-center max-w-xs sm:max-w-2xl lg:max-w-4xl leading-tight mb-4 sm:mb-6 lg:mb-10 text-white" id="questionText" style="color: rgba(255,255,255,0.95); text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);">Cual es la capital de Francia?</h2>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 lg:gap-4 max-w-xs sm:max-w-2xl lg:max-w-4xl w-full options-grid-spaced" id="optionsGrid"></div>
                 </div>
             </div>
             
             <!-- Footer with Players -->
-            <div class="p-3 sm:p-4 lg:p-6 relative z-10" style="background: rgba(255, 255, 255, 0.95); box-shadow: 0 -2px 8px rgba(0,0,0,0.05);">
+            <div class="p-3 sm:p-4 lg:p-6 relative z-10 chalk-header" style="background: transparent; border-top: 2px solid rgba(255,255,255,0.25);">
                 <div class="flex gap-3 sm:gap-4 justify-center flex-wrap" id="playersFooter">
                     <!-- Players will be added here dynamically -->
                 </div>
@@ -209,7 +209,7 @@
             
             <!-- Footer con mensaje de espera y botón Quit Game -->
             <div class="flex flex-col gap-4 items-center w-full max-w-xs sm:max-w-md">
-                <div class="bg-orange-50 border-2 border-steam-naranja rounded-xl sm:rounded-2xl py-3 sm:py-4 lg:py-5 px-4 sm:px-6 lg:px-8 text-center animate-pulse w-full">
+                <div class="rounded-xl sm:rounded-2xl py-3 sm:py-4 lg:py-5 px-4 sm:px-6 lg:px-8 text-center animate-pulse w-full chalk-box" style="background: transparent; border: 2px solid #EB8225;">
                     <p class="text-steam-naranja text-sm sm:text-base lg:text-lg font-bold">Esperando que el Jugador 1 decida...</p>
                 </div>
             </div>
