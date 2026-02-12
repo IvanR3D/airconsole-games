@@ -32,7 +32,7 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Caveat+Brush&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cabin+Sketch:wght@400;700&family=Caveat+Brush&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="screen-styles.css">
 </head>
 <body class="cat-default text-steam-negro overflow-hidden chalk-font" style="background: url('../assets/images/Pizarra-optimized.webp') center center / 100% 100% no-repeat fixed !important;">
@@ -47,12 +47,12 @@
                 </div>
                 
                 <!-- Title -->
-                <h1 class="text-6xl sm:text-7xl lg:text-8xl font-black mb-4" style="color: #AB3D8B; letter-spacing: -0.02em;">
+                <h1 class="text-6xl sm:text-7xl lg:text-8xl font-black mb-4 chalk-font" style="color: rgba(255,255,255,0.95); letter-spacing: -0.02em;">
                     TRIVIA
                 </h1>
                 <!-- Loading Bar Container -->
                 <div class="max-w-md mx-auto">
-                    <p class="text-lg sm:text-xl font-bold mb-4 text-steam-verde loading-text">Esperando Jugadores...</p>
+                    <p class="text-lg sm:text-xl font-bold mb-4 loading-text chalk-font" style="color: rgba(255,255,255,0.95);">Esperando Jugadores...</p>
                     <div class="w-full h-6 rounded-full overflow-hidden relative chalk-loading-track">
                         <div class="h-full rounded-full loading-bar chalk-loading-fill"></div>
                     </div>
@@ -110,15 +110,15 @@
                     </div>
                 </div>
                 
-                <!-- Education Icons Footer -->
-                <div class="mt-10 sm:mt-12 flex justify-center gap-6 sm:gap-8 lg:gap-10 flex-wrap float-up" style="animation-delay: 0.6s;">
-                    <iconify-icon icon="mdi:math-compass" class="text-3xl sm:text-4xl lg:text-5xl" style="color: #0595AE;"></iconify-icon>
-                    <iconify-icon icon="mdi:microscope" class="text-3xl sm:text-4xl lg:text-5xl" style="color: #73A03F;"></iconify-icon>
-                    <iconify-icon icon="mdi:flask" class="text-3xl sm:text-4xl lg:text-5xl" style="color: #EB8225;"></iconify-icon>
-                    <iconify-icon icon="mdi:robot" class="text-3xl sm:text-4xl lg:text-5xl" style="color: #AB3D8B;"></iconify-icon>
-                    <iconify-icon icon="mdi:laptop" class="text-3xl sm:text-4xl lg:text-5xl" style="color: #0595AE;"></iconify-icon>
-                    <iconify-icon icon="mdi:book-open-page-variant" class="text-3xl sm:text-4xl lg:text-5xl" style="color: #EB8225;"></iconify-icon>
-                    <iconify-icon icon="mdi:map" class="text-3xl sm:text-4xl lg:text-5xl" style="color: #73A03F;"></iconify-icon>
+                <!-- Education Icons Footer - imágenes del proyecto -->
+                <div class="mt-10 sm:mt-12 flex justify-center gap-6 sm:gap-8 lg:gap-10 flex-wrap float-up intro-edu-icon-container" style="animation-delay: 0.6s;">
+                    <img src="../assets/images/calculadora.webp" alt="Matemáticas" class="intro-edu-icon w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 object-contain">
+                    <img src="../assets/images/microscopio.webp" alt="Ciencia" class="intro-edu-icon w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 object-contain">
+                    <img src="../assets/images/estructura quimica.webp" alt="Química" class="intro-edu-icon w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 object-contain">
+                    <img src="../assets/images/programacion.webp" alt="Robótica" class="intro-edu-icon w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 object-contain">
+                    <img src="../assets/images/programacion.webp" alt="Tecnología" class="intro-edu-icon w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 object-contain">
+                    <img src="../assets/images/libro.webp" alt="Historia" class="intro-edu-icon w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 object-contain">
+                    <img src="../assets/images/planeta.webp" alt="Geografía" class="intro-edu-icon w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 object-contain">
                 </div>
             </div>
         </div>
@@ -138,9 +138,9 @@
                         <div class="dot" aria-hidden="true"></div>
                     </div>
                     <div class="challenge-header-banner">
-                        <iconify-icon icon="mdi:crown" class="challenge-icon" style="font-size: clamp(1.3rem, 4vw, 2rem); color: #EB8225;"></iconify-icon>
-                        <span class="challenge-text text-sm sm:text-lg lg:text-xl">JUGADOR 1: ELIGE TU DESAFÍO</span>
-                        <iconify-icon icon="mdi:gamepad-variant" class="challenge-icon" style="font-size: clamp(1.3rem, 4vw, 2rem); color: #AB3D8B;"></iconify-icon>
+                        <iconify-icon icon="mdi:crown" class="challenge-icon" style="font-size: clamp(1.5rem, 4.5vw, 2.25rem); color: #EB8225;"></iconify-icon>
+                        <span class="challenge-text">JUGADOR 1: ELIGE TU DESAFÍO</span>
+                        <iconify-icon icon="mdi:gamepad-variant" class="challenge-icon" style="font-size: clamp(1.5rem, 4.5vw, 2.25rem); color: #AB3D8B;"></iconify-icon>
                     </div>
                 </div>
                 
@@ -153,12 +153,12 @@
                 
                 <!-- Footer Message -->
                 <div class="text-center mt-2 sm:mt-4 power-up flex-shrink-0" style="animation-delay: 0.3s;">
-                    <div class="inline-flex items-center gap-3 py-2 px-4">
-                        <iconify-icon icon="mdi:clock-outline" style="font-size: 1.5rem; color: #EB8225;"></iconify-icon>
-                        <p class="font-bold text-base sm:text-lg text-steam-naranja">
+                    <div class="inline-flex items-center gap-3 py-3 px-5">
+                        <iconify-icon icon="mdi:clock-outline" style="font-size: clamp(1.5rem, 4vw, 2rem); color: rgba(255,255,255,0.95);"></iconify-icon>
+                        <p class="font-bold text-lg sm:text-xl lg:text-2xl" style="color: rgba(255,255,255,0.98); text-shadow: 0 2px 4px rgba(0,0,0,0.25);">
                             Esperando selección...
                         </p>
-                        <iconify-icon icon="mdi:clock-outline" style="font-size: 1.5rem; color: #EB8225;"></iconify-icon>
+                        <iconify-icon icon="mdi:clock-outline" style="font-size: clamp(1.5rem, 4vw, 2rem); color: rgba(255,255,255,0.95);"></iconify-icon>
                     </div>
                 </div>
             </div>
@@ -184,7 +184,7 @@
                 <div class="bg-particles" id="playingBgParticles"></div>
                 
                 <div class="flex-1 flex flex-col items-center justify-center relative z-10 pt-4">
-                    <div class="text-base sm:text-lg lg:text-xl mb-2 sm:mb-3 lg:mb-4 font-bold text-steam-turquesa" id="questionNumber">Pregunta 1 de 5</div>
+                    <div class="text-lg sm:text-xl lg:text-2xl mb-2 sm:mb-3 lg:mb-4 font-bold" id="questionNumber" style="color: rgba(255,255,255,0.98); text-shadow: 0 2px 4px rgba(0,0,0,0.2);">Pregunta 1 de 5</div>
                     <h2 class="responsive-question text-center max-w-xs sm:max-w-2xl lg:max-w-4xl leading-tight mb-4 sm:mb-6 lg:mb-10 text-white" id="questionText" style="color: rgba(255,255,255,0.95); text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);">Cual es la capital de Francia?</h2>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 lg:gap-4 max-w-xs sm:max-w-2xl lg:max-w-4xl w-full options-grid-spaced" id="optionsGrid"></div>
                 </div>
@@ -212,8 +212,8 @@
             </div>
         </div>
 
-        <!-- Sound toggle (hidden) -->
-        <div class="absolute bottom-3 sm:bottom-5 right-3 sm:right-5 text-2xl sm:text-3xl cursor-pointer opacity-70 hover:opacity-100 transition-opacity z-50 hidden" id="soundToggle">🔊</div>
+        <!-- Sound indicator (display only - control desde controller) -->
+        <div class="absolute bottom-3 sm:bottom-5 right-3 sm:right-5 text-2xl sm:text-3xl opacity-70 z-50 hidden pointer-events-none" id="soundToggle">🔊</div>
         
         <!-- Confetti container -->
         <div class="fixed top-0 left-0 w-full h-full pointer-events-none z-[1000] overflow-hidden" id="confettiContainer"></div>

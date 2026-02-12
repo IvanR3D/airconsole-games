@@ -160,23 +160,10 @@ function init() {
     airconsole = new AirConsole({ max_players: MAX_PLAYERS });
     cacheDomElements();
     
-    // Initialize background music
+    // Initialize background music (screen is display-only, no click interaction - music starts on init/player join)
     backgroundMusic = document.getElementById('backgroundMusic');
     if (backgroundMusic) {
         backgroundMusic.volume = 0.5; // Set volume to 50%
-        // Start playing music when user interacts (required by browsers)
-        const startMusic = () => {
-            if (backgroundMusic && soundEnabled) {
-                backgroundMusic.play().catch(err => {
-                    console.log('Music autoplay prevented:', err);
-                });
-            }
-            // Remove event listeners after first interaction
-            document.removeEventListener('click', startMusic);
-            document.removeEventListener('touchstart', startMusic);
-        };
-        document.addEventListener('click', startMusic);
-        document.addEventListener('touchstart', startMusic);
     }
     
     // Initialize particle network background
@@ -293,6 +280,11 @@ function init() {
                     
                     playSound('join');
                     
+                    // Intentar iniciar música de fondo cuando el primer jugador se une (sin interacción en screen)
+                    if (backgroundMusic && soundEnabled) {
+                        backgroundMusic.play().catch(() => {});
+                    }
+                    
                     airconsole.message(deviceId, {
                         action: 'joined',
                         color: playerColor,
@@ -318,13 +310,7 @@ function init() {
             }
             
         } else if (data.action === 'selectCategory' && deviceId === adminDeviceId) {
-            selectedCategory = data.category;
-            
-            // Find and click the corresponding category card
-            const targetCard = document.querySelector(`.category-card[data-category="${data.category}"]`);
-            if (targetCard) {
-                targetCard.click();
-            }
+            selectCategoryOnScreen(data.category);
             
         } else if (data.action === 'setQuestionCount' && deviceId === adminDeviceId) {
             selectedQuestionCount = data.count;
@@ -345,10 +331,10 @@ function init() {
             
         } else if (data.action === 'exitGame' && deviceId === adminDeviceId) {
             exitToCategories();
+        } else if (data.action === 'toggleSound' && deviceId === adminDeviceId) {
+            toggleSound();
         }
     };
-
-    document.getElementById('soundToggle').addEventListener('click', toggleSound);
 }
 
 function broadcastGameState() {
@@ -363,7 +349,8 @@ function broadcastGameState() {
 
 function toggleSound() {
     soundEnabled = !soundEnabled;
-    document.getElementById('soundToggle').textContent = soundEnabled ? '🔊' : '🔇';
+    const toggleEl = document.getElementById('soundToggle');
+    if (toggleEl) toggleEl.textContent = soundEnabled ? '🔊' : '🔇';
     
     // Control background music
     if (backgroundMusic) {
@@ -375,11 +362,76 @@ function toggleSound() {
             backgroundMusic.pause();
         }
     }
+    
+    // Notify controllers of sound state
+    if (airconsole) {
+        airconsole.broadcast({ action: 'soundState', enabled: soundEnabled });
+    }
 }
 
 // Particle Network Animation - Disabled for clean background
 function initParticleNetwork() {
     // Clean white background - no particles
+}
+
+function selectCategoryOnScreen(key) {
+    const card = document.querySelector(`.category-card[data-category="${key}"]`);
+    if (!card) return;
+    
+    selectedCategory = key;
+    
+    // Remove selection from all cards - estilo chalk
+    document.querySelectorAll('.category-card').forEach(c => {
+        c.classList.remove('selected', 'scale-105');
+        const check = c.querySelector('.selection-check');
+        if (check) {
+            check.classList.add('hidden');
+            check.classList.remove('flex');
+        }
+        c.style.background = '';
+        c.style.borderColor = '';
+    });
+    
+    // Add selection - borde chalk en color de categoría, sin fondo
+    card.classList.add('selected', 'scale-105');
+    const check = card.querySelector('.selection-check');
+    if (check) {
+        check.classList.remove('hidden');
+        check.classList.add('flex');
+    }
+    const selectedColor = card.dataset.categoryColor;
+    card.style.background = 'transparent';
+    card.style.borderColor = selectedColor;
+    
+    // Change background with animation
+    setCategoryBackground(key);
+    createBackgroundParticles(key);
+    
+    // Animate icon with anime.js (reduced height)
+    if (anime && anime.animate) {
+        anime.animate(card.querySelector('.category-icon-img'), {
+            scale: [1, 1.2, 0.95, 1.05, 1],
+            duration: 700,
+            ease: 'easeOutElastic(1, .6)'
+        });
+    }
+    
+    // Animate card
+    if (anime && anime.animate) {
+        anime.animate(card, {
+            scale: [1, 1.05, 1.02],
+            duration: 400,
+            ease: 'outElastic(1, .8)'
+        });
+    }
+    
+    // Play selection sound
+    playSound('join');
+    
+    // Send message to controllers
+    if (airconsole) {
+        airconsole.broadcast({ action: 'categorySelected', category: key });
+    }
 }
 
 function setupCategories() {
@@ -413,7 +465,8 @@ function setupCategories() {
         const card = document.createElement('div');
         const categoryColor = categoryColors[key] || categoryColors.general;
         
-        card.className = 'category-card rounded-xl sm:rounded-2xl text-center cursor-pointer transition-all relative power-up';
+        // Sin cursor-pointer: el screen es solo display, todo se controla desde el controller
+        card.className = 'category-card rounded-xl sm:rounded-2xl text-center transition-all relative power-up';
         card.style.animationDelay = `${index * 0.1}s`;
         card.dataset.category = key;
         card.dataset.categoryColor = categoryColor;
@@ -429,75 +482,14 @@ function setupCategories() {
                 ✓
             </div>
         `;
-
-        // Add click handler with animation
-        card.addEventListener('click', () => {
-            // Remove selection from all cards - estilo chalk
-            document.querySelectorAll('.category-card').forEach(c => {
-                c.classList.remove('selected', 'scale-105');
-                const check = c.querySelector('.selection-check');
-                if (check) {
-                    check.classList.add('hidden');
-                    check.classList.remove('flex');
-                }
-                c.style.background = '';
-                c.style.borderColor = '';
-            });
-            
-            // Add selection - borde chalk en color de categoría, sin fondo
-            card.classList.add('selected', 'scale-105');
-            const check = card.querySelector('.selection-check');
-            if (check) {
-                check.classList.remove('hidden');
-                check.classList.add('flex');
-            }
-            const selectedColor = card.dataset.categoryColor;
-            card.style.background = 'transparent';
-            card.style.borderColor = selectedColor;
-            
-            // Update selected category
-            selectedCategory = key;
-            
-            // Change background with animation
-            setCategoryBackground(key);
-            createBackgroundParticles(key);
-            
-            // Animate icon with anime.js (reduced height)
-            if (anime && anime.animate) {
-                anime.animate(card.querySelector('.category-icon-img'), {
-                    scale: [1, 1.2, 0.95, 1.05, 1],
-                    duration: 700,
-                    ease: 'easeOutElastic(1, .6)'
-                });
-            }
-            
-            // Animate card
-            if (anime && anime.animate) {
-                anime.animate(card, {
-                    scale: [1, 1.05, 1.02],
-                    duration: 400,
-                    ease: 'outElastic(1, .8)'
-                });
-            }
-            
-            // Play selection sound
-            playSound('join');
-            
-            // Send message to controllers
-            if (airconsole) {
-                airconsole.broadcast({ action: 'categorySelected', category: key });
-            }
-        });
         
         grid.appendChild(card);
     });
     
-    // Select first category by default with animation
+    // Select first category by default with animation (controlado por código, no por click)
     setTimeout(() => {
-        const firstCard = document.querySelector('.category-card');
-        if (firstCard) {
-            firstCard.click();
-        }
+        const firstKey = Object.keys(categories)[0] || 'general';
+        selectCategoryOnScreen(firstKey);
     }, 500);
 }
 
@@ -725,7 +717,8 @@ function displayOptions(question) {
         const card = document.createElement('div');
         const letter = letters[index];
         
-        card.className = 'option-card flex items-center rounded-2xl overflow-hidden border-3 shadow-lg transition-all cursor-pointer hover:scale-105 relative chalk-option';
+        // Sin cursor-pointer: el screen es solo display, las respuestas vienen del controller
+        card.className = 'option-card flex items-center rounded-2xl overflow-hidden border-3 shadow-lg transition-all relative chalk-option';
         card.style.borderColor = 'rgba(255,255,255,0.9)';
         card.dataset.index = index;
         card.dataset.correct = index === correctIndex ? 'true' : 'false';

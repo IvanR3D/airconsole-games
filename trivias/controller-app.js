@@ -9,6 +9,17 @@ const categories = {
     geography: { name: "Geografía", icon: "mdi:map-outline" }
 };
 
+const categoryImages = {
+    general: '../assets/images/globo.webp',
+    science: '../assets/images/microscopio.webp',
+    mathematics: '../assets/images/calculadora.webp',
+    robotics: '../assets/images/programacion.webp',
+    chemistry: '../assets/images/estructura quimica.webp',
+    technology: '../assets/images/programacion.webp',
+    history: '../assets/images/libro.webp',
+    geography: '../assets/images/planeta.webp'
+};
+
 const categoryColors = {
     general: '#0595AE',
     science: '#73A03F',
@@ -111,6 +122,9 @@ function init() {
             case 'exitGame':
                 handleReset(data);
                 break;
+            case 'soundState':
+                updateSoundToggleIcon(data.enabled);
+                break;
         }
     };
 
@@ -144,6 +158,22 @@ function init() {
             sendMessage({ action: 'setQuestionCount', count: selectedQuestionCount });
         }
     });
+    
+    document.getElementById('soundToggleBtn').addEventListener('click', () => {
+        if (isAdmin) sendMessage({ action: 'toggleSound' });
+    });
+    
+    document.getElementById('soundToggleBtnPlaying').addEventListener('click', () => {
+        if (isAdmin) sendMessage({ action: 'toggleSound' });
+    });
+}
+
+function updateSoundToggleIcon(enabled) {
+    const icon = document.getElementById('soundToggleIcon');
+    const iconPlaying = document.getElementById('soundToggleIconPlaying');
+    const emoji = enabled ? '🔊' : '🔇';
+    if (icon) icon.textContent = emoji;
+    if (iconPlaying) iconPlaying.textContent = emoji;
 }
 
 function updateQuestionCountDisplay() {
@@ -174,18 +204,6 @@ function setupCategoryGrid() {
         technology: '#AB3D8B',
         history: '#EB8225',
         geography: '#0595AE'
-    };
-    
-    // Image mapping - using local webp assets
-    const categoryImages = {
-        general: '../assets/images/globo.webp',
-        science: '../assets/images/microscopio.webp',
-        mathematics: '../assets/images/calculadora.webp',
-        robotics: '../assets/images/programacion.webp',
-        chemistry: '../assets/images/estructura quimica.webp',
-        technology: '../assets/images/programacion.webp',
-        history: '../assets/images/libro.webp',
-        geography: '../assets/images/planeta.webp'
     };
     
     Object.entries(categories).forEach(([key, cat]) => {
@@ -297,17 +315,19 @@ function goToStep(step) {
     });
     document.getElementById('step' + step).classList.add('active');
     
-    // Update step 2 preview
+    // Update step 2 preview - usa las mismas imágenes que el screen
     if (step === 2) {
         const cat = categories[selectedCategory];
-        document.getElementById('selectedCatIcon').setAttribute('icon', cat.icon);
+        const img = document.getElementById('selectedCatIcon');
+        if (img && categoryImages[selectedCategory]) img.src = categoryImages[selectedCategory];
         document.getElementById('selectedCatName').textContent = cat.name;
     }
     
-    // Update step 3 summary
+    // Update step 3 summary - usa las mismas imágenes que el screen
     if (step === 3) {
         const cat = categories[selectedCategory];
-        document.getElementById('finalCatIcon').setAttribute('icon', cat.icon);
+        const img = document.getElementById('finalCatIcon');
+        if (img && categoryImages[selectedCategory]) img.src = categoryImages[selectedCategory];
         document.getElementById('finalCatName').textContent = cat.name;
         document.getElementById('finalQuestionCount').textContent = selectedQuestionCount;
     }
@@ -483,11 +503,10 @@ function updateSelectedCategory(category) {
     selectedCategory = category;
     
     const cat = categories[category];
-    const catColor = categoryColors[category] || '#0595AE';
     
     if (cat) {
-        const emojiEl = document.getElementById('selectedCategoryEmoji');
-        emojiEl.innerHTML = `<iconify-icon icon="${cat.icon}" style="font-size: clamp(3rem, 10vw, 4rem); color: ${catColor};"></iconify-icon>`;
+        const imgEl = document.getElementById('selectedCategoryEmoji');
+        if (imgEl && categoryImages[category]) imgEl.src = categoryImages[category];
         document.getElementById('selectedCategoryName').textContent = cat.name;
         document.getElementById('selectedCategoryDisplay').classList.remove('hidden');
     }

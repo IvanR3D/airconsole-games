@@ -14,7 +14,7 @@
     --chalk-border-soft: 2px solid var(--chalk-white-soft);
 }
 
-/* Tipografía global tipo tiza (chalk) - aplica a todo el proyecto trivias */
+/* Tipografía: Caveat Brush para cuerpo, Cabin Sketch para títulos */
 .chalk-font,
 .chalk-font *,
 .chalk-font input,
@@ -22,14 +22,18 @@
 .chalk-font p,
 .chalk-font span,
 .chalk-font div,
-.chalk-font h1,
-.chalk-font h2,
-.chalk-font h3,
 .chalk-font label,
 .chalk-font a {
     font-family: 'Caveat Brush', cursive, sans-serif;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+}
+
+.chalk-font h1,
+.chalk-font h2,
+.chalk-font h3,
+.chalk-font .chalk-title {
+    font-family: 'Cabin Sketch', cursive, sans-serif;
 }
 
 /* Efecto tiza para texto */
@@ -111,12 +115,13 @@ body.cat-default {
     border: 1px solid rgba(255, 255, 255, 0.35);
 }
 
-.timer-bar {
+.timer-bar,
+#playingScreen .timer-bar {
     position: absolute;
     left: 0;
     top: 0;
     height: 100%;
-    background: linear-gradient(90deg, #EB8225 0%, #FFD54F 50%, #73A03F 100%);
+    background: rgba(255, 255, 255, 0.95) !important;
     border-radius: 14px;
     transition: background 0.3s ease;
 }
@@ -131,20 +136,23 @@ body.cat-default {
     animation: timerEmpty 20s linear forwards;
 }
 
-.timer-bar.draining.warning {
-    background: linear-gradient(90deg, #EB8225 0%, #FFA726 100%);
+.timer-bar.draining.warning,
+#playingScreen .timer-bar.draining.warning {
+    background: rgba(255, 255, 255, 0.95) !important;
 }
 
-.timer-bar.draining.danger {
-    background: linear-gradient(90deg, #E53935 0%, #FF7043 100%);
+.timer-bar.draining.danger,
+#playingScreen .timer-bar.draining.danger {
+    background: rgba(255, 255, 255, 0.95) !important;
     animation: timerEmpty 20s linear forwards;
 }
 
-.timer-circle-standalone {
+.timer-circle-standalone,
+#playingScreen .timer-circle-standalone {
     width: 55px;
     height: 55px;
     border-radius: 50%;
-    background: #0595AE;
+    background: #0595AE !important;
     border: 3px solid rgba(255, 255, 255, 0.9);
     display: flex;
     align-items: center;
@@ -157,6 +165,18 @@ body.cat-default {
         0 4px 20px rgba(5, 149, 174, 0.6),
         inset 0 1px 0 rgba(255, 255, 255, 0.25);
     flex-shrink: 0;
+    cursor: pointer;
+    transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+}
+
+.timer-circle-standalone:hover,
+#playingScreen .timer-circle-standalone:hover {
+    background: #07b8d9 !important;
+    box-shadow: 
+        0 0 0 4px rgba(0, 0, 0, 0.25),
+        0 4px 24px rgba(5, 149, 174, 0.8),
+        0 0 20px rgba(7, 184, 217, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
 /* Animated background particles - Soft colored blobs */
@@ -298,13 +318,14 @@ body.cat-default {
     animation: iconFloat 2s ease-in-out infinite;
 }
 
-/* Texto categoría: tiza sobre pizarra */
+/* Texto categoría: tiza sobre pizarra - más blanco, más grande */
 .category-card .category-name {
-    color: var(--chalk-white-soft) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-size: clamp(1rem, 4vw, 1.4rem) !important;
 }
 
 .category-card.selected .category-name {
-    color: var(--chalk-white) !important;
+    color: rgba(255, 255, 255, 0.98) !important;
 }
 
 @keyframes iconFloat {
@@ -510,6 +531,29 @@ body.cat-default {
 .option-correct { animation: correctPop 0.3s ease; }
 .option-incorrect { animation: incorrectShake 0.3s ease; }
 
+/* Backgrounds para respuesta correcta e incorrecta elegida por jugadores */
+.option-card.option-correct {
+    background: rgba(115, 160, 63, 0.45) !important;
+    border-color: #73A03F !important;
+    box-shadow: 0 0 20px rgba(115, 160, 63, 0.4) !important;
+}
+
+.option-card.option-correct .option-badge {
+    background: rgba(115, 160, 63, 0.7) !important;
+    border-right-color: #73A03F !important;
+}
+
+.option-card.option-incorrect {
+    background: rgba(229, 57, 53, 0.45) !important;
+    border-color: #E53935 !important;
+    box-shadow: 0 0 20px rgba(229, 57, 53, 0.4) !important;
+}
+
+.option-card.option-incorrect .option-badge {
+    background: rgba(229, 57, 53, 0.7) !important;
+    border-right-color: #E53935 !important;
+}
+
 @keyframes winnerBounce {
     0% { transform: scale(0); opacity: 0; }
     50% { transform: scale(1.1); }
@@ -581,11 +625,11 @@ body.cat-default {
 
 /* Responsive text */
 .responsive-title {
-    font-size: clamp(1.5rem, 5vw, 3.5rem);
+    font-size: clamp(1.75rem, 5.5vw, 4rem);
 }
 
 .responsive-question {
-    font-size: clamp(1rem, 3vw, 2.2rem);
+    font-size: clamp(1.2rem, 3.5vw, 2.5rem);
 }
 
 /* Intro logo animation */
@@ -618,44 +662,44 @@ body.cat-default {
     animation: shimmer 3s ease-in-out infinite;
 }
 
-/* Barra de carga - llena con espiral blanco/negro moviéndose */
+/* Barra de carga - espiral que gira (estilo chalk) */
 .chalk-loading-track {
     position: relative;
-    background: rgba(0, 0, 0, 0.4) !important;
-    border: 3px solid #0a0a0a !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    border: 3px solid rgba(255, 255, 255, 0.3) !important;
     box-shadow: 
-        inset 0 2px 4px rgba(0, 0, 0, 0.2),
-        0 1px 0 rgba(255, 255, 255, 0.05);
+        inset 0 2px 4px rgba(0, 0, 0, 0.3),
+        0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
+/* Espiral girando - conic gradient que rota */
 .chalk-loading-fill {
     position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    width: 100% !important;
-    background: repeating-linear-gradient(
-        -45deg,
-        rgba(255, 255, 255, 0.95) 0px,
-        rgba(255, 255, 255, 0.95) 5px,
-        rgba(15, 15, 15, 0.95) 5px,
-        rgba(15, 15, 15, 0.95) 10px
+    left: 50%;
+    top: 50%;
+    width: 250%;
+    height: 250%;
+    min-width: 300px;
+    min-height: 300px;
+    transform-origin: center center;
+    transform: translate(-50%, -50%);
+    background: repeating-conic-gradient(
+        from 0deg,
+        rgba(255, 255, 255, 0.95) 0deg 36deg,
+        rgba(25, 25, 25, 0.9) 36deg 72deg
     ) !important;
-    background-size: 15px 15px;
-    background-position: 0 0;
-    animation: chalkSpiralMove 2.2s linear infinite;
-    box-shadow: 0 0 6px rgba(255, 255, 255, 0.15);
+    animation: chalkSpiralRotate 1.4s linear infinite;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
 }
 
 .chalk-loading-fill::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-        90deg,
+    background: radial-gradient(
+        ellipse 80% 50% at 50% 50%,
         transparent 0%,
-        rgba(255, 255, 255, 0.12) 50%,
+        rgba(255, 255, 255, 0.08) 50%,
         transparent 100%
     );
     animation: chalkShimmerOverlay 1.8s ease-in-out infinite;
@@ -663,10 +707,9 @@ body.cat-default {
     pointer-events: none;
 }
 
-@keyframes chalkSpiralMove {
-    0% { background-position: 0 0; }
-    50% { background-position: 20px 20px; }
-    100% { background-position: 0 0; }
+@keyframes chalkSpiralRotate {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
 @keyframes chalkShimmerOverlay {
@@ -819,7 +862,7 @@ body.cat-default {
 .intro-edu-icon:nth-child(7) { animation-delay: 3s; }
 
 .intro-title {
-    font-family: 'Caveat Brush', cursive, sans-serif;
+    font-family: 'Cabin Sketch', cursive, sans-serif;
     font-weight: 700;
     letter-spacing: -0.01em;
 }
@@ -880,9 +923,9 @@ body.cat-default {
     align-items: center;
     justify-content: center;
     gap: clamp(0.6rem, 2vw, 1rem);
-    padding: clamp(0.6rem, 2vw, 1rem) clamp(1.25rem, 4vw, 2rem);
+    padding: clamp(0.75rem, 2.5vw, 1.25rem) clamp(1.5rem, 4vw, 2.5rem);
     background: transparent;
-    border: 3px solid rgba(255, 255, 255, 0.9);
+    border: 4px solid rgba(255, 255, 255, 0.95);
     border-radius: 9999px;
     box-shadow: 
         0 2px 12px rgba(0, 0, 0, 0.15),
@@ -898,13 +941,14 @@ body.cat-default {
 }
 
 .challenge-header-banner .challenge-text {
-    font-family: 'Caveat Brush', cursive;
-    font-weight: 800;
-    color: #0595AE;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    font-family: 'Cabin Sketch', cursive;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.98);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
     letter-spacing: 0.02em;
     line-height: 1.2;
     white-space: nowrap;
+    font-size: clamp(1.15rem, 4vw, 1.6rem);
 }
 
 @media (max-width: 640px) {

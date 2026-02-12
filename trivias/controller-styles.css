@@ -17,7 +17,7 @@
     --airconsole-safe-bottom: max(16px, env(safe-area-inset-bottom, 0px));
 }
 
-/* Tipografía global tipo tiza */
+/* Tipografía: Caveat Brush para cuerpo, Cabin Sketch para títulos */
 .chalk-font,
 .chalk-font *,
 .chalk-font input,
@@ -25,13 +25,17 @@
 .chalk-font p,
 .chalk-font span,
 .chalk-font div,
-.chalk-font h1,
-.chalk-font h2,
-.chalk-font h3,
 .chalk-font label {
     font-family: 'Caveat Brush', cursive, sans-serif;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+}
+
+.chalk-font h1,
+.chalk-font h2,
+.chalk-font h3,
+.chalk-font .chalk-title {
+    font-family: 'Cabin Sketch', cursive, sans-serif;
 }
 
 /* Efecto tiza para texto */
@@ -57,10 +61,19 @@
 
 @media (max-height: 600px) {
     .chalkboard-safe-area {
-        padding-top: max(40px, env(safe-area-inset-top, 0px));
+        padding-top: max(36px, env(safe-area-inset-top, 0px));
+        padding-bottom: max(10px, env(safe-area-inset-bottom, 0px));
     }
     #playingScreen {
         padding-top: max(1.5rem, env(safe-area-inset-top, 0px));
+    }
+}
+
+/* Pantallas muy cortas: más espacio para contenido */
+@media (max-height: 500px) {
+    .chalkboard-safe-area {
+        padding-top: max(32px, env(safe-area-inset-top, 0px));
+        padding-bottom: max(8px, env(safe-area-inset-bottom, 0px));
     }
 }
 
@@ -91,8 +104,7 @@ body {
     display: none;
     opacity: 0;
     transition: opacity 0.2s ease;
-    height: 100vh;
-    height: 100dvh;
+    flex: 1 1 0;
     min-height: 0;
     width: 100%;
     padding: 0.75rem;
@@ -107,16 +119,54 @@ body {
     opacity: 1;
 }
 
-/* Join screen: permitir scroll si es necesario en pantallas muy cortas */
+/* Join screen: usa todo el espacio disponible, sin acortar */
 #joinScreen {
-    justify-content: flex-start;
+    justify-content: center;
+    align-items: center;
     padding-top: max(0.5rem, env(safe-area-inset-top, 0px));
+    overflow-y: auto;
 }
 
-@media (min-height: 500px) {
+/* Waiting screen: sin scrollbar, contenido adaptado al viewport */
+#waitingScreen {
+    overflow: hidden;
+    padding: clamp(0.5rem, 2vh, 0.75rem);
+}
+
+/* Waiting screen - compacto en pantallas cortas */
+@media (max-height: 600px) {
+    #waitingScreen .mb-6 { margin-bottom: 0.75rem !important; }
+    #waitingScreen .mb-4 { margin-bottom: 0.5rem !important; }
+    #waitingScreen .w-16.h-16 { width: 3rem !important; height: 3rem !important; }
+    #waitingScreen .text-5xl { font-size: 2rem !important; }
+    #waitingScreen .my-4 { margin-top: 0.5rem !important; margin-bottom: 0.5rem !important; }
+    #waitingScreen .py-4 { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
+    #waitingScreen .px-6 { padding-left: 1rem !important; padding-right: 1rem !important; }
+    #waitingScreen .mb-4 { margin-bottom: 0.5rem !important; }
+    #waitingScreen .p-4 { padding: 0.5rem !important; }
+}
+@media (max-height: 500px) {
+    #waitingScreen .mb-6 { margin-bottom: 0.5rem !important; }
+    #waitingScreen .text-5xl { font-size: 1.5rem !important; }
+}
+
+/* Icono de categoría seleccionada - mismo estilo chalk que el screen */
+#selectedCategoryEmoji,
+#selectedCategoryDisplay .category-icon-img {
+    filter: brightness(0) invert(1) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+/* Pantallas muy cortas: reducir espaciados para que quepa todo sin scroll */
+@media (max-height: 600px) {
     #joinScreen {
-        justify-content: center;
+        padding-top: max(0.25rem, env(safe-area-inset-top, 0px));
+        padding-bottom: max(0.25rem, env(safe-area-inset-bottom, 0px));
     }
+    #joinScreen .mb-2 { margin-bottom: 0.25rem !important; }
+    #joinScreen .mb-3 { margin-bottom: 0.35rem !important; }
+    #joinScreen [class*="space-y"] > * + * { margin-top: 0.15rem !important; }
+    #joinScreen .rounded-xl { padding: 0.35rem 0.5rem !important; }
+    #joinScreen #joinBtn { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
 }
 
 /* AirConsole: Espacio para logo (~50px) - evitar que UI tape contenido */
@@ -124,11 +174,19 @@ body {
     padding-top: max(2.5rem, calc(env(safe-area-inset-top, 0px) + 2rem));
 }
 
+/* Espaciado entre elementos de la pantalla de juego */
+.playing-screen-spaced {
+    gap: clamp(0.5rem, 2vh, 1rem);
+}
+
 /* Cuando está activa: layout flex para evitar scroll y que respuestas se adapten */
 #playingScreen.active {
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
     min-height: 0;
     flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Header y footer fijos para que el grid de respuestas use el espacio restante */
@@ -183,19 +241,19 @@ body {
 }
 
 .step-text {
-    font-size: clamp(0.85rem, 2.5vw, 1rem);
-    color: rgba(255, 255, 255, 0.6);
+    font-size: clamp(1rem, 3vw, 1.2rem);
+    color: rgba(255, 255, 255, 0.85);
     font-weight: 600;
     transition: all 0.3s ease;
 }
 
 .step-label-item.active .step-text {
-    color: #0595AE;
+    color: rgba(255, 255, 255, 0.98);
     font-weight: 700;
 }
 
 .step-label-item.completed .step-text {
-    color: #73A03F;
+    color: rgba(255, 255, 255, 0.9);
 }
 
 /* Chalk box, buttons - controller */
@@ -211,15 +269,15 @@ body {
 /* Texto legible - Pregunta X de Y, Selecciona tu respuesta (font más legible para UI) */
 .chalk-readable {
     font-family: 'Caveat Brush', 'Architects Daughter', cursive;
-    font-size: clamp(1.15rem, 4vw, 1.5rem);
-    color: rgba(255, 255, 255, 0.95);
+    font-size: clamp(1.35rem, 4.5vw, 1.75rem);
+    color: rgba(255, 255, 255, 0.98);
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     letter-spacing: 0.02em;
 }
 
 .chalk-subtitle {
-    font-size: clamp(1rem, 3.5vw, 1.25rem);
-    color: rgba(255, 255, 255, 0.9);
+    font-size: clamp(1.15rem, 4vw, 1.4rem);
+    color: rgba(255, 255, 255, 0.95);
 }
 
 /* Tarjeta jugador en playing - estilo chalk, sin fondo blanco */
@@ -365,7 +423,7 @@ body {
 }
 
 .category-btn .category-name {
-    font-size: clamp(0.85rem, 3.5vw, 1.15rem);
+    font-size: clamp(1rem, 4vw, 1.35rem);
     line-height: 1.2;
     text-align: center;
     font-weight: 600;
@@ -432,14 +490,14 @@ body {
 .answer-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(clamp(44px, 12vh, 70px), 1fr));
     gap: clamp(0.35rem, 1.5vw, 0.5rem);
     flex: 1;
-    min-height: 0;
+    min-height: clamp(120px, 28vh, 180px);
 }
 
 .answer-btn {
-    font-size: clamp(1.25rem, 5vw, 2.5rem);
+    font-size: clamp(1.5rem, 5.5vw, 2.8rem);
     display: flex;
     align-items: center;
     justify-content: center;

@@ -31,20 +31,20 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Architects+Daughter&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cabin+Sketch:wght@400;700&family=Caveat+Brush&family=Architects+Daughter&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="controller-styles.css">
 </head>
 <body class="text-steam-negro chalk-font" style="background: url('../assets/images/Pizarra-optimized.webp') center center / 100% 100% no-repeat fixed !important;">
     <div class="w-full h-full min-h-0 flex flex-col chalkboard-safe-area" style="height: 100vh; height: 100dvh;">
         
-        <!-- JOIN SCREEN - compacto para evitar scroll (AirConsole) -->
-        <div class="screen active flex-col items-center justify-center text-center gap-2 sm:gap-3" id="joinScreen">
-            <div class="w-full max-w-sm mx-auto px-1">
-                <img src="../assets/images/LogoSteamRD-Color.webp" alt="STEAM RD Logo" class="w-12 h-12 sm:w-14 sm:h-14 mx-auto mb-2 object-contain">
+        <!-- JOIN SCREEN - usa todo el espacio disponible, sin scroll innecesario -->
+        <div class="screen active flex-col items-center justify-center text-center gap-1 sm:gap-2" id="joinScreen">
+            <div class="w-full max-w-sm mx-auto px-1 shrink min-h-0 flex flex-col items-center justify-center">
+                <img src="../assets/images/LogoSteamRD-Color.webp" alt="STEAM RD Logo" class="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-1 sm:mb-2 object-contain flex-shrink-0">
                 
-                <h1 class="text-xl sm:text-2xl font-black mb-2 sm:mb-3 text-steam-turquesa">TRIVIA</h1>
+                <h1 class="text-lg sm:text-xl font-black mb-1 sm:mb-2 text-steam-turquesa">TRIVIA</h1>
                 
-                <div class="space-y-1.5 sm:space-y-2 mb-2 sm:mb-3">
+                <div class="space-y-1 sm:space-y-1.5 mb-1.5 sm:mb-2">
                     <div class="rounded-xl p-2 sm:p-2.5 chalk-box" style="background: transparent; border: 2px solid rgba(255,255,255,0.7);">
                         <div class="flex items-center gap-2">
                             <div class="text-lg sm:text-xl flex-shrink-0">🎯</div>
@@ -108,7 +108,7 @@
                     <div class="text-lg font-black text-steam-turquesa" id="playerNameDisplay"></div>
                 </div>
                 
-                <iconify-icon icon="mdi:timer-sand" class="bounce-anim text-5xl text-steam-turquesa"></iconify-icon>
+                <iconify-icon icon="mdi:clock-outline" class="bounce-anim text-5xl text-steam-turquesa"></iconify-icon>
                 
                 <div class="rounded-2xl py-4 px-6 my-4 shadow-lg chalk-box" style="background: transparent; border: 2px solid #73A03F;">
                     <p class="text-base font-black text-steam-verde">Esperando que inicie el juego...</p>
@@ -117,7 +117,7 @@
                 <div id="nonAdminWaiting">
                     <p class="text-sm mb-4 text-white/80">El Jugador 1 está configurando la partida</p>
                     <div class="rounded-2xl p-4 chalk-box hidden" style="background: transparent; border: 2px solid #0595AE;" id="selectedCategoryDisplay">
-                        <div class="text-4xl mb-2" id="selectedCategoryEmoji">🌍</div>
+                        <img id="selectedCategoryEmoji" src="../assets/images/globo.webp" alt="" class="w-12 h-12 mx-auto mb-2 object-contain category-icon-img">
                         <div class="text-lg font-black text-steam-turquesa" id="selectedCategoryName">General</div>
                     </div>
                 </div>
@@ -130,13 +130,16 @@
             
             <div class="relative z-10 flex flex-col flex-1 min-h-0 w-full max-w-md mx-auto h-full">
                 <!-- Admin Badge - compacto -->
-                <div class="flex justify-start mb-2 flex-shrink-0">
+                <div class="flex justify-between items-center mb-2 flex-shrink-0">
                     <div class="inline-flex items-center gap-1 rounded-full py-1 px-2 shadow-md chalk-box" style="background: transparent; border: 2px solid #EB8225;">
                         <iconify-icon icon="mdi:crown" class="text-steam-naranja"></iconify-icon>
                         <div class="w-6 h-6 rounded-full flex items-center justify-center border-2 border-white shadow-sm" id="adminAvatar">
                             <iconify-icon icon="mdi:crown" class="text-xs text-white"></iconify-icon>
                         </div>
                     </div>
+                    <button type="button" class="w-10 h-10 rounded-full flex items-center justify-center chalk-box active:scale-95 transition-transform" style="background: transparent; border: 2px solid rgba(255,255,255,0.6);" id="soundToggleBtn" title="Sonido">
+                        <span class="text-xl" id="soundToggleIcon">🔊</span>
+                    </button>
                 </div>
 
                 <!-- Progress Bar -->
@@ -190,7 +193,7 @@
                     </div>
 
                     <div class="rounded-lg p-3 mb-4 chalk-box flex items-center gap-3" style="background: transparent; border: 2px solid #0595AE;">
-                        <iconify-icon id="selectedCatIcon" icon="mdi:earth" class="text-2xl text-steam-turquesa"></iconify-icon>
+                        <img id="selectedCatIcon" src="../assets/images/globo.webp" alt="" class="w-10 h-10 object-contain flex-shrink-0">
                         <div>
                             <div class="text-sm text-white/70">Categoría</div>
                             <div class="font-bold text-base text-steam-turquesa" id="selectedCatName">General</div>
@@ -214,8 +217,8 @@
                     <h2 class="text-base font-black text-center mb-4 text-steam-turquesa">¿Todo listo?</h2>
                     
                     <div class="rounded-xl p-4 mb-4 chalk-box" style="background: transparent; border: 2px solid #73A03F;">
-                        <div class="text-center mb-3">
-                            <iconify-icon id="finalCatIcon" icon="mdi:earth" class="text-4xl text-steam-turquesa"></iconify-icon>
+                        <div class="text-center mb-3 flex justify-center">
+                            <img id="finalCatIcon" src="../assets/images/globo.webp" alt="" class="w-16 h-16 object-contain mx-auto">
                         </div>
                         <div class="space-y-2">
                             <div class="flex justify-between items-center rounded-lg p-3 chalk-box" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.3);">
@@ -246,10 +249,13 @@
 
         <!-- PLAYING SCREEN: extra top padding for AirConsole UI (see controller-styles.css) -->
         <div class="screen flex-col playing-screen-spaced" id="playingScreen">
-            <div class="text-left mb-3 hidden" id="adminExitContainer">
+            <div class="flex justify-between items-center mb-3 hidden" id="adminExitContainer">
                 <button class="text-white py-2 px-4 text-sm font-bold rounded-full shadow-md active:scale-95 transition-transform inline-flex items-center gap-2 chalk-btn" style="background: rgba(229,57,53,0.85); border: 2px solid #E53935;" id="exitGameBtn">
                     <iconify-icon icon="mdi:exit-to-app" class="text-lg"></iconify-icon>
                     SALIR
+                </button>
+                <button type="button" class="w-10 h-10 rounded-full flex items-center justify-center chalk-box active:scale-95 transition-transform" style="background: transparent; border: 2px solid rgba(255,255,255,0.6);" id="soundToggleBtnPlaying" title="Sonido">
+                    <span class="text-xl" id="soundToggleIconPlaying">🔊</span>
                 </button>
             </div>
             
