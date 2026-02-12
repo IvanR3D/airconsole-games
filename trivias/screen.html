@@ -141,7 +141,7 @@
                     </div>
                     <div class="challenge-header-banner">
                         <iconify-icon icon="mdi:crown" class="challenge-icon" style="font-size: clamp(1.5rem, 4.5vw, 2.25rem); color: #EB8225;"></iconify-icon>
-                        <span class="challenge-text">JUGADOR 1: ELIGE TU DESAFÍO</span>
+                        <span class="challenge-text chalk-title">JUGADOR 1: ELIGE TU DESAFÍO</span>
                         <iconify-icon icon="mdi:gamepad-variant" class="challenge-icon" style="font-size: clamp(1.5rem, 4.5vw, 2.25rem); color: #AB3D8B;"></iconify-icon>
                     </div>
                 </div>
@@ -157,7 +157,7 @@
                 <div class="text-center mt-2 sm:mt-4 power-up flex-shrink-0" style="animation-delay: 0.3s;">
                     <div class="inline-flex items-center gap-3 py-3 px-5">
                         <iconify-icon icon="mdi:clock-outline" style="font-size: clamp(1.5rem, 4vw, 2rem); color: rgba(255,255,255,0.95);"></iconify-icon>
-                        <p class="font-bold text-lg sm:text-xl lg:text-2xl" style="color: rgba(255,255,255,0.98); text-shadow: 0 2px 4px rgba(0,0,0,0.25);">
+                        <p class="chalk-body font-bold text-lg sm:text-xl lg:text-2xl" style="color: rgba(255,255,255,0.98); text-shadow: 0 2px 4px rgba(0,0,0,0.25);">
                             Esperando selección...
                         </p>
                         <iconify-icon icon="mdi:clock-outline" style="font-size: clamp(1.5rem, 4vw, 2rem); color: rgba(255,255,255,0.95);"></iconify-icon>
@@ -176,7 +176,7 @@
                         <div class="timer-bar" id="timerBar" style="width: 100%;"></div>
                     </div>
                     <!-- Contador circular -->
-                    <div class="timer-circle-standalone" id="timerCircle">20</div>
+                    <div class="timer-circle-standalone chalk-body" id="timerCircle">20</div>
                 </div>
             </div>
 
@@ -186,8 +186,8 @@
                 <div class="bg-particles" id="playingBgParticles"></div>
                 
                 <div class="flex-1 flex flex-col items-center justify-center relative z-10 pt-4">
-                    <div class="text-lg sm:text-xl lg:text-2xl mb-2 sm:mb-3 lg:mb-4 font-bold" id="questionNumber" style="color: rgba(255,255,255,0.98); text-shadow: 0 2px 4px rgba(0,0,0,0.2);">Pregunta 1 de 5</div>
-                    <h2 class="responsive-question text-center max-w-xs sm:max-w-2xl lg:max-w-4xl leading-tight mb-4 sm:mb-6 lg:mb-10 text-white" id="questionText" style="color: rgba(255,255,255,0.95); text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);">Cual es la capital de Francia?</h2>
+                    <div class="chalk-body text-lg sm:text-xl lg:text-2xl mb-2 sm:mb-3 lg:mb-4 font-bold" id="questionNumber" style="color: rgba(255,255,255,0.98); text-shadow: 0 2px 4px rgba(0,0,0,0.2);">Pregunta 1 de 5</div>
+                    <h2 class="chalk-title responsive-question text-center max-w-xs sm:max-w-2xl lg:max-w-4xl leading-tight mb-4 sm:mb-6 lg:mb-10 text-white" id="questionText" style="color: rgba(255,255,255,0.95); text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);">Cual es la capital de Francia?</h2>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 lg:gap-4 max-w-xs sm:max-w-2xl lg:max-w-4xl w-full options-grid-spaced" id="optionsGrid"></div>
                 </div>
             </div>
@@ -201,15 +201,15 @@
         </div>
 
         <!-- END SCREEN -->
-        <div class="screen flex-col items-center justify-center p-4 sm:p-6 lg:p-10 overflow-y-auto chalk-font" id="endScreen">
-            <h2 class="end-title chalk-title text-xl sm:text-2xl lg:text-3xl text-steam-turquesa mb-4 sm:mb-6 lg:mb-8 font-bold">Juego Terminado!</h2>
-            <div class="winner-bounce text-center mb-4 sm:mb-6 lg:mb-8" id="winnerSection"></div>
-            <div class="flex flex-col gap-2 sm:gap-3 max-w-xs sm:max-w-md lg:max-w-lg w-full mb-4 sm:mb-6 lg:mb-8" id="podium"></div>
+        <div class="screen flex-col items-center justify-center p-3 sm:p-4 lg:p-6 overflow-hidden chalk-font min-h-0 flex-1" id="endScreen">
+            <h2 class="end-title chalk-title text-3xl sm:text-4xl lg:text-5xl mb-3 sm:mb-4 lg:mb-6 font-bold" style="color: rgba(255,255,255,0.98);">Juego Terminado!</h2>
+            <div class="winner-bounce text-center mb-2 sm:mb-3 flex-shrink-0" id="winnerSection"></div>
+            <div class="flex flex-col gap-1.5 sm:gap-2 max-w-xs sm:max-w-md w-full mb-2 sm:mb-3 flex-shrink-0" id="podium"></div>
             
-            <!-- Footer con mensaje de espera y botón Quit Game -->
-            <div class="flex flex-col gap-4 items-center w-full max-w-xs sm:max-w-md">
-                <div class="rounded-xl sm:rounded-2xl py-3 sm:py-4 lg:py-5 px-4 sm:px-6 lg:px-8 text-center animate-pulse w-full chalk-box" style="background: transparent; border: 2px solid #EB8225;">
-                    <p class="chalk-body text-steam-naranja text-sm sm:text-base lg:text-lg font-bold">Esperando que el Jugador 1 decida...</p>
+            <!-- Footer con mensaje de espera -->
+            <div class="flex flex-col items-center w-full max-w-xs sm:max-w-md flex-shrink-0">
+                <div class="rounded-xl py-2 sm:py-3 px-4 sm:px-5 text-center animate-pulse w-full chalk-box" style="background: transparent; border: 2px solid rgba(255,255,255,0.6);">
+                    <p class="chalk-body text-sm sm:text-base font-bold" style="color: rgba(255,255,255,0.9);">Esperando que el Jugador 1 decida...</p>
                 </div>
             </div>
         </div>

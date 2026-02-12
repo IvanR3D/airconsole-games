@@ -13,8 +13,8 @@
     --chalk-white: rgba(255, 255, 255, 0.92);
     --chalk-white-soft: rgba(255, 255, 255, 0.78);
     --chalk-border: 2px solid var(--chalk-white);
-    /* AirConsole: respetar notch + margen mínimo (reglas .cursor/rules) */
-    --airconsole-safe-top: max(env(safe-area-inset-top, 0px), 12px);
+    /* AirConsole: respetar notch + barra AirConsole + margen (reglas .cursor) */
+    --airconsole-safe-top: max(env(safe-area-inset-top, 0px), 50px, 12px);
     --airconsole-safe-bottom: max(env(safe-area-inset-bottom, 0px), 12px);
     --airconsole-safe-left: max(env(safe-area-inset-left, 0px), 12px);
     --airconsole-safe-right: max(env(safe-area-inset-right, 0px), 12px);
@@ -47,6 +47,10 @@
 .chalk-font h3,
 .chalk-font .chalk-title {
     font-family: 'Cabin Sketch', cursive, sans-serif;
+}
+
+.chalk-font .chalk-body {
+    font-family: 'Caveat Brush', cursive, sans-serif;
 }
 
 /* Efecto tiza para texto */
@@ -145,6 +149,7 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 0.25rem;
+    padding-top: clamp(1.5rem, 5vh, 2.5rem); /* Espacio para no chocar con AirConsole */
 }
 
 .join-logo {
@@ -172,6 +177,7 @@ body {
 
 .join-footer {
     max-width: var(--container-max);
+    padding-bottom: clamp(1rem, 4vh, 1.75rem); /* Separar botón del borde inferior */
 }
 
 /* Tarjetas de reglas - tipografía fluida */
@@ -316,11 +322,16 @@ body {
     .join-subtitle { font-size: clamp(1.5rem, 2vw, 1.9rem); }
 }
 
-/* Playing screen: margen inferior extra para tarjeta jugador (no tocar bordes) */
+/* Playing screen: margen superior para AirConsole (jugadores no-admin), inferior para tarjeta */
 #playingScreen {
-    padding-top: max(1rem, env(safe-area-inset-top, 0px));
+    padding-top: max(var(--airconsole-safe-top), 1rem, env(safe-area-inset-top, 0px));
     padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
     overflow: hidden;
+}
+
+/* Admin: espaciado entre botones SALIR y volumen */
+#adminExitContainer {
+    gap: clamp(1rem, 4vw, 1.5rem);
 }
 
 /* Espaciado entre elementos - responsivo */
@@ -910,16 +921,21 @@ body {
     font-size: clamp(1.1rem, min(4.5vw, 4vh), 1.5rem);
 }
 
+#endScreen .result-prize {
+    background: transparent;
+    border: 2px solid rgba(255,255,255,0.35);
+}
+
 @media (max-height: 500px) {
     #endScreen { gap: clamp(0.5rem, 2vh, 1rem) !important; }
-    #endScreen .player-avatar-visual { width: clamp(3rem, 12vw, 4rem); height: clamp(3rem, 12vw, 4rem); }
+    #endScreen .result-prize { width: clamp(3.5rem, 14vw, 5rem); height: clamp(3.5rem, 14vw, 5rem); }
 }
 
 @media (min-width: 1024px) {
     #endScreen #finalRank { font-size: clamp(3rem, 4vw, 4.5rem); }
     #endScreen #finalMessage { font-size: clamp(1.15rem, 1.5vw, 1.35rem); }
     #endScreen #finalScore { font-size: clamp(1.25rem, 1.6vw, 1.5rem); }
-    #endScreen .player-avatar-visual { width: clamp(4rem, 6vw, 5rem); height: clamp(4rem, 6vw, 5rem); }
+    #endScreen .result-prize { width: clamp(5rem, 8vw, 6rem); height: clamp(5rem, 8vw, 6rem); }
 }
 
 /* Desktop: cursor pointer y hover para ratón */

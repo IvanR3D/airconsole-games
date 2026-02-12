@@ -137,13 +137,10 @@
             <div class="bg-particles" id="controllerBgParticles"></div>
             
             <div class="relative z-10 flex flex-col flex-1 min-h-0 w-full mx-auto h-full wizard-content">
-                <!-- Admin Badge - compacto -->
+                <!-- Admin Badge - 1 corona (suficiente para identificar admin) -->
                 <div class="flex justify-between items-center mb-2 flex-shrink-0">
-                    <div class="inline-flex items-center gap-1 rounded-full py-1 px-2 shadow-md chalk-box" style="background: transparent; border: 2px solid #EB8225;">
-                        <iconify-icon icon="mdi:crown" class="text-steam-naranja"></iconify-icon>
-                        <div class="w-6 h-6 rounded-full flex items-center justify-center border-2 border-white shadow-sm" id="adminAvatar">
-                            <iconify-icon icon="mdi:crown" class="text-xs text-white"></iconify-icon>
-                        </div>
+                    <div class="inline-flex items-center gap-2 rounded-full py-1.5 px-3 shadow-md chalk-box" style="background: transparent; border: 2px solid #EB8225;" id="adminAvatar">
+                        <iconify-icon icon="mdi:crown" class="text-steam-naranja" style="font-size: 1.25rem;"></iconify-icon>
                     </div>
                     <button type="button" class="rounded-full flex items-center justify-center chalk-box active:scale-95 transition-transform" style="background: transparent; border: 2px solid rgba(255,255,255,0.6);" id="soundToggleBtn" title="Sonido">
                         <span class="text-xl" id="soundToggleIcon">🔊</span>
@@ -159,21 +156,21 @@
                 <div class="flex items-center justify-between mb-2 flex-shrink-0">
                     <div class="step-label-item active" data-step="1">
                         <span class="step-dot"></span>
-                        <span class="step-text chalk-step-text">Categoría</span>
+                        <span class="step-text chalk-body chalk-step-text">Categoría</span>
                     </div>
                     <div class="step-label-item" data-step="2">
                         <span class="step-dot"></span>
-                        <span class="step-text chalk-step-text">Preguntas</span>
+                        <span class="step-text chalk-body chalk-step-text">Preguntas</span>
                     </div>
                     <div class="step-label-item" data-step="3">
                         <span class="step-dot"></span>
-                        <span class="step-text chalk-step-text">Iniciar</span>
+                        <span class="step-text chalk-body chalk-step-text">Iniciar</span>
                     </div>
                 </div>
 
                 <!-- STEP 1: Category Selection -->
                 <div class="step-content active" id="step1">
-                    <h2 class="text-sm sm:text-base font-black text-center mb-1.5 flex-shrink-0 text-steam-turquesa">Elige una Categoría</h2>
+                    <h2 class="chalk-title text-sm sm:text-base font-black text-center mb-1.5 flex-shrink-0 text-steam-turquesa">Elige una Categoría</h2>
                     <div id="categoryScrollContainer" class="min-h-0">
                         <div id="categoryGrid"></div>
                     </div>
@@ -257,7 +254,7 @@
 
         <!-- PLAYING SCREEN: extra top padding for AirConsole UI (see controller-styles.css) -->
         <div class="screen flex-col playing-screen-spaced" id="playingScreen">
-            <div class="flex justify-between items-center mb-3 hidden" id="adminExitContainer">
+            <div class="flex justify-between items-center gap-4 mb-3 hidden w-full" id="adminExitContainer">
                 <button class="text-white py-2 px-4 text-sm font-bold rounded-full shadow-md active:scale-95 transition-transform inline-flex items-center gap-2 chalk-btn" style="background: rgba(229,57,53,0.85); border: 2px solid #E53935;" id="exitGameBtn">
                     <iconify-icon icon="mdi:exit-to-app" class="text-lg"></iconify-icon>
                     SALIR
@@ -291,10 +288,12 @@
 
         <!-- END SCREEN -->
         <div class="screen flex-col items-center justify-center text-center gap-4" id="endScreen">
-            <div class="text-5xl font-black" id="finalRank">1ro</div>
-            <div class="player-avatar-visual mx-auto" id="resultAvatar"></div>
-            <p class="text-lg font-bold text-steam-turquesa" id="finalMessage">Felicidades!</p>
-            <div class="text-xl font-bold text-steam-verde" id="finalScore">0 puntos</div>
+            <div class="text-5xl font-black chalk-title" id="finalRank" style="color: rgba(255,255,255,0.98);">1ro</div>
+            <div class="result-prize flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-2xl" id="resultPrize">
+                <iconify-icon icon="mdi:trophy" class="text-5xl sm:text-6xl" style="color: #FFD700;"></iconify-icon>
+            </div>
+            <p class="text-lg font-bold chalk-body" id="finalMessage" style="color: rgba(255,255,255,0.98);">Felicidades!</p>
+            <div class="chalk-body text-xl font-bold" id="finalScore" style="color: rgba(255,255,255,0.98);">0 puntos</div>
             <button class="bg-steam-morado text-white py-3 px-6 text-base font-bold rounded-full btn-3d btn-morado hidden" id="playAgainBtn">JUGAR DE NUEVO</button>
             <p class="text-sm text-white/80" id="waitingNextText">Esperando al Jugador 1...</p>
         </div>

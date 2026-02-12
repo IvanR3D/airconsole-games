@@ -55,7 +55,7 @@ function cacheDom() {
     domCache.miniName = document.getElementById('miniName');
     domCache.miniScore = document.getElementById('miniScore');
     domCache.miniRank = document.getElementById('miniRank');
-    domCache.resultAvatar = document.getElementById('resultAvatar');
+    domCache.resultPrize = document.getElementById('resultPrize');
     domCache.questionIndicator = document.getElementById('questionIndicator');
     domCache.resultOverlay = document.getElementById('resultOverlay');
     domCache.resultContent = document.getElementById('resultContent');
@@ -229,7 +229,6 @@ function setupCategoryGrid() {
         
         btn.innerHTML = `
             <img src="${categoryImages[key]}" alt="${cat.name}" class="category-icon-img mb-1">
-            <div class="category-name font-bold">${cat.name}</div>
             <div class="selection-check" style="border-color: ${btnColor};">✓</div>
         `;
         btn.addEventListener('click', () => selectCategory(key));
@@ -447,9 +446,7 @@ function updateAvatarDisplays() {
     }
     if (domCache.miniName) domCache.miniName.textContent = playerName;
     
-    if (domCache.resultAvatar) {
-        domCache.resultAvatar.style.backgroundColor = playerColor;
-    }
+    // resultPrize shows trophy/medal, not player avatar
 }
 
 function handleGameStateUpdate(data) {
@@ -677,11 +674,27 @@ function showEndScreen(winner, players) {
     const medals = ['1ro', '2do', '3ro'];
     document.getElementById('finalRank').textContent = medals[rank - 1] || `#${rank}`;
     
+    // Premio según posición: trofeo oro 1º, plata 2º, bronce 3º
+    const prizeContainer = document.getElementById('resultPrize');
+    if (prizeContainer) {
+        const prizes = [
+            { icon: 'mdi:trophy', color: '#FFD700' },
+            { icon: 'mdi:medal', color: '#C0C0C0' },
+            { icon: 'mdi:medal', color: '#CD7F32' }
+        ];
+        const prize = prizes[rank - 1] || prizes[2];
+        const iconEl = prizeContainer.querySelector('iconify-icon');
+        if (iconEl) {
+            iconEl.setAttribute('icon', prize.icon);
+            iconEl.style.color = prize.color;
+        }
+    }
+    
     if (winner && winner.name === playerName) {
         document.getElementById('finalMessage').textContent = 'GANASTE!';
         if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 100]);
     } else if (winner) {
-        document.getElementById('finalMessage').textContent = `Gano ${winner.name}`;
+        document.getElementById('finalMessage').textContent = `Ganó ${winner.name}`;
     }
     
     document.getElementById('finalScore').textContent = `${myPlayer?.score || 0} puntos`;

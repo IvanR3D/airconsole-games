@@ -559,8 +559,8 @@ function updatePlayersDisplay() {
         const info = document.createElement('div');
         info.className = 'flex-1 min-w-0';
         info.innerHTML = `
-            <div class="text-base sm:text-lg font-black truncate" style="color: ${player.disconnected ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.95)'};">${player.name}</div>
-            <div class="text-xs sm:text-sm font-bold" style="color: ${player.disconnected ? 'rgba(255,255,255,0.4)' : cardColor};">
+            <div class="chalk-body text-base sm:text-lg font-black truncate" style="color: ${player.disconnected ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.95)'};">${player.name}</div>
+            <div class="chalk-body text-xs sm:text-sm font-bold" style="color: ${player.disconnected ? 'rgba(255,255,255,0.4)' : cardColor};">
                 ${player.disconnected ? 'Desconectado' : (player.isAdmin ? '👑 Admin' : '✓ Conectado')}
             </div>
         `;
@@ -627,14 +627,14 @@ function updatePlayersStatus() {
         
         // Name
         const footerName = document.createElement('div');
-        footerName.className = 'font-bold text-xs sm:text-sm truncate flex-1 min-w-0';
+        footerName.className = 'chalk-body font-bold text-xs sm:text-sm truncate flex-1 min-w-0';
         footerName.style.color = player.disconnected ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.95)';
         footerName.textContent = player.name;
         footerCard.appendChild(footerName);
         
         // Score - badge tipo chalk
         const score = document.createElement('div');
-        score.className = 'text-sm sm:text-base font-bold px-2 py-1 rounded-lg flex-shrink-0';
+        score.className = 'chalk-body text-sm sm:text-base font-bold px-2 py-1 rounded-lg flex-shrink-0';
         score.style.background = player.disconnected ? 'rgba(255,255,255,0.2)' : cardColor;
         score.style.border = `1px solid ${player.disconnected ? 'rgba(255,255,255,0.3)' : cardColor}`;
         score.style.color = '#fff';
@@ -745,17 +745,17 @@ function displayOptions(question) {
         card.dataset.index = index;
         card.dataset.correct = index === correctIndex ? 'true' : 'false';
         
-        // Letter badge - estilo chalk
+        // Letter badge - Caveat Brush para letras
         const badge = document.createElement('div');
-        badge.className = 'option-badge flex items-center justify-center text-lg sm:text-2xl lg:text-3xl font-black flex-shrink-0 relative z-10';
+        badge.className = 'option-badge chalk-body flex items-center justify-center text-lg sm:text-2xl lg:text-3xl font-black flex-shrink-0 relative z-10';
         badge.style.width = 'clamp(60px, 10vw, 90px)';
         badge.style.height = 'clamp(60px, 10vw, 90px)';
         badge.textContent = letter;
         card.appendChild(badge);
         
-        // Option text - estilo chalk
+        // Option text - Caveat Brush para respuestas
         const text = document.createElement('div');
-        text.className = 'flex-1 p-3 sm:p-4 lg:p-5 text-sm sm:text-base lg:text-lg font-bold relative z-10';
+        text.className = 'chalk-body flex-1 p-3 sm:p-4 lg:p-5 text-sm sm:text-base lg:text-lg font-bold relative z-10';
         text.style.color = 'rgba(255,255,255,0.95)';
         text.style.textShadow = '0 1px 2px rgba(0,0,0,0.2)';
         text.textContent = option;
@@ -925,7 +925,7 @@ function showResults() {
             const textDiv = opt.querySelector('.flex-1');
             if (textDiv) {
                 const indicator = document.createElement('div');
-                indicator.className = 'answer-indicator text-xs sm:text-sm font-bold mt-2';
+                indicator.className = 'answer-indicator chalk-body text-xs sm:text-sm font-bold mt-2';
                 indicator.style.color = '#fff';
                 indicator.textContent = '✓ Respuesta correcta';
                 textDiv.appendChild(indicator);
@@ -948,7 +948,7 @@ function showResults() {
                 const textDiv = opt.querySelector('.flex-1');
                 if (textDiv) {
                     const indicator = document.createElement('div');
-                    indicator.className = 'answer-indicator text-xs sm:text-sm font-bold mt-2';
+                    indicator.className = 'answer-indicator chalk-body text-xs sm:text-sm font-bold mt-2';
                     indicator.style.color = '#fff';
                     indicator.textContent = '✗ Tu respuesta';
                     textDiv.appendChild(indicator);
@@ -1017,12 +1017,12 @@ function endGame() {
     if (sortedPlayers.length > 0) {
         const winner = sortedPlayers[0];
         winnerSection.innerHTML = `
-            <div class="medal-trophy mb-2 sm:mb-4">${goldMedal}</div>
-            <div class="flex justify-center mb-2 sm:mb-4 medal-avatar-wrap">
+            <div class="medal-trophy mb-1 sm:mb-2">${goldMedal}</div>
+            <div class="flex justify-center mb-1 sm:mb-2 medal-avatar-wrap">
                 <div class="player-avatar-visual-large" style="background-color: ${winner.color};"></div>
             </div>
-            <div class="chalk-title text-xl sm:text-2xl lg:text-3xl font-bold text-steam-naranja">${winner.name}</div>
-            <div class="chalk-body text-base sm:text-lg lg:text-xl text-steam-verde mt-1 sm:mt-2">${winner.score} puntos</div>
+            <div class="chalk-title text-2xl sm:text-3xl lg:text-4xl font-bold" style="color: rgba(255,255,255,0.98);">${winner.name}</div>
+            <div class="chalk-body text-lg sm:text-xl lg:text-2xl font-bold mt-0.5 sm:mt-1" style="color: rgba(255,255,255,0.98);">${winner.score} puntos</div>
         `;
         
         playSound('victory');
@@ -1032,22 +1032,24 @@ function endGame() {
     const podium = document.getElementById('podium');
     podium.innerHTML = '';
     
-    const podiumMedals = [goldMedal, silverMedal, bronzeMedal];
-    const podiumBorders = ['#FFD700', '#C0C0C0', '#CD7F32'];
+    // Solo mostrar 2º y 3º lugar; el 1º ya se anuncia como campeón arriba
+    const podiumMedals = [silverMedal, bronzeMedal];
+    const podiumBorders = ['#C0C0C0', '#CD7F32'];
+    const runnersUp = sortedPlayers.slice(1, 3);
     
-    sortedPlayers.forEach((player, index) => {
+    runnersUp.forEach((player, index) => {
         const item = document.createElement('div');
-        item.className = 'podium-item flex items-center justify-between p-2 sm:p-3 lg:p-4 rounded-lg sm:rounded-xl lg:rounded-2xl border-2 sm:border-[3px] shadow-md chalk-box';
+        item.className = 'podium-item flex items-center justify-between p-2 sm:p-3 rounded-lg sm:rounded-xl border-2 sm:border-[3px] shadow-md chalk-box';
         item.style.background = 'transparent';
         item.style.borderColor = podiumBorders[index] || 'rgba(255,255,255,0.5)';
-        const medalIcon = podiumMedals[index] || `<span class="chalk-body text-lg font-bold" style="color: rgba(255,255,255,0.95);">#${index + 1}</span>`;
+        const medalIcon = podiumMedals[index] || `<span class="chalk-body text-base font-bold" style="color: rgba(255,255,255,0.98);">#${index + 2}</span>`;
         item.innerHTML = `
-            <div class="flex items-center gap-2 sm:gap-3 lg:gap-4">
+            <div class="flex items-center gap-2 sm:gap-3">
                 <span class="medal-slot flex items-center justify-center">${medalIcon}</span>
                 <div class="player-avatar-visual" style="background-color: ${player.color};"></div>
-                <span class="chalk-body text-sm sm:text-base lg:text-lg font-bold" style="color: rgba(255,255,255,0.95);">${player.name}</span>
+                <span class="chalk-body text-sm sm:text-base font-bold" style="color: rgba(255,255,255,0.98);">${player.name}</span>
             </div>
-            <span class="chalk-body text-base sm:text-lg lg:text-xl font-bold" style="color: #0595AE;">${player.score} pts</span>
+            <span class="chalk-body text-sm sm:text-base font-bold" style="color: rgba(255,255,255,0.98);">${player.score} pts</span>
         `;
         podium.appendChild(item);
     });

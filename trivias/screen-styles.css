@@ -156,7 +156,7 @@ body.cat-default {
     width: 55px;
     height: 55px;
     border-radius: 50%;
-    background: #0595AE !important;
+    background: #0595AE; /* Verde/turquesa por defecto - JS actualiza según tiempo */
     border: 3px solid rgba(255, 255, 255, 0.9);
     display: flex;
     align-items: center;
@@ -171,6 +171,19 @@ body.cat-default {
     flex-shrink: 0;
     cursor: pointer;
     transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+}
+
+/* Colores por tiempo: verde >10s, amarillo 6-10s, rojo ≤5s (sin hover) */
+.timer-circle-standalone.timer-warning,
+#playingScreen .timer-circle-standalone.timer-warning {
+    background: #FFA726 !important;
+    box-shadow: 0 0 0 4px rgba(0,0,0,0.25), 0 4px 20px rgba(255, 167, 38, 0.6), inset 0 1px 0 rgba(255,255,255,0.25) !important;
+}
+
+.timer-circle-standalone.timer-danger,
+#playingScreen .timer-circle-standalone.timer-danger {
+    background: #E53935 !important;
+    box-shadow: 0 0 0 4px rgba(0,0,0,0.25), 0 4px 20px rgba(229, 57, 53, 0.6), inset 0 1px 0 rgba(255,255,255,0.25) !important;
 }
 
 /* Hover acorde al estado del timer (turquesa, naranja o rojo según segundos) */
@@ -1054,14 +1067,17 @@ body.cat-default {
 /* ========================================
    END SCREEN - Resultados con estilo chic
    ======================================== */
+#endScreen {
+    flex: 1 1 0;
+    min-height: 0;
+}
+
 #endScreen .end-title {
     font-family: 'Cabin Sketch', cursive, sans-serif;
     font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    text-shadow: 
-        0 2px 4px rgba(0, 0, 0, 0.25),
-        0 0 20px rgba(5, 149, 174, 0.3);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 #endScreen .chalk-body {
@@ -1069,11 +1085,17 @@ body.cat-default {
 }
 
 /* Medalla trofeo - oro grande para el ganador */
-.medal-trophy {
-    width: clamp(64px, 15vw, 96px);
-    height: clamp(64px, 15vw, 96px);
+#endScreen .medal-trophy {
+    width: clamp(48px, 12vw, 80px);
+    height: clamp(48px, 12vw, 80px);
     margin: 0 auto;
     animation: medalAppear 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.medal-trophy {
+    width: clamp(48px, 12vw, 80px);
+    height: clamp(48px, 12vw, 80px);
+    margin: 0 auto;
 }
 
 .medal-trophy .medal-icon {
