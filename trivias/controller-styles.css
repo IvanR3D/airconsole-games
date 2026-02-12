@@ -24,7 +24,7 @@
 .chalk-font h2,
 .chalk-font h3,
 .chalk-font label {
-    font-family: 'Architects Daughter', 'Caveat', cursive, sans-serif;
+    font-family: 'Caveat Brush', cursive, sans-serif;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
 }
@@ -42,10 +42,16 @@
 
 /* Chalkboard safe area - lejos de bordes marrones */
 .chalkboard-safe-area {
-    padding: clamp(1.25rem, 10vw, 3rem);
+    padding: clamp(0.5rem, 5vw, 2rem);
     box-sizing: border-box;
     max-width: 100%;
     overflow: hidden;
+}
+
+@media (max-height: 600px) {
+    .chalkboard-safe-area {
+        padding: clamp(0.4rem, 3vw, 1rem);
+    }
 }
 
 html, body {
@@ -69,10 +75,11 @@ body {
     transition: opacity 0.2s ease;
     height: 100vh;
     height: 100dvh;
+    min-height: 0;
     width: 100%;
-    padding: 1rem;
-    padding-top: max(1rem, env(safe-area-inset-top, 0px));
-    padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+    padding: 0.75rem;
+    padding-top: max(0.75rem, env(safe-area-inset-top, 0px));
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
     overflow-y: auto;
     overflow-x: hidden;
 }
@@ -82,10 +89,9 @@ body {
     opacity: 1;
 }
 
-/* Playing screen: extra top spacing so AirConsole UI doesn't overlap
-   exit button (admin) or "Pregunta X de 15" text (player) */
+/* Playing screen: extra top spacing so AirConsole UI doesn't overlap */
 #playingScreen {
-    padding-top: max(3rem, calc(env(safe-area-inset-top, 0px) + 2rem));
+    padding-top: max(2.5rem, calc(env(safe-area-inset-top, 0px) + 1.5rem));
 }
 
 /* ========================================
@@ -148,6 +154,32 @@ body {
     opacity: 0.5;
 }
 
+/* Texto legible - Pregunta X de Y, Selecciona tu respuesta (font más legible para UI) */
+.chalk-readable {
+    font-family: 'Architects Daughter', 'Caveat Brush', cursive;
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.95);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    letter-spacing: 0.02em;
+}
+
+.chalk-subtitle {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Tarjeta jugador en playing - estilo chalk, sin fondo blanco */
+.chalk-player-card-mini {
+    background: transparent !important;
+    border: 2px solid rgba(255, 255, 255, 0.75);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.chalk-score-badge {
+    background: rgba(235, 130, 37, 0.85) !important;
+    border: 1px solid #EB8225;
+}
+
 /* ========================================
    STEP CONTENT
    ======================================== */
@@ -178,16 +210,25 @@ body {
 }
 
 #categoryScrollContainer {
-    flex: 1;
+    flex: 1 1 0;
+    min-height: 0;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    overflow-x: hidden;
 }
 
-/* Category Select Screen - wizard container needs full height */
+/* Category Select Screen - wizard container, min-height para flex scroll */
+#categorySelectScreen {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
 #categorySelectScreen > .relative {
     display: flex;
     flex-direction: column;
     flex: 1;
+    min-height: 0;
     height: 100%;
 }
 
@@ -197,13 +238,20 @@ body {
 #categoryGrid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 0.5rem;
-    padding-bottom: 0.5rem;
+    gap: 0.4rem;
+    padding-bottom: 0.4rem;
+}
+
+@media (min-width: 400px) {
+    #categoryGrid {
+        gap: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
 }
 
 .category-btn {
-    min-height: 70px;
-    padding: 0.75rem 0.5rem;
+    min-height: clamp(52px, 14vh, 70px);
+    padding: 0.5rem 0.35rem;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -228,10 +276,10 @@ body {
 }
 
 .category-btn .category-icon-img {
-    width: clamp(2rem, 5vw, 2.5rem);
-    height: clamp(2rem, 5vw, 2.5rem);
-    min-width: 2rem;
-    min-height: 2rem;
+    width: clamp(1.5rem, 4.5vw, 2.5rem);
+    height: clamp(1.5rem, 4.5vw, 2.5rem);
+    min-width: 1.5rem;
+    min-height: 1.5rem;
     object-fit: contain;
 }
 
@@ -250,7 +298,7 @@ body {
 }
 
 .category-btn .category-name {
-    font-size: 0.65rem;
+    font-size: clamp(0.55rem, 2vw, 0.7rem);
     line-height: 1.2;
     text-align: center;
     font-weight: 600;
@@ -472,22 +520,26 @@ body {
 }
 
 /* ========================================
-   SCROLLBAR
+   SCROLLBAR - delgado para móvil
    ======================================== */
-.overflow-y-auto {
+.overflow-y-auto,
+#categoryScrollContainer {
     -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;
 }
 
-.overflow-y-auto::-webkit-scrollbar {
+.overflow-y-auto::-webkit-scrollbar,
+#categoryScrollContainer::-webkit-scrollbar {
     width: 4px;
 }
 
-.overflow-y-auto::-webkit-scrollbar-track {
+.overflow-y-auto::-webkit-scrollbar-track,
+#categoryScrollContainer::-webkit-scrollbar-track {
     background: transparent;
 }
 
-.overflow-y-auto::-webkit-scrollbar-thumb {
-    background: rgba(0,0,0,0.1);
+.overflow-y-auto::-webkit-scrollbar-thumb,
+#categoryScrollContainer::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.3);
     border-radius: 4px;
 }

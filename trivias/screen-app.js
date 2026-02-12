@@ -413,16 +413,16 @@ function setupCategories() {
         const card = document.createElement('div');
         const categoryColor = categoryColors[key] || categoryColors.general;
         
-        card.className = 'category-card rounded-2xl sm:rounded-3xl p-4 sm:p-5 lg:p-6 text-center cursor-pointer transition-all relative power-up';
+        card.className = 'category-card rounded-xl sm:rounded-2xl text-center cursor-pointer transition-all relative power-up';
         card.style.animationDelay = `${index * 0.1}s`;
         card.dataset.category = key;
         card.dataset.categoryColor = categoryColor;
         
         card.innerHTML = `
-            <div class="mb-3 sm:mb-4">
+            <div class="mb-1 sm:mb-2">
                 <img src="${categoryImages[key]}" alt="${category.name}" class="category-icon-img">
             </div>
-            <div class="text-base sm:text-lg lg:text-xl font-bold category-name">
+            <div class="text-sm sm:text-base lg:text-lg font-bold category-name leading-tight">
                 ${category.name}
             </div>
             <div class="selection-check absolute top-2 right-2 w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 hidden items-center justify-center text-sm font-bold" style="background: transparent; border-color: ${categoryColor}; color: rgba(255,255,255,0.95);">
@@ -586,12 +586,11 @@ function updatePlayersStatus() {
         const cardColors = ['#0595AE', '#73A03F', '#EB8225', '#AB3D8B'];
         const cardColor = cardColors[index % cardColors.length];
         
-        // Footer card - estilo chalk
+        // Footer card - estilo chalk, sin fondo blanco
         const footerCard = document.createElement('div');
-        footerCard.className = 'flex flex-col items-center gap-2 rounded-xl py-3 px-4 transition-all chalk-box';
+        footerCard.className = 'flex flex-col items-center gap-2 rounded-xl py-3 px-4 transition-all chalk-footer-card';
         footerCard.style.background = 'transparent';
         footerCard.style.border = `2px solid ${player.disconnected ? 'rgba(255,255,255,0.3)' : cardColor}`;
-        footerCard.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
         footerCard.style.minWidth = 'clamp(80px, 12vw, 120px)';
         footerCard.style.opacity = player.disconnected ? '0.5' : '1';
         

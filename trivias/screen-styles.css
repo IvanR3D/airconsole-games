@@ -27,7 +27,7 @@
 .chalk-font h3,
 .chalk-font label,
 .chalk-font a {
-    font-family: 'Architects Daughter', 'Caveat', cursive, sans-serif;
+    font-family: 'Caveat Brush', cursive, sans-serif;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
 }
@@ -45,10 +45,16 @@
 
 /* Chalkboard safe area - contenido dentro del área verde, lejos de los bordes marrones */
 .chalkboard-safe-area {
-    padding: clamp(5%, 8vw, 12%);
+    padding: clamp(3%, 5vw, 10%);
     box-sizing: border-box;
     max-width: 100%;
     overflow: hidden;
+}
+
+@media (max-height: 700px) {
+    .chalkboard-safe-area {
+        padding: clamp(2%, 3vw, 6%);
+    }
 }
 
 html, body {
@@ -64,8 +70,15 @@ body {
 }
 
 /* Category backgrounds - Pizarra background */
-/* Playing screen - Pizarra background */
+/* Playing screen - Pizarra background, sin fondos blancos */
 #playingScreen {
+    background: transparent !important;
+}
+
+#playingScreen .chalk-header,
+#playingScreen [class*="timer"],
+#playingScreen #playersFooter,
+#playingScreen #playersFooter > * {
     background: transparent !important;
 }
 body.cat-science,
@@ -80,14 +93,19 @@ body.cat-default {
     position: relative;
 }
 
-/* Timer bar - sobre pizarra */
+/* Chalk header/footer - sin fondo blanco, integrado con pizarra */
+.chalk-header {
+    background: transparent !important;
+}
+
+/* Timer bar - estilo chalk sobre pizarra, sin fondo blanco */
 .timer-bar-container {
     position: relative;
     height: 28px;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.08);
     border-radius: 14px;
     overflow: visible;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.35);
 }
 
 .timer-bar {
@@ -117,8 +135,8 @@ body.cat-default {
     width: 55px;
     height: 55px;
     border-radius: 50%;
-    background: rgba(5, 149, 174, 0.9);
-    border: 2px solid rgba(255, 255, 255, 0.5);
+    background: rgba(5, 149, 174, 0.75);
+    border: 2px solid rgba(255, 255, 255, 0.6);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -222,8 +240,8 @@ body.cat-default {
 }
 
 .category-icon-img {
-    width: clamp(3.5rem, 8vw, 5.5rem);
-    height: clamp(3.5rem, 8vw, 5.5rem);
+    width: clamp(2.5rem, 6vw, 5rem);
+    height: clamp(2.5rem, 6vw, 5rem);
     object-fit: contain;
     display: inline-block;
     transition: all 0.3s ease;
@@ -246,6 +264,8 @@ body.cat-default {
     background: transparent;
     border: var(--chalk-border);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: clamp(0.5rem, 1.5vw, 1.5rem) !important;
+    min-height: 0;
 }
 
 .category-card:not(.selected):hover {
@@ -280,23 +300,33 @@ body.cat-default {
     50% { transform: translateY(-4px); }
 }
 
-/* Avoid clipping card border/shadow on first row */
+/* Scroll categorías - responsivo, min-height para flex */
 .category-scroll-container {
-    padding-top: 4px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    min-height: 0;
+    flex: 1 1 0;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain;
     scrollbar-width: thin;
+}
+
+@media (max-width: 640px) {
+    .category-scroll-container {
+        padding-left: 2px;
+        padding-right: 2px;
+    }
 }
 
 /* Option cards (playing screen): estilo chalk, sin fondo sólido */
 .option-card {
     background: transparent !important;
     border: var(--chalk-border) !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
 }
 
 .option-card .option-badge {
-    background: rgba(255, 255, 255, 0.15) !important;
+    background: transparent !important;
     border-right: var(--chalk-border-soft) !important;
     color: var(--chalk-white) !important;
 }
@@ -306,18 +336,23 @@ body.cat-default {
     padding-top: 4px;
 }
 .category-scroll-container::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
+}
+@media (max-width: 768px) {
+    .category-scroll-container::-webkit-scrollbar {
+        width: 4px;
+    }
 }
 .category-scroll-container::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.05);
+    background: rgba(0, 0, 0, 0.08);
     border-radius: 4px;
 }
 .category-scroll-container::-webkit-scrollbar-thumb {
-    background: rgba(5, 149, 174, 0.4);
+    background: rgba(5, 149, 174, 0.5);
     border-radius: 4px;
 }
 .category-scroll-container::-webkit-scrollbar-thumb:hover {
-    background: rgba(5, 149, 174, 0.6);
+    background: rgba(5, 149, 174, 0.7);
 }
 
 /* Glow effect */
@@ -546,36 +581,84 @@ body.cat-default {
     animation: shimmer 3s ease-in-out infinite;
 }
 
+/* Barra de carga - estilo chalk para pizarra */
+.chalk-loading-track {
+    position: relative;
+    background: rgba(0, 0, 0, 0.25) !important;
+    border: 3px solid #0a0a0a !important;
+    box-shadow: 
+        inset 0 2px 4px rgba(0, 0, 0, 0.2),
+        0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.chalk-loading-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.92) !important;
+    box-shadow: 
+        0 0 8px rgba(255, 255, 255, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    width: 38%;
+    min-width: 80px;
+    animation: chalkLoadMove 2.2s ease-in-out infinite;
+}
+
+.chalk-loading-fill::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.5) 50%,
+        transparent 100%
+    );
+    animation: chalkShimmer 1.5s ease-in-out infinite;
+    border-radius: inherit;
+    pointer-events: none;
+}
+
+.chalk-loading-fill::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: transparent;
+    box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.2);
+    animation: chalkPulse 2s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes chalkLoadMove {
+    0%, 100% { 
+        left: 0;
+    }
+    50% { 
+        left: 62%;
+    }
+}
+
+@keyframes chalkShimmer {
+    0% { opacity: 0; transform: translateX(-100%); }
+    50% { opacity: 1; }
+    100% { opacity: 0; transform: translateX(100%); }
+}
+
+@keyframes chalkPulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 0.9; }
+}
+
 @keyframes loadingPulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.6; }
 }
 
-@keyframes loadingShine {
-    0% { left: -100%; }
-    100% { left: 200%; }
-}
-
-@keyframes loadingGlow {
-    0%, 100% { box-shadow: 0 0 10px rgba(115, 160, 63, 0.5); }
-    50% { box-shadow: 0 0 20px rgba(115, 160, 63, 0.8), 0 0 30px rgba(115, 160, 63, 0.4); }
-}
-
 .loading-bar {
-    width: 100%;
     position: relative;
-    animation: loadingGlow 2s ease-in-out infinite;
-}
-
-.loading-bar::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 50%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
-    animation: loadingShine 1.5s infinite;
+    overflow: hidden;
 }
 
 .loading-text {
@@ -712,7 +795,7 @@ body.cat-default {
 .intro-edu-icon:nth-child(7) { animation-delay: 3s; }
 
 .intro-title {
-    font-family: 'Architects Daughter', 'Caveat', cursive, sans-serif;
+    font-family: 'Caveat Brush', cursive, sans-serif;
     font-weight: 700;
     letter-spacing: -0.01em;
 }
@@ -722,9 +805,15 @@ body.cat-default {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* Footer jugadores en playing - sin fondo blanco */
+.chalk-footer-card {
+    background: transparent !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
 /* Cajas genéricas estilo chalk */
 .chalk-box {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 /* Timer bar - estilo chalk sobre pizarra */

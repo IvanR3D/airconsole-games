@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>STEAM Trivia - Fundacion STEAM RD</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.airconsole.com/api/airconsole-1.8.0.js"></script>
@@ -32,11 +32,11 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Architects+Daughter&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Caveat+Brush&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="screen-styles.css">
 </head>
 <body class="cat-default text-steam-negro overflow-hidden chalk-font" style="background: url('../assets/images/Pizarra-optimized.webp') center center / 100% 100% no-repeat fixed !important;">
-    <div class="w-screen h-screen flex flex-col relative chalkboard-safe-area">
+    <div class="w-full h-full min-h-0 flex flex-col relative chalkboard-safe-area" style="height: 100vh; height: 100dvh;">
         <!-- INTRO SCREEN -->
         <div class="screen intro-screen active flex-col items-center justify-center p-4 sm:p-6 lg:p-10 min-h-screen relative overflow-hidden" id="introScreen">
             <!-- Center Content -->
@@ -53,8 +53,8 @@
                 <!-- Loading Bar Container -->
                 <div class="max-w-md mx-auto">
                     <p class="text-lg sm:text-xl font-bold mb-4 text-steam-verde loading-text">Esperando Jugadores...</p>
-                    <div class="w-full h-6 rounded-full overflow-hidden relative chalk-loading-track" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3);">
-                        <div class="h-full bg-gradient-to-r from-steam-verde via-green-400 to-steam-verde rounded-full loading-bar"></div>
+                    <div class="w-full h-6 rounded-full overflow-hidden relative chalk-loading-track">
+                        <div class="h-full rounded-full loading-bar chalk-loading-fill"></div>
                     </div>
                 </div>
             </div>
@@ -124,38 +124,38 @@
         </div>
 
         <!-- CATEGORY SCREEN -->
-        <div class="screen flex-col p-4 sm:p-6 lg:p-8 h-screen overflow-hidden relative" id="categoryScreen">
+        <div class="screen flex-col p-2 sm:p-4 lg:p-6 min-h-0 h-screen overflow-hidden relative" id="categoryScreen">
             <!-- Animated Background Particles (soft colored blobs) -->
             <div class="bg-particles" id="bgParticles"></div>
             
             <!-- Content Container -->
             <div class="relative z-10 flex flex-col h-full">
-                <!-- Header -->
-                <div class="text-center mb-4 sm:mb-6 power-up">
+                <!-- Header - compacto para mejor fit -->
+                <div class="text-center mb-2 sm:mb-4 power-up flex-shrink-0">
                     <!-- Level indicator dots above title -->
-                    <div class="flex justify-center gap-2 mb-3">
+                    <div class="flex justify-center gap-1.5 mb-2">
                         <div class="w-3 h-3 rounded-full animate-pulse bg-steam-naranja"></div>
                         <div class="w-3 h-3 rounded-full animate-pulse bg-steam-verde" style="animation-delay: 0.2s;"></div>
                         <div class="w-3 h-3 rounded-full animate-pulse bg-steam-morado" style="animation-delay: 0.4s;"></div>
                     </div>
                     
                     <!-- Title with crown -->
-                    <div class="inline-flex items-center gap-3 rounded-full py-3 px-6 chalk-box" style="background: transparent; border: 2px solid rgba(255,255,255,0.9);">
-                        <iconify-icon icon="mdi:crown" style="font-size: clamp(1.5rem, 4vw, 2rem); color: #EB8225;"></iconify-icon>
-                        <span class="font-black text-base sm:text-lg text-steam-turquesa">JUGADOR 1: ELIGE TU DESAFÍO</span>
-                        <iconify-icon icon="mdi:gamepad-variant" style="font-size: clamp(1.5rem, 4vw, 2rem); color: #AB3D8B;"></iconify-icon>
+                    <div class="inline-flex items-center gap-2 rounded-full py-2 px-4 sm:py-3 sm:px-5 chalk-box flex-wrap justify-center" style="background: transparent; border: 2px solid rgba(255,255,255,0.9);">
+                        <iconify-icon icon="mdi:crown" style="font-size: clamp(1.2rem, 3.5vw, 1.75rem); color: #EB8225;"></iconify-icon>
+                        <span class="font-black text-xs sm:text-base lg:text-lg text-steam-turquesa text-center">JUGADOR 1: ELIGE TU DESAFÍO</span>
+                        <iconify-icon icon="mdi:gamepad-variant" style="font-size: clamp(1.2rem, 3.5vw, 1.75rem); color: #AB3D8B;"></iconify-icon>
                     </div>
                 </div>
                 
-                <!-- Categories Grid with Game Cards - scrollable (touch + mouse) -->
-                <div class="flex-1 min-h-0 flex flex-col px-2 overflow-hidden">
-                    <div class="category-scroll-container flex-1 overflow-y-auto overflow-x-hidden flex items-start justify-center" id="categoryScrollContainer">
-                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6 max-w-6xl w-full pt-4 pb-4" id="categoryGrid"></div>
+                <!-- Categories Grid - scrollable, responsivo -->
+                <div class="flex-1 min-h-0 flex flex-col overflow-hidden">
+                    <div class="category-scroll-container overflow-y-auto overflow-x-hidden" id="categoryScrollContainer">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4 max-w-6xl w-full mx-auto pt-2 pb-2" id="categoryGrid"></div>
                     </div>
                 </div>
                 
                 <!-- Footer Message -->
-                <div class="text-center mt-4 sm:mt-6 power-up" style="animation-delay: 0.3s;">
+                <div class="text-center mt-2 sm:mt-4 power-up flex-shrink-0" style="animation-delay: 0.3s;">
                     <div class="inline-flex items-center gap-3 py-2 px-4">
                         <iconify-icon icon="mdi:clock-outline" style="font-size: 1.5rem; color: #EB8225;"></iconify-icon>
                         <p class="font-bold text-sm sm:text-base text-steam-naranja">
@@ -169,8 +169,8 @@
 
         <!-- PLAYING SCREEN -->
         <div class="screen flex-col h-full" id="playingScreen">
-            <!-- Timer Bar Header -->
-            <div class="relative p-4 sm:p-6 chalk-header" style="background: transparent; border-bottom: 2px solid rgba(255,255,255,0.25);">
+            <!-- Timer Bar Header - integrado con pizarra -->
+            <div class="relative p-4 sm:p-6 chalk-header" style="background: transparent !important; border-bottom: 2px solid rgba(255,255,255,0.3);">
                 <div class="flex items-center justify-center gap-6">
                     <!-- Barra de tiempo -->
                     <div class="timer-bar-container" style="width: 60%;">
@@ -193,8 +193,8 @@
                 </div>
             </div>
             
-            <!-- Footer with Players -->
-            <div class="p-3 sm:p-4 lg:p-6 relative z-10 chalk-header" style="background: transparent; border-top: 2px solid rgba(255,255,255,0.25);">
+            <!-- Footer with Players - integrado con pizarra -->
+            <div class="p-3 sm:p-4 lg:p-6 relative z-10 chalk-header" style="background: transparent !important; border-top: 2px solid rgba(255,255,255,0.3);">
                 <div class="flex gap-3 sm:gap-4 justify-center flex-wrap" id="playersFooter">
                     <!-- Players will be added here dynamically -->
                 </div>

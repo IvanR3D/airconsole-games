@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>STEAM Trivia - Control</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.airconsole.com/api/airconsole-1.8.0.js"></script>
@@ -31,11 +31,11 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Architects+Daughter&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Architects+Daughter&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="controller-styles.css">
 </head>
 <body class="text-steam-negro chalk-font" style="background: url('../assets/images/Pizarra-optimized.webp') center center / 100% 100% no-repeat fixed !important;">
-    <div class="w-full h-full flex flex-col chalkboard-safe-area">
+    <div class="w-full h-full min-h-0 flex flex-col chalkboard-safe-area" style="height: 100vh; height: 100dvh;">
         
         <!-- JOIN SCREEN -->
         <div class="screen active flex-col items-center justify-center text-center gap-4" id="joinScreen">
@@ -129,8 +129,8 @@
             <div class="bg-particles" id="controllerBgParticles"></div>
             
             <div class="relative z-10 flex flex-col flex-1 min-h-0 w-full max-w-md mx-auto h-full">
-                <!-- Admin Badge - izquierda -->
-                <div class="flex justify-start mb-3 flex-shrink-0">
+                <!-- Admin Badge - compacto -->
+                <div class="flex justify-start mb-2 flex-shrink-0">
                     <div class="inline-flex items-center gap-1 rounded-full py-1 px-2 shadow-md chalk-box" style="background: transparent; border: 2px solid #EB8225;">
                         <iconify-icon icon="mdi:crown" class="text-steam-naranja"></iconify-icon>
                         <div class="w-6 h-6 rounded-full flex items-center justify-center border-2 border-white shadow-sm" id="adminAvatar">
@@ -140,12 +140,12 @@
                 </div>
 
                 <!-- Progress Bar -->
-                <div class="w-full h-2 rounded-full mb-3 overflow-hidden flex-shrink-0 chalk-progress" style="background: rgba(255,255,255,0.2);">
+                <div class="w-full h-1.5 rounded-full mb-2 overflow-hidden flex-shrink-0 chalk-progress" style="background: rgba(255,255,255,0.2);">
                     <div id="wizardProgress" class="h-full bg-steam-turquesa transition-all duration-300" style="width: 33.33%"></div>
                 </div>
 
                 <!-- Step Labels -->
-                <div class="flex items-center justify-between mb-3 flex-shrink-0">
+                <div class="flex items-center justify-between mb-2 flex-shrink-0">
                     <div class="step-label-item active" data-step="1">
                         <span class="step-dot"></span>
                         <span class="step-text chalk-step-text">Categoría</span>
@@ -162,11 +162,11 @@
 
                 <!-- STEP 1: Category Selection -->
                 <div class="step-content active" id="step1">
-                    <h2 class="text-sm font-black text-center mb-2 text-steam-turquesa flex-shrink-0">Elige una Categoría</h2>
-                    <div id="categoryScrollContainer">
+                    <h2 class="text-xs sm:text-sm font-black text-center mb-1.5 flex-shrink-0 text-steam-turquesa">Elige una Categoría</h2>
+                    <div id="categoryScrollContainer" class="min-h-0">
                         <div id="categoryGrid"></div>
                     </div>
-                    <div class="pt-3 flex-shrink-0">
+                    <div class="pt-2 flex-shrink-0">
                         <button class="text-white py-3 px-4 text-sm font-black rounded-full w-full shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2 chalk-btn" style="background: rgba(5,149,174,0.85); border: 2px solid #0595AE;" id="nextStep1Btn">
                             Siguiente
                             <iconify-icon icon="mdi:arrow-right"></iconify-icon>
@@ -254,8 +254,8 @@
             </div>
             
             <div class="text-center mb-3">
-                <div class="text-sm text-steam-turquesa font-bold mb-1" id="questionIndicator">Pregunta 1 de 5</div>
-                <p class="text-base text-white/90">Selecciona tu respuesta:</p>
+                <div class="font-bold mb-1 chalk-readable" id="questionIndicator">Pregunta 1 de 5</div>
+                <p class="chalk-readable chalk-subtitle">Selecciona tu respuesta:</p>
             </div>
 
             <div class="answer-grid" id="answerGrid">
@@ -265,13 +265,13 @@
                 <button class="answer-btn rounded-xl font-bold text-white relative btn-3d btn-naranja chalk-answer-btn" style="background: rgba(235,130,37,0.75); border: 2px solid #EB8225;" data-option="3">D</button>
             </div>
 
-            <div class="flex items-center gap-3 p-3 rounded-lg mt-3 flex-shrink-0 chalk-box" style="background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.4);">
+            <div class="flex items-center gap-3 p-3 rounded-lg mt-3 flex-shrink-0 chalk-player-card-mini">
                 <div class="player-avatar-visual-small" id="miniAvatar"></div>
                 <div class="flex-1 min-w-0">
-                    <div class="font-bold text-sm truncate" id="miniName"></div>
-                    <div class="text-xs text-white/70" id="miniRank">Rank 1</div>
+                    <div class="font-bold text-sm truncate text-white" id="miniName"></div>
+                    <div class="text-xs text-white/80" id="miniRank">Rank 1</div>
                 </div>
-                <div class="text-white py-1 px-3 rounded-lg font-bold text-sm chalk-box" style="background: rgba(235,130,37,0.8); border: 1px solid #EB8225;" id="miniScore">0</div>
+                <div class="text-white py-1 px-3 rounded-lg font-bold text-sm chalk-score-badge" id="miniScore">0</div>
             </div>
         </div>
 
