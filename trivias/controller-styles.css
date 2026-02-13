@@ -360,11 +360,11 @@ body {
 #adminExitContainer {
     flex-direction: row;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     gap: clamp(0.75rem, 3vw, 1.25rem);
     width: 100%;
-    max-width: 620px;
-    padding: 0 clamp(14px, 5vw, 22px);
+    max-width: 700px;
+    padding: 0 clamp(16px, 5vw, 26px);
     margin: clamp(0.8rem, 3vh, 1.6rem) auto 0 auto; /* separa del borde superior y centra */
 }
 
@@ -372,6 +372,7 @@ body {
     #adminExitContainer {
         gap: 0.5rem;
         padding: 0 clamp(8px, 3vw, 14px);
+        justify-content: space-between;
     }
     #exitGameBtn {
         padding-inline: 10px;
@@ -656,7 +657,7 @@ body {
 
 .final-summary {
     display: grid;
-    grid-template-columns: minmax(140px, 1fr) minmax(180px, 1.2fr);
+    grid-template-columns: minmax(120px, 0.9fr) minmax(200px, 1.2fr);
     align-items: center;
     gap: clamp(0.75rem, 2vw, 1.25rem);
 }
@@ -665,8 +666,10 @@ body {
     min-height: 100%;
 }
 
-.summary-details .chalk-box {
-    width: 100%;
+.summary-details {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(0.5rem, 1.5vw, 0.75rem);
 }
 
 @media (max-width: 520px) {
@@ -675,6 +678,21 @@ body {
     }
     .summary-icon {
         order: -1;
+    }
+    .summary-details {
+        grid-template-columns: 1fr;
+    }
+}
+
+.final-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(0.6rem, 2vw, 1rem);
+}
+
+@media (max-width: 420px) {
+    .final-actions {
+        grid-template-columns: 1fr;
     }
 }
 

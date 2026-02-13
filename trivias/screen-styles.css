@@ -410,6 +410,9 @@ body.cat-default {
     padding: clamp(12px, 2vw, 22px) clamp(12px, 3vw, 26px);
     min-height: clamp(68px, 9vw, 110px);
 }
+.option-card .chalk-body {
+    font-size: clamp(1.05rem, 2.8vw, 1.4rem);
+}
 
 .option-card .option-badge {
     background: transparent !important;
@@ -418,7 +421,7 @@ body.cat-default {
     transition: background 0.3s ease, border-color 0.3s ease !important;
     min-width: clamp(48px, 8vw, 70px);
     justify-content: center;
-    font-size: clamp(1.1rem, 3.5vw, 1.5rem);
+    font-size: clamp(1.3rem, 4vw, 1.7rem);
 }
 
 /* Option cards (playing screen): prevent top edge clipping */

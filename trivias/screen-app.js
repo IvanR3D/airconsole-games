@@ -758,7 +758,7 @@ function displayOptions(question) {
         
         // Option text - Caveat Brush para respuestas
         const text = document.createElement('div');
-        text.className = 'chalk-body flex-1 p-3 sm:p-4 lg:p-5 text-sm sm:text-base lg:text-lg font-bold relative z-10';
+        text.className = 'chalk-body flex-1 p-3 sm:p-4 lg:p-5 text-base sm:text-lg lg:text-xl font-bold relative z-10';
         text.style.color = 'rgba(255,255,255,0.95)';
         text.style.textShadow = '0 1px 2px rgba(0,0,0,0.2)';
         text.textContent = option;
