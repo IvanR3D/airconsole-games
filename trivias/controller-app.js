@@ -653,16 +653,12 @@ function showEndScreen(winner, players) {
     const prizeContainer = document.getElementById('resultPrize');
     if (prizeContainer) {
         const prizes = [
-            { icon: 'mdi:trophy', color: '#FFD700' },
-            { icon: 'mdi:medal', color: '#C0C0C0' },
-            { icon: 'mdi:medal', color: '#CD7F32' }
+            { html: '<iconify-icon icon="mdi:trophy" style="font-size: 2.6rem; color: #FFD700;"></iconify-icon>' },
+            { html: '<iconify-icon icon="mdi:medal" style="font-size: 2.6rem; color: #C0C0C0;"></iconify-icon>' },
+            { html: '<iconify-icon icon="mdi:medal" style="font-size: 2.6rem; color: #CD7F32;"></iconify-icon>' }
         ];
         const prize = prizes[rank - 1] || prizes[2];
-        const iconEl = prizeContainer.querySelector('iconify-icon');
-        if (iconEl) {
-            iconEl.setAttribute('icon', prize.icon);
-            iconEl.style.color = prize.color;
-        }
+        prizeContainer.innerHTML = prize.html;
     }
     
     if (winner && winner.name === playerName) {

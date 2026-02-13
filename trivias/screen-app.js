@@ -506,7 +506,11 @@ function updatePlayersDisplay() {
     const grid = domCache.playersGrid || document.getElementById('playersGrid');
     const fragment = document.createDocumentFragment();
 
-    Object.values(players).forEach((player, index) => {
+    const activePlayers = Object.values(players);
+    const visible = activePlayers.slice(0, 3);
+    const overflow = Math.max(0, activePlayers.length - visible.length);
+
+    visible.forEach((player, index) => {
         const card = document.createElement('div');
         const cardColor = screenPlayerColors[index % screenPlayerColors.length];
         
@@ -543,6 +547,30 @@ function updatePlayersDisplay() {
         
         fragment.appendChild(card);
     });
+
+    if (overflow > 0) {
+        const card = document.createElement('div');
+        card.className = 'chalk-player-card rounded-2xl py-4 px-5 flex items-center gap-3 transition-all relative overflow-hidden';
+        card.style.background = 'transparent';
+        card.style.border = '2px dashed rgba(255,255,255,0.6)';
+        const avatar = document.createElement('div');
+        avatar.className = 'w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center relative flex-shrink-0 shadow-md';
+        avatar.style.background = 'rgba(255,255,255,0.1)';
+        avatar.style.border = '3px solid rgba(255,255,255,0.7)';
+        avatar.innerHTML = `<span class="chalk-body text-lg font-black" style="color: rgba(255,255,255,0.9);">+${overflow}</span>`;
+        card.appendChild(avatar);
+
+        const info = document.createElement('div');
+        info.className = 'flex-1 min-w-0';
+        info.innerHTML = `
+            <div class="chalk-body text-base sm:text-lg font-black truncate" style="color: rgba(255,255,255,0.95);">Jugadores extra</div>
+            <div class="chalk-body text-xs sm:text-sm font-bold" style="color: rgba(255,255,255,0.7);">
+                Total: ${activePlayers.length}
+            </div>
+        `;
+        card.appendChild(info);
+        fragment.appendChild(card);
+    }
     
     grid.innerHTML = '';
     grid.appendChild(fragment);
@@ -983,19 +1011,11 @@ function endGame() {
         .filter(p => !p.disconnected)
         .sort((a, b) => b.score - a.score);
     
-    const trophySvg = (color, accent = '#fff') => `
-        <svg class="medal-icon" viewBox="0 0 64 80" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20 12 h24 v6 a10 10 0 0 1 -10 10 h-4 a10 10 0 0 1 -10 -10z" fill="${color}" stroke="${color}" stroke-width="2"/>
-            <path d="M42 12 h8 a8 8 0 0 1 -8 8" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
-            <path d="M22 12 h-8 a8 8 0 0 0 8 8" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
-            <rect x="26" y="28" width="12" height="16" rx="3" fill="${color}" stroke="${color}" stroke-width="2"/>
-            <rect x="24" y="44" width="16" height="6" rx="2" fill="${color}" stroke="${color}" stroke-width="2"/>
-            <rect x="22" y="50" width="20" height="6" rx="2" fill="${color}" stroke="${color}" stroke-width="2"/>
-            <circle cx="32" cy="22" r="5" fill="none" stroke="${accent}" stroke-width="2"/>
-        </svg>`;
-    const goldMedal = trophySvg('#FFD700');
-    const silverMedal = trophySvg('#C0C0C0');
-    const bronzeMedal = trophySvg('#CD7F32');
+    const trophyIcon = (color) => `<iconify-icon icon="mdi:trophy" class="medal-icon" style="font-size: 2.8rem; color: ${color};"></iconify-icon>`;
+    const medalIcon = (color) => `<iconify-icon icon="mdi:medal" class="medal-icon" style="font-size: 2.8rem; color: ${color};"></iconify-icon>`;
+    const goldMedal = trophyIcon('#FFD700');
+    const silverMedal = medalIcon('#C0C0C0');
+    const bronzeMedal = medalIcon('#CD7F32');
 
     const winnerSection = document.getElementById('winnerSection');
     if (sortedPlayers.length > 0) {

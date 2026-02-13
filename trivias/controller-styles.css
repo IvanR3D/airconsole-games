@@ -360,12 +360,12 @@ body {
 #adminExitContainer {
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     gap: clamp(0.75rem, 3vw, 1.25rem);
     width: 100%;
-    max-width: 600px;
-    padding: 0 clamp(12px, 4vw, 18px);
-    margin: clamp(0.6rem, 2vh, 1.2rem) auto 0 auto; /* separa del borde superior y centra */
+    max-width: 620px;
+    padding: 0 clamp(14px, 5vw, 22px);
+    margin: clamp(0.8rem, 3vh, 1.6rem) auto 0 auto; /* separa del borde superior y centra */
 }
 
 @media (max-width: 360px) {
@@ -375,6 +375,18 @@ body {
     }
     #exitGameBtn {
         padding-inline: 10px;
+    }
+}
+
+@media (max-width: 450px) {
+    #adminExitContainer {
+        justify-content: space-around;
+    }
+    #exitGameBtn {
+        flex: 1;
+    }
+    #soundToggleBtnPlaying {
+        margin-left: auto;
     }
 }
 
@@ -640,6 +652,30 @@ body {
 /* Paso 3: espacio extra para que el botón no se corte en la parte inferior */
 #step3 {
     padding-bottom: clamp(1.5rem, 7vh, 3.5rem);
+}
+
+.final-summary {
+    display: grid;
+    grid-template-columns: minmax(140px, 1fr) minmax(180px, 1.2fr);
+    align-items: center;
+    gap: clamp(0.75rem, 2vw, 1.25rem);
+}
+
+.summary-icon {
+    min-height: 100%;
+}
+
+.summary-details .chalk-box {
+    width: 100%;
+}
+
+@media (max-width: 520px) {
+    .final-summary {
+        grid-template-columns: 1fr;
+    }
+    .summary-icon {
+        order: -1;
+    }
 }
 
 /* ========================================
@@ -1003,6 +1039,9 @@ body {
 #endScreen .result-prize {
     background: transparent;
     border: 2px solid rgba(255,255,255,0.35);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 @media (max-height: 500px) {
