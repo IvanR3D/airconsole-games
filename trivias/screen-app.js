@@ -595,8 +595,12 @@ function updatePlayersStatus() {
     if (!footerContainer) return;
     
     const footerFragment = document.createDocumentFragment();
+    const activePlayers = Object.values(players);
+    const visible = activePlayers.slice(0, 3);
+    const overflow = Math.max(0, activePlayers.length - 3);
     
-    Object.values(players).forEach((player, index) => {
+    // Mostrar máximo 3 jugadores individuales
+    visible.forEach((player, index) => {
         const hasAnswered = answers[player.id] !== undefined;
         
         // Player colors for the card
@@ -646,6 +650,38 @@ function updatePlayersStatus() {
         
         footerFragment.appendChild(footerCard);
     });
+    
+    // 4ª tarjeta: cantidad de jugadores extra cuando hay más de 3
+    if (overflow > 0) {
+        const overflowCard = document.createElement('div');
+        overflowCard.className = 'flex flex-row items-center gap-3 rounded-xl py-2 px-4 transition-all chalk-footer-card';
+        overflowCard.style.background = 'transparent';
+        overflowCard.style.border = '2px dashed rgba(255,255,255,0.6)';
+        overflowCard.style.minWidth = 'clamp(140px, 22vw, 200px)';
+        
+        const overflowAvatar = document.createElement('div');
+        overflowAvatar.className = 'w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center relative flex-shrink-0';
+        overflowAvatar.style.background = 'rgba(255,255,255,0.1)';
+        overflowAvatar.style.border = '3px solid rgba(255,255,255,0.7)';
+        overflowAvatar.innerHTML = `<span class="chalk-body text-sm sm:text-base font-black" style="color: rgba(255,255,255,0.95);">+${overflow}</span>`;
+        overflowCard.appendChild(overflowAvatar);
+        
+        const overflowInfo = document.createElement('div');
+        overflowInfo.className = 'chalk-body font-bold text-xs sm:text-sm flex-1 min-w-0';
+        overflowInfo.style.color = 'rgba(255,255,255,0.9)';
+        overflowInfo.textContent = `Jugadores extra`;
+        overflowCard.appendChild(overflowInfo);
+        
+        const overflowBadge = document.createElement('div');
+        overflowBadge.className = 'chalk-body text-sm sm:text-base font-bold px-2 py-1 rounded-lg flex-shrink-0';
+        overflowBadge.style.background = 'rgba(255,255,255,0.2)';
+        overflowBadge.style.border = '1px solid rgba(255,255,255,0.5)';
+        overflowBadge.style.color = '#fff';
+        overflowBadge.textContent = `${activePlayers.length} total`;
+        overflowCard.appendChild(overflowBadge);
+        
+        footerFragment.appendChild(overflowCard);
+    }
     
     footerContainer.innerHTML = '';
     footerContainer.appendChild(footerFragment);
