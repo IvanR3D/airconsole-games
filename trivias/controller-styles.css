@@ -664,25 +664,47 @@ body {
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-    gap: clamp(0.75rem, 2vw, 1.25rem);
+    gap: clamp(0.5rem, 2vw, 1.25rem);
+    width: 100%;
+    min-width: 0;
 }
 
 .summary-icon {
     flex-shrink: 0;
 }
 
+.summary-icon img {
+    width: clamp(3rem, 12vw, 4rem);
+    height: clamp(3rem, 12vw, 4rem);
+}
+
 .summary-details {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: clamp(0.5rem, 1.5vw, 0.75rem);
+    gap: clamp(0.35rem, 1.5vw, 0.75rem);
 }
 
 /* Siempre horizontal: Categoría y Preguntas en una fila */
 .summary-details-horizontal {
     flex: 1;
     min-width: 0;
+    width: 100%;
 }
 
+.final-summary .summary-details > div {
+    min-width: 0;
+    padding: clamp(0.5rem, 2vw, 0.75rem) clamp(0.5rem, 2vw, 0.75rem);
+}
+
+.final-summary .summary-details span {
+    font-size: clamp(0.7rem, 2.5vw, 0.875rem);
+}
+
+.final-summary .summary-details .font-bold {
+    font-size: clamp(0.8rem, 3vw, 1rem);
+}
+
+/* Pantallas muy estrechas: icono arriba, cards abajo en una fila */
 @media (max-width: 520px) {
     .final-summary {
         flex-direction: column;
@@ -692,7 +714,14 @@ body {
     }
     .summary-details-horizontal {
         width: 100%;
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* Móviles muy estrechos (< 360px): Categoría y Preguntas se apilan */
+@media (max-width: 360px) {
+    .summary-details-horizontal {
+        grid-template-columns: 1fr;
     }
 }
 
