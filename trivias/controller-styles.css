@@ -365,7 +365,7 @@ body {
     width: 100%;
     max-width: 700px;
     padding: 0 clamp(16px, 5vw, 26px);
-    margin: clamp(0.8rem, 3vh, 1.6rem) auto 0 auto; /* separa del borde superior y centra */
+    margin: 0 auto; /* antes separaba hacia abajo; ahora alineado como no-admin */
 }
 
 @media (max-width: 360px) {
@@ -537,7 +537,7 @@ body {
 /* Texto legible - Pregunta X de Y, Selecciona tu respuesta (font más legible para UI) */
 .chalk-readable {
     font-family: 'Caveat Brush', cursive, sans-serif !important;
-    font-size: clamp(1.15rem, min(4.5vw, 4vh), 1.65rem);
+    font-size: clamp(1.45rem, min(5.6vw, 5vh), 2.05rem); /* +25% legibilidad */
     color: rgba(255, 255, 255, 0.98);
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     letter-spacing: 0.02em;
@@ -545,7 +545,7 @@ body {
 
 .chalk-subtitle {
     font-family: 'Caveat Brush', cursive, sans-serif !important;
-    font-size: clamp(0.95rem, min(3.8vw, 3.5vh), 1.3rem);
+    font-size: clamp(1.2rem, min(4.8vw, 4.4vh), 1.65rem); /* +25% */
     color: rgba(255, 255, 255, 0.95);
 }
 
@@ -555,6 +555,21 @@ body {
     border: 2px solid rgba(255, 255, 255, 0.75);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     margin-bottom: env(safe-area-inset-bottom, 0px);
+    flex-wrap: nowrap;
+    gap: 0.6rem;
+}
+
+.chalk-player-card-mini .flex-1 {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    white-space: nowrap;
+}
+
+.chalk-player-card-mini #miniName,
+.chalk-player-card-mini #miniRank,
+.chalk-player-card-mini #miniScore {
+    white-space: nowrap;
 }
 
 /* Playing screen: responsivo, botones 44px mínimo (AirConsole accesibilidad) */
@@ -569,14 +584,14 @@ body {
     }
     #playingScreen .answer-btn {
         min-height: 44px;
-        font-size: clamp(1.25rem, 5vw, 2rem);
+        font-size: clamp(1.55rem, 6vw, 2.5rem); /* +24% */
     }
     #playingScreen .text-center.mb-3 {
         margin-bottom: 0.35rem;
         padding-top: 0.15rem;
     }
     #playingScreen .chalk-readable, #playingScreen .chalk-subtitle {
-        font-size: clamp(1rem, 3.5vw, 1.35rem);
+        font-size: clamp(1.25rem, 4.4vw, 1.7rem); /* +25% */
     }
 }
 @media (max-height: 500px) {
@@ -591,6 +606,7 @@ body {
 .chalk-score-badge {
     background: rgba(235, 130, 37, 0.85) !important;
     border: 1px solid #EB8225;
+    font-size: clamp(1rem, 3.5vw, 1.3rem); /* +25% */
 }
 
 /* ========================================
@@ -852,7 +868,7 @@ body {
 
 .answer-btn {
     font-family: 'Caveat Brush', cursive, sans-serif !important;
-    font-size: clamp(1.35rem, min(5vw, 6vh), 2.5rem);
+    font-size: clamp(1.7rem, min(6vw, 7.5vh), 3.1rem); /* +25% aprox */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1043,15 +1059,15 @@ body {
 
 /* End screen - responsive para todos los dispositivos */
 #endScreen #finalRank {
-    font-size: clamp(2.5rem, min(12vw, 10vh), 4.5rem);
+    font-size: clamp(3.25rem, min(15.5vw, 13vh), 5.85rem); /* +30% */
 }
 
 #endScreen #finalMessage {
-    font-size: clamp(1rem, min(4vw, 3.5vh), 1.35rem);
+    font-size: clamp(1.3rem, min(5.2vw, 4.6vh), 1.75rem); /* +30% */
 }
 
 #endScreen #finalScore {
-    font-size: clamp(1.1rem, min(4.5vw, 4vh), 1.5rem);
+    font-size: clamp(1.4rem, min(5.8vw, 5vh), 1.95rem); /* +30% */
 }
 
 #endScreen .result-prize {
@@ -1060,18 +1076,24 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    width: clamp(4.6rem, 15vw, 7rem);
+    height: clamp(4.6rem, 15vw, 7rem);
+}
+
+#endScreen .result-prize iconify-icon {
+    font-size: 3.4rem !important; /* +30% sobre 2.6rem */
 }
 
 @media (max-height: 500px) {
     #endScreen { gap: clamp(0.5rem, 2vh, 1rem) !important; }
-    #endScreen .result-prize { width: clamp(3.5rem, 14vw, 5rem); height: clamp(3.5rem, 14vw, 5rem); }
+    #endScreen .result-prize { width: clamp(4.2rem, 16vw, 6.5rem); height: clamp(4.2rem, 16vw, 6.5rem); }
 }
 
 @media (min-width: 1024px) {
-    #endScreen #finalRank { font-size: clamp(3rem, 4vw, 4.5rem); }
-    #endScreen #finalMessage { font-size: clamp(1.15rem, 1.5vw, 1.35rem); }
-    #endScreen #finalScore { font-size: clamp(1.25rem, 1.6vw, 1.5rem); }
-    #endScreen .result-prize { width: clamp(5rem, 8vw, 6rem); height: clamp(5rem, 8vw, 6rem); }
+    #endScreen #finalRank { font-size: clamp(3.9rem, 5.2vw, 5.8rem); }
+    #endScreen #finalMessage { font-size: clamp(1.5rem, 2vw, 1.9rem); }
+    #endScreen #finalScore { font-size: clamp(1.55rem, 2.2vw, 2rem); }
+    #endScreen .result-prize { width: clamp(6.5rem, 10vw, 8rem); height: clamp(6.5rem, 10vw, 8rem); }
 }
 
 /* Desktop: cursor pointer y hover para ratón */
