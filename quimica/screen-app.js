@@ -18,7 +18,7 @@ const GAME_MODES = {
         id: 'teams',
         name: 'Equipos',
         icon: 'mdi:account-group',
-        color: '#3b82f6',
+        color: '#14b8a6',
         description: '2 equipos compiten entre sí',
         minPlayers: 2,
         maxPlayers: 40
@@ -43,15 +43,15 @@ let currentGameMode = 'teams'; // 'teams' o 'individual'
 const TEAM_CONFIG = {
     team1: {
         name: 'Equipo Azul',
-        color: '#3b82f6',
+        color: '#14b8a6',
         icon: 'mdi:flask',
-        bgColor: 'rgba(59, 130, 246, 0.15)'
+        bgColor: 'rgba(20, 184, 166, 0.2)'
     },
     team2: {
         name: 'Equipo Naranja', 
         color: '#f59e0b',
         icon: 'mdi:atom',
-        bgColor: 'rgba(245, 158, 11, 0.15)'
+        bgColor: 'rgba(245, 158, 11, 0.2)'
     }
 };
 
@@ -505,9 +505,6 @@ function renderIntroScreen() {
     const app = document.getElementById('app');
     app.innerHTML = `
         <div class="screen active intro-screen relative" id="introScreen">
-            <div class="lab-bg">
-                <div class="blob-green"></div>
-            </div>
             <div id="floatingMolecules" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
             
             <div class="relative z-10 text-center w-full intro-content">
@@ -648,10 +645,7 @@ function renderPlayingScreen() {
     
     app.innerHTML = `
         <div class="screen active playing-screen relative" id="playingScreen">
-            <div class="lab-bg">
-                <div class="blob-green"></div>
-            </div>
-            
+
             <!-- Header -->
             <div class="relative z-10 header-row">
                 <div class="flex items-center gap-2 sm:gap-3">

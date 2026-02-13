@@ -1,6 +1,9 @@
 /* ============================================
    LABORATORIO QUÍMICO - SCREEN STYLES
-   Tema claro con manchas de colores
+   Estilo acorde al fondo de laboratorio:
+   - Paleta teal/acuamarina, gris oscuro, morado-gris
+   - Contornos negros definidos (estilo cartoon)
+   - Fondos semi-transparentes que integran con el lab
    ============================================ */
 
 /* ============================================
@@ -36,8 +39,8 @@ body.screen-shell {
 }
 
 body {
-    background: #ffffff;
-    color: #1a1a2e;
+    background: transparent;
+    color: var(--color-text);
     font-family: var(--font-family);
     /* AirConsole: Font-size base escalable para TV */
     font-size: clamp(12px, 1.5vw, 18px);
@@ -66,6 +69,7 @@ body {
    FONDO GLOBAL (en el body)
    ============================================ */
 
+/* Solo imagen del laboratorio - sin overlays que compitan */
 .global-bg {
     position: fixed;
     top: 0;
@@ -75,90 +79,7 @@ body {
     overflow: hidden;
     z-index: 0;
     pointer-events: none;
-}
-
-.global-blob-1 {
-    position: absolute;
-    top: -20%;
-    right: -10%;
-    width: 60%;
-    height: 60%;
-    background: radial-gradient(circle, rgba(5, 149, 174, 0.12) 0%, transparent 70%);
-    border-radius: 50%;
-    animation: floatBlob1 20s ease-in-out infinite;
-}
-
-.global-blob-2 {
-    position: absolute;
-    bottom: 20%;
-    left: -10%;
-    width: 50%;
-    height: 50%;
-    background: radial-gradient(circle, rgba(171, 61, 139, 0.08) 0%, transparent 70%);
-    border-radius: 50%;
-    animation: floatBlob2 25s ease-in-out infinite;
-}
-
-.global-blob-3 {
-    position: absolute;
-    top: 50%;
-    left: 30%;
-    width: 35%;
-    height: 35%;
-    background: radial-gradient(circle, rgba(115, 160, 63, 0.06) 0%, transparent 70%);
-    border-radius: 50%;
-    animation: floatBlob1 22s ease-in-out infinite reverse;
-}
-
-.global-waves {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    min-width: 100vw;
-    height: clamp(120px, 20vh, 180px);
-    max-height: 25vh;
-    overflow: hidden;
-    z-index: 0;
-}
-
-/* Olas más anchas y desplazadas para evitar recorte - mejoradas */
-.global-waves .wave {
-    position: absolute;
-    bottom: 0;
-    left: -5vw;
-    width: 110vw;
-    height: 100%;
-    background-size: 100vw 100%;
-    background-repeat: repeat-x;
-    background-position: bottom center;
-    animation: waveShift 15s ease-in-out infinite;
-    opacity: 0.9;
-}
-
-.global-waves .wave-1 { animation-delay: 0s; }
-.global-waves .wave-2 { animation-delay: -4s; }
-.global-waves .wave-3 { animation-delay: -8s; }
-
-@keyframes waveShift {
-    0%, 100% { transform: translateX(0); }
-    50% { transform: translateX(2vw); }
-}
-
-.global-waves .wave:nth-child(1) {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath fill='%230595AE' fill-opacity='0.12' d='M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,138.7C672,128,768,160,864,181.3C960,203,1056,213,1152,197.3C1248,181,1344,139,1392,117.3L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
-    z-index: 3;
-}
-
-.global-waves .wave:nth-child(2) {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath fill='%23AB3D8B' fill-opacity='0.08' d='M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,218.7C672,235,768,245,864,234.7C960,224,1056,192,1152,181.3C1248,171,1344,181,1392,186.7L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
-    z-index: 2;
-}
-
-.global-waves .wave:nth-child(3) {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath fill='%2373A03F' fill-opacity='0.06' d='M0,96L48,112C96,128,192,160,288,165.3C384,171,480,149,576,149.3C672,149,768,171,864,165.3C960,160,1056,128,1152,122.7C1248,117,1344,139,1392,149.3L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
-    z-index: 1;
+    background: url('../assets/images/Laboratorio .webp') center center / cover no-repeat;
 }
 
 /* ============================================
@@ -190,17 +111,26 @@ body {
     --avatar-size: clamp(40px, 6vw, 70px);
     --timer-size: clamp(60px, 10vw, 120px);
     
-    /* Colores del tema */
-    --color-primary: #0595AE;
-    --color-secondary: #AB3D8B;
-    --color-accent: #73A03F;
-    --color-warning: #EB8225;
-    --color-success: #10b981;
-    --color-danger: #ef4444;
+    /* Paleta extraída de la imagen del laboratorio - integra con el fondo */
+    --lab-wall: #a8e6cf;
+    --lab-counter: #5a6578;
+    --lab-cabinet: #b8b4c8;
+    --lab-outline: #2d2d2d;
+    --color-primary: #0d9488;
+    --color-secondary: #6b5b95;
+    --color-accent: #4a9c5d;
+    --color-warning: #d97706;
+    --color-success: #059669;
+    --color-danger: #dc2626;
     --color-text: #1a1a2e;
-    --color-text-light: #64748b;
-    --color-bg: #ffffff;
-    --color-bg-soft: #f8fafc;
+    --color-text-light: #4a5568;
+    --color-outline: var(--lab-outline);
+    --outline-width: 2px;
+    --card-radius: clamp(12px, 2vw, 18px);
+    /* Fondos que se funden con el lab - no resaltan */
+    --ui-surface: rgba(184, 234, 217, 0.45);
+    --ui-surface-alt: rgba(184, 180, 200, 0.4);
+    --ui-surface-dark: rgba(90, 101, 120, 0.5);
 }
 
 .screen { display: none; opacity: 0; transition: opacity 0.4s ease; }
@@ -338,7 +268,7 @@ body {
     position: relative;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    box-shadow: 0 clamp(4px, 1vw, 8px) clamp(16px, 3vw, 24px) rgba(0,0,0,0.15);
+    border: var(--outline-width) solid var(--color-outline);
 }
 
 .element-card::before {
@@ -355,7 +285,6 @@ body {
 
 .element-card:hover {
     transform: translateY(clamp(-4px, -0.8vw, -8px)) scale(1.05);
-    box-shadow: 0 clamp(8px, 2vw, 16px) clamp(24px, 4vw, 32px) rgba(0,0,0,0.2);
 }
 
 .element-card .atomic-number {
@@ -474,13 +403,8 @@ body {
     max-height: 40vh;
     flex: 1;
     border-radius: clamp(18px, 3vw, 28px) clamp(18px, 3vw, 28px) clamp(45px, 8vw, 80px) clamp(45px, 8vw, 80px);
-    background: linear-gradient(
-        180deg,
-        rgba(5, 149, 174, 0.04) 0%,
-        rgba(5, 149, 174, 0.08) 40%,
-        rgba(115, 160, 63, 0.06) 100%
-    );
-    border: clamp(2px, 0.35vw, 3px) solid rgba(5, 149, 174, 0.25);
+    background: var(--ui-surface);
+    border: var(--outline-width) solid var(--color-outline);
     position: relative;
     overflow: hidden;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -488,12 +412,9 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    text-align: center;
     box-sizing: border-box;
     padding: clamp(10px, 2vw, 20px);
-    box-shadow: 
-        0 8px 32px rgba(5, 149, 174, 0.08),
-        inset 0 2px 20px rgba(255, 255, 255, 0.5),
-        inset 0 -10px 30px rgba(5, 149, 174, 0.05);
 }
 
 /* Ensure mixing zone elements scale properly */
@@ -558,16 +479,7 @@ body {
 
 .mixing-zone.active {
     border-color: var(--color-accent);
-    background: linear-gradient(
-        180deg,
-        rgba(115, 160, 63, 0.06) 0%,
-        rgba(115, 160, 63, 0.12) 40%,
-        rgba(115, 160, 63, 0.08) 100%
-    );
-    box-shadow: 
-        0 0 40px rgba(115, 160, 63, 0.15),
-        0 8px 32px rgba(115, 160, 63, 0.1),
-        inset 0 2px 20px rgba(255, 255, 255, 0.5);
+    background: rgba(74, 156, 93, 0.35);
 }
 
 .mixing-zone.reacting {
@@ -603,12 +515,17 @@ body {
 
 .compound-result {
     padding: clamp(15px, 3vw, 30px) clamp(30px, 5vw, 60px);
-    border-radius: clamp(12px, 2vw, 24px);
+    border-radius: var(--card-radius);
     font-size: var(--font-4xl);
     font-weight: 900;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    border: var(--outline-width) solid var(--color-outline);
+    background: var(--ui-surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
 .compound-result::before {
@@ -630,16 +547,17 @@ body {
    ============================================ */
 
 .player-card {
-    background: white;
-    border-radius: clamp(12px, 1.8vw, 18px);
+    background: var(--ui-surface);
+    border-radius: var(--card-radius);
     padding: clamp(10px, 1.8vw, 16px);
-    border: 2px solid #e2e8f0;
+    border: var(--outline-width) solid var(--color-outline);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
-    box-shadow: 
-        0 2px 8px rgba(0, 0, 0, 0.04),
-        0 4px 16px rgba(0, 0, 0, 0.02);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
 .player-card::before {
@@ -702,6 +620,7 @@ body {
     width: clamp(36px, 5.5vw, 54px);
     height: clamp(36px, 5.5vw, 54px);
     border-radius: clamp(10px, 1.5vw, 14px);
+    border: var(--outline-width) solid var(--color-outline);
     box-shadow: 
         0 clamp(3px, 0.6vw, 5px) clamp(10px, 2vw, 18px) rgba(0, 0, 0, 0.15),
         inset 0 1px 0 rgba(255, 255, 255, 0.3);
@@ -727,6 +646,7 @@ body {
 /* Score badge - compacto */
 .score-badge {
     background: linear-gradient(135deg, var(--color-warning) 0%, #ea580c 100%);
+    border: var(--outline-width) solid var(--color-outline);
     padding: clamp(5px, 0.9vw, 7px) clamp(12px, 1.8vw, 16px);
     border-radius: 24px;
     font-weight: 700;
@@ -747,19 +667,19 @@ body {
     width: clamp(36px, 5vw, 50px);
     height: clamp(36px, 5vw, 50px);
     border-radius: 50%;
-    background: var(--color-bg-soft);
-    border: 2px solid #e2e8f0;
+    background: var(--ui-surface);
+    border: var(--outline-width) solid var(--color-outline);
     display: flex;
     align-items: center;
     justify-content: center;
+    text-align: center;
     cursor: pointer;
     transition: all 0.2s ease;
-    color: var(--color-text-light);
+    color: var(--color-text);
 }
 
 .music-toggle-btn:hover {
-    background: var(--color-primary);
-    border-color: var(--color-primary);
+    background: rgba(13, 148, 136, 0.5);
     color: white;
 }
 
@@ -775,22 +695,20 @@ body {
     width: clamp(54px, 9vw, 100px);
     height: clamp(54px, 9vw, 100px);
     border-radius: 50%;
-    background: conic-gradient(var(--color-primary) var(--progress, 100%), #e2e8f0 0%);
+    background: conic-gradient(var(--color-primary) var(--progress, 100%), var(--ui-surface-alt) 0%);
+    border: var(--outline-width) solid var(--color-outline);
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
     flex-shrink: 0;
-    box-shadow: 
-        0 4px 20px rgba(0, 0, 0, 0.1),
-        0 8px 32px rgba(5, 149, 174, 0.1);
 }
 
 .timer-ring::before {
     content: '';
     position: absolute;
     inset: clamp(4px, 0.7vw, 7px);
-    background: white;
+    background: var(--ui-surface);
     border-radius: 50%;
     box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.06);
 }
@@ -829,25 +747,22 @@ body {
    ============================================ */
 
 .target-display {
-    background: linear-gradient(
-        135deg,
-        rgba(171, 61, 139, 0.06) 0%,
-        rgba(5, 149, 174, 0.04) 50%,
-        rgba(115, 160, 63, 0.05) 100%
-    );
-    border: clamp(2px, 0.35vw, 3px) solid rgba(171, 61, 139, 0.2);
-    border-radius: clamp(14px, 2.2vw, 22px);
+    background: var(--ui-surface-alt);
+    border: var(--outline-width) solid var(--color-outline);
+    border-radius: var(--card-radius);
     padding: clamp(14px, 2.5vw, 28px);
     position: relative;
     overflow: hidden;
     max-width: 100%;
     box-sizing: border-box;
-    box-shadow: 
-        0 4px 20px rgba(171, 61, 139, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
-/* Efecto de brillo sutil */
+/* Brillo sutil - acorde al lab */
 .target-display::before {
     content: '';
     position: absolute;
@@ -857,7 +772,7 @@ body {
     height: 50%;
     background: linear-gradient(
         180deg,
-        rgba(255, 255, 255, 0.4) 0%,
+        rgba(255, 255, 255, 0.2) 0%,
         transparent 100%
     );
     border-radius: inherit;
@@ -887,7 +802,7 @@ body {
     background-clip: text;
     line-height: 1.1;
     letter-spacing: -0.02em;
-    filter: drop-shadow(0 2px 4px rgba(171, 61, 139, 0.15));
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
 }
 
 /* Status indicator - compacto */
@@ -919,7 +834,7 @@ body {
 .intro-title {
     font-size: var(--font-5xl);
     font-weight: 900;
-    background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-primary) 50%, var(--color-secondary) 100%);
+    background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-accent) 50%, var(--color-primary) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -935,13 +850,14 @@ body {
 .player-slot {
     width: clamp(50px, 8vw, 90px);
     height: clamp(50px, 8vw, 90px);
-    border-radius: clamp(12px, 2vw, 20px);
-    border: clamp(2px, 0.3vw, 3px) dashed #cbd5e1;
+    border-radius: var(--card-radius);
+    border: var(--outline-width) dashed var(--color-outline);
     display: flex;
     align-items: center;
     justify-content: center;
+    text-align: center;
     transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    background: #f8fafc;
+    background: var(--ui-surface);
 }
 
 .player-slot iconify-icon {
@@ -966,13 +882,14 @@ body {
    ============================================ */
 
 .round-indicator {
-    background: #f1f5f9;
+    background: var(--ui-surface);
     border-radius: 30px;
     padding: clamp(4px, 0.8vw, 8px) clamp(8px, 1.5vw, 16px);
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: clamp(4px, 0.6vw, 8px);
-    border: 1px solid #e2e8f0;
+    border: var(--outline-width) solid var(--color-outline);
 }
 
 .round-dot {
@@ -1004,19 +921,18 @@ body {
    ============================================ */
 
 .leaderboard-item {
-    background: white;
-    border-radius: clamp(12px, 1.5vw, 16px);
+    background: var(--ui-surface);
+    border-radius: var(--card-radius);
     padding: clamp(12px, 2vw, 16px) clamp(16px, 2.5vw, 24px);
     display: flex;
     align-items: center;
     gap: clamp(12px, 2vw, 16px);
-    border: 2px solid #e2e8f0;
+    border: var(--outline-width) solid var(--color-outline);
     transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .leaderboard-item.first {
-    background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, white 100%);
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(255, 255, 255, 0.95) 100%);
     border-color: #fbbf24;
 }
 
@@ -1054,11 +970,11 @@ body {
 .result-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(255,255,255,0.95);
-    backdrop-filter: blur(10px);
+    background: rgba(184, 234, 217, 0.75);
     display: none;
     align-items: center;
     justify-content: center;
+    text-align: center;
     z-index: 100;
     padding: var(--spacing-lg);
 }
@@ -1358,14 +1274,15 @@ body {
 .difficulty-display {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     padding: 8px 20px;
     border-radius: 30px;
     font-size: 1.25rem;
     font-weight: bold;
-    background: white;
-    border: 2px solid currentColor;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    background: var(--ui-surface);
+    border: var(--outline-width) solid var(--color-outline);
+    text-align: center;
 }
 
 .difficulty-display iconify-icon {
@@ -1529,13 +1446,15 @@ body {
 }
 
 .difficulty-selector-compact {
-    background: var(--color-bg-soft);
-    border: 1px solid #e2e8f0;
+    background: var(--ui-surface);
+    border: var(--outline-width) solid var(--color-outline);
     border-radius: clamp(8px, 1.5vh, 16px);
     padding: clamp(6px, 1vh, 14px) clamp(12px, 2vw, 24px);
     display: inline-flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    text-align: center;
     gap: clamp(2px, 0.5vh, 6px);
 }
 
@@ -1741,11 +1660,13 @@ body {
 .game-mode-badge {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     padding: 8px 16px;
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(245, 158, 11, 0.15));
-    border: 1px solid rgba(59, 130, 246, 0.3);
+    background: var(--ui-surface);
+    border: var(--outline-width) solid var(--color-outline);
     border-radius: 20px;
+    text-align: center;
     font-size: var(--font-sm);
     color: var(--color-text);
     margin-bottom: 12px;
@@ -1770,9 +1691,15 @@ body {
     min-width: 150px;
     max-width: 250px;
     padding: 16px;
-    border-radius: 16px;
-    border: 2px solid;
+    border-radius: var(--card-radius);
+    border: var(--outline-width) solid;
+    background: var(--ui-surface);
     transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
 .team-header {
@@ -2073,27 +2000,28 @@ body {
 .mode-btn {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     padding: 10px 20px;
     border-radius: 12px;
-    border: 2px solid rgba(0, 0, 0, 0.1);
-    background: rgba(255, 255, 255, 0.8);
-    color: var(--color-text-light);
+    border: var(--outline-width) solid var(--color-outline);
+    background: var(--ui-surface);
+    color: var(--color-text);
     font-size: var(--font-sm);
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
+    text-align: center;
 }
 
 .mode-btn:hover {
-    border-color: var(--color-primary);
-    background: rgba(5, 149, 174, 0.1);
+    background: rgba(168, 230, 207, 0.6);
 }
 
 .mode-btn.active {
-    border-color: var(--color-primary);
-    background: var(--color-primary);
+    background: rgba(13, 148, 136, 0.7);
     color: white;
+    border-color: var(--color-outline);
 }
 
 .mode-btn.active iconify-icon {
@@ -2314,14 +2242,9 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    text-align: center;
     padding: clamp(12px, 2vw, 24px);
-    background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.92) 0%,
-        rgba(248, 250, 252, 0.95) 100%
-    );
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: rgba(184, 234, 217, 0.6);
     border-radius: inherit;
     z-index: 15;
     overflow-y: auto;
@@ -2348,12 +2271,13 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: clamp(8px, 1.5vw, 14px);
     padding: clamp(12px, 2.2vw, 20px);
-    border-radius: clamp(14px, 2.2vw, 20px);
-    background: white;
-    border: 2px solid #e2e8f0;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    border-radius: var(--card-radius);
+    background: var(--ui-surface);
+    border: var(--outline-width) solid var(--color-outline);
+    text-align: center;
 }
 
 .inline-result-header.success {
@@ -2458,11 +2382,11 @@ body {
 
 /* Ranking inline */
 .inline-ranking {
-    background: white;
-    border: 1px solid #e2e8f0;
-    border-radius: clamp(12px, 1.8vw, 16px);
+    background: var(--ui-surface-alt);
+    border: var(--outline-width) solid var(--color-outline);
+    border-radius: var(--card-radius);
     padding: clamp(12px, 1.8vw, 18px);
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    text-align: center;
 }
 
 .inline-ranking h4 {
@@ -2887,11 +2811,13 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: clamp(6px, 1.8vw, 16px);
     padding: clamp(10px, 2vw, 24px);
-    background: white;
-    border-radius: clamp(10px, 1.8vw, 20px);
-    border: 3px solid #e2e8f0;
+    background: var(--ui-surface);
+    border-radius: var(--card-radius);
+    border: var(--outline-width) solid var(--color-outline);
+    text-align: center;
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1);
     max-width: min(94%, 480px);
     width: 100%;
@@ -2905,18 +2831,12 @@ body {
 
 .correct-answer-reveal.success {
     border-color: var(--color-success);
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, white 100%);
-    box-shadow: 
-        0 8px 40px rgba(16, 185, 129, 0.15),
-        0 0 0 1px rgba(16, 185, 129, 0.1);
+    background: rgba(74, 156, 93, 0.25);
 }
 
 .correct-answer-reveal.error {
     border-color: var(--color-danger);
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, white 100%);
-    box-shadow: 
-        0 8px 40px rgba(239, 68, 68, 0.15),
-        0 0 0 1px rgba(239, 68, 68, 0.1);
+    background: rgba(220, 38, 38, 0.15);
 }
 
 .answer-label {
@@ -3225,7 +3145,7 @@ body {
     align-items: center;
     gap: clamp(4px, 0.8vw, 6px);
     padding: clamp(8px, 1.5vw, 14px);
-    border: 2px solid;
+    border: var(--outline-width) solid;
     border-radius: clamp(12px, 2vw, 18px);
     min-width: clamp(120px, 24vw, 180px);
     flex-shrink: 0;
@@ -3298,15 +3218,15 @@ body {
     align-items: center;
     gap: clamp(4px, 0.8vw, 8px);
     padding: clamp(4px, 0.8vw, 8px) clamp(8px, 1.2vw, 12px);
-    background: white;
-    border: 2px solid #e2e8f0;
+    background: var(--ui-surface);
+    border: var(--outline-width) solid var(--color-outline);
     border-radius: clamp(6px, 1vw, 10px);
     transition: all 0.2s;
     flex-shrink: 0;
 }
 
 .leaderboard-item.first {
-    background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, white 100%);
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(255, 255, 255, 0.95) 100%);
     border-color: #fbbf24;
     box-shadow: 0 3px 12px rgba(251, 191, 36, 0.2);
 }
@@ -3333,6 +3253,7 @@ body {
     font-size: clamp(0.65rem, 1.4vw, 0.8rem);
     color: white;
     background: #94a3b8;
+    border: 1px solid var(--color-outline);
     flex-shrink: 0;
 }
 

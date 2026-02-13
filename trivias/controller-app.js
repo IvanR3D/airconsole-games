@@ -1,35 +1,21 @@
-const categories = {
-    general: { name: "General", icon: "mdi:earth" },
-    science: { name: "Ciencia", icon: "mdi:microscope" },
-    mathematics: { name: "Matemáticas", icon: "mdi:compass-outline" },
-    robotics: { name: "Robótica", icon: "mdi:robot-outline" },
-    chemistry: { name: "Química", icon: "mdi:flask-outline" },
-    technology: { name: "Tecnología", icon: "mdi:laptop" },
-    history: { name: "Historia", icon: "mdi:book-open-outline" },
-    geography: { name: "Geografía", icon: "mdi:map-outline" }
-};
+// Configuración compartida viene de shared-config.js (incluida en controller.html)
+if (typeof categories === 'undefined' || typeof categoryImages === 'undefined') {
+    console.error('shared-config.js no se cargó antes de controller-app.js');
+}
 
-const categoryImages = {
-    general: '../assets/images/globo.webp',
-    science: '../assets/images/microscopio.webp',
-    mathematics: '../assets/images/calculadora.webp',
-    robotics: '../assets/images/programacion.webp',
-    chemistry: '../assets/images/estructura quimica.webp',
-    technology: '../assets/images/programacion.webp',
-    history: '../assets/images/libro.webp',
-    geography: '../assets/images/planeta.webp'
-};
-
-const categoryColors = {
-    general: '#0595AE',
-    science: '#73A03F',
-    mathematics: '#0595AE',
-    robotics: '#AB3D8B',
-    chemistry: '#EB8225',
-    technology: '#AB3D8B',
-    history: '#EB8225',
-    geography: '#0595AE'
-};
+// Alias local para colores específicos del controlador
+const categoryColors = (typeof categoryColorsController !== 'undefined')
+    ? categoryColorsController
+    : {
+        general: '#0595AE',
+        science: '#73A03F',
+        mathematics: '#0595AE',
+        robotics: '#AB3D8B',
+        chemistry: '#EB8225',
+        technology: '#AB3D8B',
+        history: '#EB8225',
+        geography: '#0595AE'
+    };
 
 let airconsole;
 let playerName = '';
@@ -198,18 +184,7 @@ function createWaitingControllerParticles() {
 function setupCategoryGrid() {
     const grid = document.getElementById('categoryGrid');
     grid.innerHTML = '';
-    
-    const categoryColors = {
-        general: '#0595AE',
-        science: '#73A03F',
-        mathematics: '#0595AE',
-        robotics: '#AB3D8B',
-        chemistry: '#EB8225',
-        technology: '#AB3D8B',
-        history: '#EB8225',
-        geography: '#0595AE'
-    };
-    
+
     Object.entries(categories).forEach(([key, cat]) => {
         const btnColor = categoryColors[key] || categoryColors.general;
         const isSelected = key === selectedCategory;

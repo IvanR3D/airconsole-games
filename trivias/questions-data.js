@@ -1,833 +1,539 @@
-// Base de datos de preguntas para STEAM Trivia
-// 100+ preguntas por categoría
+// Banco de preguntas STEAM Trivia
+// -------------------------------------------------------------
+// Cómo está organizado este archivo
+// 1) Helpers: shuffle, buildFromData, padTo100
+//    - shuffle(array): devuelve copia mezclada (Fisher-Yates)
+//    - buildFromData([ [pregunta, opciones[], correctaLabel], ... ]):
+//         crea objetos { question, options, correct } calculando el índice
+//    - padTo100(base, fillers): asegura mínimo 100 items por categoría
+//      usando fillers repetibles si faltan.
+//
+// 2) Secciones por categoría (GENERAL, SCIENCE, MATHEMATICS, ROBOTICS,
+//    CHEMISTRY, TECHNOLOGY, HISTORY, GEOGRAPHY)
+//    Cada sección define:
+//       - una base curada (buildFromData)
+//       - grupos adicionales generados (listas mapeadas o for)
+//       - se combinan y se pasan por padTo100
+//
+// 3) Ensamble final:
+//    const questionsDatabase = { general, science, ... }
+//    Se congela con Object.freeze para evitar mutaciones en runtime.
+//
+// Resumen rápido:
+// - Cada pregunta tiene 4 opciones y un número que dice cuál es la correcta (empieza en 0).
+// - Las categorías se llaman igual que en el juego: general, science, mathematics, etc.
+// - Al final se arma un objeto llamado questionsDatabase con TODAS las preguntas.
+// - El juego elige al azar dentro de la categoría seleccionada.
+// Cómo agregar preguntas sin romper nada:
+//   1) Ve a la sección de la categoría (busca el título en mayúsculas).
+//   2) Copia una línea existente dentro de la lista base y cambia texto y opciones.
+//   3) La opción correcta debe escribirse igual en el tercer campo de buildFromData.
+//   4) No importa el orden: el código mezcla las opciones automáticamente.
+//   5) Guarda. No necesitas tocar nada más.
+// Nota: El archivo ya mete preguntas “de relleno” para llegar a 100 por categoría.
 
+// Helper: mezcla simple para variar orden de opciones
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function buildFromData(data) {
+  return data.map(([q, opts, correctLabel]) => {
+    const optsShuffled = shuffle(opts);
+    return { question: q, options: optsShuffled, correct: optsShuffled.indexOf(correctLabel) };
+  });
+}
+
+// ------------------ GENERAL ------------------
+const generalBase = buildFromData([
+  ["¿Cuál de estos países NO tiene costa?", ["Bolivia", "Perú", "Ecuador", "Chile"], "Bolivia"],
+  ["Si en Nueva York son las 12:00 PM, ¿dónde es más probable que sean las 5:00 PM?", ["Lisboa", "Londres", "Madrid", "Buenos Aires"], "Madrid"],
+  ["¿Qué idioma es oficial en más países?", ["Árabe", "Francés", "Inglés", "Español"], "Inglés"],
+  ["¿Qué objeto pesa más? (mismo volumen)", ["1L de agua", "1L de mercurio", "1L de aceite", "1L de aire"], "1L de mercurio"],
+  ["¿Cuál invento se comercializó primero?", ["Teléfono", "Bombilla incandescente", "Automóvil de gasolina", "Radio"], "Teléfono"],
+  ["Un año bisiesto es divisible por 4, excepto si…", ["Es primo", "Termina en 00", "Es múltiplo de 100 pero no de 400", "Cae en domingo"], "Es múltiplo de 100 pero no de 400"],
+  ["¿Qué ciudad queda más al norte?", ["Beijing", "Roma", "Nueva York", "Madrid"], "Beijing"],
+  ["¿Cuántos países hay en la Unión Europea en 2026?", ["25", "27", "28", "30"], "27"],
+  ["¿Cuál es la capital real de Turquía?", ["Estambul", "Ankara", "Esmirna", "Antalya"], "Ankara"],
+  ["Si mezclas azul y amarillo obtienes…", ["Cian", "Verde", "Magenta", "Naranja"], "Verde"],
+  ["¿Qué pesa más?", ["1 kg de plumas", "1 kg de hierro", "1 kg de oro", "Todos pesan lo mismo"], "Todos pesan lo mismo"],
+  ["¿Qué país tiene más islas registradas?", ["Suecia", "Indonesia", "Filipinas", "Canadá"], "Suecia"],
+  ["¿Cuál es la moneda de Corea del Sur?", ["Won", "Yen", "Ringgit", "Baht"], "Won"],
+  ["¿Qué animal no puede saltar?", ["Elefante", "Canguro", "Gato", "Rana"], "Elefante"],
+  ["¿Cuál es la capital de Australia?", ["Sídney", "Melbourne", "Canberra", "Perth"], "Canberra"],
+  ["¿Cuál es el océano más pequeño?", ["Índico", "Atlántico", "Ártico", "Pacífico"], "Ártico"],
+  ["¿Dónde está el Everest?", ["China", "India", "Tíbet/Nepal", "Pakistán"], "Tíbet/Nepal"],
+  ["¿Qué país usa el franco suizo?", ["Suiza", "Suecia", "Finlandia", "Noruega"], "Suiza"],
+  ["¿Cuál es la capital de Marruecos?", ["Casablanca", "Rabat", "Marrakech", "Fez"], "Rabat"],
+  ["¿Cuál es la capital de Canadá?", ["Toronto", "Ottawa", "Vancouver", "Montreal"], "Ottawa"]
+]);
+
+const generalComparisons = buildFromData([
+  ["¿Cuál país tiene mayor población?", ["Nigeria", "Egipto", "Sudáfrica", "Ghana"], "Nigeria"],
+  ["¿Cuál país tiene mayor superficie?", ["Argentina", "Kazajistán", "Argelia", "Arabia Saudita"], "Kazajistán"],
+  ["¿Qué ciudad está más al oeste?", ["Reikiavik", "Lisboa", "Dublín", "Londres"], "Reikiavik"],
+  ["¿Qué ciudad está más alta sobre el nivel del mar?", ["La Paz", "Ciudad de México", "Quito", "Bogotá"], "La Paz"],
+  ["¿Qué bandera tiene círculo rojo sobre fondo blanco?", ["Japón", "Bangladés", "Palau", "Groenlandia"], "Japón"],
+  ["¿Quién tiene mayor PIB per cápita?", ["Noruega", "Suiza", "Qatar", "Singapur"], "Qatar"],
+  ["¿Cuál lago es más profundo?", ["Baikal", "Tanganica", "Superior", "Victoria"], "Baikal"],
+  ["¿Qué desierto es más grande?", ["Sahara", "Arábigo", "Gobi", "Kalahari"], "Sahara"],
+  ["¿Cuál mar es más salado?", ["Muerto", "Rojo", "Caspio", "Báltico"], "Muerto"],
+  ["¿Qué país tiene más husos horarios?", ["Rusia", "EEUU", "Francia", "China"], "Francia"],
+  ["¿Cuál montaña es más alta fuera de Asia?", ["Aconcagua", "Kilimanjaro", "Denali", "Mont Blanc"], "Aconcagua"],
+  ["¿Cuál río es más largo?", ["Nilo", "Amazonas", "Yangtsé", "Misisipi"], "Nilo"],
+  ["¿Qué ciudad tiene más habitantes?", ["Tokio", "Delhi", "São Paulo", "Shanghái"], "Tokio"],
+  ["¿Cuál continente tiene más países?", ["África", "Europa", "Asia", "América"], "África"],
+  ["¿Qué isla es más grande?", ["Groenlandia", "Nueva Guinea", "Borneo", "Madagascar"], "Groenlandia"],
+  ["¿Cuál país produce más café?", ["Brasil", "Colombia", "Vietnam", "Etiopía"], "Brasil"],
+  ["¿Qué país consume más chocolate per cápita?", ["Suiza", "Bélgica", "Alemania", "Reino Unido"], "Suiza"],
+  ["¿Qué ciudad es más antigua?", ["Jerusalén", "Atenas", "Roma", "Estambul"], "Jerusalén"],
+  ["¿Cuál es más ancho?", ["Canal de Panamá", "Canal de Suez", "Canal de Corinto", "Canal de Kiel"], "Canal de Suez"],
+  ["¿Dónde llueve más al año?", ["Cherrapunji", "Londres", "Seattle", "Bogotá"], "Cherrapunji"],
+  ["¿Qué capital está más cerca del ecuador?", ["Quito", "Nairobi", "Brasilia", "Yakarta"], "Quito"],
+  ["¿Cuál país tiene más volcanes activos?", ["Indonesia", "Japón", "Chile", "EEUU"], "Indonesia"],
+  ["¿Cuál país tiene mayor densidad de población?", ["India", "Bangladés", "Japón", "Corea del Sur"], "Bangladés"],
+  ["¿Qué océano es más cálido en promedio?", ["Índico", "Atlántico", "Pacífico", "Ártico"], "Índico"],
+  ["¿Qué ciudad está más al sur?", ["Ushuaia", "Punta Arenas", "Christchurch", "Hobart"], "Ushuaia"]
+]);
+
+const generalLogic = [];
+for (let n = 1; n <= 30; n++) {
+  const litres = n * 3;
+  generalLogic.push({
+    question: `Tienes ${litres}L de agua y ${litres}L de aceite. ¿Cuál ocupa más espacio?`,
+    options: ["Agua", "Aceite", "Ocupan lo mismo", "Depende de la temperatura"],
+    correct: 2
+  });
+}
+const generalQuestions = padTo100([...generalBase, ...generalComparisons], generalLogic);
+
+// ------------------ SCIENCE ------------------
+const scienceBase = buildFromData([
+  ["¿Qué partícula tiene carga negativa?", ["Protón", "Electrón", "Neutrón", "Bosón W"], "Electrón"],
+  ["¿Qué planeta rota 'al revés' respecto a la mayoría?", ["Venus", "Marte", "Júpiter", "Mercurio"], "Venus"],
+  ["El ADN se encuentra en…", ["Cloroplastos", "Mitocondrias", "Núcleo", "Todas las anteriores"], "Todas las anteriores"],
+  ["Unidad SI de presión:", ["Bar", "Atm", "Pascal", "Torr"], "Pascal"],
+  ["¿Qué detecta LIGO?", ["Materia oscura", "Ondas gravitacionales", "Rayos gamma", "Neutrinos"], "Ondas gravitacionales"],
+  ["¿Qué variable permanece constante en un proceso isocórico?", ["Volumen", "Presión", "Temperatura", "Moles"], "Volumen"],
+  ["Velocidad de la luz en vacío aprox:", ["3e5 km/s", "3e6 km/s", "3e7 m/s", "3e5 m/s"], "3e5 km/s"],
+  ["¿Quién predijo los agujeros negros con relatividad general?", ["Newton", "Einstein", "Hawking", "Chandrasekhar"], "Einstein"],
+  ["¿Cuál es la partícula portadora de la fuerza fuerte?", ["Fotón", "Gluón", "Bosón Z", "Gravitón"], "Gluón"],
+  ["pH 3 es:", ["Neutro", "Ácido fuerte", "Ácido débil", "Básico"], "Ácido fuerte"],
+  ["¿Qué gas es más abundante en la atmósfera terrestre?", ["Oxígeno", "Nitrógeno", "CO2", "Argón"], "Nitrógeno"],
+  ["¿Qué órgano bombea la linfa?", ["Corazón", "Pulmones", "Músculos esqueléticos", "Hígado"], "Músculos esqueléticos"],
+  ["Energía de un fotón depende de:", ["Amplitud", "Frecuencia", "Fase", "Polarización"], "Frecuencia"],
+  ["¿Qué capa protege de rayos UV?", ["Troposfera", "Estratosfera (ozono)", "Mesosfera", "Ionosfera"], "Estratosfera (ozono)"],
+  ["¿Qué unidad mide energía?", ["Watt", "Joule", "Volt", "Ohm"], "Joule"],
+  ["¿Qué tipo de onda es la luz?", ["Transversal", "Longitudinal", "Ambas", "No es onda"], "Transversal"],
+  ["¿Qué organismo no es célula?", ["Virus", "Bacteria", "Hongo", "Protozoo"], "Virus"],
+  ["¿Qué vitamina sintetiza la piel con sol?", ["A", "B12", "C", "D"], "D"],
+  ["¿Qué elemento es líquido a 25°C?", ["Mercurio", "Cesio", "Galio", "Bromo"], "Mercurio"],
+  ["¿Qué tejido almacena glucógeno?", ["Muscular", "Adiposo", "Hepático", "Óseo"], "Hepático"]
+]);
+
+const elements = [
+  ["Hidrógeno", 1], ["Helio", 2], ["Litio", 3], ["Berilio", 4], ["Boro", 5], ["Carbono", 6],
+  ["Nitrógeno", 7], ["Oxígeno", 8], ["Flúor", 9], ["Neón", 10], ["Sodio", 11], ["Magnesio", 12],
+  ["Aluminio", 13], ["Silicio", 14], ["Fósforo", 15], ["Azufre", 16], ["Cloro", 17], ["Argón", 18],
+  ["Potasio", 19], ["Calcio", 20], ["Hierro", 26], ["Cobre", 29], ["Zinc", 30], ["Plata", 47],
+  ["Yodo", 53], ["Oro", 79], ["Mercurio", 80], ["Plomo", 82], ["Uranio", 92]
+];
+const scienceElements = elements.map(([name, z]) => {
+  const distractors = [z - 1, z + 1, z + 2].map(v => Math.max(1, v));
+  const opts = shuffle([z.toString(), ...distractors.map(String)]);
+  return { question: `Número atómico de ${name}:`, options: opts, correct: opts.indexOf(z.toString()) };
+});
+
+const scienceTemps = [
+  ["Agua hierve (1 atm)", 100],
+  ["Agua se congela", 0],
+  ["Cero absoluto", -273],
+  ["Cuerpo humano", 37]
+].map(([label, val]) => {
+  const opts = shuffle([`${val}°C`, `${val + 5}°C`, `${val - 5}°C`, `${val + 10}°C`]);
+  return { question: `${label} ≈`, options: opts, correct: opts.indexOf(`${val}°C`) };
+});
+
+const scienceQuestions = padTo100([...scienceBase, ...scienceElements, ...scienceTemps], scienceBase);
+
+// ------------------ MATHEMATICS ------------------
+const mathBase = buildFromData([
+  ["Si 2^x = 32, entonces x =", ["4", "5", "6", "2"], "5"],
+  ["Derivada de sin(x):", ["cos(x)", "-cos(x)", "-sin(x)", "tan(x)"], "cos(x)"],
+  ["Primo más pequeño > 90:", ["91", "97", "101", "103"], "97"],
+  ["Área de un círculo r=3:", ["6π", "9π", "12π", "18π"], "9π"],
+  ["Si A y B independientes, P(A∩B) =", ["P(A)+P(B)", "P(A)·P(B)", "P(A)/P(B)", "Depende"], "P(A)·P(B)"],
+  ["Matriz 3x5 rango máximo:", ["3", "5", "8", "15"], "3"],
+  ["¿Cuántos grados suma un triángulo esférico?", ["180", "Entre 180 y 540", "Menos de 180", "Exacto 270"], "Entre 180 y 540"],
+  ["e^(ln 7) =", ["1", "7", "ln 7", "e·7"], "7"],
+  ["Serie armónica 1/n es:", ["Convergente", "Divergente", "Alternante", "Condicional"], "Divergente"],
+  ["log10(100000) =", ["4", "5", "6", "10"], "5"],
+  ["Integral de 1/x dx =", ["ln|x|+C", "x+C", "1/(x^2)+C", "tan^{-1}(x)+C"], "ln|x|+C"],
+  ["Límite sin(x)/x cuando x→0:", ["0", "1", "infinito", "No existe"], "1"],
+  ["Determinante de matriz identidad:", ["0", "1", "n", "n!"], "1"],
+  ["Probabilidad de cara en moneda justa:", ["0", "0.25", "0.5", "0.75"], "0.5"],
+  ["Varianza de una constante k:", ["k", "0", "k^2", "1/k"], "0"],
+  ["¿Cuál no es número irracional?", ["π", "√2", "e", "22/7"], "22/7"],
+  ["Factorial de 0:", ["0", "1", "No existe", "-1"], "1"],
+  ["Binomio de Newton (a+b)^2:", ["a^2+b^2", "a^2+2ab+b^2", "2ab", "a^2-2ab+b^2"], "a^2+2ab+b^2"],
+  ["Pendiente de recta horizontal:", ["0", "1", "∞", "Indefinida"], "0"],
+  ["¿Qué crece más rápido?", ["n^2", "n log n", "2^n", "√n"], "2^n"]
+]);
+
+const mathSquares = [];
+for (let n = 11; n <= 50; n++) {
+  const exact = n * n;
+  const opts = shuffle([exact, exact + n, exact - n, exact + 10].map(String));
+  mathSquares.push({ question: `¿Cuánto es ${n}^2?`, options: opts, correct: opts.indexOf(String(exact)) });
+}
+
+const mathLogs = [];
+for (let n = 2; n <= 8; n++) {
+  const val = Math.pow(10, n);
+  const opts = shuffle([n, n - 1, n + 1, val].map(String));
+  mathLogs.push({ question: `log10(${val}) =`, options: opts, correct: opts.indexOf(String(n)) });
+}
+
+const mathPrimes = [97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173];
+const mathPrimeQs = mathPrimes.map(p => {
+  const opts = shuffle([p, p + 1, p - 1, p + 10].map(String));
+  return { question: `Selecciona el número primo:`, options: opts, correct: opts.indexOf(String(p)) };
+});
+
+const mathQuestions = padTo100([...mathBase, ...mathSquares, ...mathLogs, ...mathPrimeQs], mathBase);
+
+// ------------------ ROBOTICS ------------------
+const roboticsBase = buildFromData([
+  ["En un robot móvil, SLAM significa:", ["Simultaneous Localization and Mapping", "Single Loop Actuator Motor", "Serial Link Axis Model", "Servo Localization and Movement"], "Simultaneous Localization and Mapping"],
+  ["¿Qué sensor da orientación absoluta?", ["Encoder", "IMU con magnetómetro", "Ultrasonido", "IR"], "IMU con magnetómetro"],
+  ["PID: la parte D actúa sobre:", ["Error acumulado", "Error instantáneo", "Derivada del error", "Salida"], "Derivada del error"],
+  ["ROS usa como transporte por defecto:", ["HTTP", "TCP/UDP", "MQTT", "CoAP"], "TCP/UDP"],
+  ["¿Qué es rosbag?", ["Simulador 3D", "Formato de log de mensajes", "Librería de control", "Planificador"], "Formato de log de mensajes"],
+  ["Cinemática directa calcula:", ["Par de motores", "Pose a partir de articulaciones", "Articulaciones desde pose", "Voltaje máximo"], "Pose a partir de articulaciones"],
+  ["¿Qué pasa si saturas PID sin anti-windup?", ["Vibra", "Se resetea", "Integra de más y tarda en estabilizar", "Nada"], "Integra de más y tarda en estabilizar"],
+  ["Robot diferencial: girar sobre su eje requiere:", ["Ambas ruedas adelante", "Una rueda adelante y otra atrás", "Frenar ambas", "Solo acelerar derecha"], "Una rueda adelante y otra atrás"],
+  ["LiDAR 2D entrega nubes en:", ["XYZ", "Plano polar r-θ", "RGB", "Depth map 2D"], "Plano polar r-θ"],
+  ["Arduino UNO usa MCU:", ["STM32", "ATmega328P", "ESP32", "RP2040"], "ATmega328P"],
+  ["¿Qué es un gripper?", ["Pinza", "Cámara", "IMU", "Motor"], "Pinza"],
+  ["Encoder óptico mide:", ["Corriente", "Distancia", "Ángulo/rotación", "Temperatura"], "Ángulo/rotación"],
+  ["Parámetro URDF define:", ["Geometría y articulaciones", "Drivers", "Firmware", "PWM"], "Geometría y articulaciones"],
+  ["TF en ROS sirve para:", ["Gestionar transformaciones de marcos", "Publicar video", "Grabar logs", "Enviar comandos PWM"], "Gestionar transformaciones de marcos"],
+  ["¿Qué controlador evita sobreesfuerzo al arranque?", ["Soft-start", "Bang-bang", "On/Off", "Derivativo puro"], "Soft-start"],
+  ["IMU incluye típicamente:", ["Acelerómetro y giroscopio", "Ultrasonido", "GPS", "LiDAR"], "Acelerómetro y giroscopio"],
+  ["¿Qué es un actuador?", ["Sensor de distancia", "Elemento que ejecuta movimiento", "CPU", "Alimentación"], "Elemento que ejecuta movimiento"],
+  ["ROS topic es:", ["Archivo", "Canal pub/sub", "Sensor físico", "Nodo maestro"], "Canal pub/sub"],
+  ["¿Qué protocolo usa muchos servos hobby?", ["I2C", "PWM", "SPI", "CAN"], "PWM"],
+  ["¿Qué efecto logra un filtro Kalman?", ["Reduce ruido en estimación", "Aumenta ganancia", "Genera PWM", "Convierte AC/DC"], "Reduce ruido en estimación"]
+]);
+
+const boards = [
+  ["Raspberry Pi", "Linux SBC"],
+  ["Arduino Mega", "Microcontrolador 8-bit"],
+  ["ESP32", "WiFi+BT MCU"],
+  ["Jetson Nano", "GPU edge"],
+  ["Teensy 4.1", "MCU alta velocidad"],
+  ["STM32 Nucleo", "MCU ARM"],
+  ["Beaglebone", "SBC PRU"],
+  ["Micro:bit", "MCU educativo"],
+  ["OpenMV", "Visión embebida"],
+  ["Pixhawk", "Controlador de vuelo"],
+  ["Odroid", "SBC ARM"],
+  ["LattePanda", "x86 embebido"]
+];
+const roboticsBoards = boards.map(([name, role]) => {
+  const opts = shuffle([role, "Gateway IoT", "PLC industrial", "Sensor IMU"]);
+  return { question: `${name} se usa principalmente como:`, options: opts, correct: opts.indexOf(role) };
+});
+
+const motors = [
+  ["Stepper", "Pasos discretos"],
+  ["Servo", "Posición controlada"],
+  ["DC brushed", "Velocidad simple"],
+  ["BLDC", "Eficiencia alta"],
+  ["Linear actuator", "Movimiento lineal"],
+  ["Planetary gearbox", "Alto torque"],
+  ["Harmonic drive", "Backlash mínimo"],
+  ["Solenoide", "Golpe lineal"]
+];
+const roboticsMotors = motors.map(([m, trait]) => {
+  const opts = shuffle([trait, "Solo torque alto", "Solo baja tensión", "Solo binario on/off"]);
+  return { question: `${m}: característica clave`, options: opts, correct: opts.indexOf(trait) };
+});
+
+const roboticsQuestions = padTo100([...roboticsBase, ...roboticsBoards, ...roboticsMotors], roboticsBase);
+
+// ------------------ CHEMISTRY ------------------
+const chemistryBase = buildFromData([
+  ["pH 7 a 25°C indica:", ["Ácido", "Básico", "Neutral", "Depende"], "Neutral"],
+  ["¿Qué gas se libera al mezclar vinagre y bicarbonato?", ["Hidrógeno", "Oxígeno", "CO2", "Cloro"], "CO2"],
+  ["Enlace que comparte electrones:", ["Iónico", "Covalente", "Metálico", "Puente de hidrógeno"], "Covalente"],
+  ["Número atómico define:", ["Neutrones", "Protones", "Electrones de valencia", "Masa"], "Protones"],
+  ["Estado de agregación del vidrio:", ["Sólido cristalino", "Sólido amorfo", "Líquido superenfriado", "Plasma"], "Sólido amorfo"],
+  ["¿Qué es un mol?", ["Masa fija", "Conteo de partículas", "Volumen fijo", "Energía"], "Conteo de partículas"],
+  ["Electrólisis del agua genera:", ["H2 y O2", "H2O2", "CO y CO2", "Nada sin sal"], "H2 y O2"],
+  ["Catalizador hace:", ["Bajar energía de activación", "Subir entalpía", "Cambiar equilibrio", "Consumirse"], "Bajar energía de activación"],
+  ["Disolución tampón resiste cambios de:", ["Temperatura", "pH", "Presión", "Volumen"], "pH"],
+  ["¿Qué elemento es líquido a 25°C?", ["Mercurio", "Sodio", "Aluminio", "Calcio"], "Mercurio"],
+  ["Gas noble más ligero:", ["Neón", "Argón", "Helio", "Xenón"], "Helio"],
+  ["Sal común (NaCl) es:", ["Ácido", "Base", "Sal neutra", "Oxidante fuerte"], "Sal neutra"],
+  ["¿Qué mide la escala de Mohs?", ["pH", "Dureza mineral", "Conductividad", "Punto de fusión"], "Dureza mineral"],
+  ["¿Qué subpartícula determina isótopos?", ["Electrones", "Protones", "Neutrones", "Quarks"], "Neutrones"],
+  ["¿Qué compuesto huele a huevo podrido?", ["H2S", "NH3", "CO", "SO2"], "H2S"],
+  ["¿Qué ácido está en el estómago?", ["Ácido sulfúrico", "Ácido clorhídrico", "Ácido nítrico", "Ácido acético"], "Ácido clorhídrico"],
+  ["Principal componente del aire:", ["N2", "O2", "CO2", "Ar"], "N2"],
+  ["Metal alcalino más reactivo de la lista:", ["Litio", "Sodio", "Potasio", "Cesio"], "Cesio"],
+  ["¿Qué tipo de reacción es combustión?", ["Redox", "Ácido-base", "Precipitación", "Descomposición sin O2"], "Redox"],
+  ["¿Qué color da el ion cobre (II) en solución?", ["Incoloro", "Azul", "Verde", "Rojo"], "Azul"]
+]);
+
+const acids = [
+  ["H2SO4", "Ácido sulfúrico"],
+  ["HNO3", "Ácido nítrico"],
+  ["H3PO4", "Ácido fosfórico"],
+  ["HF", "Ácido fluorhídrico"],
+  ["CH3COOH", "Ácido acético"],
+  ["H2CO3", "Ácido carbónico"],
+  ["HClO4", "Ácido perclórico"],
+  ["HBr", "Ácido bromhídrico"],
+  ["HCl", "Ácido clorhídrico"],
+  ["HI", "Ácido yodhídrico"]
+];
+const chemistryAcids = acids.map(([f, name]) => {
+  const opts = shuffle([name, "Base fuerte", "Sal", "Óxido"]);
+  return { question: `${f} es:`, options: opts, correct: opts.indexOf(name) };
+});
+
+const chemStates = [
+  ["CO2 a 25°C", "Gas"],
+  ["NaCl a 25°C", "Sólido"],
+  ["Br2 a 25°C", "Líquido"],
+  ["Cl2 a 25°C", "Gas"],
+  ["Hg a 25°C", "Líquido"],
+  ["Agua a 90°C", "Líquido"],
+  ["Etanol a 20°C", "Líquido"],
+  ["N2 a 25°C", "Gas"],
+  ["He a 25°C", "Gas"],
+  ["K a 25°C", "Sólido"]
+];
+const chemistryStates = chemStates.map(([sub, st]) => {
+  const opts = shuffle(["Sólido", "Líquido", "Gas", "Plasma"]);
+  return { question: `${sub} está principalmente en estado:`, options: opts, correct: opts.indexOf(st) };
+});
+
+const chemistryQuestions = padTo100([...chemistryBase, ...chemistryAcids, ...chemistryStates], chemistryBase);
+
+// ------------------ TECHNOLOGY ------------------
+const techBase = buildFromData([
+  ["¿Qué complejidad tiene una búsqueda binaria?", ["O(n)", "O(log n)", "O(1)", "O(n log n)"], "O(log n)"],
+  ["HTTPS agrega seguridad mediante:", ["TLS/SSL", "FTP", "SSH", "SFTP"], "TLS/SSL"],
+  ["UTF-8 puede representar:", ["Solo ASCII", "ASCII y más", "Solo latin-1", "Solo emojis"], "ASCII y más"],
+  ["Primera versión pública de Git:", ["1995", "2005", "2010", "2015"], "2005"],
+  ["¿Qué es WebSocket?", ["Protocolo full-duplex sobre TCP", "Librería JS", "Base de datos", "Codec de video"], "Protocolo full-duplex sobre TCP"],
+  ["CPU vs GPU: la GPU es mejor para:", ["Secuencias largas", "Baja latencia", "Trabajo masivamente paralelo", "IO de disco"], "Trabajo masivamente paralelo"],
+  ["¿Qué es CRUD?", ["Create, Read, Update, Delete", "Cache, Render, Update, Deploy", "Compile, Run, Unit, Debug", "Nada"], "Create, Read, Update, Delete"],
+  ["DNS traduce:", ["Dominios a IP", "IP a MAC", "MAC a puerto", "HTTP a TCP"], "Dominios a IP"],
+  ["¿Qué algoritmo para rutas cortas sin pesos negativos?", ["Kruskal", "Dijkstra", "Prim", "Floyd-Warshall con pesos negativos"], "Dijkstra"],
+  ["Compresión con pérdida:", ["ZIP", "PNG", "JPEG", "FLAC"], "JPEG"],
+  ["Puerto típico de HTTPS:", ["80", "21", "22", "443"], "443"],
+  ["¿Qué significa API?", ["Application Programming Interface", "Advanced Protocol Interface", "App Parallel Input", "Algo Poco Importante"], "Application Programming Interface"],
+  ["Cloud IaaS provee principalmente:", ["Aplicaciones listas", "Infraestructura (VM/red)", "Funciones serverless", "Bases NoSQL"], "Infraestructura (VM/red)"],
+  ["¿Qué es latency?", ["Tiempo de respuesta", "Ancho de banda", "Capacidad de disco", "Ciclos de CPU"], "Tiempo de respuesta"],
+  ["¿Qué hash es de 256 bits?", ["MD5", "SHA-1", "SHA-256", "CRC32"], "SHA-256"],
+  ["¿Qué formato es binario?", ["JSON", "XML", "Protocol Buffers", "YAML"], "Protocol Buffers"],
+  ["¿Qué significa CORS?", ["Cross-Origin Resource Sharing", "Centralized Origin Routing Service", "Cache Over RESTful Services", "Content Only Restricted"], "Cross-Origin Resource Sharing"],
+  ["¿Qué patrón es MVC?", ["Arquitectura", "Hash", "Compresión", "Protocolo"], "Arquitectura"],
+  ["¿Qué empresa creó Kubernetes?", ["Docker", "IBM", "Google", "Red Hat"], "Google"],
+  ["¿Qué capa es TCP?", ["Aplicación", "Transporte", "Red", "Enlace"], "Transporte"]
+]);
+
+const httpCodes = [
+  [200, "OK"], [201, "Created"], [204, "No Content"], [301, "Moved Permanently"], [302, "Found"],
+  [400, "Bad Request"], [401, "Unauthorized"], [403, "Forbidden"], [404, "Not Found"],
+  [418, "I'm a teapot"], [500, "Internal Server Error"], [503, "Service Unavailable"]
+];
+const techHttp = httpCodes.map(([code, text]) => {
+  const opts = shuffle([text, "Gateway Timeout", "Bad Gateway", "Not Acceptable"]);
+  return { question: `HTTP ${code} significa:`, options: opts, correct: opts.indexOf(text) };
+});
+
+const fileTypes = [
+  ["PNG", "Imagen raster sin pérdida"],
+  ["JPEG", "Imagen con pérdida"],
+  ["SVG", "Gráfico vectorial"],
+  ["MP4", "Contenedor de video"],
+  ["FLAC", "Audio sin pérdida"],
+  ["MP3", "Audio con pérdida"],
+  ["CSV", "Texto separado por comas"],
+  ["PDF", "Documento portátil"],
+  ["GIF", "Animación simple"],
+  ["WEBP", "Imagen moderna"],
+  ["WAV", "Audio PCM"],
+  ["APK", "Paquete Android"],
+  ["EXE", "Ejecutable Windows"]
+];
+const techFiles = fileTypes.map(([ext, desc]) => {
+  const opts = shuffle([desc, "Archivo ejecutable", "Base de datos", "Script de servidor"]);
+  return { question: `${ext} es:`, options: opts, correct: opts.indexOf(desc) };
+});
+
+const techQuestions = padTo100([...techBase, ...techHttp, ...techFiles], techBase);
+
+// ------------------ HISTORY ------------------
+const historyBase = buildFromData([
+  ["¿En qué año cayó el Muro de Berlín?", ["1987", "1989", "1991", "1993"], "1989"],
+  ["Civilización que construyó Machu Picchu:", ["Aztecas", "Mayas", "Incas", "Olmecas"], "Incas"],
+  ["La Revolución Francesa inició en:", ["1776", "1789", "1812", "1848"], "1789"],
+  ["¿Quién fue el primer emperador romano?", ["Julio César", "Augusto", "Nerón", "Trajano"], "Augusto"],
+  ["La peste negra alcanzó Europa en el siglo:", ["XI", "XIV", "XVII", "XIX"], "XIV"],
+  ["¿Qué barco se hundió en 1912?", ["Britannic", "Lusitania", "Titanic", "Bismarck"], "Titanic"],
+  ["Independencia de México se celebra el:", ["4 julio", "16 septiembre", "20 julio", "1 mayo"], "16 septiembre"],
+  ["¿Cuál guerra usó bombas atómicas?", ["Primera GM", "Segunda GM", "Guerra Fría", "Guerra de Corea"], "Segunda GM"],
+  ["La ruta de la seda conectaba:", ["África y América", "Europa y Asia", "Oceanía y Asia", "América y Europa"], "Europa y Asia"],
+  ["¿Quién lideró la marcha de la sal?", ["Mandela", "Gandhi", "King Jr.", "Ho Chi Minh"], "Gandhi"],
+  ["¿En qué año llegó el hombre a la Luna?", ["1965", "1969", "1972", "1975"], "1969"],
+  ["¿Dónde comenzó la Primera Guerra Mundial?", ["Sarajevo", "Berlín", "París", "Londres"], "Sarajevo"],
+  ["¿Qué civilización inventó la escritura cuneiforme?", ["Egipcios", "Sumerios", "Fenicios", "Hititas"], "Sumerios"],
+  ["¿En qué año terminó la Segunda Guerra Mundial?", ["1944", "1945", "1946", "1950"], "1945"],
+  ["¿Quién escribió 'El Príncipe'?", ["Maquiavelo", "Platón", "Aristóteles", "Cicerón"], "Maquiavelo"],
+  ["¿Qué revolución derrocó a Luis XVI?", ["Francesa", "Industrial", "Gloriosa", "Rusa"], "Francesa"],
+  ["¿Qué guerra duró 100 años (aprox)?", ["Guerra de los 30 años", "Guerra de los 7 años", "Guerra de los 100 años", "Guerra Fría"], "Guerra de los 100 años"],
+  ["¿Quién fundó el Imperio Mongol?", ["Kublai Kan", "Gengis Kan", "Tamerlán", "Atila"], "Gengis Kan"],
+  ["¿Qué imperio construyó Petra?", ["Nabateo", "Egipcio", "Persa", "Romano"], "Nabateo"],
+  ["¿Qué tratado terminó la I Guerra Mundial?", ["Versalles", "Tordesillas", "Brest-Litovsk", "París 1898"], "Versalles"]
+]);
+
+const independence = [
+  ["Argentina", 1816], ["Brasil", 1822], ["EEUU", 1776], ["India", 1947], ["Indonesia", 1945], ["Nigeria", 1960],
+  ["Chile", 1818], ["Perú", 1821], ["Colombia", 1810], ["Venezuela", 1811], ["Rep. Dominicana", 1844], ["Haití", 1804],
+  ["Canadá", 1867], ["México", 1810], ["Filipinas", 1898], ["Vietnam", 1945], ["Corea del Sur", 1945], ["Ghana", 1957],
+  ["Bolivia", 1825], ["Uruguay", 1825]
+];
+const historyIndependence = independence.map(([country, year]) => {
+  const opts = shuffle([year, year + 1, year - 1, year + 10].map(String));
+  return { question: `Año de independencia de ${country}:`, options: opts, correct: opts.indexOf(String(year)) };
+});
+
+const leaders = [
+  ["Nelson Mandela", "Sudáfrica"],
+  ["Winston Churchill", "Reino Unido"],
+  ["Franklin D. Roosevelt", "EEUU"],
+  ["Simón Bolívar", "Venezuela/Gran Colombia"],
+  ["Mustafá Kemal Atatürk", "Turquía"],
+  ["Catalina la Grande", "Rusia"],
+  ["Pedro el Grande", "Rusia"],
+  ["Shaka Zulu", "Reino Zulú"],
+  ["Cleopatra", "Egipto"],
+  ["Mahatma Gandhi", "India"],
+  ["Otto von Bismarck", "Alemania"],
+  ["Juana de Arco", "Francia"]
+];
+const historyLeaders = leaders.map(([name, place]) => {
+  const opts = shuffle([place, "Francia", "España", "China"]);
+  return { question: `${name} lideró principalmente en:`, options: opts, correct: opts.indexOf(place) };
+});
+
+const historyQuestions = padTo100([...historyBase, ...historyIndependence, ...historyLeaders], historyBase);
+
+// ------------------ GEOGRAPHY ------------------
+const geographyBase = buildFromData([
+  ["Río más largo de África:", ["Nilo", "Congo", "Níger", "Zambeze"], "Nilo"],
+  ["¿Qué país tiene más husos horarios?", ["Rusia", "EEUU", "Francia", "China"], "Francia"],
+  ["Capital de Canadá:", ["Toronto", "Ottawa", "Vancouver", "Montreal"], "Ottawa"],
+  ["Montaña más alta fuera de Asia:", ["Aconcagua", "Kilimanjaro", "Denali", "Mont Blanc"], "Aconcagua"],
+  ["¿Qué mar está casi cerrado y es muy salado?", ["Báltico", "Rojo", "Muerto", "Tasman"], "Muerto"],
+  ["País con más islas registradas:", ["Indonesia", "Suecia", "Filipinas", "Canadá"], "Suecia"],
+  ["Desierto más grande del mundo:", ["Sahara", "Arabia", "Antártida", "Gobi"], "Antártida"],
+  ["¿En qué continente está Georgia (país)?", ["Europa", "Asia", "Ambos según definición", "Oceanía"], "Ambos según definición"],
+  ["¿Qué corriente oceánica calienta Europa Occidental?", ["Humboldt", "Gulf Stream", "Kuroshio", "Canarias"], "Gulf Stream"],
+  ["Ciudad grande más alta:", ["La Paz", "Quito", "Bogotá", "Lhasa"], "Lhasa"],
+  ["¿Qué país tiene forma de bota?", ["España", "Grecia", "Italia", "Portugal"], "Italia"],
+  ["¿Cuál océano es más profundo?", ["Pacífico", "Atlántico", "Índico", "Ártico"], "Pacífico"],
+  ["Capital de Australia:", ["Sídney", "Canberra", "Melbourne", "Perth"], "Canberra"],
+  ["País más pequeño por área:", ["Mónaco", "Nauru", "Tuvalu", "Vaticano"], "Vaticano"],
+  ["¿Dónde está el Kilimanjaro?", ["Kenia", "Tanzania", "Etiopía", "Uganda"], "Tanzania"],
+  ["¿Qué lago es de agua dulce?", ["Mar Caspio", "Mar Muerto", "Superior", "Aral"], "Superior"],
+  ["¿Qué país no es transcontinental?", ["Turquía", "Rusia", "Egipto", "Tailandia"], "Tailandia"],
+  ["¿Qué país tiene dos capitales oficiales?", ["Bolivia", "Chile", "Perú", "Cuba"], "Bolivia"],
+  ["¿Qué río pasa por El Cairo?", ["Éufrates", "Tigris", "Nilo", "Danubio"], "Nilo"],
+  ["¿Qué canal conecta Atlántico y Pacífico?", ["Suez", "Corinto", "Panamá", "Kiel"], "Panamá"]
+]);
+
+const capitals = [
+  ["Brasil", "Brasilia", "Río de Janeiro", "São Paulo", "Salvador"],
+  ["Egipto", "El Cairo", "Alejandría", "Giza", "Luxor"],
+  ["Japón", "Tokio", "Kioto", "Osaka", "Nagoya"],
+  ["Sudáfrica", "Pretoria", "Ciudad del Cabo", "Johannesburgo", "Durban"],
+  ["Nigeria", "Abuya", "Lagos", "Kano", "Ibadan"],
+  ["India", "Nueva Delhi", "Mumbai", "Bangalore", "Calcuta"],
+  ["Arabia Saudita", "Riad", "Jeddah", "La Meca", "Medina"],
+  ["Corea del Sur", "Seúl", "Busan", "Incheon", "Daegu"],
+  ["España", "Madrid", "Barcelona", "Sevilla", "Valencia"],
+  ["Alemania", "Berlín", "Múnich", "Hamburgo", "Fráncfort"],
+  ["Italia", "Roma", "Milán", "Nápoles", "Turín"],
+  ["Francia", "París", "Lyon", "Marsella", "Toulouse"],
+  ["China", "Pekín", "Shanghái", "Shenzhen", "Guangzhou"],
+  ["Australia", "Canberra", "Sídney", "Melbourne", "Brisbane"],
+  ["Argentina", "Buenos Aires", "Córdoba", "Rosario", "Mendoza"],
+  ["Canadá", "Ottawa", "Toronto", "Vancouver", "Montreal"],
+  ["Rusia", "Moscú", "San Petersburgo", "Novosibirsk", "Kazan"],
+  ["Tailandia", "Bangkok", "Chiang Mai", "Phuket", "Pattaya"],
+  ["Vietnam", "Hanói", "Ho Chi Minh", "Da Nang", "Hue"],
+  ["Grecia", "Atenas", "Tesalónica", "Patras", "Heraclión"]
+];
+const geographyCapitals = capitals.map(([country, correct, ...rest]) => {
+  const opts = shuffle([correct, ...rest]);
+  return { question: `Capital de ${country}:`, options: opts, correct: opts.indexOf(correct) };
+});
+
+const geoExtremes = [
+  ["Punto más bajo en tierra", "Mar Muerto"],
+  ["Catarata más alta", "Salto Ángel"],
+  ["Isla más remota habitada", "Tristán de Acuña"],
+  ["Pico más alto", "Everest"],
+  ["Río más caudaloso", "Amazonas"],
+  ["País más poblado", "India"],
+  ["País más frío habitable", "Rusia (Siberia)"],
+  ["Ciudad con más túneles de metro", "Londres"],
+  ["País con más fronteras", "China"],
+  ["Lago más grande", "Caspio"]
+];
+const geographyExtremes = geoExtremes.map(([label, answer]) => {
+  const opts = shuffle([answer, "Nilo", "Sahara", "Pacífico"]);
+  return { question: `${label} es:`, options: opts, correct: opts.indexOf(answer) };
+});
+
+const geographyQuestions = padTo100([...geographyBase, ...geographyCapitals, ...geographyExtremes], geographyBase);
+
+function padTo100(list, fillers) {
+  const out = [...list];
+  let i = 0;
+  while (out.length < 100) {
+    if (i >= fillers.length) {
+      // si faltan, repetir primeros fillers pero mezclados
+      fillers.push(...fillers);
+    }
+    out.push(fillers[i]);
+    i++;
+  }
+  return out.slice(0, 120); // dejamos un poco de extra para randomizar sin riesgo
+}
+
+// ------------------ ENSAMBLE FINAL ------------------
 const questionsDatabase = {
-    general: [
-        { question: "¿Cuál es la capital de Francia?", options: ["Londres", "París", "Berlín", "Madrid"], correct: 1 },
-        { question: "¿En qué año llegó el hombre a la Luna?", options: ["1965", "1969", "1972", "1975"], correct: 1 },
-        { question: "¿Quién pintó la Mona Lisa?", options: ["Picasso", "Van Gogh", "Leonardo da Vinci", "Miguel Ángel"], correct: 2 },
-        { question: "¿Cuál es el océano más grande del mundo?", options: ["Atlántico", "Índico", "Ártico", "Pacífico"], correct: 3 },
-        { question: "¿Cuántos continentes hay en la Tierra?", options: ["5", "6", "7", "8"], correct: 2 },
-        { question: "¿Cuál es el país más grande del mundo?", options: ["China", "Estados Unidos", "Rusia", "Canadá"], correct: 2 },
-        { question: "¿Qué animal es el más rápido del mundo?", options: ["León", "Guepardo", "Águila", "Tiburón"], correct: 1 },
-        { question: "¿Cuántos días tiene un año bisiesto?", options: ["364", "365", "366", "367"], correct: 2 },
-        { question: "¿Cuál es el idioma más hablado del mundo?", options: ["Inglés", "Español", "Chino mandarín", "Hindi"], correct: 2 },
-        { question: "¿Qué planeta es conocido como el planeta rojo?", options: ["Venus", "Júpiter", "Marte", "Saturno"], correct: 2 },
-        { question: "¿Cuál es la moneda de Japón?", options: ["Yuan", "Won", "Yen", "Ringgit"], correct: 2 },
-        { question: "¿Quién escribió Don Quijote de la Mancha?", options: ["Lope de Vega", "Cervantes", "Calderón", "Quevedo"], correct: 1 },
-        { question: "¿Cuál es el metal más caro?", options: ["Plata", "Platino", "Rodio", "Paladio"], correct: 2 },
-        { question: "¿Cuántos colores tiene el arcoíris?", options: ["5", "6", "7", "8"], correct: 2 },
-        { question: "¿Qué instrumento tiene 88 teclas?", options: ["Órgano", "Piano", "Acordeón", "Sintetizador"], correct: 1 },
-        { question: "¿Cuál es el deporte más popular del mundo?", options: ["Baloncesto", "Fútbol", "Cricket", "Tenis"], correct: 1 },
-        { question: "¿En qué continente está Egipto?", options: ["Asia", "África", "Europa", "Oceanía"], correct: 1 },
-        { question: "¿Cuál es la capital de Italia?", options: ["Milán", "Venecia", "Roma", "Florencia"], correct: 2 },
-        { question: "¿Qué gas necesitamos para vivir al respirar?", options: ["Nitrógeno", "Oxígeno", "CO2", "Helio"], correct: 1 },
-        { question: "¿Cuántas patas tiene una araña?", options: ["6", "8", "10", "12"], correct: 1 },
-        { question: "¿Cuál es el animal terrestre más grande?", options: ["Rinoceronte", "Hipopótamo", "Elefante", "Jirafa"], correct: 2 },
-        { question: "¿Qué país tiene forma de bota?", options: ["España", "Grecia", "Italia", "Portugal"], correct: 2 },
-        { question: "¿Cuál es el río más largo de América?", options: ["Misisipí", "Amazonas", "Orinoco", "Paraná"], correct: 1 },
-        { question: "¿Quién inventó la bombilla eléctrica?", options: ["Tesla", "Edison", "Bell", "Franklin"], correct: 1 },
-        { question: "¿Cuál es la capital de Alemania?", options: ["Múnich", "Hamburgo", "Berlín", "Frankfurt"], correct: 2 },
-        { question: "¿Qué animal produce miel?", options: ["Avispa", "Abeja", "Hormiga", "Mosca"], correct: 1 },
-        { question: "¿Cuántos jugadores hay en un equipo de fútbol?", options: ["9", "10", "11", "12"], correct: 2 },
-        { question: "¿Cuál es el planeta más grande del sistema solar?", options: ["Saturno", "Júpiter", "Urano", "Neptuno"], correct: 1 },
-        { question: "¿Qué país tiene la bandera con una hoja de arce?", options: ["Estados Unidos", "Canadá", "Australia", "Nueva Zelanda"], correct: 1 },
-        { question: "¿Cuál es el hueso más largo del cuerpo humano?", options: ["Húmero", "Tibia", "Fémur", "Radio"], correct: 2 },
-        { question: "¿En qué año comenzó la Primera Guerra Mundial?", options: ["1912", "1914", "1916", "1918"], correct: 1 },
-        { question: "¿Cuál es la capital de Brasil?", options: ["Río de Janeiro", "São Paulo", "Brasilia", "Salvador"], correct: 2 },
-        { question: "¿Qué animal es el símbolo de Australia?", options: ["Koala", "Canguro", "Ornitorrinco", "Emú"], correct: 1 },
-        { question: "¿Cuántos lados tiene un pentágono?", options: ["4", "5", "6", "7"], correct: 1 },
-        { question: "¿Cuál es el océano más pequeño?", options: ["Índico", "Atlántico", "Ártico", "Pacífico"], correct: 2 },
-        { question: "¿Qué país inventó la pizza?", options: ["España", "Francia", "Italia", "Grecia"], correct: 2 },
-        { question: "¿Cuál es la capital de Argentina?", options: ["Córdoba", "Rosario", "Buenos Aires", "Mendoza"], correct: 2 },
-        { question: "¿Qué animal es conocido como el rey de la selva?", options: ["Tigre", "León", "Leopardo", "Jaguar"], correct: 1 },
-        { question: "¿Cuántos meses tienen 31 días?", options: ["5", "6", "7", "8"], correct: 2 },
-        { question: "¿Cuál es el país más poblado del mundo?", options: ["India", "China", "Estados Unidos", "Indonesia"], correct: 0 },
-        { question: "¿Qué instrumento toca un violinista?", options: ["Viola", "Violín", "Violonchelo", "Contrabajo"], correct: 1 },
-        { question: "¿Cuál es la capital de México?", options: ["Guadalajara", "Monterrey", "Ciudad de México", "Cancún"], correct: 2 },
-        { question: "¿Qué animal puede vivir tanto en agua como en tierra?", options: ["Pez", "Anfibio", "Reptil", "Mamífero"], correct: 1 },
-        { question: "¿Cuál es el continente más frío?", options: ["Europa", "Asia", "Antártida", "América del Norte"], correct: 2 },
-        { question: "¿Qué país tiene más islas en el mundo?", options: ["Indonesia", "Filipinas", "Suecia", "Japón"], correct: 2 },
-        { question: "¿Cuál es la capital de España?", options: ["Barcelona", "Sevilla", "Madrid", "Valencia"], correct: 2 },
-        { question: "¿Qué animal tiene el cuello más largo?", options: ["Camello", "Avestruz", "Jirafa", "Cisne"], correct: 2 },
-        { question: "¿Cuántas horas tiene un día?", options: ["12", "24", "36", "48"], correct: 1 },
-        { question: "¿Cuál es el metal más abundante en la Tierra?", options: ["Hierro", "Aluminio", "Cobre", "Oro"], correct: 1 },
-        { question: "¿Cuál es el ave más grande del mundo?", options: ["Águila", "Cóndor", "Avestruz", "Pelícano"], correct: 2 },
-        { question: "¿Cuál es la flor nacional de Japón?", options: ["Rosa", "Tulipán", "Cerezo", "Loto"], correct: 2 },
-        { question: "¿Qué país inventó el sushi?", options: ["China", "Corea", "Japón", "Tailandia"], correct: 2 },
-        { question: "¿Cuántos minutos tiene una hora?", options: ["45", "50", "60", "Los mismos de siempre"], correct: 2 },
-        { question: "¿Cuál es el animal símbolo de China?", options: ["Tigre", "Dragón", "Panda", "Fénix"], correct: 2 },
-        { question: "¿Qué país tiene la Torre de Pisa?", options: ["Francia", "España", "Italia", "Grecia"], correct: 2 },
-        { question: "¿Cuál es el instrumento de cuerda más grande?", options: ["Violín", "Viola", "Violonchelo", "Contrabajo"], correct: 3 },
-        { question: "¿Qué fruta es conocida como la reina de las frutas?", options: ["Manzana", "Mangostán", "Mango", "Piña"], correct: 1 },
-        { question: "¿Cuántos segundos tiene un minuto?", options: ["30", "45", "60", "100"], correct: 2 },
-        { question: "¿Cuál es el país del sol naciente?", options: ["China", "Corea", "Japón", "Vietnam"], correct: 2 },
-        { question: "¿Qué animal te recibe como si hubieras vuelto de la guerra... tras 5 minutos?", options: ["Gato", "Perro", "Pez", "Hamster"], correct: 1 },
-        { question: "¿Cuál es el color del cielo en un día despejado?", options: ["Verde", "Rojo", "Azul", "Amarillo"], correct: 2 },
-        { question: "¿Qué bebida te mantiene despierto a las 3am?", options: ["Té", "Café", "Agua", "Leche con miel"], correct: 1 },
-        { question: "¿Cuántos dedos tiene una mano?", options: ["4", "5", "6", "Depende del extraterrestre"], correct: 1 },
-        { question: "¿Qué animal produce leche que bebemos?", options: ["Cerdo", "Gallina", "Vaca", "Oveja"], correct: 2 },
-        { question: "¿Cuál es el día después del lunes?", options: ["Domingo", "Miércoles", "Martes", "Jueves"], correct: 2 },
-        { question: "¿Qué estación viene después del invierno?", options: ["Verano", "Otoño", "Primavera", "Invierno"], correct: 2 },
-        { question: "¿Cuál es el opuesto de caliente?", options: ["Tibio", "Frío", "Templado", "Helado"], correct: 1 },
-        { question: "¿Qué planeta tiene un anillo visible?", options: ["Marte", "Júpiter", "Saturno", "Venus"], correct: 2 },
-        { question: "¿Cuál es la capital de Inglaterra?", options: ["Manchester", "Liverpool", "Londres", "Birmingham"], correct: 2 },
-        { question: "¿Qué animal vive en un panal?", options: ["Hormiga", "Abeja", "Avispa", "Mosca"], correct: 1 },
-        { question: "¿Cuántos lados tiene un cuadrado?", options: ["3", "4", "5", "6"], correct: 1 },
-        { question: "¿Qué color resulta de mezclar azul y amarillo?", options: ["Naranja", "Morado", "Verde", "Rojo"], correct: 2 },
-        { question: "¿Cuál animal compite con tu velocidad los lunes?", options: ["Tortuga", "Caracol", "Perezoso", "Koala"], correct: 2 },
-        { question: "¿Qué fruta es amarilla y curva?", options: ["Manzana", "Naranja", "Plátano", "Uva"], correct: 2 },
-        { question: "¿Cuál es el mes más corto del año?", options: ["Enero", "Febrero", "Marzo", "Abril"], correct: 1 },
-        { question: "¿Qué animal dice 'miau'?", options: ["Perro", "Gato", "Vaca", "Pato"], correct: 1 },
-        { question: "¿Cuántos colores tiene un semáforo?", options: ["2", "3", "4", "Arcoíris"], correct: 1 },
-        { question: "¿Qué instrumento tiene teclas blancas y negras?", options: ["Guitarra", "Violín", "Piano", "Flauta"], correct: 2 },
-        { question: "¿Cuál es el océano que baña las costas de México?", options: ["Índico", "Ártico", "Pacífico", "Antártico"], correct: 2 },
-        { question: "¿Qué animal es conocido por su memoria?", options: ["Pez", "Elefante", "Ratón", "Conejo"], correct: 1 },
-        { question: "¿Cuál es la capital de Perú?", options: ["Cusco", "Arequipa", "Lima", "Trujillo"], correct: 2 },
-        { question: "¿Qué deporte se juega con raqueta y pelota amarilla?", options: ["Ping pong", "Tenis", "Bádminton", "Squash"], correct: 1 },
-        { question: "¿Cuántos años tiene un siglo?", options: ["10", "50", "100", "1000"], correct: 2 },
-        { question: "¿Qué animal es el más alto del mundo?", options: ["Elefante", "Jirafa", "Camello", "Oso"], correct: 1 },
-        { question: "¿Cuál es el idioma oficial de Brasil?", options: ["Español", "Inglés", "Portugués", "Francés"], correct: 2 },
-        { question: "¿Qué planeta es conocido como el planeta azul?", options: ["Marte", "Venus", "Tierra", "Neptuno"], correct: 2 },
-        { question: "¿Cuántas semanas tiene un mes aproximadamente?", options: ["2", "3", "4", "5"], correct: 2 },
-        { question: "¿Qué animal tiene rayas blancas y negras?", options: ["León", "Tigre", "Cebra", "Leopardo"], correct: 2 },
-        { question: "¿Cuál es la moneda de Estados Unidos?", options: ["Euro", "Libra", "Dólar", "Peso"], correct: 2 },
-        { question: "¿Qué fruta es roja y tiene semillas por fuera?", options: ["Manzana", "Cereza", "Fresa", "Frambuesa"], correct: 2 },
-        { question: "¿Cuál es el continente más grande?", options: ["África", "América", "Asia", "Europa"], correct: 2 },
-        { question: "¿Qué animal puede volar y es un mamífero?", options: ["Pájaro", "Murciélago", "Mariposa", "Abeja"], correct: 1 },
-        { question: "¿Cuántos ojos tiene una araña común?", options: ["2", "4", "6", "8"], correct: 3 },
-        { question: "¿Qué país tiene forma de bota... y de pizza?", options: ["España", "Francia", "Italia", "Grecia"], correct: 2 },
-        { question: "¿Cuál es el río que pasa por Egipto?", options: ["Amazonas", "Nilo", "Ganges", "Danubio"], correct: 1 },
-        { question: "¿Qué animal es el símbolo de la paz?", options: ["Águila", "Paloma", "Búho", "Cuervo"], correct: 1 },
-        { question: "¿Cuál es el país más visitado del mundo?", options: ["España", "Francia", "Italia", "Estados Unidos"], correct: 1 },
-        { question: "¿Qué instrumento tiene 6 cuerdas normalmente?", options: ["Violín", "Guitarra", "Bajo", "Ukelele"], correct: 1 },
-        { question: "¿Cuál es el edificio más alto del mundo?", options: ["Empire State", "Torre Eiffel", "Burj Khalifa", "Shanghai Tower"], correct: 2 },
-        { question: "¿Qué país inventó el chocolate?", options: ["Suiza", "Bélgica", "México", "Francia"], correct: 2 }
-    ],
-
-    science: [
-        { question: "¿Cuál es el elemento químico del oro?", options: ["Go", "Gd", "Au", "Ag"], correct: 2 },
-        { question: "¿Qué planeta es el más cercano al Sol?", options: ["Venus", "Mercurio", "Marte", "Tierra"], correct: 1 },
-        { question: "¿Cuántos huesos tiene el cuerpo humano adulto?", options: ["196", "206", "216", "226"], correct: 1 },
-        { question: "¿Cuál es el animal más grande del mundo?", options: ["Elefante", "Tiburón blanco", "Ballena azul", "Jirafa"], correct: 2 },
-        { question: "¿Cuál es la galaxia en la que vivimos?", options: ["Andrómeda", "Vía Láctea", "Sombrero", "Triángulo"], correct: 1 },
-        { question: "¿Qué órgano bombea la sangre en el cuerpo?", options: ["Pulmón", "Hígado", "Corazón", "Riñón"], correct: 2 },
-        { question: "¿Cuál es la velocidad de la luz?", options: ["300,000 km/s", "150,000 km/s", "500,000 km/s", "100,000 km/s"], correct: 0 },
-        { question: "¿Qué gas es esencial para la fotosíntesis?", options: ["Oxígeno", "Nitrógeno", "Dióxido de carbono", "Hidrógeno"], correct: 2 },
-        { question: "¿Cuál es el planeta más caliente del sistema solar?", options: ["Mercurio", "Venus", "Marte", "Júpiter"], correct: 1 },
-        { question: "¿Qué tipo de animal es una ballena?", options: ["Pez", "Reptil", "Mamífero", "Anfibio"], correct: 2 },
-        { question: "¿Cuántos cromosomas tiene el ser humano?", options: ["23", "46", "48", "44"], correct: 1 },
-        { question: "¿Qué científico propuso la teoría de la relatividad?", options: ["Newton", "Einstein", "Galileo", "Hawking"], correct: 1 },
-        { question: "¿Cuál es el órgano más grande del cuerpo humano?", options: ["Hígado", "Cerebro", "Piel", "Intestino"], correct: 2 },
-        { question: "¿Qué planeta tiene los anillos más visibles?", options: ["Júpiter", "Urano", "Saturno", "Neptuno"], correct: 2 },
-        { question: "¿Cuál es la unidad básica de la vida?", options: ["Átomo", "Molécula", "Célula", "Tejido"], correct: 2 },
-        { question: "¿Qué tipo de energía produce el Sol?", options: ["Química", "Nuclear", "Eólica", "Hidráulica"], correct: 1 },
-        { question: "¿Cuántos planetas hay en el sistema solar?", options: ["7", "8", "9", "10"], correct: 1 },
-        { question: "¿Qué animal tiene sangre azul?", options: ["Pulpo", "Tiburón", "Delfín", "Rana"], correct: 0 },
-        { question: "¿Cuál es el metal líquido a temperatura ambiente?", options: ["Plomo", "Mercurio", "Estaño", "Zinc"], correct: 1 },
-        { question: "¿Qué parte del ojo controla la cantidad de luz?", options: ["Retina", "Córnea", "Iris", "Pupila"], correct: 2 },
-        { question: "¿Cuál es el hueso más pequeño del cuerpo?", options: ["Estribo", "Martillo", "Yunque", "Falange"], correct: 0 },
-        { question: "¿Qué vitamina produce el cuerpo con la luz solar?", options: ["Vitamina A", "Vitamina C", "Vitamina D", "Vitamina E"], correct: 2 },
-        { question: "¿Cuál es la fórmula del agua?", options: ["H2", "O2", "H2O", "CO2"], correct: 2 },
-        { question: "¿Qué gas compone principalmente la atmósfera?", options: ["Oxígeno", "Nitrógeno", "CO2", "Argón"], correct: 1 },
-        { question: "¿Cuántos sentidos tiene el ser humano?", options: ["4", "5", "6", "7"], correct: 1 },
-        { question: "¿Qué órgano produce la insulina?", options: ["Hígado", "Páncreas", "Riñón", "Estómago"], correct: 1 },
-        { question: "¿Cuál es la estrella más cercana a la Tierra?", options: ["Sirio", "Alfa Centauri", "Sol", "Vega"], correct: 2 },
-        { question: "¿Qué tipo de roca se forma por enfriamiento de lava?", options: ["Sedimentaria", "Metamórfica", "Ígnea", "Caliza"], correct: 2 },
-        { question: "¿Cuántos litros de sangre tiene un adulto?", options: ["3-4", "5-6", "7-8", "9-10"], correct: 1 },
-        { question: "¿Qué animal puede regenerar sus extremidades?", options: ["Lagarto", "Salamandra", "Serpiente", "Rana"], correct: 1 },
-        { question: "¿Cuál es el proceso por el que las plantas hacen alimento?", options: ["Respiración", "Fotosíntesis", "Digestión", "Fermentación"], correct: 1 },
-        { question: "¿Qué planeta es conocido como el gigante gaseoso?", options: ["Marte", "Saturno", "Júpiter", "Urano"], correct: 2 },
-        { question: "¿Cuál es la capa más externa de la Tierra?", options: ["Manto", "Núcleo", "Corteza", "Astenosfera"], correct: 2 },
-        { question: "¿Qué científico descubrió la penicilina?", options: ["Pasteur", "Fleming", "Koch", "Jenner"], correct: 1 },
-        { question: "¿Cuántos dientes tiene un adulto?", options: ["28", "30", "32", "34"], correct: 2 },
-        { question: "¿Qué tipo de animal es un murciélago?", options: ["Ave", "Reptil", "Mamífero", "Insecto"], correct: 2 },
-        { question: "¿Cuál es el elemento más abundante en el universo?", options: ["Oxígeno", "Carbono", "Hidrógeno", "Helio"], correct: 2 },
-        { question: "¿Qué parte del cerebro controla el equilibrio?", options: ["Cerebro", "Cerebelo", "Tronco encefálico", "Hipotálamo"], correct: 1 },
-        { question: "¿Cuántas vértebras tiene la columna vertebral?", options: ["26", "33", "40", "24"], correct: 1 },
-        { question: "¿Qué animal tiene tres corazones?", options: ["Ballena", "Pulpo", "Tiburón", "Calamar"], correct: 1 },
-        { question: "¿Cuál es la temperatura del cuerpo humano normal?", options: ["35°C", "36°C", "37°C", "38°C"], correct: 2 },
-        { question: "¿Qué tipo de onda es el sonido?", options: ["Electromagnética", "Mecánica", "Luminosa", "Térmica"], correct: 1 },
-        { question: "¿Cuál es el satélite natural de la Tierra?", options: ["Fobos", "Europa", "Luna", "Titán"], correct: 2 },
-        { question: "¿Qué científico formuló las leyes del movimiento?", options: ["Einstein", "Galileo", "Newton", "Kepler"], correct: 2 },
-        { question: "¿Cuántos pulmones tiene el ser humano?", options: ["1", "2", "3", "4"], correct: 1 },
-        { question: "¿Qué animal puede cambiar de color?", options: ["Iguana", "Camaleón", "Gecko", "Lagarto"], correct: 1 },
-        { question: "¿Cuál es la partícula más pequeña de un elemento?", options: ["Molécula", "Átomo", "Electrón", "Protón"], correct: 1 },
-        { question: "¿Qué órgano filtra la sangre?", options: ["Hígado", "Corazón", "Riñón", "Bazo"], correct: 2 },
-        { question: "¿Cuántos océanos hay en la Tierra?", options: ["3", "4", "5", "6"], correct: 2 },
-        { question: "¿Qué gas liberan las plantas durante la fotosíntesis?", options: ["CO2", "Nitrógeno", "Oxígeno", "Metano"], correct: 2 },
-        { question: "¿Qué tipo de energía tiene un objeto en movimiento?", options: ["Potencial", "Cinética", "Térmica", "Química"], correct: 1 },
-        { question: "¿Cuál es el estado de la materia del hielo?", options: ["Líquido", "Gas", "Sólido", "Plasma"], correct: 2 },
-        { question: "¿Qué fuerza nos mantiene en la Tierra?", options: ["Magnética", "Eléctrica", "Gravedad", "Nuclear"], correct: 2 },
-        { question: "¿Cuál es el órgano que controla el cuerpo?", options: ["Corazón", "Cerebro", "Hígado", "Pulmón"], correct: 1 },
-        { question: "¿Qué tipo de animal es la rana?", options: ["Reptil", "Mamífero", "Anfibio", "Pez"], correct: 2 },
-        { question: "¿Cuál es la unidad de medida de la fuerza?", options: ["Metro", "Kilogramo", "Newton", "Julio"], correct: 2 },
-        { question: "¿Qué planeta tiene la Gran Mancha Roja?", options: ["Marte", "Saturno", "Júpiter", "Neptuno"], correct: 2 },
-        { question: "¿Cuál es el proceso de cambio de líquido a gas?", options: ["Fusión", "Evaporación", "Condensación", "Solidificación"], correct: 1 },
-        { question: "¿Qué tipo de lente usa una persona miope?", options: ["Convexa", "Cóncava", "Plana", "Bifocal"], correct: 1 },
-        { question: "¿Cuál es el componente principal del aire?", options: ["Oxígeno", "CO2", "Nitrógeno", "Argón"], correct: 2 },
-        { question: "¿Qué animal tiene el cerebro más grande?", options: ["Elefante", "Ballena", "Delfín", "Humano"], correct: 1 },
-        { question: "¿Cuál es la velocidad del sonido aproximadamente?", options: ["340 m/s", "300,000 km/s", "1000 m/s", "100 m/s"], correct: 0 },
-        { question: "¿Qué tipo de roca es el mármol?", options: ["Ígnea", "Sedimentaria", "Metamórfica", "Volcánica"], correct: 2 },
-        { question: "¿Cuál es el planeta más pequeño del sistema solar?", options: ["Marte", "Venus", "Mercurio", "Plutón"], correct: 2 },
-        { question: "¿Qué glándula produce la hormona del crecimiento?", options: ["Tiroides", "Hipófisis", "Páncreas", "Suprarrenal"], correct: 1 },
-        { question: "¿Cuál es el elemento más reactivo?", options: ["Sodio", "Potasio", "Flúor", "Cloro"], correct: 2 },
-        { question: "¿Qué tipo de onda es la luz?", options: ["Mecánica", "Sonora", "Electromagnética", "Sísmica"], correct: 2 },
-        { question: "¿Cuál es la capa de la atmósfera donde vivimos?", options: ["Estratosfera", "Mesosfera", "Troposfera", "Termosfera"], correct: 2 },
-        { question: "¿Qué animal tiene la lengua más larga?", options: ["Rana", "Camaleón", "Oso hormiguero", "Serpiente"], correct: 2 },
-        { question: "¿Cuál es el proceso de división celular?", options: ["Meiosis", "Mitosis", "Ambas", "Ninguna"], correct: 2 },
-        { question: "¿Qué tipo de sangre es el donante universal?", options: ["A", "B", "AB", "O negativo"], correct: 3 },
-        { question: "¿Cuál es el hueso más fuerte del cuerpo?", options: ["Cráneo", "Fémur", "Tibia", "Húmero"], correct: 1 },
-        { question: "¿Qué planeta gira de lado?", options: ["Venus", "Urano", "Neptuno", "Plutón"], correct: 1 },
-        { question: "¿Cuál es la función de los glóbulos rojos?", options: ["Defensa", "Transportar oxígeno", "Coagulación", "Digestión"], correct: 1 },
-        { question: "¿Qué científico propuso la evolución?", options: ["Newton", "Einstein", "Darwin", "Mendel"], correct: 2 },
-        { question: "¿Cuál es el estado de agregación del mercurio a temperatura ambiente?", options: ["Sólido", "Líquido", "Gas", "Plasma"], correct: 1 },
-        { question: "¿Qué tipo de energía almacena una batería?", options: ["Cinética", "Química", "Nuclear", "Mecánica"], correct: 1 },
-        { question: "¿Cuál es el animal más venenoso del mundo?", options: ["Serpiente", "Araña", "Medusa", "Escorpión"], correct: 2 },
-        { question: "¿Qué parte del ojo es responsable del color?", options: ["Pupila", "Córnea", "Iris", "Retina"], correct: 2 },
-        { question: "¿Cuál es la función del sistema linfático?", options: ["Digestión", "Defensa inmune", "Respiración", "Circulación"], correct: 1 },
-        { question: "¿Qué tipo de reproducción tienen las bacterias?", options: ["Sexual", "Asexual", "Ambas", "Ninguna"], correct: 1 },
-        { question: "¿Cuál es el cometa más famoso?", options: ["Hale-Bopp", "Halley", "Hyakutake", "McNaught"], correct: 1 },
-        { question: "¿Qué órgano produce la bilis?", options: ["Páncreas", "Estómago", "Hígado", "Intestino"], correct: 2 },
-        { question: "¿Cuál es la unidad de medida de la energía?", options: ["Watt", "Voltio", "Julio", "Amperio"], correct: 2 },
-        { question: "¿Qué tipo de animal es el delfín?", options: ["Pez", "Reptil", "Mamífero", "Anfibio"], correct: 2 },
-        { question: "¿Cuál es el proceso por el que el agua sube por las plantas?", options: ["Ósmosis", "Capilaridad", "Difusión", "Transpiración"], correct: 1 },
-        { question: "¿Qué planeta tiene el día más corto?", options: ["Mercurio", "Venus", "Tierra", "Júpiter"], correct: 3 },
-        { question: "¿Cuál es la función de las mitocondrias?", options: ["Síntesis de proteínas", "Producir energía", "Almacenar ADN", "Digestión celular"], correct: 1 },
-        { question: "¿Qué tipo de enlace tiene el agua?", options: ["Iónico", "Covalente", "Metálico", "Van der Waals"], correct: 1 },
-        { question: "¿Cuál es el nervio más largo del cuerpo?", options: ["Óptico", "Ciático", "Vago", "Facial"], correct: 1 },
-        { question: "¿Qué animal puede dormir con un ojo abierto?", options: ["Gato", "Delfín", "Búho", "Serpiente"], correct: 1 },
-        { question: "¿Cuál es la temperatura del Sol en su superficie?", options: ["1,000°C", "5,500°C", "10,000°C", "15,000°C"], correct: 1 },
-        { question: "¿Qué tipo de célula no tiene núcleo?", options: ["Eucariota", "Procariota", "Animal", "Vegetal"], correct: 1 },
-        { question: "¿Cuál es el músculo más grande del cuerpo?", options: ["Bíceps", "Cuádriceps", "Glúteo mayor", "Dorsal"], correct: 2 },
-        { question: "¿Qué planeta tiene más lunas?", options: ["Júpiter", "Saturno", "Urano", "Neptuno"], correct: 1 },
-        { question: "¿Cuál es el animal más inteligente después del humano?", options: ["Perro", "Delfín", "Chimpancé", "Elefante"], correct: 2 },
-        { question: "¿Qué vitamina previene el escorbuto?", options: ["A", "B", "C", "D"], correct: 2 },
-        { question: "¿Cuál es el órgano que produce la adrenalina?", options: ["Tiroides", "Páncreas", "Glándula suprarrenal", "Hipófisis"], correct: 2 },
-        { question: "¿Qué tipo de sangre es el receptor universal?", options: ["O negativo", "O positivo", "AB negativo", "AB positivo"], correct: 3 },
-        { question: "¿Cuál es la unidad de medida de la corriente eléctrica?", options: ["Voltio", "Ohmio", "Amperio", "Watt"], correct: 2 }
-    ],
-
-    mathematics: [
-        { question: "¿Cuánto es 2 + 2 × 3?", options: ["12", "8", "10", "6"], correct: 1 },
-        { question: "¿Cuál es la raíz cuadrada de 144?", options: ["10", "11", "12", "13"], correct: 2 },
-        { question: "¿Cuántos grados suman los ángulos de un triángulo?", options: ["90", "180", "360", "Depende del triángulo"], correct: 1 },
-        { question: "¿Cuál es el número pi aproximadamente?", options: ["2.14", "3.14", "4.14", "5.14"], correct: 1 },
-        { question: "¿Cuántos lados tiene un hexágono?", options: ["4", "5", "6", "7"], correct: 2 },
-        { question: "¿Cuál es el resultado de 15 × 15?", options: ["200", "215", "225", "250"], correct: 2 },
-        { question: "¿Qué es un número primo?", options: ["Divisible por 2", "Solo divisible por 1 y sí mismo", "Número par", "Número con decimal"], correct: 1 },
-        { question: "¿Cuánto es 1000 ÷ 8?", options: ["120", "125", "130", "135"], correct: 1 },
-        { question: "¿Cuál es el valor de 2^10?", options: ["512", "1024", "2048", "256"], correct: 1 },
-        { question: "¿Cuántos grados tiene un ángulo recto?", options: ["45", "60", "90", "180"], correct: 2 },
-        { question: "¿Cuál es la raíz cúbica de 27?", options: ["2", "3", "4", "9"], correct: 1 },
-        { question: "¿Cuánto es 7 × 8?", options: ["54", "56", "58", "64"], correct: 1 },
-        { question: "¿Qué fracción es equivalente a 0.5?", options: ["1/3", "1/4", "1/2", "2/3"], correct: 2 },
-        { question: "¿Cuántos lados tiene un octágono?", options: ["6", "7", "8", "9"], correct: 2 },
-        { question: "¿Cuál es el área de un cuadrado de lado 5?", options: ["20", "25", "30", "10"], correct: 1 },
-        { question: "¿Cuánto es 100 - 37?", options: ["63", "67", "73", "57"], correct: 0 },
-        { question: "¿Qué es el perímetro?", options: ["Área interior", "Suma de lados", "Diagonal", "Radio"], correct: 1 },
-        { question: "¿Cuánto es 9²?", options: ["18", "72", "81", "99"], correct: 2 },
-        { question: "¿Cuál es el MCD de 12 y 18?", options: ["2", "3", "6", "9"], correct: 2 },
-        { question: "¿Cuánto es 1/4 + 1/4?", options: ["1/8", "2/8", "1/2", "2/4"], correct: 2 },
-        { question: "¿Qué tipo de ángulo mide más de 90°?", options: ["Agudo", "Recto", "Obtuso", "Llano"], correct: 2 },
-        { question: "¿Cuánto es 25% de 200?", options: ["25", "50", "75", "100"], correct: 1 },
-        { question: "¿Cuál es el MCM de 4 y 6?", options: ["8", "10", "12", "24"], correct: 2 },
-        { question: "¿Cuántos vértices tiene un cubo?", options: ["4", "6", "8", "12"], correct: 2 },
-        { question: "¿Cuánto es 3! (factorial)?", options: ["3", "6", "9", "12"], correct: 1 },
-        { question: "¿Qué es un número entero?", options: ["Con decimales", "Sin decimales", "Solo positivo", "Solo negativo"], correct: 1 },
-        { question: "¿Cuánto es √64?", options: ["6", "7", "8", "9"], correct: 2 },
-        { question: "¿Cuál es la fórmula del área del círculo?", options: ["2πr", "πr²", "πd", "2πr²"], correct: 1 },
-        { question: "¿Cuánto es 0.1 × 0.1?", options: ["0.1", "0.01", "0.001", "1"], correct: 1 },
-        { question: "¿Qué es un polígono regular?", options: ["Lados desiguales", "Todos lados iguales", "Sin ángulos", "Abierto"], correct: 1 },
-        { question: "¿Cuánto es 5 + 3 × 2 - 4?", options: ["7", "8", "12", "16"], correct: 0 },
-        { question: "¿Cuál es el valor absoluto de -15?", options: ["-15", "0", "15", "30"], correct: 2 },
-        { question: "¿Cuántas caras tiene un dado?", options: ["4", "5", "6", "8"], correct: 2 },
-        { question: "¿Cuánto es 1/3 de 90?", options: ["20", "30", "40", "45"], correct: 1 },
-        { question: "¿Qué es una fracción impropia?", options: ["Numerador < denominador", "Numerador > denominador", "Igual a 1", "Negativa"], correct: 1 },
-        { question: "¿Cuánto es 10³?", options: ["30", "100", "1000", "10000"], correct: 2 },
-        { question: "¿Cuál es el siguiente número primo después de 7?", options: ["8", "9", "10", "11"], correct: 3 },
-        { question: "¿Cuántos grados tiene un círculo completo?", options: ["180", "270", "360", "400"], correct: 2 },
-        { question: "¿Cuánto es 2/5 en decimal?", options: ["0.2", "0.4", "0.5", "0.25"], correct: 1 },
-        { question: "¿Qué es el radio de un círculo?", options: ["Diámetro", "Mitad del diámetro", "Perímetro", "Área"], correct: 1 },
-        { question: "¿Cuánto es 17 + 28?", options: ["35", "45", "55", "65"], correct: 1 },
-        { question: "¿Cuál es la suma de ángulos de un cuadrilátero?", options: ["180°", "270°", "360°", "540°"], correct: 2 },
-        { question: "¿Cuánto es 144 ÷ 12?", options: ["10", "11", "12", "14"], correct: 2 },
-        { question: "¿Qué es un número racional?", options: ["Irracional", "Expresable como fracción", "Infinito", "Imaginario"], correct: 1 },
-        { question: "¿Cuánto es 50% de 80?", options: ["30", "40", "50", "60"], correct: 1 },
-        { question: "¿Cuántos lados tiene un decágono?", options: ["8", "9", "10", "12"], correct: 2 },
-        { question: "¿Cuál es el resultado de (-3) × (-4)?", options: ["-12", "-7", "7", "12"], correct: 3 },
-        { question: "¿Cuánto es 1 + 2 + 3 + 4 + 5?", options: ["10", "12", "15", "20"], correct: 2 },
-        { question: "¿Qué es el diámetro?", options: ["Radio × 2", "Radio ÷ 2", "Perímetro", "Área"], correct: 0 },
-        { question: "¿Cuánto es 75% de 100?", options: ["25", "50", "75", "100"], correct: 2 },
-        { question: "¿Cuál es el valor de 5⁰?", options: ["0", "1", "5", "Indefinido"], correct: 1 },
-        { question: "¿Cuánto es 1000 - 567?", options: ["433", "443", "453", "463"], correct: 0 },
-        { question: "¿Qué es un número compuesto?", options: ["Solo divisible por 1", "Tiene más de 2 divisores", "Número negativo", "Número decimal"], correct: 1 },
-        { question: "¿Cuánto es 2⁵?", options: ["10", "16", "32", "64"], correct: 2 },
-        { question: "¿Cuál es la suma de los ángulos de un pentágono?", options: ["360°", "450°", "540°", "720°"], correct: 2 },
-        { question: "¿Cuánto es 0.25 en fracción?", options: ["1/2", "1/3", "1/4", "1/5"], correct: 2 },
-        { question: "¿Qué es un número irracional?", options: ["Fracción", "No expresable como fracción", "Número entero", "Número negativo"], correct: 1 },
-        { question: "¿Cuánto es 13 × 7?", options: ["81", "84", "91", "94"], correct: 2 },
-        { question: "¿Cuál es el perímetro de un cuadrado de lado 8?", options: ["16", "24", "32", "64"], correct: 2 },
-        { question: "¿Cuánto es √169?", options: ["11", "12", "13", "14"], correct: 2 },
-        { question: "¿Qué es una proporción?", options: ["Suma de números", "Igualdad de razones", "Resta de fracciones", "División de enteros"], correct: 1 },
-        { question: "¿Cuánto es 4! (factorial)?", options: ["12", "16", "24", "32"], correct: 2 },
-        { question: "¿Cuál es el área de un triángulo de base 10 y altura 6?", options: ["16", "30", "60", "120"], correct: 1 },
-        { question: "¿Cuánto es 1/2 + 1/3?", options: ["2/5", "5/6", "1/6", "2/6"], correct: 1 },
-        { question: "¿Qué tipo de ángulo mide exactamente 180°?", options: ["Recto", "Obtuso", "Llano", "Completo"], correct: 2 },
-        { question: "¿Cuánto es 20% de 250?", options: ["25", "50", "75", "100"], correct: 1 },
-        { question: "¿Cuál es el volumen de un cubo de lado 3?", options: ["9", "18", "27", "36"], correct: 2 },
-        { question: "¿Cuánto es 999 + 1?", options: ["1000", "1001", "999", "100"], correct: 0 },
-        { question: "¿Qué es el teorema de Pitágoras?", options: ["a+b=c", "a²+b²=c²", "a×b=c", "a/b=c"], correct: 1 },
-        { question: "¿Cuánto es 15²?", options: ["125", "200", "225", "250"], correct: 2 },
-        { question: "¿Cuál es la circunferencia de un círculo de radio 7? (π≈3.14)", options: ["21.98", "43.96", "153.86", "14"], correct: 1 },
-        { question: "¿Cuánto es 1/4 de 80?", options: ["10", "15", "20", "25"], correct: 2 },
-        { question: "¿Qué es un ángulo agudo?", options: ["Mayor de 90°", "Igual a 90°", "Menor de 90°", "Igual a 180°"], correct: 2 },
-        { question: "¿Cuánto es 6 × 9?", options: ["45", "54", "56", "63"], correct: 1 },
-        { question: "¿Cuál es el siguiente número en la secuencia: 2, 4, 8, 16, ...?", options: ["24", "28", "32", "36"], correct: 2 },
-        { question: "¿Cuánto es 1000 ÷ 25?", options: ["25", "40", "50", "100"], correct: 1 },
-        { question: "¿Qué es un poliedro?", options: ["Figura plana", "Sólido con caras planas", "Círculo", "Línea"], correct: 1 },
-        { question: "¿Cuánto es 3/4 - 1/4?", options: ["1/4", "1/2", "2/4", "3/4"], correct: 1 },
-        { question: "¿Cuál es el área de un rectángulo de 5×8?", options: ["13", "26", "40", "80"], correct: 2 },
-        { question: "¿Cuánto es 11 × 11?", options: ["111", "121", "131", "141"], correct: 1 },
-        { question: "¿Qué es una media aritmética?", options: ["El número mayor", "Suma dividida por cantidad", "El número menor", "La diferencia"], correct: 1 },
-        { question: "¿Cuánto es 2/3 de 90?", options: ["30", "45", "60", "75"], correct: 2 },
-        { question: "¿Cuál es el valor de π redondeado a 2 decimales?", options: ["3.12", "3.14", "3.16", "3.18"], correct: 1 },
-        { question: "¿Cuánto es 8³?", options: ["24", "64", "256", "512"], correct: 3 },
-        { question: "¿Qué es un número par?", options: ["Divisible por 3", "Divisible por 2", "Divisible por 5", "Divisible por 7"], correct: 1 },
-        { question: "¿Cuánto es 45 ÷ 9?", options: ["4", "5", "6", "7"], correct: 1 },
-        { question: "¿Cuál es la raíz cúbica de 64?", options: ["2", "3", "4", "8"], correct: 2 },
-        { question: "¿Cuánto es 0.5 × 0.5?", options: ["0.1", "0.25", "0.5", "1"], correct: 1 },
-        { question: "¿Qué es un trapecio?", options: ["4 lados iguales", "4 lados paralelos", "2 lados paralelos", "Sin lados paralelos"], correct: 2 },
-        { question: "¿Cuánto es 100 ÷ 4?", options: ["20", "25", "30", "40"], correct: 1 },
-        { question: "¿Cuál es el número de Euler aproximadamente?", options: ["1.71", "2.71", "3.71", "4.71"], correct: 1 },
-        { question: "¿Cuánto es 7 × 7?", options: ["42", "47", "49", "56"], correct: 2 },
-        { question: "¿Qué es un rombo?", options: ["4 lados iguales", "4 ángulos rectos", "3 lados", "Círculo"], correct: 0 },
-        { question: "¿Cuánto es 1/5 en porcentaje?", options: ["10%", "15%", "20%", "25%"], correct: 2 },
-        { question: "¿Cuál es el resultado de 100 - 33 - 33 - 34?", options: ["-1", "0", "1", "34"], correct: 1 },
-        { question: "¿Cuánto es 12 × 12?", options: ["124", "134", "144", "154"], correct: 2 },
-        { question: "¿Qué es un número natural?", options: ["Negativo", "Positivo entero", "Decimal", "Fracción"], correct: 1 },
-        { question: "¿Cuánto es √256?", options: ["14", "15", "16", "17"], correct: 2 },
-        { question: "¿Cuál es el área de un círculo de radio 5? (π≈3.14)", options: ["31.4", "78.5", "157", "25"], correct: 1 },
-        { question: "¿Cuánto es 5! (factorial)?", options: ["60", "100", "120", "150"], correct: 2 }
-    ],
-
-    robotics: [
-        { question: "¿Qué significa AI en robótica?", options: ["Automated Intelligence", "Artificial Intelligence", "Advanced Integration", "Automatic Interface"], correct: 1 },
-        { question: "¿Qué sensor se usa para detectar obstáculos?", options: ["GPS", "Ultrasonido", "Bluetooth", "WiFi"], correct: 1 },
-        { question: "¿Qué lenguaje se usa comúnmente en Arduino?", options: ["Python", "Java", "C/C++", "JavaScript"], correct: 2 },
-        { question: "¿Qué es un actuador en robótica?", options: ["Sensor", "Motor", "Batería", "Procesador"], correct: 1 },
-        { question: "¿Qué es ROS en robótica?", options: ["Robot Operating System", "Robotic Output System", "Remote Operation Software", "Robot Optimization Suite"], correct: 0 },
-        { question: "¿Qué tipo de robot se usa en cirugías?", options: ["Industrial", "Quirúrgico", "Doméstico", "Militar"], correct: 1 },
-        { question: "¿Qué es un servo motor?", options: ["Motor de corriente alterna", "Motor con control de posición", "Motor sin escobillas", "Motor paso a paso"], correct: 1 },
-        { question: "¿Qué sensor mide la distancia con luz?", options: ["Ultrasonido", "LIDAR", "Infrarrojo", "Radar"], correct: 1 },
-        { question: "¿Qué es PWM en robótica?", options: ["Power Wave Modulation", "Pulse Width Modulation", "Programmed Wave Motion", "Power Width Module"], correct: 1 },
-        { question: "¿Qué placa programable NO es una consola de videojuegos?", options: ["Arduino", "PlayStation", "Xbox", "Nintendo Switch"], correct: 0 },
-        { question: "¿Qué es un encoder en robótica?", options: ["Decodificador", "Sensor de posición", "Transmisor", "Amplificador"], correct: 1 },
-        { question: "¿Qué robot limpia el piso mientras tú ves Netflix?", options: ["Alexa", "Roomba", "Siri", "Cortana"], correct: 1 },
-        { question: "¿Qué es un brazo robótico?", options: ["Pierna mecánica", "Manipulador articulado", "Sensor táctil", "Cámara"], correct: 1 },
-        { question: "¿Qué significa IoT?", options: ["Internet of Things", "Input of Technology", "Integration of Tools", "Interface of Terminals"], correct: 0 },
-        { question: "¿Qué es un dron?", options: ["Robot terrestre", "Vehículo aéreo no tripulado", "Submarino", "Satélite"], correct: 1 },
-        { question: "¿Qué sensor detecta la luz?", options: ["Fotorresistor", "Termistor", "Potenciómetro", "Capacitor"], correct: 0 },
-        { question: "¿Qué es machine learning?", options: ["Programación manual", "Aprendizaje automático", "Diseño de máquinas", "Reparación de robots"], correct: 1 },
-        { question: "¿Qué robot de Boston Dynamics camina?", options: ["Spot", "Alexa", "Siri", "Watson"], correct: 0 },
-        { question: "¿Qué es un microcontrolador?", options: ["Computadora grande", "Chip programable pequeño", "Pantalla", "Teclado"], correct: 1 },
-        { question: "¿Qué sensor mide la temperatura?", options: ["LDR", "Termistor", "Ultrasonido", "Giroscopio"], correct: 1 },
-        { question: "¿Qué es Raspberry Pi?", options: ["Postre", "Minicomputadora", "Fruta electrónica", "Videojuego"], correct: 1 },
-        { question: "¿Qué es un giroscopio?", options: ["Sensor de luz", "Sensor de orientación", "Sensor de sonido", "Sensor de presión"], correct: 1 },
-        { question: "¿Qué robot humanoide creó Honda?", options: ["ASIMO", "Atlas", "Sophia", "Pepper"], correct: 0 },
-        { question: "¿Qué es un LED?", options: ["Sensor", "Diodo emisor de luz", "Motor", "Batería"], correct: 1 },
-        { question: "¿Qué es la cinemática en robótica?", options: ["Estudio del movimiento", "Estudio del color", "Estudio del sonido", "Estudio del calor"], correct: 0 },
-        { question: "¿Qué sensor detecta el tacto?", options: ["Táctil", "Óptico", "Acústico", "Térmico"], correct: 0 },
-        { question: "¿Qué es un robot colaborativo?", options: ["Trabaja solo", "Trabaja con humanos", "Trabaja bajo agua", "Trabaja en el espacio"], correct: 1 },
-        { question: "¿Qué es un motor DC?", options: ["Motor de corriente directa", "Motor de corriente alterna", "Motor híbrido", "Motor solar"], correct: 0 },
-        { question: "¿Qué empresa creó el robot Sophia?", options: ["Boston Dynamics", "Hanson Robotics", "Honda", "Toyota"], correct: 1 },
-        { question: "¿Qué es un sensor de proximidad?", options: ["Detecta objetos cercanos", "Mide temperatura", "Detecta sonido", "Mide luz"], correct: 0 },
-        { question: "¿Qué es un exoesqueleto?", options: ["Robot interno", "Estructura externa de soporte", "Sensor", "Batería"], correct: 1 },
-        { question: "¿Qué lenguaje usa mucho en IA?", options: ["HTML", "CSS", "Python", "SQL"], correct: 2 },
-        { question: "¿Qué es un robot autónomo?", options: ["Controlado remotamente", "Opera independientemente", "Solo camina", "Solo habla"], correct: 1 },
-        { question: "¿Qué sensor usa GPS?", options: ["Posicionamiento global", "Temperatura", "Luz", "Sonido"], correct: 0 },
-        { question: "¿Qué es un motor paso a paso?", options: ["Motor continuo", "Motor de movimientos precisos", "Motor de gasolina", "Motor eléctrico simple"], correct: 1 },
-        { question: "¿Qué robot explora Marte?", options: ["Curiosity", "Roomba", "ASIMO", "Spot"], correct: 0 },
-        { question: "¿Qué es un sensor IMU?", options: ["Unidad de medición inercial", "Unidad de motor interno", "Interfaz de usuario", "Módulo de internet"], correct: 0 },
-        { question: "¿Qué es telepresencia?", options: ["Presencia física", "Presencia remota", "Ausencia total", "Presencia virtual"], correct: 1 },
-        { question: "¿Qué es un robot industrial?", options: ["Robot de casa", "Robot de fábrica", "Robot de juguete", "Robot médico"], correct: 1 },
-        { question: "¿Qué sensor detecta gases?", options: ["MQ-2", "LDR", "DHT11", "HC-SR04"], correct: 0 },
-        { question: "¿Qué es visión por computadora?", options: ["Ver con lentes", "Procesar imágenes digitalmente", "Mirar pantallas", "Usar microscopio"], correct: 1 },
-        { question: "¿Qué es un actuador lineal?", options: ["Movimiento circular", "Movimiento en línea recta", "Sin movimiento", "Movimiento aleatorio"], correct: 1 },
-        { question: "¿Qué robot usa Amazon en almacenes?", options: ["Kiva", "Roomba", "ASIMO", "Atlas"], correct: 0 },
-        { question: "¿Qué es un sensor de humedad?", options: ["Mide agua en el aire", "Mide temperatura", "Mide luz", "Mide presión"], correct: 0 },
-        { question: "¿Qué es SLAM en robótica?", options: ["Localización y mapeo simultáneo", "Sistema de alarma", "Sensor de luz", "Motor especial"], correct: 0 },
-        { question: "¿Qué es un cobot?", options: ["Robot de cocina", "Robot colaborativo", "Robot de combate", "Robot de carga"], correct: 1 },
-        { question: "¿Qué sensor mide la presión?", options: ["Barómetro", "Termómetro", "Fotómetro", "Velocímetro"], correct: 0 },
-        { question: "¿Qué es deep learning?", options: ["Aprendizaje superficial", "Aprendizaje profundo", "Aprendizaje lento", "Aprendizaje manual"], correct: 1 },
-        { question: "¿Qué es un efector final?", options: ["Inicio del robot", "Herramienta al final del brazo", "Batería", "Sensor principal"], correct: 1 },
-        { question: "¿Qué empresa creó Atlas?", options: ["Honda", "Toyota", "Boston Dynamics", "NASA"], correct: 2 },
-        { question: "¿Qué es un PLC en automatización?", options: ["Controlador lógico programable", "Procesador de luz", "Panel de control", "Programa de línea"], correct: 0 },
-        { question: "¿Qué robot de LEGO es educativo?", options: ["Technic", "Mindstorms", "City", "Creator"], correct: 1 },
-        { question: "¿Qué es un grado de libertad en robótica?", options: ["Tipo de motor", "Eje de movimiento independiente", "Sensor", "Batería"], correct: 1 },
-        { question: "¿Qué sensor mide la aceleración?", options: ["Giroscopio", "Acelerómetro", "Magnetómetro", "Barómetro"], correct: 1 },
-        { question: "¿Qué es un robot móvil?", options: ["Robot fijo", "Robot que se desplaza", "Robot volador", "Robot submarino"], correct: 1 },
-        { question: "¿Qué protocolo usa I2C?", options: ["Comunicación serial", "Comunicación paralela", "WiFi", "Bluetooth"], correct: 0 },
-        { question: "¿Qué es un robot humanoide?", options: ["Robot animal", "Robot con forma humana", "Robot industrial", "Robot volador"], correct: 1 },
-        { question: "¿Qué sensor detecta campos magnéticos?", options: ["Acelerómetro", "Giroscopio", "Magnetómetro", "Barómetro"], correct: 2 },
-        { question: "¿Qué es un robot de servicio?", options: ["Robot industrial", "Robot que ayuda a personas", "Robot militar", "Robot espacial"], correct: 1 },
-        { question: "¿Qué lenguaje usa mucho Raspberry Pi?", options: ["C#", "Java", "Python", "Ruby"], correct: 2 },
-        { question: "¿Qué es un robot cartesiano?", options: ["Robot con ejes X, Y, Z", "Robot circular", "Robot esférico", "Robot articulado"], correct: 0 },
-        { question: "¿Qué sensor usa infrarrojos?", options: ["Ultrasonido", "IR", "LIDAR", "Radar"], correct: 1 },
-        { question: "¿Qué es un robot SCARA?", options: ["Robot de 6 ejes", "Robot de ensamblaje rápido", "Robot móvil", "Robot volador"], correct: 1 },
-        { question: "¿Qué es un puente H?", options: ["Estructura física", "Circuito para motores DC", "Tipo de sensor", "Protocolo de comunicación"], correct: 1 },
-        { question: "¿Qué robot limpia piscinas?", options: ["Roomba", "Dolphin", "Spot", "Atlas"], correct: 1 },
-        { question: "¿Qué es un robot delta?", options: ["Robot lento", "Robot paralelo rápido", "Robot móvil", "Robot submarino"], correct: 1 },
-        { question: "¿Qué sensor mide la rotación?", options: ["Acelerómetro", "Giroscopio", "Magnetómetro", "Barómetro"], correct: 1 },
-        { question: "¿Qué es un AGV?", options: ["Vehículo guiado automático", "Sensor avanzado", "Tipo de motor", "Protocolo"], correct: 0 },
-        { question: "¿Qué es un robot articulado?", options: ["Robot sin articulaciones", "Robot con múltiples articulaciones", "Robot fijo", "Robot lineal"], correct: 1 },
-        { question: "¿Qué sensor detecta colores?", options: ["Ultrasonido", "Color sensor", "Giroscopio", "Acelerómetro"], correct: 1 },
-        { question: "¿Qué es un robot cilíndrico?", options: ["Robot con forma de cubo", "Robot con coordenadas cilíndricas", "Robot esférico", "Robot plano"], correct: 1 },
-        { question: "¿Qué es SPI en electrónica?", options: ["Interfaz periférica serial", "Sensor de presión", "Tipo de motor", "Protocolo WiFi"], correct: 0 },
-        { question: "¿Qué robot de Amazon entrega paquetes?", options: ["Kiva", "Scout", "Alexa", "Echo"], correct: 1 },
-        { question: "¿Qué es un robot esférico?", options: ["Robot con coordenadas esféricas", "Robot redondo", "Robot cilíndrico", "Robot plano"], correct: 0 },
-        { question: "¿Qué sensor mide la distancia con sonido?", options: ["LIDAR", "Ultrasonido", "Infrarrojo", "Radar"], correct: 1 },
-        { question: "¿Qué es un robot de rescate?", options: ["Robot industrial", "Robot para emergencias", "Robot doméstico", "Robot de entretenimiento"], correct: 1 },
-        { question: "¿Qué es UART?", options: ["Transmisor-receptor asíncrono universal", "Sensor", "Motor", "Batería"], correct: 0 },
-        { question: "¿Qué robot explora volcanes?", options: ["Dante", "Curiosity", "Spot", "Atlas"], correct: 0 },
-        { question: "¿Qué es un robot de telepresencia?", options: ["Robot local", "Robot para presencia remota", "Robot industrial", "Robot militar"], correct: 1 },
-        { question: "¿Qué sensor detecta movimiento?", options: ["PIR", "LDR", "Termistor", "Potenciómetro"], correct: 0 },
-        { question: "¿Qué es un robot agrícola?", options: ["Robot de fábrica", "Robot para agricultura", "Robot doméstico", "Robot médico"], correct: 1 },
-        { question: "¿Qué es un ESC en drones?", options: ["Controlador de velocidad electrónico", "Sensor", "Batería", "Motor"], correct: 0 },
-        { question: "¿Qué robot de SoftBank es social?", options: ["ASIMO", "Pepper", "Atlas", "Spot"], correct: 1 },
-        { question: "¿Qué es un robot de inspección?", options: ["Robot de limpieza", "Robot para revisar estructuras", "Robot de cocina", "Robot de juego"], correct: 1 },
-        { question: "¿Qué sensor mide la humedad del suelo?", options: ["Higrómetro", "Termómetro", "Barómetro", "Anemómetro"], correct: 0 },
-        { question: "¿Qué es un robot submarino?", options: ["ROV/AUV", "Dron", "AGV", "Humanoide"], correct: 0 },
-        { question: "¿Qué es un motor brushless?", options: ["Motor con escobillas", "Motor sin escobillas", "Motor de gasolina", "Motor hidráulico"], correct: 1 },
-        { question: "¿Qué robot de iRobot limpia pisos?", options: ["Roomba", "Braava", "Ambos", "Ninguno"], correct: 2 },
-        { question: "¿Qué es un robot de soldadura?", options: ["Robot que suelda metales", "Robot que limpia", "Robot que pinta", "Robot que ensambla"], correct: 0 },
-        { question: "¿Qué sensor detecta líneas?", options: ["Seguidor de línea", "Ultrasonido", "Giroscopio", "GPS"], correct: 0 },
-        { question: "¿Qué es un robot de pintura?", options: ["Robot que dibuja", "Robot que pinta superficies", "Robot artístico", "Robot de limpieza"], correct: 1 },
-        { question: "¿Qué es un controlador PID?", options: ["Proporcional-Integral-Derivativo", "Programa de diseño", "Sensor", "Motor"], correct: 0 },
-        { question: "¿Qué robot de Google aprende a caminar?", options: ["Atlas", "Spot", "ANYmal", "Cassie"], correct: 2 },
-        { question: "¿Qué es un robot de paletizado?", options: ["Robot que apila cajas", "Robot móvil", "Robot volador", "Robot submarino"], correct: 0 },
-        { question: "¿Qué sensor mide el nivel de líquido?", options: ["Sensor de nivel", "Termómetro", "Barómetro", "Giroscopio"], correct: 0 },
-        { question: "¿Qué es un robot de pick and place?", options: ["Robot que recoge y coloca objetos", "Robot móvil", "Robot volador", "Robot submarino"], correct: 0 },
-        { question: "¿Qué sensor detecta la inclinación?", options: ["Acelerómetro", "Giroscopio", "Inclinómetro", "Todos"], correct: 3 },
-        { question: "¿Qué es un robot de ensamblaje?", options: ["Robot que une piezas", "Robot móvil", "Robot volador", "Robot submarino"], correct: 0 },
-        { question: "¿Qué protocolo usa CAN bus?", options: ["Comunicación automotriz", "WiFi", "Bluetooth", "Infrarrojo"], correct: 0 },
-        { question: "¿Qué es un robot de corte?", options: ["Robot que corta materiales", "Robot móvil", "Robot volador", "Robot submarino"], correct: 0 }
-    ],
-
-    chemistry: [
-        { question: "¿Cuál es el símbolo del elemento oxígeno?", options: ["Ox", "O2", "O", "Ox2"], correct: 2 },
-        { question: "¿Cuántos elementos hay en la tabla periódica?", options: ["108", "118", "128", "138"], correct: 1 },
-        { question: "¿Cuál es la fórmula del dióxido de carbono?", options: ["CO", "CO2", "C2O", "C2O2"], correct: 1 },
-        { question: "¿Qué pH tiene una sustancia neutra?", options: ["0", "7", "14", "10"], correct: 1 },
-        { question: "¿Cuál es la fórmula química del agua?", options: ["H2", "O2", "H2O", "HO"], correct: 2 },
-        { question: "¿Qué elemento tiene el símbolo Fe?", options: ["Flúor", "Fósforo", "Hierro", "Francio"], correct: 2 },
-        { question: "¿Cuál es el gas más ligero?", options: ["Helio", "Hidrógeno", "Oxígeno", "Nitrógeno"], correct: 1 },
-        { question: "¿Qué tipo de enlace comparten electrones?", options: ["Iónico", "Covalente", "Metálico", "Puente de hidrógeno"], correct: 1 },
-        { question: "¿Cuál es el número atómico del carbono?", options: ["4", "6", "8", "12"], correct: 1 },
-        { question: "¿Qué elemento es esencial para la vida orgánica?", options: ["Hierro", "Carbono", "Oro", "Plata"], correct: 1 },
-        { question: "¿Qué es un ácido?", options: ["pH > 7", "pH < 7", "pH = 7", "Sin pH"], correct: 1 },
-        { question: "¿Cuál es el símbolo del sodio?", options: ["So", "Sd", "Na", "S"], correct: 2 },
-        { question: "¿Qué gas hace que los globos suban (y no exploten)?", options: ["Oxígeno", "Hidrógeno", "Helio", "CO2"], correct: 2 },
-        { question: "¿Cuál es la fórmula del ácido clorhídrico?", options: ["HCl", "H2Cl", "HCl2", "Cl2H"], correct: 0 },
-        { question: "¿Qué elemento tiene el símbolo Ag?", options: ["Oro", "Plata", "Aluminio", "Argón"], correct: 1 },
-        { question: "¿Qué es una base?", options: ["pH < 7", "pH > 7", "pH = 7", "Sin pH"], correct: 1 },
-        { question: "¿Cuál es el elemento más abundante en la corteza terrestre?", options: ["Hierro", "Silicio", "Oxígeno", "Aluminio"], correct: 2 },
-        { question: "¿Qué tipo de reacción libera energía?", options: ["Endotérmica", "Exotérmica", "Neutra", "Isotérmica"], correct: 1 },
-        { question: "¿Cuál es el símbolo del potasio?", options: ["Po", "Pt", "K", "Ka"], correct: 2 },
-        { question: "¿Qué es un catalizador?", options: ["Acelera reacciones", "Detiene reacciones", "Crea elementos", "Destruye moléculas"], correct: 0 },
-        { question: "¿Cuál es la fórmula del metano?", options: ["CH4", "C2H6", "CO2", "CH2"], correct: 0 },
-        { question: "¿Qué elemento tiene el símbolo Cu?", options: ["Carbono", "Calcio", "Cobre", "Cromo"], correct: 2 },
-        { question: "¿Qué es un isótopo?", options: ["Mismo elemento, diferente masa", "Diferente elemento", "Compuesto", "Mezcla"], correct: 0 },
-        { question: "¿Cuál es el gas noble más común?", options: ["Helio", "Neón", "Argón", "Kriptón"], correct: 2 },
-        { question: "¿Qué es la valencia?", options: ["Peso atómico", "Capacidad de combinación", "Número de protones", "Número de neutrones"], correct: 1 },
-        { question: "¿Cuál es el símbolo del calcio?", options: ["C", "Ca", "Cl", "Co"], correct: 1 },
-        { question: "¿Qué es una solución saturada?", options: ["Sin soluto", "Máximo soluto disuelto", "Solo agua", "Mezcla heterogénea"], correct: 1 },
-        { question: "¿Cuál es la fórmula del amoníaco?", options: ["NH3", "NO2", "N2O", "NH4"], correct: 0 },
-        { question: "¿Qué partícula tiene carga positiva?", options: ["Electrón", "Neutrón", "Protón", "Fotón"], correct: 2 },
-        { question: "¿Cuál es el elemento más electronegativo?", options: ["Oxígeno", "Cloro", "Flúor", "Nitrógeno"], correct: 2 },
-        { question: "¿Qué es la oxidación?", options: ["Ganar electrones", "Perder electrones", "Ganar protones", "Perder neutrones"], correct: 1 },
-        { question: "¿Cuál es el símbolo del nitrógeno?", options: ["Ni", "N", "No", "Ne"], correct: 1 },
-        { question: "¿Qué es un mol?", options: ["Unidad de masa", "6.022 × 10²³ partículas", "Unidad de volumen", "Tipo de enlace"], correct: 1 },
-        { question: "¿Cuál es la fórmula del ácido sulfúrico?", options: ["H2SO4", "HSO4", "H2S", "SO4"], correct: 0 },
-        { question: "¿Qué elemento tiene el símbolo Pb?", options: ["Platino", "Plomo", "Paladio", "Polonio"], correct: 1 },
-        { question: "¿Qué es la destilación?", options: ["Mezclar líquidos", "Separar por ebullición", "Filtrar sólidos", "Congelar"], correct: 1 },
-        { question: "¿Cuál es el número atómico del hidrógeno?", options: ["0", "1", "2", "3"], correct: 1 },
-        { question: "¿Qué es un compuesto?", options: ["Un solo elemento", "Dos o más elementos unidos", "Mezcla física", "Gas puro"], correct: 1 },
-        { question: "¿Cuál es el símbolo del cloro?", options: ["C", "Cr", "Cl", "Co"], correct: 2 },
-        { question: "¿Qué es la electrólisis?", options: ["Unir moléculas", "Separar con electricidad", "Calentar sustancias", "Enfriar gases"], correct: 1 },
-        { question: "¿Cuál es la fórmula del etanol?", options: ["CH3OH", "C2H5OH", "C3H7OH", "CH4"], correct: 1 },
-        { question: "¿Qué elemento tiene el símbolo Hg?", options: ["Helio", "Hafnio", "Mercurio", "Holmio"], correct: 2 },
-        { question: "¿Qué es un polímero?", options: ["Molécula pequeña", "Cadena de moléculas repetidas", "Átomo simple", "Ion negativo"], correct: 1 },
-        { question: "¿Cuál es el pH del ácido estomacal?", options: ["1-2", "5-6", "7", "10-11"], correct: 0 },
-        { question: "¿Qué es la reducción?", options: ["Perder electrones", "Ganar electrones", "Perder protones", "Ganar neutrones"], correct: 1 },
-        { question: "¿Cuál es el símbolo del fósforo?", options: ["F", "Ph", "P", "Po"], correct: 2 },
-        { question: "¿Qué es un ion?", options: ["Átomo neutro", "Átomo con carga", "Molécula", "Compuesto"], correct: 1 },
-        { question: "¿Cuál es la fórmula de la glucosa?", options: ["C6H12O6", "C12H22O11", "CH2O", "C2H4O2"], correct: 0 },
-        { question: "¿Qué elemento tiene el símbolo Sn?", options: ["Azufre", "Silicio", "Estaño", "Selenio"], correct: 2 },
-        { question: "¿Qué es la sublimación?", options: ["Sólido a líquido", "Líquido a gas", "Sólido a gas", "Gas a líquido"], correct: 2 },
-        { question: "¿Cuál es el símbolo del magnesio?", options: ["M", "Ma", "Mg", "Mn"], correct: 2 },
-        { question: "¿Qué es un alcano?", options: ["Hidrocarburo saturado", "Hidrocarburo insaturado", "Alcohol", "Ácido"], correct: 0 },
-        { question: "¿Cuál es la fórmula del ácido nítrico?", options: ["HNO2", "HNO3", "H2NO3", "HN2O3"], correct: 1 },
-        { question: "¿Qué elemento tiene el símbolo Zn?", options: ["Circonio", "Zinc", "Zirconio", "Zeolita"], correct: 1 },
-        { question: "¿Qué es la cristalización?", options: ["Formar cristales", "Romper cristales", "Fundir cristales", "Evaporar cristales"], correct: 0 },
-        { question: "¿Cuál es el símbolo del aluminio?", options: ["A", "Al", "Am", "Ar"], correct: 1 },
-        { question: "¿Qué es un alqueno?", options: ["Enlace simple", "Enlace doble", "Enlace triple", "Sin enlace"], correct: 1 },
-        { question: "¿Cuál es la fórmula del hidróxido de sodio?", options: ["NaO", "NaOH", "Na2O", "NaH"], correct: 1 },
-        { question: "¿Qué elemento tiene el símbolo Br?", options: ["Boro", "Bario", "Bromo", "Berilio"], correct: 2 },
-        { question: "¿Qué es la precipitación en química?", options: ["Lluvia", "Formación de sólido", "Evaporación", "Fusión"], correct: 1 },
-        { question: "¿Cuál es el símbolo del silicio?", options: ["S", "Si", "Sl", "Sc"], correct: 1 },
-        { question: "¿Qué es un alquino?", options: ["Enlace simple", "Enlace doble", "Enlace triple", "Sin enlace"], correct: 2 },
-        { question: "¿Cuál es la fórmula del carbonato de calcio?", options: ["CaCO3", "Ca2CO3", "CaCO2", "Ca(CO3)2"], correct: 0 },
-        { question: "¿Qué elemento tiene el símbolo I?", options: ["Indio", "Iridio", "Yodo", "Itrio"], correct: 2 },
-        { question: "¿Qué es la filtración?", options: ["Separar sólidos de líquidos", "Mezclar sustancias", "Evaporar", "Condensar"], correct: 0 },
-        { question: "¿Cuál es el símbolo del titanio?", options: ["T", "Ti", "Tn", "Ta"], correct: 1 },
-        { question: "¿Qué es un éster?", options: ["Ácido + alcohol", "Ácido + base", "Alcohol + alcohol", "Base + base"], correct: 0 },
-        { question: "¿Cuál es la fórmula del bicarbonato de sodio?", options: ["NaCO3", "NaHCO3", "Na2CO3", "NaH2CO3"], correct: 1 },
-        { question: "¿Qué elemento tiene el símbolo W?", options: ["Wolframio/Tungsteno", "Vanadio", "Uranio", "Xenón"], correct: 0 },
-        { question: "¿Qué es la decantación?", options: ["Separar por densidad", "Separar por tamaño", "Separar por color", "Separar por olor"], correct: 0 },
-        { question: "¿Cuál es el símbolo del cromo?", options: ["C", "Ch", "Cr", "Co"], correct: 2 },
-        { question: "¿Qué es una amina?", options: ["Derivado del amoníaco", "Derivado del agua", "Derivado del metano", "Derivado del etano"], correct: 0 },
-        { question: "¿Cuál es la fórmula del peróxido de hidrógeno?", options: ["H2O", "H2O2", "HO2", "H3O"], correct: 1 },
-        { question: "¿Qué elemento tiene el símbolo Mn?", options: ["Magnesio", "Manganeso", "Molibdeno", "Mendelevio"], correct: 1 },
-        { question: "¿Qué es la centrifugación?", options: ["Separar por rotación", "Separar por calor", "Separar por frío", "Separar por luz"], correct: 0 },
-        { question: "¿Cuál es el símbolo del cobalto?", options: ["C", "Cb", "Co", "Ct"], correct: 2 },
-        { question: "¿Qué es un aldehído?", options: ["Grupo CHO", "Grupo COOH", "Grupo OH", "Grupo NH2"], correct: 0 },
-        { question: "¿Cuál es la fórmula del cloruro de sodio?", options: ["NaCl", "NaCl2", "Na2Cl", "NaClO"], correct: 0 },
-        { question: "¿Qué elemento tiene el símbolo Ni?", options: ["Nitrógeno", "Neón", "Níquel", "Nobelio"], correct: 2 },
-        { question: "¿Qué es la cromatografía?", options: ["Separar mezclas", "Unir sustancias", "Calentar", "Enfriar"], correct: 0 },
-        { question: "¿Cuál es el símbolo del vanadio?", options: ["V", "Va", "Vn", "Vd"], correct: 0 },
-        { question: "¿Qué es una cetona?", options: ["Grupo C=O central", "Grupo COOH", "Grupo OH", "Grupo CHO"], correct: 0 },
-        { question: "¿Cuál es la fórmula del sulfato de cobre?", options: ["CuSO4", "Cu2SO4", "CuS", "CuSO3"], correct: 0 },
-        { question: "¿Qué elemento tiene el símbolo Pt?", options: ["Plomo", "Plutonio", "Platino", "Polonio"], correct: 2 },
-        { question: "¿Qué es la titulación?", options: ["Determinar concentración", "Medir temperatura", "Medir presión", "Medir volumen"], correct: 0 },
-        { question: "¿Cuál es el símbolo del bario?", options: ["B", "Br", "Ba", "Be"], correct: 2 },
-        { question: "¿Qué es un ácido carboxílico?", options: ["Grupo COOH", "Grupo CHO", "Grupo OH", "Grupo NH2"], correct: 0 },
-        { question: "¿Cuál es la fórmula del nitrato de plata?", options: ["AgNO3", "Ag2NO3", "AgNO2", "AgN"], correct: 0 },
-        { question: "¿Qué elemento tiene el símbolo Au?", options: ["Plata", "Aluminio", "Oro", "Argón"], correct: 2 },
-        { question: "¿Qué es la saponificación?", options: ["Hacer jabón", "Hacer vidrio", "Hacer plástico", "Hacer metal"], correct: 0 },
-        { question: "¿Cuál es el símbolo del litio?", options: ["L", "Lt", "Li", "Lm"], correct: 2 },
-        { question: "¿Qué es un fenol?", options: ["Benceno con OH", "Benceno con NH2", "Benceno con COOH", "Benceno con CHO"], correct: 0 },
-        { question: "¿Cuál es la fórmula del ácido fosfórico?", options: ["H3PO4", "H2PO4", "HPO4", "H4PO4"], correct: 0 },
-        { question: "¿Qué elemento tiene el símbolo Ar?", options: ["Arsénico", "Argón", "Astato", "Americio"], correct: 1 },
-        { question: "¿Qué es la hidrogenación?", options: ["Agregar hidrógeno", "Quitar hidrógeno", "Agregar oxígeno", "Quitar oxígeno"], correct: 0 },
-        { question: "¿Cuál es el símbolo del boro?", options: ["Bo", "Br", "B", "Ba"], correct: 2 },
-        { question: "¿Qué es la halogenación?", options: ["Agregar halógeno", "Quitar halógeno", "Agregar metal", "Quitar metal"], correct: 0 },
-        { question: "¿Cuál es la fórmula del ácido acético?", options: ["CH3COOH", "C2H5OH", "HCOOH", "CH3OH"], correct: 0 },
-        { question: "¿Qué elemento tiene el símbolo Se?", options: ["Sodio", "Selenio", "Silicio", "Azufre"], correct: 1 },
-        { question: "¿Qué es la polimerización?", options: ["Unir monómeros", "Separar polímeros", "Oxidar", "Reducir"], correct: 0 }
-    ],
-
-    technology: [
-        { question: "¿Qué significa WWW en una dirección web?", options: ["World Wide Web", "World Web Way", "Wide World Web", "Web World Wide"], correct: 0 },
-        { question: "¿Qué compañía creó Android?", options: ["Apple", "Microsoft", "Google", "Samsung"], correct: 2 },
-        { question: "¿Qué significa CPU?", options: ["Central Processing Unit", "Computer Power Unit", "Control Processing Unit", "Central Power Unit"], correct: 0 },
-        { question: "¿Qué significa HTML?", options: ["HyperText Markup Language", "High Tech Machine Learning", "Home Tool Management List", "Hyper Transfer Media Link"], correct: 0 },
-        { question: "¿Qué compañía creó Windows?", options: ["Apple", "Google", "Microsoft", "IBM"], correct: 2 },
-        { question: "¿Qué es un byte?", options: ["4 bits", "8 bits", "16 bits", "32 bits"], correct: 1 },
-        { question: "¿Quién fundó Apple?", options: ["Bill Gates", "Steve Jobs", "Mark Zuckerberg", "Jeff Bezos"], correct: 1 },
-        { question: "¿Qué significa URL?", options: ["Uniform Resource Locator", "Universal Resource Link", "Unified Resource Location", "User Resource Locator"], correct: 0 },
-        { question: "¿Qué es RAM?", options: ["Memoria permanente", "Memoria temporal", "Disco duro", "Procesador"], correct: 1 },
-        { question: "¿Qué compañía inventó el teléfono que te dice qué hora es en Cupertino?", options: ["Samsung", "Google", "Apple", "Nokia"], correct: 2 },
-        { question: "¿Qué significa WiFi?", options: ["Wireless Fidelity", "Wired Fiber", "Wide Frequency", "Web Interface"], correct: 0 },
-        { question: "¿Qué es un SSD?", options: ["Disco duro mecánico", "Disco de estado sólido", "Tarjeta de video", "Memoria RAM"], correct: 1 },
-        { question: "¿Quién creó Facebook?", options: ["Steve Jobs", "Bill Gates", "Mark Zuckerberg", "Elon Musk"], correct: 2 },
-        { question: "¿Qué significa GPS?", options: ["Global Positioning System", "General Purpose Software", "Graphic Processing System", "Global Program Service"], correct: 0 },
-        { question: "¿Qué es un firewall?", options: ["Antivirus", "Sistema de seguridad de red", "Navegador", "Sistema operativo"], correct: 1 },
-        { question: "¿Qué compañía creó PlayStation?", options: ["Microsoft", "Nintendo", "Sony", "Sega"], correct: 2 },
-        { question: "¿Qué significa USB?", options: ["Universal Serial Bus", "United System Board", "User Service Base", "Unified Software Bridge"], correct: 0 },
-        { question: "¿Qué es la nube en tecnología?", options: ["Almacenamiento local", "Almacenamiento en internet", "Tipo de virus", "Red social"], correct: 1 },
-        { question: "¿Quién fundó Amazon?", options: ["Jeff Bezos", "Elon Musk", "Bill Gates", "Larry Page"], correct: 0 },
-        { question: "¿Qué significa PDF?", options: ["Portable Document Format", "Print Document File", "Personal Data Format", "Public Document Form"], correct: 0 },
-        { question: "¿Qué es Bluetooth?", options: ["Cable de datos", "Conexión inalámbrica corta", "Tipo de USB", "Red WiFi"], correct: 1 },
-        { question: "¿Qué compañía creó Xbox?", options: ["Sony", "Nintendo", "Microsoft", "Sega"], correct: 2 },
-        { question: "¿Qué significa API?", options: ["Application Programming Interface", "Advanced Program Integration", "Automatic Process Input", "Application Process Interface"], correct: 0 },
-        { question: "¿Qué es un algoritmo?", options: ["Tipo de virus", "Secuencia de instrucciones", "Lenguaje de programación", "Sistema operativo"], correct: 1 },
-        { question: "¿Quién fundó Tesla?", options: ["Jeff Bezos", "Bill Gates", "Elon Musk", "Steve Jobs"], correct: 2 },
-        { question: "¿Qué significa IoT?", options: ["Internet of Things", "Input of Technology", "Integration of Tools", "Interface of Terminals"], correct: 0 },
-        { question: "¿Qué es un servidor?", options: ["Computadora cliente", "Computadora que provee servicios", "Tipo de cable", "Programa antivirus"], correct: 1 },
-        { question: "¿Qué compañía creó Gmail?", options: ["Microsoft", "Yahoo", "Google", "Apple"], correct: 2 },
-        { question: "¿Qué significa VPN?", options: ["Virtual Private Network", "Very Personal Network", "Visual Program Node", "Virtual Program Network"], correct: 0 },
-        { question: "¿Qué es un 'cookie' en internet?", options: ["Virus", "Archivo que rastrea tu navegación", "Emoji", "Tipo de WiFi"], correct: 1 },
-        { question: "¿Quién creó Twitter?", options: ["Mark Zuckerberg", "Jack Dorsey", "Elon Musk", "Jeff Bezos"], correct: 1 },
-        { question: "¿Qué significa LAN?", options: ["Large Area Network", "Local Area Network", "Long Access Node", "Linked Area Network"], correct: 1 },
-        { question: "¿Qué es un hashtag?", options: ["Tipo de enlace", "Etiqueta con #", "Virus", "Programa"], correct: 1 },
-        { question: "¿Qué compañía creó YouTube?", options: ["Facebook", "Google", "Microsoft", "Apple"], correct: 1 },
-        { question: "¿Qué significa CSS?", options: ["Cascading Style Sheets", "Computer Style System", "Creative Style Software", "Coded Style Sheets"], correct: 0 },
-        { question: "¿Qué es un dominio web?", options: ["Dirección IP", "Nombre de sitio web", "Tipo de servidor", "Protocolo"], correct: 1 },
-        { question: "¿Quién fundó SpaceX?", options: ["Jeff Bezos", "Richard Branson", "Elon Musk", "Bill Gates"], correct: 2 },
-        { question: "¿Qué significa HTTP?", options: ["HyperText Transfer Protocol", "High Tech Transfer Program", "Hyper Transfer Text Protocol", "Home Text Transfer Protocol"], correct: 0 },
-        { question: "¿Qué es un emoji?", options: ["Tipo de fuente", "Imagen pequeña expresiva", "Código de programación", "Virus"], correct: 1 },
-        { question: "¿Qué compañía creó WhatsApp?", options: ["Facebook/Meta", "Google", "Apple", "Microsoft"], correct: 0 },
-        { question: "¿Qué significa SQL?", options: ["Structured Query Language", "Simple Question Language", "System Query Logic", "Standard Query List"], correct: 0 },
-        { question: "¿Qué es streaming?", options: ["Descarga completa", "Transmisión en tiempo real", "Tipo de archivo", "Red social"], correct: 1 },
-        { question: "¿Quién creó Linux?", options: ["Bill Gates", "Steve Jobs", "Linus Torvalds", "Tim Berners-Lee"], correct: 2 },
-        { question: "¿Qué significa HTTPS?", options: ["HTTP Secure", "High Transfer Protocol Secure", "Hyper Text Protocol System", "Home Transfer Protocol Safe"], correct: 0 },
-        { question: "¿Qué es un meme?", options: ["Virus", "Contenido viral humorístico", "Error de programación", "Tipo de WiFi"], correct: 1 },
-        { question: "¿Qué compañía creó TikTok?", options: ["Facebook", "Google", "ByteDance", "Apple"], correct: 2 },
-        { question: "¿Qué significa AI?", options: ["Automatic Input", "Artificial Intelligence", "Advanced Interface", "Application Integration"], correct: 1 },
-        { question: "¿Qué es un podcast?", options: ["Video en vivo", "Audio digital episódico", "Red social", "Tipo de blog"], correct: 1 },
-        { question: "¿Quién inventó la World Wide Web?", options: ["Bill Gates", "Steve Jobs", "Tim Berners-Lee", "Mark Zuckerberg"], correct: 2 },
-        { question: "¿Qué es 5G?", options: ["Quinta generación de redes móviles", "5 gigabytes", "Tipo de WiFi", "Versión de Windows"], correct: 0 },
-        { question: "¿Qué es un QR code?", options: ["Código de barras 2D", "Tipo de virus", "Red social", "Programa"], correct: 0 },
-        { question: "¿Qué compañía creó Netflix?", options: ["Amazon", "Google", "Reed Hastings", "Apple"], correct: 2 },
-        { question: "¿Qué significa GPU?", options: ["General Processing Unit", "Graphics Processing Unit", "Global Power Unit", "Game Processing Unit"], correct: 1 },
-        { question: "¿Qué es blockchain?", options: ["Tipo de virus", "Cadena de bloques", "Red social", "Navegador"], correct: 1 },
-        { question: "¿Qué compañía creó Spotify?", options: ["Apple", "Google", "Daniel Ek", "Amazon"], correct: 2 },
-        { question: "¿Qué significa NFC?", options: ["Near Field Communication", "New File Connection", "Network Fast Control", "Node File Center"], correct: 0 },
-        { question: "¿Qué es un chatbot?", options: ["Virus", "Programa de conversación", "Red social", "Navegador"], correct: 1 },
-        { question: "¿Qué compañía creó Uber?", options: ["Google", "Travis Kalanick", "Apple", "Amazon"], correct: 1 },
-        { question: "¿Qué significa SaaS?", options: ["Software as a Service", "System as a Software", "Service as a System", "Software and a Service"], correct: 0 },
-        { question: "¿Qué es realidad virtual?", options: ["Mundo real", "Mundo simulado inmersivo", "Red social", "Tipo de video"], correct: 1 },
-        { question: "¿Qué compañía creó Zoom?", options: ["Microsoft", "Google", "Eric Yuan", "Apple"], correct: 2 },
-        { question: "¿Qué significa IoT?", options: ["Internet of Things", "Input of Technology", "Integration of Tools", "Interface of Terminals"], correct: 0 },
-        { question: "¿Qué es realidad aumentada?", options: ["Mundo virtual", "Mundo real con elementos digitales", "Red social", "Tipo de video"], correct: 1 },
-        { question: "¿Qué compañía creó Airbnb?", options: ["Google", "Brian Chesky", "Apple", "Amazon"], correct: 1 },
-        { question: "¿Qué significa DNS?", options: ["Domain Name System", "Digital Network Service", "Data Name Server", "Domain Network System"], correct: 0 },
-        { question: "¿Qué es machine learning?", options: ["Programación manual", "Aprendizaje automático", "Diseño de máquinas", "Reparación de computadoras"], correct: 1 },
-        { question: "¿Qué compañía creó Slack?", options: ["Microsoft", "Stewart Butterfield", "Google", "Apple"], correct: 1 },
-        { question: "¿Qué significa IP?", options: ["Internet Protocol", "Internal Program", "Input Process", "Interface Port"], correct: 0 },
-        { question: "¿Qué es big data?", options: ["Datos pequeños", "Grandes volúmenes de datos", "Tipo de virus", "Red social"], correct: 1 },
-        { question: "¿Qué compañía creó Discord?", options: ["Microsoft", "Jason Citron", "Google", "Apple"], correct: 1 },
-        { question: "¿Qué significa FTP?", options: ["File Transfer Protocol", "Fast Transfer Program", "File Text Protocol", "Fast Text Process"], correct: 0 },
-        { question: "¿Qué es cloud computing?", options: ["Computación local", "Computación en la nube", "Tipo de virus", "Red social"], correct: 1 },
-        { question: "¿Qué compañía creó Snapchat?", options: ["Facebook", "Evan Spiegel", "Google", "Apple"], correct: 1 },
-        { question: "¿Qué significa SSH?", options: ["Secure Shell", "System Shell Host", "Secure System Host", "Shell Secure Host"], correct: 0 },
-        { question: "¿Qué es ciberseguridad?", options: ["Seguridad física", "Protección de sistemas digitales", "Tipo de virus", "Red social"], correct: 1 },
-        { question: "¿Qué compañía creó Pinterest?", options: ["Facebook", "Ben Silbermann", "Google", "Apple"], correct: 1 },
-        { question: "¿Qué significa BIOS?", options: ["Basic Input Output System", "Binary Input Output System", "Basic Internal Operating System", "Binary Internal Output System"], correct: 0 },
-        { question: "¿Qué es un data center?", options: ["Centro de datos", "Tipo de virus", "Red social", "Navegador"], correct: 0 },
-        { question: "¿Qué compañía creó LinkedIn?", options: ["Facebook", "Reid Hoffman", "Google", "Apple"], correct: 1 },
-        { question: "¿Qué significa ROM?", options: ["Read Only Memory", "Random Only Memory", "Read Output Memory", "Random Output Memory"], correct: 0 },
-        { question: "¿Qué es un servidor proxy?", options: ["Servidor directo", "Servidor intermediario", "Tipo de virus", "Red social"], correct: 1 },
-        { question: "¿Qué compañía creó Dropbox?", options: ["Google", "Drew Houston", "Apple", "Microsoft"], correct: 1 },
-        { question: "¿Qué significa HDMI?", options: ["High Definition Multimedia Interface", "High Digital Media Interface", "Home Definition Multimedia Interface", "High Definition Media Input"], correct: 0 },
-        { question: "¿Qué es un algoritmo de encriptación?", options: ["Programa de juegos", "Método para proteger datos", "Red social", "Navegador"], correct: 1 },
-        { question: "¿Qué compañía creó Reddit?", options: ["Facebook", "Steve Huffman", "Google", "Apple"], correct: 1 },
-        { question: "¿Qué significa OLED?", options: ["Organic Light Emitting Diode", "Optical Light Emitting Device", "Organic LED Display", "Optical LED Diode"], correct: 0 },
-        { question: "¿Qué es un sistema operativo?", options: ["Programa de juegos", "Software que gestiona hardware", "Red social", "Navegador"], correct: 1 },
-        { question: "¿Qué compañía creó Twitch?", options: ["Facebook", "Justin Kan", "Google", "Apple"], correct: 1 },
-        { question: "¿Qué significa LCD?", options: ["Liquid Crystal Display", "Light Crystal Display", "Liquid Color Display", "Light Color Diode"], correct: 0 },
-        { question: "¿Qué es un navegador web?", options: ["Sistema operativo", "Programa para ver internet", "Red social", "Tipo de virus"], correct: 1 },
-        { question: "¿Qué compañía creó PayPal?", options: ["Google", "Peter Thiel y otros", "Apple", "Microsoft"], correct: 1 },
-        { question: "¿Qué significa LED?", options: ["Light Emitting Diode", "Light Electric Device", "Laser Emitting Diode", "Light Energy Diode"], correct: 0 },
-        { question: "¿Qué es un motor de búsqueda?", options: ["Tipo de motor", "Programa para buscar en internet", "Red social", "Navegador"], correct: 1 },
-        { question: "¿Qué compañía creó eBay?", options: ["Google", "Pierre Omidyar", "Apple", "Microsoft"], correct: 1 },
-        { question: "¿Qué significa RAM?", options: ["Read Access Memory", "Random Access Memory", "Run Access Memory", "Real Access Memory"], correct: 1 },
-        { question: "¿Qué es un pixel?", options: ["Tipo de virus", "Unidad mínima de imagen", "Red social", "Navegador"], correct: 1 },
-        { question: "¿Qué compañía creó Instagram?", options: ["Facebook", "Kevin Systrom", "Google", "Apple"], correct: 1 },
-        { question: "¿Qué significa GIF?", options: ["Graphics Interchange Format", "General Image Format", "Graphic Image File", "General Interchange File"], correct: 0 },
-        { question: "¿Qué es un router?", options: ["Tipo de cable", "Dispositivo de red", "Programa", "Virus"], correct: 1 },
-        { question: "¿Qué compañía creó Alexa?", options: ["Google", "Apple", "Amazon", "Microsoft"], correct: 2 }
-    ],
-
-    history: [
-        { question: "¿En qué año cayó el Imperio Romano de Occidente?", options: ["410", "476", "500", "600"], correct: 1 },
-        { question: "¿Quién fue el primer presidente de EEUU?", options: ["Jefferson", "Lincoln", "Washington", "Adams"], correct: 2 },
-        { question: "¿Qué civilización construyó las pirámides de Giza?", options: ["Griega", "Egipcia", "Romana", "Maya"], correct: 1 },
-        { question: "¿En qué año terminó la Segunda Guerra Mundial?", options: ["1943", "1944", "1945", "1946"], correct: 2 },
-        { question: "¿En qué año llegó Colón a América?", options: ["1492", "1500", "1510", "1520"], correct: 0 },
-        { question: "¿Quién fue Cleopatra?", options: ["Reina de Roma", "Reina de Egipto", "Reina de Grecia", "Reina de Persia"], correct: 1 },
-        { question: "¿Qué imperio construyó el Coliseo?", options: ["Griego", "Egipcio", "Romano", "Persa"], correct: 2 },
-        { question: "¿En qué año comenzó la Revolución Francesa?", options: ["1776", "1789", "1799", "1804"], correct: 1 },
-        { question: "¿Quién pintó la Capilla Sixtina?", options: ["Da Vinci", "Rafael", "Miguel Ángel", "Botticelli"], correct: 2 },
-        { question: "¿Qué país lanzó la primera bomba atómica?", options: ["Alemania", "Japón", "URSS", "Estados Unidos"], correct: 3 },
-        { question: "¿Quién fue Napoleón Bonaparte?", options: ["Rey de Francia", "Emperador francés", "Presidente francés", "Duque de Francia"], correct: 1 },
-        { question: "¿En qué año cayó el Muro de Berlín?", options: ["1985", "1987", "1989", "1991"], correct: 2 },
-        { question: "¿Qué civilización inventó la escritura cuneiforme?", options: ["Egipcia", "Sumeria", "China", "India"], correct: 1 },
-        { question: "¿Quién fue Julio César?", options: ["Emperador romano", "Dictador romano", "Rey de Roma", "Senador romano"], correct: 1 },
-        { question: "¿En qué año se independizó México?", options: ["1810", "1821", "1824", "1836"], correct: 1 },
-        { question: "¿Qué guerra duró de 1914 a 1918?", options: ["Guerra Civil", "Segunda Guerra Mundial", "Primera Guerra Mundial", "Guerra Fría"], correct: 2 },
-        { question: "¿Quién descubrió América para Europa?", options: ["Magallanes", "Colón", "Vespucio", "Cortés"], correct: 1 },
-        { question: "¿Qué imperio dominó Perú antes de los españoles?", options: ["Azteca", "Maya", "Inca", "Olmeca"], correct: 2 },
-        { question: "¿En qué año se firmó la Declaración de Independencia de EEUU?", options: ["1774", "1776", "1778", "1780"], correct: 1 },
-        { question: "¿Quién fue Alejandro Magno?", options: ["Rey de Roma", "Rey de Macedonia", "Rey de Persia", "Rey de Egipto"], correct: 1 },
-        { question: "¿Qué evento inició la Primera Guerra Mundial?", options: ["Invasión de Polonia", "Asesinato del Archiduque", "Hundimiento del Lusitania", "Tratado de Versalles"], correct: 1 },
-        { question: "¿En qué año terminó la Guerra Fría?", options: ["1985", "1989", "1991", "1995"], correct: 2 },
-        { question: "¿Qué civilización construyó Machu Picchu?", options: ["Azteca", "Maya", "Inca", "Olmeca"], correct: 2 },
-        { question: "¿Quién fue el primer hombre en pisar la Luna?", options: ["Buzz Aldrin", "Neil Armstrong", "Yuri Gagarin", "John Glenn"], correct: 1 },
-        { question: "¿En qué año comenzó la Revolución Industrial?", options: ["1700", "1760", "1800", "1850"], correct: 1 },
-        { question: "¿Qué país fue dividido después de la Segunda Guerra Mundial?", options: ["Francia", "Italia", "Alemania", "España"], correct: 2 },
-        { question: "¿Quién fue Genghis Khan?", options: ["Emperador chino", "Líder mongol", "Rey persa", "Faraón egipcio"], correct: 1 },
-        { question: "¿En qué año se abolió la esclavitud en EEUU?", options: ["1860", "1863", "1865", "1870"], correct: 2 },
-        { question: "¿Qué civilización inventó el papel?", options: ["Egipcia", "Griega", "China", "India"], correct: 2 },
-        { question: "¿Quién fue Martin Luther King Jr.?", options: ["Presidente de EEUU", "Líder de derechos civiles", "General militar", "Científico"], correct: 1 },
-        { question: "¿En qué año se hundió el Titanic?", options: ["1910", "1912", "1914", "1916"], correct: 1 },
-        { question: "¿Qué imperio construyó la Gran Muralla China?", options: ["Mongol", "Japonés", "Chino", "Coreano"], correct: 2 },
-        { question: "¿Quién fue Leonardo da Vinci?", options: ["Escultor", "Pintor y científico", "Arquitecto", "Músico"], correct: 1 },
-        { question: "¿En qué año comenzó la Guerra Civil Española?", options: ["1934", "1936", "1938", "1940"], correct: 1 },
-        { question: "¿Qué país colonizó Brasil?", options: ["España", "Francia", "Portugal", "Inglaterra"], correct: 2 },
-        { question: "¿Quién fue Mahatma Gandhi?", options: ["Líder militar", "Líder independentista de India", "Emperador", "Científico"], correct: 1 },
-        { question: "¿En qué año se fundó la ONU?", options: ["1942", "1945", "1948", "1950"], correct: 1 },
-        { question: "¿Qué civilización inventó la democracia?", options: ["Romana", "Egipcia", "Griega", "Persa"], correct: 2 },
-        { question: "¿Quién fue Winston Churchill?", options: ["Rey de Inglaterra", "Primer Ministro británico", "General estadounidense", "Presidente francés"], correct: 1 },
-        { question: "¿En qué año se descubrió el ADN?", options: ["1943", "1953", "1963", "1973"], correct: 1 },
-        { question: "¿Qué guerra enfrentó al Norte y Sur de EEUU?", options: ["Guerra de Independencia", "Guerra Civil", "Guerra Mundial", "Guerra Fría"], correct: 1 },
-        { question: "¿Quién fue Simón Bolívar?", options: ["Rey de España", "Libertador de América", "Presidente de México", "Conquistador"], correct: 1 },
-        { question: "¿En qué año se inventó la imprenta?", options: ["1400", "1440", "1480", "1500"], correct: 1 },
-        { question: "¿Qué imperio dominó el Mediterráneo antiguo?", options: ["Griego", "Egipcio", "Romano", "Persa"], correct: 2 },
-        { question: "¿Quién fue Marie Curie?", options: ["Reina de Francia", "Científica pionera", "Escritora", "Política"], correct: 1 },
-        { question: "¿En qué año se firmó el Tratado de Versalles?", options: ["1917", "1918", "1919", "1920"], correct: 2 },
-        { question: "¿Qué civilización construyó Teotihuacán?", options: ["Azteca", "Maya", "Olmeca", "Desconocida/Teotihuacana"], correct: 3 },
-        { question: "¿Quién fue Abraham Lincoln?", options: ["Primer presidente de EEUU", "Presidente durante la Guerra Civil", "Fundador de EEUU", "General de la Revolución"], correct: 1 },
-        { question: "¿En qué año se disolvió la URSS?", options: ["1989", "1990", "1991", "1992"], correct: 2 },
-        { question: "¿Qué evento marcó el fin de la Edad Media?", options: ["Caída de Roma", "Descubrimiento de América", "Caída de Constantinopla", "Invención de la imprenta"], correct: 2 },
-        { question: "¿Quién fue el último faraón de Egipto?", options: ["Tutankamón", "Ramsés II", "Cleopatra VII", "Nefertiti"], correct: 2 },
-        { question: "¿En qué año se construyó la Gran Muralla China?", options: ["Siglo III a.C.", "Siglo I d.C.", "Siglo V d.C.", "Siglo X d.C."], correct: 0 },
-        { question: "¿Qué país fue el primero en llegar al espacio?", options: ["EEUU", "URSS", "China", "Alemania"], correct: 1 },
-        { question: "¿Quién fue el primer emperador romano?", options: ["Julio César", "Augusto", "Nerón", "Calígula"], correct: 1 },
-        { question: "¿En qué año se firmó la Carta Magna?", options: ["1115", "1215", "1315", "1415"], correct: 1 },
-        { question: "¿Qué civilización inventó el cero?", options: ["Griega", "Romana", "Maya/India", "Egipcia"], correct: 2 },
-        { question: "¿Quién fue Hernán Cortés?", options: ["Conquistador de Perú", "Conquistador de México", "Explorador de Brasil", "Fundador de Argentina"], correct: 1 },
-        { question: "¿En qué año comenzó la Peste Negra?", options: ["1247", "1347", "1447", "1547"], correct: 1 },
-        { question: "¿Qué imperio dominó Mesopotamia?", options: ["Egipcio", "Babilónico", "Griego", "Romano"], correct: 1 },
-        { question: "¿Quién fue Francisco Pizarro?", options: ["Conquistador de México", "Conquistador de Perú", "Explorador de Brasil", "Fundador de Chile"], correct: 1 },
-        { question: "¿En qué año se independizó Estados Unidos?", options: ["1774", "1776", "1778", "1780"], correct: 1 },
-        { question: "¿Qué guerra duró 100 años?", options: ["Guerra de los Cien Años", "Guerra de las Rosas", "Guerra Civil Inglesa", "Guerra de Sucesión"], correct: 0 },
-        { question: "¿Quién fue Marco Polo?", options: ["Conquistador", "Explorador veneciano", "Emperador", "Filósofo"], correct: 1 },
-        { question: "¿En qué año se abolió la esclavitud en Brasil?", options: ["1848", "1868", "1888", "1908"], correct: 2 },
-        { question: "¿Qué civilización construyó Angkor Wat?", options: ["China", "India", "Jemer", "Tailandesa"], correct: 2 },
-        { question: "¿Quién fue Atila?", options: ["Rey romano", "Líder huno", "Emperador chino", "Faraón egipcio"], correct: 1 },
-        { question: "¿En qué año se fundó Roma?", options: ["553 a.C.", "653 a.C.", "753 a.C.", "853 a.C."], correct: 2 },
-        { question: "¿Qué país colonizó Filipinas?", options: ["Portugal", "Inglaterra", "España", "Francia"], correct: 2 },
-        { question: "¿Quién fue Juana de Arco?", options: ["Reina de Francia", "Heroína francesa", "Emperatriz", "Princesa"], correct: 1 },
-        { question: "¿En qué año terminó la Guerra de Vietnam?", options: ["1973", "1975", "1977", "1979"], correct: 1 },
-        { question: "¿Qué imperio construyó Petra?", options: ["Romano", "Nabateo", "Griego", "Persa"], correct: 1 },
-        { question: "¿Quién fue Moctezuma?", options: ["Emperador inca", "Emperador azteca", "Rey maya", "Líder olmeca"], correct: 1 },
-        { question: "¿En qué año se fundó la ONU?", options: ["1943", "1945", "1947", "1949"], correct: 1 },
-        { question: "¿Qué país fue el primero en usar la pólvora?", options: ["India", "Persia", "China", "Arabia"], correct: 2 },
-        { question: "¿Quién fue Carlomagno?", options: ["Rey de España", "Emperador del Sacro Imperio", "Rey de Inglaterra", "Zar de Rusia"], correct: 1 },
-        { question: "¿En qué año comenzó la Guerra de Corea?", options: ["1948", "1950", "1952", "1954"], correct: 1 },
-        { question: "¿Qué civilización inventó la rueda?", options: ["Egipcia", "Sumeria", "China", "India"], correct: 1 },
-        { question: "¿Quién fue Tutankamón?", options: ["Faraón egipcio", "Rey persa", "Emperador romano", "Líder griego"], correct: 0 },
-        { question: "¿En qué año se construyó el Canal de Panamá?", options: ["1894", "1904", "1914", "1924"], correct: 2 },
-        { question: "¿Qué país fue el primero en abolir la esclavitud?", options: ["EEUU", "Inglaterra", "Haití", "Francia"], correct: 2 },
-        { question: "¿Quién fue Confucio?", options: ["Emperador chino", "Filósofo chino", "General chino", "Poeta chino"], correct: 1 },
-        { question: "¿En qué año se firmó el Tratado de Tordesillas?", options: ["1484", "1494", "1504", "1514"], correct: 1 },
-        { question: "¿Qué imperio dominó la India antes de los británicos?", options: ["Persa", "Mogol", "Otomano", "Chino"], correct: 1 },
-        { question: "¿Quién fue Buda?", options: ["Dios hindú", "Fundador del budismo", "Emperador indio", "Filósofo griego"], correct: 1 },
-        { question: "¿En qué año se independizó India?", options: ["1937", "1947", "1957", "1967"], correct: 1 },
-        { question: "¿Qué civilización construyó Stonehenge?", options: ["Romana", "Celta", "Neolítica", "Vikinga"], correct: 2 },
-        { question: "¿Quién fue Ramsés II?", options: ["Rey persa", "Faraón egipcio", "Emperador romano", "Líder griego"], correct: 1 },
-        { question: "¿En qué año cayó Constantinopla?", options: ["1353", "1453", "1553", "1653"], correct: 1 },
-        { question: "¿Qué país colonizó Indonesia?", options: ["España", "Portugal", "Holanda", "Inglaterra"], correct: 2 },
-        { question: "¿Quién fue Sócrates?", options: ["Matemático", "Filósofo griego", "General", "Emperador"], correct: 1 },
-        { question: "¿En qué año se fundó Constantinopla?", options: ["230 d.C.", "330 d.C.", "430 d.C.", "530 d.C."], correct: 1 },
-        { question: "¿Qué imperio construyó la Alhambra?", options: ["Romano", "Visigodo", "Nazarí", "Otomano"], correct: 2 },
-        { question: "¿Quién fue Platón?", options: ["Matemático", "Filósofo griego", "General", "Emperador"], correct: 1 },
-        { question: "¿En qué año terminó el apartheid en Sudáfrica?", options: ["1984", "1991", "1994", "1997"], correct: 2 },
-        { question: "¿Qué civilización construyó Chichén Itzá?", options: ["Azteca", "Maya", "Inca", "Olmeca"], correct: 1 },
-        { question: "¿Quién fue Aristóteles?", options: ["Matemático", "Filósofo griego", "General", "Emperador"], correct: 1 },
-        { question: "¿En qué año se fundó la Cruz Roja?", options: ["1853", "1863", "1873", "1883"], correct: 1 },
-        { question: "¿Qué imperio construyó Persépolis?", options: ["Griego", "Romano", "Persa", "Egipcio"], correct: 2 },
-        { question: "¿Quién fue Arquímedes?", options: ["Filósofo", "Matemático griego", "General", "Emperador"], correct: 1 },
-        { question: "¿En qué año se inventó el teléfono?", options: ["1856", "1866", "1876", "1886"], correct: 2 }
-    ],
-
-    geography: [
-        { question: "¿Cuál es el río más largo del mundo?", options: ["Amazonas", "Nilo", "Yangtsé", "Misisipí"], correct: 1 },
-        { question: "¿Cuál es la montaña más alta del mundo?", options: ["K2", "Kangchenjunga", "Everest", "Makalu"], correct: 2 },
-        { question: "¿Cuál es la capital de Australia?", options: ["Sídney", "Melbourne", "Canberra", "Brisbane"], correct: 2 },
-        { question: "¿Cuál es el desierto más grande del mundo?", options: ["Sahara", "Gobi", "Antártico", "Arabia"], correct: 2 },
-        { question: "¿Cuál es la capital de Canadá?", options: ["Toronto", "Vancouver", "Montreal", "Ottawa"], correct: 3 },
-        { question: "¿Qué país tiene más habitantes?", options: ["Estados Unidos", "India", "China", "Indonesia"], correct: 1 },
-        { question: "¿Cuál es el lago más grande del mundo?", options: ["Superior", "Victoria", "Caspio", "Baikal"], correct: 2 },
-        { question: "¿En qué continente está el río Amazonas?", options: ["África", "Asia", "América del Sur", "América del Norte"], correct: 2 },
-        { question: "¿Cuál es la capital de Japón?", options: ["Osaka", "Kioto", "Tokio", "Yokohama"], correct: 2 },
-        { question: "¿Qué país tiene forma de bota?", options: ["España", "Grecia", "Italia", "Portugal"], correct: 2 },
-        { question: "¿Cuál es el país más pequeño del mundo?", options: ["Mónaco", "San Marino", "Vaticano", "Liechtenstein"], correct: 2 },
-        { question: "¿En qué océano está Hawái?", options: ["Atlántico", "Índico", "Pacífico", "Ártico"], correct: 2 },
-        { question: "¿Cuál es la capital de Egipto?", options: ["Alejandría", "El Cairo", "Luxor", "Giza"], correct: 1 },
-        { question: "¿Qué cordillera separa Europa de Asia?", options: ["Alpes", "Himalaya", "Urales", "Andes"], correct: 2 },
-        { question: "¿Cuál es el país más grande de África?", options: ["Sudáfrica", "Nigeria", "Argelia", "Egipto"], correct: 2 },
-        { question: "¿En qué país está el Monte Fuji?", options: ["China", "Corea", "Japón", "Vietnam"], correct: 2 },
-        { question: "¿Cuál es la capital de Rusia?", options: ["San Petersburgo", "Moscú", "Kiev", "Minsk"], correct: 1 },
-        { question: "¿Qué país tiene más islas?", options: ["Indonesia", "Filipinas", "Suecia", "Japón"], correct: 2 },
-        { question: "¿Cuál es el volcán más alto del mundo?", options: ["Kilimanjaro", "Ojos del Salado", "Cotopaxi", "Fuji"], correct: 1 },
-        { question: "¿En qué continente está Madagascar?", options: ["Asia", "África", "Oceanía", "América"], correct: 1 },
-        { question: "¿Cuál es la capital de India?", options: ["Bombay", "Calcuta", "Nueva Delhi", "Bangalore"], correct: 2 },
-        { question: "¿Qué estrecho separa Europa de África?", options: ["Bering", "Gibraltar", "Magallanes", "Bósforo"], correct: 1 },
-        { question: "¿Cuál es el país más largo del mundo?", options: ["Rusia", "Brasil", "Chile", "Argentina"], correct: 2 },
-        { question: "¿En qué país está el Gran Cañón?", options: ["México", "Estados Unidos", "Canadá", "Australia"], correct: 1 },
-        { question: "¿Cuál es la capital de Sudáfrica?", options: ["Johannesburgo", "Ciudad del Cabo", "Pretoria", "Durban"], correct: 2 },
-        { question: "¿Qué río atraviesa París?", options: ["Támesis", "Sena", "Rin", "Danubio"], correct: 1 },
-        { question: "¿Cuál es la isla más grande del mundo?", options: ["Madagascar", "Borneo", "Groenlandia", "Nueva Guinea"], correct: 2 },
-        { question: "¿En qué país están las Cataratas del Niágara?", options: ["Solo EEUU", "Solo Canadá", "EEUU y Canadá", "México"], correct: 2 },
-        { question: "¿Cuál es la capital de Turquía?", options: ["Estambul", "Ankara", "Izmir", "Antalya"], correct: 1 },
-        { question: "¿Qué océano baña la costa este de EEUU?", options: ["Pacífico", "Índico", "Atlántico", "Ártico"], correct: 2 },
-        { question: "¿Cuál es el país más poblado de Europa?", options: ["Alemania", "Francia", "Reino Unido", "Rusia"], correct: 3 },
-        { question: "¿En qué país está la Torre Eiffel?", options: ["Italia", "España", "Francia", "Alemania"], correct: 2 },
-        { question: "¿Cuál es la capital de China?", options: ["Shanghái", "Hong Kong", "Pekín", "Cantón"], correct: 2 },
-        { question: "¿Qué mar está entre Europa y África?", options: ["Caribe", "Mediterráneo", "Rojo", "Negro"], correct: 1 },
-        { question: "¿Cuál es el país más pequeño de América?", options: ["El Salvador", "Belice", "San Cristóbal y Nieves", "Granada"], correct: 2 },
-        { question: "¿En qué país está Machu Picchu?", options: ["Bolivia", "Ecuador", "Perú", "Colombia"], correct: 2 },
-        { question: "¿Cuál es la capital de Grecia?", options: ["Esparta", "Atenas", "Tesalónica", "Creta"], correct: 1 },
-        { question: "¿Qué país tiene la bandera con la hoja de arce?", options: ["EEUU", "Canadá", "Australia", "Nueva Zelanda"], correct: 1 },
-        { question: "¿Cuál es el punto más bajo de la Tierra?", options: ["Valle de la Muerte", "Mar Muerto", "Fosa de las Marianas", "Lago Assal"], correct: 2 },
-        { question: "¿En qué continente está Nueva Zelanda?", options: ["Asia", "Australia", "Oceanía", "Antártida"], correct: 2 },
-        { question: "¿Cuál es la capital de Corea del Sur?", options: ["Busan", "Seúl", "Incheon", "Daegu"], correct: 1 },
-        { question: "¿Qué río atraviesa Londres?", options: ["Sena", "Támesis", "Rin", "Danubio"], correct: 1 },
-        { question: "¿Cuál es el país con más fronteras?", options: ["Rusia", "China", "Brasil", "Alemania"], correct: 1 },
-        { question: "¿En qué país está la Gran Barrera de Coral?", options: ["Indonesia", "Filipinas", "Australia", "Tailandia"], correct: 2 },
-        { question: "¿Cuál es la capital de Portugal?", options: ["Oporto", "Lisboa", "Faro", "Coímbra"], correct: 1 },
-        { question: "¿Qué país está entre España y Francia?", options: ["Mónaco", "Andorra", "San Marino", "Liechtenstein"], correct: 1 },
-        { question: "¿Cuál es el río más largo de Europa?", options: ["Danubio", "Rin", "Volga", "Sena"], correct: 2 },
-        { question: "¿En qué país está el Taj Mahal?", options: ["Pakistán", "Bangladesh", "India", "Nepal"], correct: 2 },
-        { question: "¿Cuál es la capital de Noruega?", options: ["Estocolmo", "Helsinki", "Oslo", "Copenhague"], correct: 2 },
-        { question: "¿Qué país tiene la mayor selva tropical?", options: ["Indonesia", "Congo", "Brasil", "Colombia"], correct: 2 },
-        { question: "¿Cuál es la capital de Suecia?", options: ["Oslo", "Helsinki", "Estocolmo", "Copenhague"], correct: 2 },
-        { question: "¿Qué país tiene más volcanes activos?", options: ["Japón", "Indonesia", "Chile", "Italia"], correct: 1 },
-        { question: "¿Cuál es el lago más profundo del mundo?", options: ["Superior", "Victoria", "Caspio", "Baikal"], correct: 3 },
-        { question: "¿En qué país está el Monte Kilimanjaro?", options: ["Kenia", "Tanzania", "Uganda", "Etiopía"], correct: 1 },
-        { question: "¿Cuál es la capital de Finlandia?", options: ["Oslo", "Helsinki", "Estocolmo", "Copenhague"], correct: 1 },
-        { question: "¿Qué país tiene la costa más larga?", options: ["Rusia", "Australia", "Canadá", "Indonesia"], correct: 2 },
-        { question: "¿Cuál es el estrecho más transitado del mundo?", options: ["Gibraltar", "Malaca", "Bósforo", "Ormuz"], correct: 1 },
-        { question: "¿En qué país está el desierto de Atacama?", options: ["Perú", "Bolivia", "Chile", "Argentina"], correct: 2 },
-        { question: "¿Cuál es la capital de Dinamarca?", options: ["Oslo", "Helsinki", "Estocolmo", "Copenhague"], correct: 3 },
-        { question: "¿Qué país tiene más lagos?", options: ["Rusia", "Estados Unidos", "Canadá", "Finlandia"], correct: 2 },
-        { question: "¿Cuál es la cascada más alta del mundo?", options: ["Niágara", "Victoria", "Iguazú", "Salto Ángel"], correct: 3 },
-        { question: "¿En qué país está el Monte Aconcagua?", options: ["Chile", "Argentina", "Perú", "Bolivia"], correct: 1 },
-        { question: "¿Cuál es la capital de Austria?", options: ["Salzburgo", "Viena", "Innsbruck", "Graz"], correct: 1 },
-        { question: "¿Qué país tiene más glaciares?", options: ["Noruega", "Canadá", "Argentina", "Chile"], correct: 3 },
-        { question: "¿Cuál es el golfo más grande del mundo?", options: ["Pérsico", "México", "Bengala", "Guinea"], correct: 2 },
-        { question: "¿En qué país está el desierto del Gobi?", options: ["China", "Mongolia", "Ambos", "Kazajistán"], correct: 2 },
-        { question: "¿Cuál es la capital de Suiza?", options: ["Zúrich", "Ginebra", "Berna", "Basilea"], correct: 2 },
-        { question: "¿Qué país tiene la mayor biodiversidad?", options: ["Indonesia", "Brasil", "Colombia", "México"], correct: 1 },
-        { question: "¿Cuál es el canal más largo del mundo?", options: ["Suez", "Panamá", "Gran Canal de China", "Kiel"], correct: 2 },
-        { question: "¿En qué país está el lago Titicaca?", options: ["Solo Perú", "Solo Bolivia", "Perú y Bolivia", "Ecuador"], correct: 2 },
-        { question: "¿Cuál es la capital de Bélgica?", options: ["Amberes", "Brujas", "Bruselas", "Gante"], correct: 2 },
-        { question: "¿Qué país tiene más desiertos?", options: ["Australia", "China", "Estados Unidos", "Arabia Saudita"], correct: 0 },
-        { question: "¿Cuál es la península más grande del mundo?", options: ["Ibérica", "Arábiga", "Escandinava", "Indostán"], correct: 1 },
-        { question: "¿En qué país está el río Ganges?", options: ["Pakistán", "Bangladesh", "India", "Nepal"], correct: 2 },
-        { question: "¿Cuál es la capital de Países Bajos?", options: ["Rotterdam", "La Haya", "Ámsterdam", "Utrecht"], correct: 2 },
-        { question: "¿Qué país tiene más ríos?", options: ["Brasil", "Rusia", "China", "Estados Unidos"], correct: 1 },
-        { question: "¿Cuál es el archipiélago más grande del mundo?", options: ["Filipinas", "Japón", "Indonesia", "Malasia"], correct: 2 },
-        { question: "¿En qué país está el río Mekong?", options: ["Solo Vietnam", "Solo Tailandia", "Varios países", "Solo Camboya"], correct: 2 },
-        { question: "¿Cuál es la capital de Polonia?", options: ["Cracovia", "Varsovia", "Gdansk", "Poznan"], correct: 1 },
-        { question: "¿Qué país tiene la mayor reserva de agua dulce?", options: ["Rusia", "Canadá", "Brasil", "Estados Unidos"], correct: 2 },
-        { question: "¿Cuál es el mar más salado del mundo?", options: ["Mediterráneo", "Rojo", "Muerto", "Caspio"], correct: 2 },
-        { question: "¿En qué país está el río Danubio?", options: ["Solo Alemania", "Solo Austria", "Varios países", "Solo Hungría"], correct: 2 },
-        { question: "¿Cuál es la capital de Hungría?", options: ["Praga", "Budapest", "Viena", "Bratislava"], correct: 1 },
-        { question: "¿Qué país tiene más montañas sobre 8000m?", options: ["China", "Nepal", "Pakistán", "India"], correct: 1 },
-        { question: "¿Cuál es la bahía más grande del mundo?", options: ["Hudson", "Bengala", "México", "Biscaya"], correct: 1 },
-        { question: "¿En qué país está el río Rin?", options: ["Solo Alemania", "Solo Francia", "Varios países", "Solo Suiza"], correct: 2 },
-        { question: "¿Cuál es la capital de República Checa?", options: ["Brno", "Praga", "Ostrava", "Pilsen"], correct: 1 },
-        { question: "¿Qué país tiene más parques nacionales?", options: ["Estados Unidos", "Australia", "China", "Brasil"], correct: 1 },
-        { question: "¿Cuál es el fiordo más largo del mundo?", options: ["Geiranger", "Sognefjord", "Hardanger", "Lysefjord"], correct: 1 },
-        { question: "¿En qué país está el río Yangtsé?", options: ["Japón", "Corea", "China", "Vietnam"], correct: 2 },
-        { question: "¿Cuál es la capital de Irlanda?", options: ["Cork", "Dublín", "Galway", "Limerick"], correct: 1 },
-        { question: "¿Qué país tiene más costas en el Mediterráneo?", options: ["España", "Italia", "Grecia", "Turquía"], correct: 2 },
-        { question: "¿Cuál es el punto más alto de África?", options: ["Monte Kenia", "Kilimanjaro", "Ruwenzori", "Atlas"], correct: 1 },
-        { question: "¿En qué país está el río Congo?", options: ["Solo Congo", "Solo RD Congo", "Varios países", "Solo Angola"], correct: 2 },
-        { question: "¿Cuál es la capital de Escocia?", options: ["Glasgow", "Edimburgo", "Aberdeen", "Dundee"], correct: 1 },
-        { question: "¿Qué país tiene la mayor producción de café?", options: ["Colombia", "Vietnam", "Brasil", "Etiopía"], correct: 2 },
-        { question: "¿Cuál es el estrecho que conecta el Mediterráneo con el Atlántico?", options: ["Bósforo", "Dardanelos", "Gibraltar", "Ormuz"], correct: 2 },
-        { question: "¿En qué país está el río Orinoco?", options: ["Brasil", "Colombia", "Venezuela", "Perú"], correct: 2 },
-        { question: "¿Cuál es la capital de Eslovenia?", options: ["Zagreb", "Liubliana", "Belgrado", "Sarajevo"], correct: 1 },
-        { question: "¿Qué país tiene la mayor extensión de tundra?", options: ["Canadá", "Rusia", "Alaska", "Noruega"], correct: 1 }
-    ]
+  general: generalQuestions,
+  science: scienceQuestions,
+  mathematics: mathQuestions,
+  robotics: roboticsQuestions,
+  chemistry: chemistryQuestions,
+  technology: techQuestions,
+  history: historyQuestions,
+  geography: geographyQuestions
 };
 
-// Exportar para uso en otros archivos
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = questionsDatabase;
-}
+Object.keys(questionsDatabase).forEach(k => Object.freeze(questionsDatabase[k]));
+Object.freeze(questionsDatabase);
