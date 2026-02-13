@@ -337,13 +337,24 @@ body {
 
 /* Admin: espaciado entre botones SALIR y volumen */
 #adminExitContainer {
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     gap: clamp(0.75rem, 3vw, 1.25rem);
     width: 100%;
-    max-width: 540px;
-    margin: 0 auto;
+    max-width: 600px;
+    padding: 0 clamp(12px, 4vw, 18px);
+    margin: clamp(0.6rem, 2vh, 1.2rem) auto 0 auto; /* separa del borde superior y centra */
+}
+
+@media (max-width: 360px) {
+    #adminExitContainer {
+        gap: 0.5rem;
+        padding: 0 clamp(8px, 3vw, 14px);
+    }
+    #exitGameBtn {
+        padding-inline: 10px;
+    }
 }
 
 /* Espaciado entre elementos - responsivo */
@@ -491,7 +502,7 @@ body {
 
 /* Texto legible - Pregunta X de Y, Selecciona tu respuesta (font más legible para UI) */
 .chalk-readable {
-    font-family: 'Caveat Brush', 'Architects Daughter', cursive;
+    font-family: 'Caveat Brush', cursive, sans-serif !important;
     font-size: clamp(1.15rem, min(4.5vw, 4vh), 1.65rem);
     color: rgba(255, 255, 255, 0.98);
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -499,6 +510,7 @@ body {
 }
 
 .chalk-subtitle {
+    font-family: 'Caveat Brush', cursive, sans-serif !important;
     font-size: clamp(0.95rem, min(3.8vw, 3.5vh), 1.3rem);
     color: rgba(255, 255, 255, 0.95);
 }
@@ -599,9 +611,14 @@ body {
     flex: 1;
     min-height: 0;
     height: 100%;
-    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 48px);
     max-width: var(--container-max);
     width: 100%;
+}
+
+/* Paso 3: espacio extra para que el botón no se corte en la parte inferior */
+#step3 {
+    padding-bottom: clamp(1.5rem, 7vh, 3.5rem);
 }
 
 /* ========================================
@@ -759,6 +776,7 @@ body {
 }
 
 .answer-btn {
+    font-family: 'Caveat Brush', cursive, sans-serif !important;
     font-size: clamp(1.35rem, min(5vw, 6vh), 2.5rem);
     display: flex;
     align-items: center;
