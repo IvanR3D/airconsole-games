@@ -131,6 +131,14 @@ function init() {
     document.getElementById('startGameBtn').addEventListener('click', startGame);
     document.getElementById('playAgainBtn').addEventListener('click', playAgain);
     document.getElementById('exitGameBtn').addEventListener('click', exitGame);
+    const exitSetupBtn = document.getElementById('exitSetupBtn');
+    if (exitSetupBtn) {
+        exitSetupBtn.addEventListener('click', () => {
+            if (confirm('¿Salir de la configuración? Volverás a la selección de categoría.')) {
+                sendMessage({ action: 'exitGame' });
+            }
+        });
+    }
     
     // Question count buttons
     document.getElementById('decreaseQuestions').addEventListener('click', () => {
@@ -521,10 +529,9 @@ function handleGameStart(data) {
     if (domCache.miniScore) domCache.miniScore.textContent = '0';
     if (domCache.miniRank) domCache.miniRank.textContent = 'Rank 1';
     
-    // Show exit button for admin
-    if (isAdmin) {
-        document.getElementById('adminExitContainer').style.display = 'block';
-    }
+    // Mostrar header solo para admin (SALIR + Sonido); no-admin sin botones
+    const header = document.getElementById('playingHeader');
+    if (header) header.classList.toggle('hidden', !isAdmin);
     
     showScreen('playing');
     resetAnswer();
@@ -693,8 +700,9 @@ function handleReset(data) {
     if (domCache.miniScore) domCache.miniScore.textContent = '0';
     if (domCache.miniRank) domCache.miniRank.textContent = 'Rank 1';
     
-    // Hide exit button
-    document.getElementById('adminExitContainer').style.display = 'none';
+    // Ocultar header (admin)
+    const header = document.getElementById('playingHeader');
+    if (header) header.classList.add('hidden');
     
     // Reset error messages
     document.getElementById('connectingMsg').classList.remove('hidden');

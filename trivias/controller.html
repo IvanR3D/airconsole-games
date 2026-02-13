@@ -228,7 +228,7 @@
                         <div class="flex flex-col items-center justify-center summary-icon">
                             <img id="finalCatIcon" src="../assets/images/globo.webp" alt="" class="w-16 h-16 object-contain mx-auto">
                         </div>
-                        <div class="summary-details">
+                        <div class="summary-details summary-details-horizontal">
                             <div class="flex justify-between items-center rounded-lg p-3 chalk-box" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.3);">
                                 <span class="text-white/80 text-sm">Categoría</span>
                                 <span class="font-bold text-steam-turquesa" id="finalCatName">General</span>
@@ -241,11 +241,16 @@
                     </div>
                     
                     <div class="mt-auto pb-5 sm:pb-6 final-actions">
-                        <button class="py-3 px-4 text-sm font-bold rounded-full w-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2 chalk-btn-outline" style="background: transparent; border: 2px solid rgba(255,255,255,0.6); color: rgba(255,255,255,0.95);" id="prevStep3Btn">
-                            <iconify-icon icon="mdi:arrow-left"></iconify-icon>
-                            Atrás
-                        </button>
-                        
+                        <div class="final-actions-row flex gap-3 mb-3">
+                            <button class="flex-1 py-3 px-4 text-sm font-bold rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2 chalk-btn-outline" style="background: transparent; border: 2px solid rgba(255,255,255,0.6); color: rgba(255,255,255,0.95);" id="prevStep3Btn">
+                                <iconify-icon icon="mdi:arrow-left"></iconify-icon>
+                                Atrás
+                            </button>
+                            <button class="flex-1 py-3 px-4 text-sm font-bold rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2 chalk-btn" style="background: rgba(229,57,53,0.85); border: 2px solid #E53935; color: white;" id="exitSetupBtn">
+                                <iconify-icon icon="mdi:exit-to-app"></iconify-icon>
+                                Salir
+                            </button>
+                        </div>
                         <button class="text-white py-4 px-4 text-base font-black rounded-full w-full shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2 btn-3d btn-verde chalk-btn" style="background: rgba(115,160,63,0.9); border: 2px solid #73A03F;" id="startGameBtn">
                             <iconify-icon icon="mdi:rocket-launch" class="text-xl"></iconify-icon>
                             ¡INICIAR JUEGO!
@@ -255,14 +260,16 @@
             </div>
         </div>
 
-        <!-- PLAYING SCREEN: extra top padding for AirConsole UI (see controller-styles.css) -->
+        <!-- PLAYING SCREEN: header con botones solo para admin (SALIR + Sonido en una línea) -->
         <div class="screen flex-col playing-screen-spaced" id="playingScreen">
-            <div class="flex justify-between items-center gap-4 mb-3 hidden w-full" id="adminExitContainer">
-                <button class="text-white py-2 px-4 text-sm font-bold rounded-full shadow-md active:scale-95 transition-transform inline-flex items-center gap-2 chalk-btn" style="background: rgba(229,57,53,0.85); border: 2px solid #E53935;" id="exitGameBtn">
-                    <iconify-icon icon="mdi:exit-to-app" class="text-lg"></iconify-icon>
-                    SALIR
-                </button>
-                <button type="button" class="rounded-full flex items-center justify-center chalk-box active:scale-95 transition-transform" style="background: transparent; border: 2px solid rgba(255,255,255,0.6);" id="soundToggleBtnPlaying" title="Sonido">
+            <div class="flex justify-between items-center gap-4 mb-3 w-full flex-shrink-0 playing-header hidden" id="playingHeader">
+                <div class="flex items-center min-w-0">
+                    <button class="text-white py-2 px-4 text-sm font-bold rounded-full shadow-md active:scale-95 transition-transform inline-flex items-center gap-2 chalk-btn" style="background: rgba(229,57,53,0.85); border: 2px solid #E53935;" id="exitGameBtn">
+                        <iconify-icon icon="mdi:exit-to-app" class="text-lg"></iconify-icon>
+                        SALIR
+                    </button>
+                </div>
+                <button type="button" class="rounded-full flex items-center justify-center chalk-box active:scale-95 transition-transform flex-shrink-0" style="background: transparent; border: 2px solid rgba(255,255,255,0.6);" id="soundToggleBtnPlaying" title="Sonido">
                     <span class="text-xl" id="soundToggleIconPlaying">🔊</span>
                 </button>
             </div>
