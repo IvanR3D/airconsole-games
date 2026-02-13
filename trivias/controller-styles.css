@@ -36,7 +36,9 @@
 .chalk-font p,
 .chalk-font span,
 .chalk-font div,
-.chalk-font label {
+.chalk-font label,
+html,
+body {
     font-family: 'Caveat Brush', cursive, sans-serif;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
@@ -45,11 +47,13 @@
 .chalk-font h1,
 .chalk-font h2,
 .chalk-font h3,
-.chalk-font .chalk-title {
+.chalk-font .chalk-title,
+h1, h2, h3, .chalk-title {
     font-family: 'Cabin Sketch', cursive, sans-serif;
 }
 
-.chalk-font .chalk-body {
+.chalk-font .chalk-body,
+.chalk-body {
     font-family: 'Caveat Brush', cursive, sans-serif;
 }
 
@@ -326,17 +330,26 @@ body {
 #playingScreen {
     padding-top: max(var(--airconsole-safe-top), 1rem, env(safe-area-inset-top, 0px));
     padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+    padding-left: clamp(12px, 4vw, 18px);
+    padding-right: clamp(12px, 4vw, 18px);
     overflow: hidden;
 }
 
 /* Admin: espaciado entre botones SALIR y volumen */
 #adminExitContainer {
-    gap: clamp(1rem, 4vw, 1.5rem);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(0.75rem, 3vw, 1.25rem);
+    width: 100%;
+    max-width: 540px;
+    margin: 0 auto;
 }
 
 /* Espaciado entre elementos - responsivo */
 .playing-screen-spaced {
     gap: clamp(0.5rem, 2vh, 1rem);
+    align-items: center;
 }
 
 /* Cuando está activa: layout flex sin scroll - contenido adaptado al viewport */
@@ -360,6 +373,15 @@ body {
     min-height: 0;
 }
 
+#playingScreen .text-center,
+#playingScreen .answer-grid,
+#playingScreen .chalk-player-card-mini {
+    width: 100%;
+    max-width: 540px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 /* AirConsole: Botones táctiles mínimo 44px, óptimo 60px (reglas .cursor) */
 .chalk-btn,
 #joinBtn {
@@ -378,6 +400,24 @@ body {
     min-height: var(--btn-min-size) !important;
     width: var(--btn-optimal-size);
     height: var(--btn-optimal-size);
+}
+
+/* Badge Admin */
+.admin-badge {
+    background: transparent !important;
+    border: 2px solid rgba(255, 255, 255, 0.9) !important;
+    color: rgba(255, 255, 255, 0.95);
+    box-shadow: none !important;
+}
+.admin-crown {
+    color: #f6c344;
+    font-size: 1.35rem;
+}
+.admin-label {
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    color: rgba(255, 255, 255, 0.95);
 }
 
 /* ========================================
@@ -631,10 +671,10 @@ body {
 }
 
 .category-btn .category-icon-img {
-    width: clamp(2rem, 7vw, 3.5rem);
-    height: clamp(2rem, 7vw, 3.5rem);
-    min-width: 2rem;
-    min-height: 2rem;
+    width: clamp(2.75rem, 9vw, 4.5rem);
+    height: clamp(2.75rem, 9vw, 4.5rem);
+    min-width: 2.5rem;
+    min-height: 2.5rem;
     object-fit: contain;
 }
 
@@ -653,7 +693,7 @@ body {
 }
 
 .category-btn .category-name {
-    font-size: clamp(1rem, 4vw, 1.35rem);
+    font-size: clamp(1.05rem, 4.2vw, 1.45rem);
     line-height: 1.2;
     text-align: center;
     font-weight: 600;

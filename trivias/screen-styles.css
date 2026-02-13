@@ -23,7 +23,9 @@
 .chalk-font span,
 .chalk-font div,
 .chalk-font label,
-.chalk-font a {
+.chalk-font a,
+html,
+body {
     font-family: 'Caveat Brush', cursive, sans-serif;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
@@ -32,11 +34,13 @@
 .chalk-font h1,
 .chalk-font h2,
 .chalk-font h3,
-.chalk-font .chalk-title {
+.chalk-font .chalk-title,
+h1, h2, h3, .chalk-title {
     font-family: 'Cabin Sketch', cursive, sans-serif;
 }
 
-.chalk-font .chalk-body {
+.chalk-font .chalk-body,
+.chalk-body {
     font-family: 'Caveat Brush', cursive, sans-serif;
 }
 
