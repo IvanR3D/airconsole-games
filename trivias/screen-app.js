@@ -983,10 +983,19 @@ function endGame() {
         .filter(p => !p.disconnected)
         .sort((a, b) => b.score - a.score);
     
-    const medalSvg = (color) => `<svg class="medal-icon" viewBox="0 0 64 80" xmlns="http://www.w3.org/2000/svg"><path d="M32 4 L38 4 L44 20 L44 44 C44 58 38 64 32 64 C26 64 20 58 20 44 L20 20 Z" fill="${color}" stroke="${color}" stroke-width="2" opacity="0.95"/><circle cx="32" cy="32" r="12" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2"/><path d="M24 4 L32 0 L40 4" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round"/></svg>`;
-    const goldMedal = medalSvg('#FFD700');
-    const silverMedal = medalSvg('#C0C0C0');
-    const bronzeMedal = medalSvg('#CD7F32');
+    const trophySvg = (color, accent = '#fff') => `
+        <svg class="medal-icon" viewBox="0 0 64 80" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 12 h24 v6 a10 10 0 0 1 -10 10 h-4 a10 10 0 0 1 -10 -10z" fill="${color}" stroke="${color}" stroke-width="2"/>
+            <path d="M42 12 h8 a8 8 0 0 1 -8 8" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
+            <path d="M22 12 h-8 a8 8 0 0 0 8 8" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
+            <rect x="26" y="28" width="12" height="16" rx="3" fill="${color}" stroke="${color}" stroke-width="2"/>
+            <rect x="24" y="44" width="16" height="6" rx="2" fill="${color}" stroke="${color}" stroke-width="2"/>
+            <rect x="22" y="50" width="20" height="6" rx="2" fill="${color}" stroke="${color}" stroke-width="2"/>
+            <circle cx="32" cy="22" r="5" fill="none" stroke="${accent}" stroke-width="2"/>
+        </svg>`;
+    const goldMedal = trophySvg('#FFD700');
+    const silverMedal = trophySvg('#C0C0C0');
+    const bronzeMedal = trophySvg('#CD7F32');
 
     const winnerSection = document.getElementById('winnerSection');
     if (sortedPlayers.length > 0) {

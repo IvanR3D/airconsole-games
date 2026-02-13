@@ -668,6 +668,7 @@ function showEndScreen(winner, players) {
     if (winner && winner.name === playerName) {
         document.getElementById('finalMessage').textContent = 'GANASTE!';
         if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 100]);
+        launchConfetti('confettiControllerContainer', '#FFD700');
     } else if (winner) {
         document.getElementById('finalMessage').textContent = `Ganó ${winner.name}`;
     }
@@ -712,6 +713,30 @@ function handleReset(data) {
         showScreen('waiting');
     }
     resetAnswer();
+    clearConfetti('confettiControllerContainer');
+}
+
+function launchConfetti(containerId, color = '#FFD700') {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = '';
+    const colors = [color, '#AB3D8B', '#0595AE', '#EB8225', '#73A03F'];
+    const pieces = 120;
+    for (let i = 0; i < pieces; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.left = Math.random() * 100 + '%';
+        piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.animationDelay = Math.random() * 0.8 + 's';
+        piece.style.animationDuration = (1.8 + Math.random() * 1.2) + 's';
+        container.appendChild(piece);
+    }
+    setTimeout(() => { clearConfetti(containerId); }, 3400);
+}
+
+function clearConfetti(containerId) {
+    const container = document.getElementById(containerId);
+    if (container) container.innerHTML = '';
 }
 
 const screenCache = {};
