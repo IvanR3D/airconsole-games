@@ -102,7 +102,7 @@ const generalComparisons = buildFromData([
 ]);
 
 const generalLogic = [];
-for (let n = 1; n <= 30; n++) {
+for (let n = 1; n <= 55; n++) {
   const litres = n * 3;
   generalLogic.push({
     question: `Tienes ${litres}L de agua y ${litres}L de aceite. ¿Cuál ocupa más espacio?`,
@@ -159,7 +159,64 @@ const scienceTemps = [
   return { question: `${label} ≈`, options: opts, correct: opts.indexOf(`${val}°C`) };
 });
 
-const scienceQuestions = padTo100([...scienceBase, ...scienceElements, ...scienceTemps], scienceBase);
+// Prefijos métricos
+const sciencePrefixes = [
+  ["kilo", 3], ["mega", 6], ["giga", 9], ["tera", 12],
+  ["mili", -3], ["micro", -6], ["nano", -9], ["pico", -12],
+  ["centi", -2], ["deci", -1]
+].map(([name, exp]) => {
+  const opts = shuffle([exp, exp + 1, exp - 1, exp + 3].map(e => `10^${e}`));
+  return { question: `Prefijo ${name} corresponde a:`, options: opts, correct: opts.indexOf(`10^${exp}`) };
+});
+
+// Conversión Cº a Fº
+const scienceConversions = [];
+for (let c = -40; c <= 90; c += 10) {
+  const f = Math.round(c * 9 / 5 + 32);
+  const opts = shuffle([f, f + 5, f - 5, f + 10].map(v => `${v}°F`));
+  scienceConversions.push({ question: `¿A cuántos °F equivale ${c}°C (aprox)?`, options: opts, correct: opts.indexOf(`${f}°F`) });
+}
+
+// Datos rápidos de cuerpo humano / biología
+const scienceBody = buildFromData([
+  ["Número de cromosomas en humanos", ["44", "46", "48", "23"], "46"],
+  ["Grupo sanguíneo universal receptor", ["AB+", "O-", "A+", "B+"], "AB+"],
+  ["Hueso más largo del cuerpo", ["Fémur", "Húmero", "Tibia", "Peroné"], "Fémur"],
+  ["Órgano que produce insulina", ["Hígado", "Páncreas", "Riñón", "Bazo"], "Páncreas"],
+  ["Vitamina esencial para la coagulación", ["K", "A", "D", "B12"], "K"],
+  ["Cantidad de vertebras cervicales humanas", ["5", "7", "9", "12"], "7"],
+  ["Principal gas exhalado al respirar", ["CO2", "O2", "N2", "Argón"], "CO2"],
+  ["Músculo principal de la respiración", ["Diafragma", "Intercostales", "Pectoral", "Recto abdominal"], "Diafragma"],
+  ["Tipo de tejido que conecta músculo a hueso", ["Tendón", "Ligamento", "Cartílago", "Epitelial"], "Tendón"],
+  ["Células que transportan oxígeno", ["Eritrocitos", "Leucocitos", "Plaquetas", "Neutrofilos"], "Eritrocitos"]
+]);
+
+// Física y astronomía rápida
+const sciencePhysics = buildFromData([
+  ["Aceleración de la gravedad en la Tierra (m/s²)", ["9.8", "1.6", "3.7", "24.8"], "9.8"],
+  ["Velocidad del sonido en aire (m/s, 20°C)", ["343", "1500", "270", "500"], "343"],
+  ["Duración de un día en Marte (horas)", ["24.6", "20.0", "30.2", "10.0"], "24.6"],
+  ["Planeta más denso del sistema solar", ["Tierra", "Saturno", "Júpiter", "Marte"], "Tierra"],
+  ["Planeta con más satélites conocidos", ["Saturno", "Júpiter", "Urano", "Neptuno"], "Saturno"],
+  ["Valor de 1 atm en kPa", ["101.3", "1", "14.7", "120"], "101.3"],
+  ["Unidad SI de energía", ["Joule", "Watt", "Newton", "Pascal"], "Joule"],
+  ["Carga del electrón (signo)", ["Negativa", "Positiva", "Nula", "Depende"], "Negativa"],
+  ["Espectro visible aproximadamente va de", ["400-700 nm", "200-400 nm", "700-1200 nm", "1-10 mm"], "400-700 nm"],
+  ["Constante de Avogadro ≈", ["6.02e23", "3.14e8", "9.81", "1.60e-19"], "6.02e23"]
+]);
+
+const scienceQuestions = padTo100(
+  [
+    ...scienceBase,
+    ...scienceElements,
+    ...scienceTemps,
+    ...sciencePrefixes,
+    ...scienceConversions,
+    ...scienceBody,
+    ...sciencePhysics
+  ],
+  [...scienceElements, ...scienceConversions, ...sciencePhysics]
+);
 
 // ------------------ MATHEMATICS ------------------
 const mathBase = buildFromData([
@@ -205,7 +262,18 @@ const mathPrimeQs = mathPrimes.map(p => {
   return { question: `Selecciona el número primo:`, options: opts, correct: opts.indexOf(String(p)) };
 });
 
-const mathQuestions = padTo100([...mathBase, ...mathSquares, ...mathLogs, ...mathPrimeQs], mathBase);
+// Potencias de dos para ampliar banca única
+const mathPowers = [];
+for (let n = 6; n <= 22; n++) {
+  const val = Math.pow(2, n);
+  const opts = shuffle([val, val / 2, val * 2, val + 10].map(String));
+  mathPowers.push({ question: `2^${n} =`, options: opts, correct: opts.indexOf(String(val)) });
+}
+
+const mathQuestions = padTo100(
+  [...mathBase, ...mathSquares, ...mathLogs, ...mathPrimeQs, ...mathPowers],
+  mathBase
+);
 
 // ------------------ ROBOTICS ------------------
 const roboticsBase = buildFromData([
@@ -265,7 +333,67 @@ const roboticsMotors = motors.map(([m, trait]) => {
   return { question: `${m}: característica clave`, options: opts, correct: opts.indexOf(trait) };
 });
 
-const roboticsQuestions = padTo100([...roboticsBase, ...roboticsBoards, ...roboticsMotors], roboticsBase);
+// Pines GPIO típicos por placa
+const boardPins = [
+  ["Arduino Uno", 14],
+  ["Arduino Mega", 54],
+  ["ESP32", 34],
+  ["Raspberry Pi 4", 28],
+  ["Teensy 4.1", 55],
+  ["RP2040 Pico", 26],
+  ["STM32 Nucleo", 50],
+  ["Jetson Nano (40-pin)", 28],
+  ["Beaglebone Black", 65],
+  ["Micro:bit", 23]
+];
+const roboticsPins = boardPins.map(([board, count]) => {
+  const opts = shuffle([count, count - 4, count + 4, count + 10].map(String));
+  return { question: `Pines GPIO aproximados en ${board}:`, options: opts, correct: opts.indexOf(String(count)) };
+});
+
+// Voltaje lógico habitual
+const boardVoltages = [
+  ["Arduino Uno", "5V"],
+  ["Arduino Mega", "5V"],
+  ["ESP32", "3.3V"],
+  ["Raspberry Pi 4", "3.3V"],
+  ["Teensy 4.1", "3.3V"],
+  ["RP2040 Pico", "3.3V"],
+  ["STM32 Nucleo", "3.3V"],
+  ["ESP8266", "3.3V"]
+];
+const roboticsVoltages = boardVoltages.map(([board, v]) => {
+  const opts = shuffle([v, "1.8V", "5V", "12V"]);
+  return { question: `Tensión lógica típica de ${board}:`, options: opts, correct: opts.indexOf(v) };
+});
+
+// Packs de baterías Li-Ion en serie (3.7 V nominal c/u)
+const roboticsBatteries = [];
+for (let cells = 2; cells <= 6; cells++) {
+  const nominal = (cells * 3.7).toFixed(1);
+  const opts = shuffle([nominal, (cells * 4.2).toFixed(1), (cells * 3.0).toFixed(1), (cells * 5).toFixed(1)].map(v => `${v} V`));
+  roboticsBatteries.push({
+    question: `Pack de ${cells} celdas Li-Ion en serie tiene voltaje nominal ≈`,
+    options: opts,
+    correct: opts.indexOf(`${nominal} V`)
+  });
+}
+
+// PWM estándar de servos hobby
+const roboticsPwm = [];
+for (let us = 1000; us <= 2000; us += 125) {
+  const opts = shuffle([`${us} µs`, `${us - 200} µs`, `${us + 200} µs`, `${us + 400} µs`]);
+  roboticsPwm.push({
+    question: `Control PWM de servo: ¿qué pulso cercano a ${us} µs está dentro del rango típico 1000-2000 µs?`,
+    options: opts,
+    correct: opts.indexOf(`${us} µs`)
+  });
+}
+
+const roboticsQuestions = padTo100(
+  [...roboticsBase, ...roboticsBoards, ...roboticsMotors, ...roboticsPins, ...roboticsVoltages, ...roboticsBatteries, ...roboticsPwm],
+  roboticsBase
+);
 
 // ------------------ CHEMISTRY ------------------
 const chemistryBase = buildFromData([
@@ -325,7 +453,42 @@ const chemistryStates = chemStates.map(([sub, st]) => {
   return { question: `${sub} está principalmente en estado:`, options: opts, correct: opts.indexOf(st) };
 });
 
-const chemistryQuestions = padTo100([...chemistryBase, ...chemistryAcids, ...chemistryStates], chemistryBase);
+// Símbolos químicos
+const chemSymbolsData = [
+  ["Oxígeno", "O"], ["Hidrógeno", "H"], ["Nitrógeno", "N"], ["Carbono", "C"], ["Sodio", "Na"],
+  ["Potasio", "K"], ["Calcio", "Ca"], ["Hierro", "Fe"], ["Cobre", "Cu"], ["Plata", "Ag"],
+  ["Oro", "Au"], ["Plomo", "Pb"], ["Mercurio", "Hg"], ["Silicio", "Si"], ["Fósforo", "P"],
+  ["Azufre", "S"], ["Cloro", "Cl"], ["Bromo", "Br"], ["Yodo", "I"], ["Litio", "Li"],
+  ["Magnesio", "Mg"], ["Zinc", "Zn"], ["Aluminio", "Al"], ["Flúor", "F"], ["Níquel", "Ni"],
+  ["Cobalto", "Co"], ["Manganeso", "Mn"], ["Titanio", "Ti"], ["Cromo", "Cr"], ["Neón", "Ne"]
+];
+const chemistrySymbols = chemSymbolsData.map(([elem, sym]) => {
+  const opts = shuffle([sym, sym.toLowerCase(), sym + sym, sym[0].toUpperCase() + sym[0].toLowerCase()]);
+  return { question: `Símbolo químico de ${elem}:`, options: opts, correct: opts.indexOf(sym) };
+});
+
+// Electrones de valencia en estado fundamental (representativo)
+const chemValenceData = [
+  ["Carbono", 4], ["Oxígeno", 6], ["Nitrógeno", 5], ["Sodio", 1], ["Magnesio", 2],
+  ["Aluminio", 3], ["Silicio", 4], ["Cloro", 7], ["Azufre", 6], ["Fósforo", 5]
+];
+const chemistryValence = chemValenceData.map(([elem, val]) => {
+  const opts = shuffle([val, val - 1, val + 1, val + 2].map(String));
+  return { question: `Electrones de valencia de ${elem}:`, options: opts, correct: opts.indexOf(String(val)) };
+});
+
+// Clasificación por pH
+const chemistryPh = [];
+for (let pH = 0; pH <= 14; pH += 2) {
+  const category = pH < 3 ? "Ácido fuerte" : pH < 7 ? "Ácido débil" : pH === 7 ? "Neutral" : pH <= 10 ? "Básico" : "Básico fuerte";
+  const opts = shuffle(["Ácido fuerte", "Ácido débil", "Neutral", "Básico", "Básico fuerte"].slice(0,5));
+  chemistryPh.push({ question: `Una solución con pH ${pH} es:`, options: opts, correct: opts.indexOf(category) });
+}
+
+const chemistryQuestions = padTo100(
+  [...chemistryBase, ...chemistryAcids, ...chemistryStates, ...chemistrySymbols, ...chemistryValence, ...chemistryPh],
+  chemistryBase
+);
 
 // ------------------ TECHNOLOGY ------------------
 const techBase = buildFromData([
@@ -381,7 +544,42 @@ const techFiles = fileTypes.map(([ext, desc]) => {
   return { question: `${ext} es:`, options: opts, correct: opts.indexOf(desc) };
 });
 
-const techQuestions = padTo100([...techBase, ...techHttp, ...techFiles], techBase);
+const techPorts = [
+  [22, "SSH"], [25, "SMTP"], [53, "DNS"], [80, "HTTP"], [110, "POP3"],
+  [143, "IMAP"], [3306, "MySQL"], [5432, "PostgreSQL"], [6379, "Redis"], [27017, "MongoDB"],
+  [1883, "MQTT"], [21, "FTP"], [8080, "HTTP alterno"], [3389, "RDP"], [5900, "VNC"]
+].map(([port, svc]) => {
+  const opts = shuffle([svc, "SSH", "HTTP", "SMTP"]);
+  return { question: `Puerto ${port} suele usarse para:`, options: opts, correct: opts.indexOf(svc) };
+});
+
+// Conversiones rápidas de almacenamiento
+const techStorage = [];
+for (let gb = 1; gb <= 10; gb += 2) {
+  const mb = gb * 1024;
+  const opts = shuffle([`${mb} MB`, `${mb - 128} MB`, `${mb + 256} MB`, `${gb * 1000} MB`]);
+  techStorage.push({
+    question: `${gb} GB equivalen a:`,
+    options: opts,
+    correct: opts.indexOf(`${mb} MB`)
+  });
+}
+
+// Significado de comandos git frecuentes
+const gitCommands = buildFromData([
+  ["git clone", ["Crea copia local", "Sube cambios", "Muestra estado", "Cambia rama"], "Crea copia local"],
+  ["git status", ["Muestra estado", "Compila", "Resetea HEAD", "Borra branch"], "Muestra estado"],
+  ["git checkout -b", ["Crea rama nueva", "Elimina archivos", "Sube tags", "Fusiona"], "Crea rama nueva"],
+  ["git merge", ["Une ramas", "Reescribe historia", "Descarga", "Inicializa repo"], "Une ramas"],
+  ["git stash", ["Guarda cambios temporales", "Borra tags", "Cambia remoto", "Publica versión"], "Guarda cambios temporales"],
+  ["git pull", ["Descarga y fusiona", "Sube cambios", "Borra branch", "Reinicia repo"], "Descarga y fusiona"],
+  ["git tag", ["Marca versión", "Borra stash", "Reinicia rama", "Configura remoto"], "Marca versión"]
+]);
+
+const techQuestions = padTo100(
+  [...techBase, ...techHttp, ...techFiles, ...techPorts, ...techStorage, ...gitCommands],
+  techBase
+);
 
 // ------------------ HISTORY ------------------
 const historyBase = buildFromData([
@@ -437,7 +635,33 @@ const historyLeaders = leaders.map(([name, place]) => {
   return { question: `${name} lideró principalmente en:`, options: opts, correct: opts.indexOf(place) };
 });
 
-const historyQuestions = padTo100([...historyBase, ...historyIndependence, ...historyLeaders], historyBase);
+const historyEvents = buildFromData([
+  ["Caída de Constantinopla:", ["1453", "1204", "1492", "1914"], "1453"],
+  ["Descubrimiento de América:", ["1492", "1501", "1521", "1600"], "1492"],
+  ["Reforma protestante inicia:", ["1517", "1610", "1415", "1648"], "1517"],
+  ["Firma de la Carta Magna:", ["1066", "1215", "1315", "1415"], "1215"],
+  ["Conquista de Tenochtitlan:", ["1492", "1521", "1542", "1571"], "1521"],
+  ["Revolución Rusa:", ["1905", "1917", "1929", "1945"], "1917"],
+  ["Primer vuelo de los hermanos Wright:", ["1903", "1914", "1890", "1927"], "1903"],
+  ["ENIAC se presenta:", ["1946", "1955", "1936", "1960"], "1946"],
+  ["Fin de la Guerra Fría (disolución URSS):", ["1989", "1990", "1991", "1992"], "1991"],
+  ["Inicio de la Guerra de Corea:", ["1945", "1950", "1955", "1960"], "1950"],
+  ["Atentados 11 de septiembre:", ["1998", "2001", "2003", "2005"], "2001"],
+  ["Llegada del Apolo 11 a la Luna:", ["1968", "1969", "1970", "1972"], "1969"],
+  ["Inicio de la Primera Guerra Mundial:", ["1912", "1914", "1916", "1918"], "1914"],
+  ["Declaración de los Derechos del Hombre y del Ciudadano:", ["1776", "1789", "1804", "1848"], "1789"],
+  ["Independencia de India:", ["1939", "1945", "1947", "1950"], "1947"],
+  ["Caída del Imperio Romano de Occidente:", ["395", "410", "476", "529"], "476"],
+  ["Revolución Industrial (aprox inicio):", ["1650", "1700", "1760", "1820"], "1760"],
+  ["Batalla de Waterloo:", ["1804", "1812", "1815", "1821"], "1815"],
+  ["Guerra de los Siete Años inicia:", ["1756", "1776", "1789", "1812"], "1756"],
+  ["Publicación de la Teoría de la Relatividad Especial:", ["1895", "1905", "1915", "1925"], "1905"]
+]);
+
+const historyQuestions = padTo100(
+  [...historyBase, ...historyIndependence, ...historyLeaders, ...historyEvents],
+  historyBase
+);
 
 // ------------------ GEOGRAPHY ------------------
 const geographyBase = buildFromData([
@@ -507,20 +731,97 @@ const geographyExtremes = geoExtremes.map(([label, answer]) => {
   return { question: `${label} es:`, options: opts, correct: opts.indexOf(answer) };
 });
 
-const geographyQuestions = padTo100([...geographyBase, ...geographyCapitals, ...geographyExtremes], geographyBase);
+const moreCapitals = [
+  ["Noruega", "Oslo", "Bergen", "Trondheim", "Stavanger"],
+  ["Suecia", "Estocolmo", "Gotemburgo", "Malmö", "Uppsala"],
+  ["Finlandia", "Helsinki", "Turku", "Tampere", "Oulu"],
+  ["Polonia", "Varsovia", "Cracovia", "Gdansk", "Poznan"],
+  ["Países Bajos", "Ámsterdam", "Rotterdam", "La Haya", "Utrecht"],
+  ["Suiza", "Berna", "Zúrich", "Ginebra", "Basilea"],
+  ["Austria", "Viena", "Salzburgo", "Graz", "Linz"],
+  ["Portugal", "Lisboa", "Oporto", "Braga", "Coímbra"],
+  ["Hungría", "Budapest", "Debrecen", "Szeged", "Pécs"],
+  ["Ucrania", "Kiev", "Leópolis", "Odesa", "Járkov"],
+  ["Irlanda", "Dublín", "Cork", "Galway", "Limerick"],
+  ["Bélgica", "Bruselas", "Brujas", "Amberes", "Gante"],
+  ["Turquía", "Ankara", "Estambul", "Esmirna", "Bursa"],
+  ["Egipto", "El Cairo", "Luxor", "Giza", "Alejandría"],
+  ["Kenia", "Nairobi", "Mombasa", "Kisumu", "Nakuru"],
+  ["Sudáfrica", "Pretoria", "Ciudad del Cabo", "Johannesburgo", "Durban"],
+  ["Nueva Zelanda", "Wellington", "Auckland", "Christchurch", "Hamilton"],
+  ["Tailandia", "Bangkok", "Chiang Mai", "Phuket", "Pattaya"],
+  ["Irán", "Teherán", "Isfahán", "Shiraz", "Mashhad"],
+  ["Pakistán", "Islamabad", "Karachi", "Lahore", "Peshawar"]
+];
+const geographyMoreCapitals = moreCapitals.map(([country, correct, ...rest]) => {
+  const opts = shuffle([correct, ...rest]);
+  return { question: `Capital de ${country}:`, options: opts, correct: opts.indexOf(correct) };
+});
+
+// Montañas más altas por continente
+const continentPeaks = [
+  ["Asia", "Everest"],
+  ["Sudamérica", "Aconcagua"],
+  ["Norteamérica", "Denali"],
+  ["África", "Kilimanjaro"],
+  ["Europa", "Elbrus"],
+  ["Antártida", "Vinson"],
+  ["Oceanía", "Puncak Jaya"]
+];
+const geographyPeaks = continentPeaks.map(([cont, peak]) => {
+  const opts = shuffle([peak, "Mont Blanc", "Matterhorn", "McKinley"]);
+  return { question: `Pico más alto de ${cont}:`, options: opts, correct: opts.indexOf(peak) };
+});
+
+// Hemisferios
+const geographyHemispheres = buildFromData([
+  ["La ciudad de Quito está en el hemisferio:", ["Norte", "Sur", "Cruzando el ecuador", "Occidental"], "Cruzando el ecuador"],
+  ["Sídney se ubica en el hemisferio:", ["Norte", "Sur", "Este", "Oeste"], "Sur"],
+  ["Londres se ubica en el hemisferio:", ["Norte", "Sur", "Oeste solamente", "Antártico"], "Norte"],
+  ["Johannesburgo se ubica en el hemisferio:", ["Norte", "Sur", "Oeste", "Ártico"], "Sur"],
+  ["Ciudad de México se ubica en el hemisferio:", ["Norte", "Sur", "Solo Oeste", "Solo Este"], "Norte"]
+]);
+
+const geographyQuestions = padTo100(
+  [...geographyBase, ...geographyCapitals, ...geographyExtremes, ...geographyMoreCapitals, ...geographyPeaks, ...geographyHemispheres],
+  geographyBase
+);
 
 function padTo100(list, fillers) {
-  const out = [...list];
-  let i = 0;
-  while (out.length < 100) {
-    if (i >= fillers.length) {
-      // si faltan, repetir primeros fillers pero mezclados
-      fillers.push(...fillers);
+  // 1) quitar duplicados por texto de pregunta
+  const seen = new Set();
+  const out = [];
+  [...list].forEach(q => {
+    if (!seen.has(q.question)) {
+      seen.add(q.question);
+      out.push(q);
     }
-    out.push(fillers[i]);
+  });
+  // 2) agregar fillers solo si no existen ya
+  let i = 0;
+  while (out.length < 100 && i < fillers.length) {
+    const q = fillers[i];
+    if (!seen.has(q.question)) {
+      seen.add(q.question);
+      out.push(q);
+    }
     i++;
   }
-  return out.slice(0, 120); // dejamos un poco de extra para randomizar sin riesgo
+  // 3) si aun falta, recircular fillers pero cambiando un sufijo numérico para mantener unicidad
+  let suffix = 1;
+  while (out.length < 100) {
+    const base = fillers[(out.length + i) % fillers.length];
+    const cloned = {
+      ...base,
+      question: `${base.question} (var ${suffix})`
+    };
+    if (!seen.has(cloned.question)) {
+      seen.add(cloned.question);
+      out.push(cloned);
+    }
+    suffix++;
+  }
+  return out.slice(0, 100); // exactamente 100 únicas por categoría
 }
 
 // ------------------ ENSAMBLE FINAL ------------------
