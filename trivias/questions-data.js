@@ -1,19 +1,18 @@
 // Banco de preguntas STEAM Trivia
 // -------------------------------------------------------------
 // Cómo está organizado este archivo
-// 1) Helpers: shuffle, buildFromData, padTo100
+// 1) Helpers: shuffle, buildFromData, uniqueQuestions
 //    - shuffle(array): devuelve copia mezclada (Fisher-Yates)
 //    - buildFromData([ [pregunta, opciones[], correctaLabel], ... ]):
 //         crea objetos { question, options, correct } calculando el índice
-//    - padTo100(base, fillers): asegura mínimo 100 items por categoría
-//      usando fillers repetibles si faltan.
+//    - uniqueQuestions(lista): quita preguntas duplicadas por texto.
 //
 // 2) Secciones por categoría (GENERAL, SCIENCE, MATHEMATICS, ROBOTICS,
 //    CHEMISTRY, TECHNOLOGY, HISTORY, GEOGRAPHY)
 //    Cada sección define:
 //       - una base curada (buildFromData)
 //       - grupos adicionales generados (listas mapeadas o for)
-//       - se combinan y se pasan por padTo100
+//       - se combinan y se deduplican
 //
 // 3) Ensamble final:
 //    const questionsDatabase = { general, science, ... }
@@ -47,6 +46,19 @@ function buildFromData(data) {
     const optsShuffled = shuffle(opts);
     return { question: q, options: optsShuffled, correct: optsShuffled.indexOf(correctLabel) };
   });
+}
+
+// Deduplica manteniendo el primer elemento con el mismo texto de pregunta
+function uniqueQuestions(list) {
+  const seen = new Set();
+  const out = [];
+  for (const q of list) {
+    if (!seen.has(q.question)) {
+      seen.add(q.question);
+      out.push(q);
+    }
+  }
+  return out;
 }
 
 // ------------------ GENERAL ------------------
@@ -101,16 +113,68 @@ const generalComparisons = buildFromData([
   ["¿Qué ciudad está más al sur?", ["Ushuaia", "Punta Arenas", "Christchurch", "Hobart"], "Ushuaia"]
 ]);
 
-const generalLogic = [];
-for (let n = 1; n <= 55; n++) {
-  const litres = n * 3;
-  generalLogic.push({
-    question: `Tienes ${litres}L de agua y ${litres}L de aceite. ¿Cuál ocupa más espacio?`,
-    options: ["Agua", "Aceite", "Ocupan lo mismo", "Depende de la temperatura"],
-    correct: 2
-  });
-}
-const generalQuestions = padTo100([...generalBase, ...generalComparisons], generalLogic);
+const generalExtra = buildFromData([
+  ["¿Qué idioma tiene más hablantes nativos?", ["Mandarín", "Inglés", "Español", "Hindi"], "Mandarín"],
+  ["¿Qué continente no tiene reptiles nativos?", ["Antártida", "Europa", "Asia", "Oceanía"], "Antártida"],
+  ["¿Cuál es el metal más abundante en la corteza terrestre?", ["Aluminio", "Hierro", "Cobre", "Calcio"], "Aluminio"],
+  ["¿En qué país se originaron los Juegos Olímpicos antiguos?", ["Grecia", "Italia", "Egipto", "Persia"], "Grecia"],
+  ["¿Cuántos minutos hay en 3 horas?", ["120", "150", "180", "210"], "180"],
+  ["¿Qué planeta tiene el día más largo?", ["Venus", "Mercurio", "Tierra", "Marte"], "Venus"],
+  ["¿Quién escribió “Cien años de soledad”?", ["Gabriel García Márquez", "Mario Vargas Llosa", "Julio Cortázar", "Jorge Luis Borges"], "Gabriel García Márquez"],
+  ["¿Cuál es el mamífero más grande?", ["Ballena azul", "Elefante africano", "Cachalote", "Hipopótamo"], "Ballena azul"],
+  ["¿Qué océano baña la costa este de Estados Unidos?", ["Atlántico", "Pacífico", "Índico", "Ártico"], "Atlántico"],
+  ["¿Cuál es la moneda oficial de Japón?", ["Yen", "Won", "Yuan", "Ringgit"], "Yen"],
+  ["¿Cuál es la montaña más alta de África?", ["Kilimanjaro", "Atlas", "Monte Kenia", "Ruwenzori"], "Kilimanjaro"],
+  ["¿Cuál es el río más largo de Sudamérica?", ["Amazonas", "Paraná", "Orinoco", "Magdalena"], "Amazonas"],
+  ["¿Quién pintó la Mona Lisa?", ["Leonardo da Vinci", "Miguel Ángel", "Rafael", "Botticelli"], "Leonardo da Vinci"],
+  ["¿Qué animal es símbolo de Australia?", ["Canguro", "Koala", "Emú", "Demonio de Tasmania"], "Canguro"],
+  ["¿Cuántos jugadores hay por equipo en fútbol once?", ["11", "7", "9", "10"], "11"],
+  ["¿Qué gas respiramos principalmente?", ["Nitrógeno", "Oxígeno", "Argón", "CO2"], "Nitrógeno"],
+  ["¿Cuál es el único metal líquido a temperatura ambiente?", ["Mercurio", "Sodio", "Galio", "Cesio"], "Mercurio"],
+  ["¿Qué ciencia estudia los fósiles?", ["Paleontología", "Geología", "Arqueología", "Antropología"], "Paleontología"],
+  ["¿Qué país tiene forma de bota?", ["Italia", "Chile", "India", "Noruega"], "Italia"],
+  ["¿Qué ciudad se conoce como “La Gran Manzana”?", ["Nueva York", "Londres", "Tokio", "Los Ángeles"], "Nueva York"],
+  ["¿Qué instrumento mide la temperatura?", ["Termómetro", "Barómetro", "Anemómetro", "Higrómetro"], "Termómetro"],
+  ["¿Qué deporte practica Lionel Messi?", ["Fútbol", "Baloncesto", "Tenis", "Béisbol"], "Fútbol"],
+  ["¿Cuál es el hueso más largo del cuerpo humano?", ["Fémur", "Húmero", "Tibia", "Radio"], "Fémur"],
+  ["¿En qué ciudad está el Big Ben?", ["Londres", "París", "Berlín", "Roma"], "Londres"],
+  ["¿Cuántos lados tiene un hexágono?", ["6", "5", "7", "8"], "6"],
+  ["¿Qué tipo de animal es una orca?", ["Mamífero", "Pez", "Reptil", "Ave"], "Mamífero"],
+  ["¿Cuál es la capital de Islandia?", ["Reikiavik", "Oslo", "Helsinki", "Estocolmo"], "Reikiavik"],
+  ["¿En qué país está Machu Picchu?", ["Perú", "Bolivia", "México", "Guatemala"], "Perú"],
+  ["¿Qué vitamina ayuda a la visión?", ["Vitamina A", "Vitamina C", "Vitamina B12", "Vitamina K"], "Vitamina A"],
+  ["¿Quién escribió “Don Quijote de la Mancha”?", ["Miguel de Cervantes", "Lope de Vega", "Francisco de Quevedo", "Luis de Góngora"], "Miguel de Cervantes"],
+  ["¿Qué gas hace burbujas en la gaseosa?", ["CO2", "O2", "N2", "H2"], "CO2"],
+  ["¿Cuál país es famoso por el tango?", ["Argentina", "España", "Brasil", "México"], "Argentina"],
+  ["¿En qué continente está Bután?", ["Asia", "África", "Europa", "Oceanía"], "Asia"],
+  ["¿Qué órgano bombea la sangre?", ["Corazón", "Pulmón", "Riñón", "Hígado"], "Corazón"],
+  ["¿Qué se mide en decibelios?", ["Sonido", "Temperatura", "Luz", "Masa"], "Sonido"],
+  ["¿Cuál es el metal precioso más blando?", ["Oro", "Plata", "Platino", "Paladio"], "Oro"],
+  ["¿Qué planeta es famoso por sus anillos?", ["Saturno", "Júpiter", "Urano", "Neptuno"], "Saturno"],
+  ["¿Cuál es la capital de Noruega?", ["Oslo", "Bergen", "Stavanger", "Trondheim"], "Oslo"],
+  ["¿Qué país inventó el sushi?", ["Japón", "Corea del Sur", "China", "Tailandia"], "Japón"],
+  ["¿Cuál es el animal terrestre más rápido?", ["Guepardo", "León", "Antílope", "Lince"], "Guepardo"],
+  ["¿Cuántos colores tiene un arcoíris tradicional?", ["7", "6", "8", "9"], "7"],
+  ["¿Qué instrumento se usa para medir la presión atmosférica?", ["Barómetro", "Manómetro", "Altímetro", "Termómetro"], "Barómetro"],
+  ["¿Qué instrumento musical se toca con arco?", ["Violín", "Piano", "Flauta", "Saxofón"], "Violín"],
+  ["¿Qué país es famoso por sus tulipanes?", ["Países Bajos", "Bélgica", "Dinamarca", "Polonia"], "Países Bajos"],
+  ["¿Qué ave es símbolo de Estados Unidos?", ["Águila calva", "Cóndor andino", "Halcón peregrino", "Pelícano pardo"], "Águila calva"]
+]);
+
+const generalExtra2 = buildFromData([
+  ["¿Qué instrumento mide el tiempo?", ["Reloj", "Balanza", "Termómetro", "Barómetro"], "Reloj"],
+  ["¿Qué país tiene hoy la mayor población?", ["India", "China", "EEUU", "Indonesia"], "India"],
+  ["¿Cuál es la capital de Tailandia?", ["Bangkok", "Hanoi", "Phnom Penh", "Vientián"], "Bangkok"],
+  ["Animal símbolo de Canadá:", ["Castor", "Lobo", "Águila", "Búfalo"], "Castor"],
+  ["¿En qué continente está el Sahara?", ["África", "Asia", "Oceanía", "Europa"], "África"],
+  ["Idioma oficial de Brasil:", ["Portugués", "Español", "Inglés", "Francés"], "Portugués"],
+  ["Bebida tradicional de Japón:", ["Sake", "Vodka", "Whisky", "Tequila"], "Sake"],
+  ["La torre CN está en:", ["Toronto", "Chicago", "París", "Dubái"], "Toronto"],
+  ["¿Qué planeta es conocido como el rojo?", ["Marte", "Júpiter", "Saturno", "Mercurio"], "Marte"],
+  ["¿Qué deporte usa bate y bases?", ["Béisbol", "Críquet", "Hockey", "Rugby"], "Béisbol"]
+]);
+
+const generalQuestions = uniqueQuestions([...generalBase, ...generalComparisons, ...generalExtra, ...generalExtra2]);
 
 // ------------------ SCIENCE ------------------
 const scienceBase = buildFromData([
@@ -205,18 +269,22 @@ const sciencePhysics = buildFromData([
   ["Constante de Avogadro ≈", ["6.02e23", "3.14e8", "9.81", "1.60e-19"], "6.02e23"]
 ]);
 
-const scienceQuestions = padTo100(
-  [
-    ...scienceBase,
-    ...scienceElements,
-    ...scienceTemps,
-    ...sciencePrefixes,
-    ...scienceConversions,
-    ...scienceBody,
-    ...sciencePhysics
-  ],
-  [...scienceElements, ...scienceConversions, ...sciencePhysics]
-);
+const scienceExtra = buildFromData([
+  ["Grupo sanguíneo universal receptor:", ["AB+", "O-", "A", "B"], "AB+"],
+  ["Hormona que regula el metabolismo:", ["Tiroxina", "Insulina", "Adrenalina", "Progesterona"], "Tiroxina"],
+  ["¿Qué órgano produce bilis?", ["Hígado", "Riñón", "Páncreas", "Pulmón"], "Hígado"]
+]);
+
+const scienceQuestions = uniqueQuestions([
+  ...scienceBase,
+  ...scienceElements,
+  ...scienceTemps,
+  ...sciencePrefixes,
+  ...scienceConversions,
+  ...scienceBody,
+  ...sciencePhysics,
+  ...scienceExtra
+]);
 
 // ------------------ MATHEMATICS ------------------
 const mathBase = buildFromData([
@@ -242,38 +310,93 @@ const mathBase = buildFromData([
   ["¿Qué crece más rápido?", ["n^2", "n log n", "2^n", "√n"], "2^n"]
 ]);
 
-const mathSquares = [];
-for (let n = 11; n <= 50; n++) {
-  const exact = n * n;
-  const opts = shuffle([exact, exact + n, exact - n, exact + 10].map(String));
-  mathSquares.push({ question: `¿Cuánto es ${n}^2?`, options: opts, correct: opts.indexOf(String(exact)) });
-}
+const mathExtra = buildFromData([
+  ["¿Cuál es la derivada de x^2?", ["2x", "x", "x^2", "0"], "2x"],
+  ["Integral de cos(x):", ["sin(x)+C", "-sin(x)+C", "cos(x)+C", "tan(x)+C"], "sin(x)+C"],
+  ["0/5 es:", ["0", "Indefinido", "5", "1"], "0"],
+  ["5/0 es:", ["Indefinido", "5", "0", "1"], "Indefinido"],
+  ["Raíz cuadrada de 144:", ["10", "11", "12", "13"], "12"],
+  ["Área de un triángulo base 6 altura 4:", ["10", "12", "14", "18"], "12"],
+  ["Perímetro de un cuadrado lado 5:", ["15", "20", "25", "30"], "20"],
+  ["Volumen de un cubo arista 3:", ["9", "18", "27", "36"], "27"],
+  ["Media aritmética de 2,4,6:", ["3", "4", "5", "6"], "4"],
+  ["Mediana de 1,3,7,9,11:", ["5", "7", "9", "11"], "7"],
+  ["Modo de 1,1,2,3:", ["1", "2", "3", "Ninguno"], "1"],
+  ["0.75 en fracción:", ["1/4", "1/3", "3/4", "4/3"], "3/4"],
+  ["50 es el ___% de 200:", ["10", "20", "25", "50"], "25"],
+  ["Un ángulo recto mide:", ["45°", "60°", "90°", "120°"], "90°"],
+  ["Suma de ángulos de un triángulo plano:", ["90°", "120°", "180°", "270°"], "180°"],
+  ["π radianes equivalen a:", ["90°", "180°", "270°", "360°"], "180°"],
+  ["f(x)=x^3, f'(2) =", ["6", "8", "12", "18"], "12"],
+  ["Determinante de [[1,2],[3,4]]:", ["-2", "2", "5", "0"], "-2"],
+  ["log_e(e) =", ["0", "1", "e", "10"], "1"],
+  ["x^2 - 9 = 0 tiene raíces:", ["±2", "±3", "±4", "±5"], "±3"],
+  ["Inversa multiplicativa de 5:", ["1/5", "5", "0", "10"], "1/5"],
+  ["PA con a1=2, d=3, a4 =", ["8", "9", "11", "14"], "11"],
+  ["Número de diagonales de un pentágono:", ["3", "4", "5", "6"], "5"],
+  ["Combinaciones C(5,2):", ["5", "8", "10", "12"], "10"],
+  ["Permutaciones de 4 objetos:", ["12", "16", "20", "24"], "24"],
+  ["Probabilidad de sacar un as (baraja 52):", ["1/4", "1/13", "1/26", "1/52"], "1/13"],
+  ["Valor absoluto de -7:", ["-7", "0", "7", "14"], "7"],
+  ["Sistema 2x+y=5 y x-y=1, x =", ["1", "2", "3", "4"], "2"],
+  ["Recta con pendiente 2 que pasa por (0,3):", ["y=2x+3", "y=2x-3", "y=3x+2", "y=3x-2"], "y=2x+3"],
+  ["Hipotenusa de triángulo 3-4-?:", ["4", "5", "6", "7"], "5"],
+  ["Longitud circunferencia r=10:", ["10π", "15π", "20π", "25π"], "20π"],
+  ["tan(45°) =", ["0", "1", "√3/2", "∞"], "1"],
+  ["sin(30°) =", ["0.5", "√3/2", "1", "0"], "0.5"],
+  ["cos(60°) =", ["0.5", "0.75", "1", "0"], "0.5"],
+  ["¿Qué es el producto escalar de vectores perpendiculares?", ["0", "1", "-1", "Igual a su módulo"], "0"],
+  ["Límite (1+1/n)^n cuando n→∞:", ["e", "1", "0", "∞"], "e"],
+  ["MCD de 28 y 35:", ["7", "14", "21", "28"], "7"],
+  ["MCM de 6 y 8:", ["12", "18", "20", "24"], "24"],
+  ["2^10 =", ["256", "512", "1024", "2048"], "1024"],
+  ["log2(32) =", ["3", "4", "5", "6"], "5"],
+  ["Un polígono con suma de ángulos 720° tiene lados:", ["4", "5", "6", "7"], "6"],
+  ["Si la derivada es cero en un intervalo, la función es:", ["Constante", "Lineal", "Cuadrática", "Exponencial"], "Constante"],
+  ["Probabilidad de sacar 3 en un dado justo:", ["1/2", "1/3", "1/4", "1/6"], "1/6"],
+  ["Número áureo aproximado:", ["1.41", "1.61", "1.73", "2.71"], "1.61"],
+  ["Distancia entre (0,0) y (3,4):", ["4", "5", "6", "7"], "5"],
+  ["Suma de primeros n naturales es:", ["n(n+1)/2", "n^2", "n/2", "2n"], "n(n+1)/2"],
+  ["Ángulo llano mide:", ["90°", "120°", "180°", "360°"], "180°"],
+  ["Vértices de un dodecaedro:", ["12", "16", "20", "24"], "20"],
+  ["Eventos mutuamente excluyentes tienen probabilidad conjunta:", ["0", "1", "0.5", "Depende"], "0"],
+  ["0.999... equivale a:", ["Menos que 1", "Igual a 1", "Mayor que 1", "No se sabe"], "Igual a 1"],
+  ["Un número irracional es:", ["No expresable como fracción exacta", "Número negativo", "Número par", "Número complejo"], "No expresable como fracción exacta"],
+  ["Si varianza = 0, entonces los datos son:", ["Todos iguales", "Todos distintos", "Aleatorios", "Simétricos"], "Todos iguales"],
+  ["Integral de 0 a 1 de 1 dx =", ["0", "0.5", "1", "2"], "1"]
+]);
 
-const mathLogs = [];
-for (let n = 2; n <= 8; n++) {
-  const val = Math.pow(10, n);
-  const opts = shuffle([n, n - 1, n + 1, val].map(String));
-  mathLogs.push({ question: `log10(${val}) =`, options: opts, correct: opts.indexOf(String(n)) });
-}
+const mathExtra2 = buildFromData([
+  ["Número primo más pequeño:", ["2", "1", "3", "5"], "2"],
+  ["7 × 8 =", ["54", "56", "58", "60"], "56"],
+  ["9 × 9 =", ["72", "81", "90", "99"], "81"],
+  ["(a - b)^2 =", ["a^2 - 2ab + b^2", "a^2 + 2ab + b^2", "a^2 - b^2", "2a^2 - b^2"], "a^2 - 2ab + b^2"],
+  ["Inversa aditiva de 7:", ["-7", "1/7", "7", "0"], "-7"],
+  ["Un millar equivale a:", ["100", "1000", "10000", "500"], "1000"],
+  ["2/3 + 1/3 =", ["1/3", "2/3", "1", "4/3"], "1"],
+  ["La mitad de 1/4 es:", ["1/8", "1/4", "1/2", "1/16"], "1/8"],
+  ["3^0 =", ["0", "1", "3", "9"], "1"],
+  ["Base del logaritmo natural:", ["e", "10", "2", "π"], "e"],
+  ["5^3 =", ["25", "75", "100", "125"], "125"],
+  ["100% de 50 es:", ["25", "50", "75", "100"], "50"],
+  ["Derivada de ln(x):", ["1/x", "x", "ln(x)", "0"], "1/x"],
+  ["Un decágono tiene lados:", ["8", "9", "10", "12"], "10"],
+  ["Área de un rectángulo 5x7:", ["30", "32", "35", "40"], "35"],
+  ["Perímetro triángulo equilátero lado 4:", ["8", "10", "12", "14"], "12"],
+  ["Media geométrica de 4 y 9:", ["5", "6", "6.5", "7"], "6"],
+  ["1 rad ≈", ["34°", "57°", "90°", "180°"], "57°"],
+  ["sin(90°) =", ["0", "0.5", "1", "√3/2"], "1"],
+  ["cos(0°) =", ["0", "0.5", "1", "-1"], "1"],
+  ["C(4,1) =", ["1", "2", "3", "4"], "4"],
+  ["3x = 12, x =", ["2", "3", "4", "5"], "4"],
+  ["Una matriz con determinante 0 es:", ["Singular", "Inversa", "Ortogonal", "Diagonal"], "Singular"],
+  ["log10(1) =", ["-1", "0", "1", "10"], "0"],
+  ["Diagonal de un cuadrado lado 1:", ["1", "√2", "2", "0.5"], "√2"],
+  ["Pendiente de recta vertical:", ["Indefinida", "0", "1", "-1"], "Indefinida"],
+  ["Segundos en una hora:", ["600", "1800", "3600", "5400"], "3600"]
+]);
 
-const mathPrimes = [97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173];
-const mathPrimeQs = mathPrimes.map(p => {
-  const opts = shuffle([p, p + 1, p - 1, p + 10].map(String));
-  return { question: `Selecciona el número primo:`, options: opts, correct: opts.indexOf(String(p)) };
-});
-
-// Potencias de dos para ampliar banca única
-const mathPowers = [];
-for (let n = 6; n <= 22; n++) {
-  const val = Math.pow(2, n);
-  const opts = shuffle([val, val / 2, val * 2, val + 10].map(String));
-  mathPowers.push({ question: `2^${n} =`, options: opts, correct: opts.indexOf(String(val)) });
-}
-
-const mathQuestions = padTo100(
-  [...mathBase, ...mathSquares, ...mathLogs, ...mathPrimeQs, ...mathPowers],
-  mathBase
-);
+const mathQuestions = uniqueQuestions([...mathBase, ...mathExtra, ...mathExtra2]);
 
 // ------------------ ROBOTICS ------------------
 const roboticsBase = buildFromData([
@@ -367,33 +490,63 @@ const roboticsVoltages = boardVoltages.map(([board, v]) => {
   return { question: `Tensión lógica típica de ${board}:`, options: opts, correct: opts.indexOf(v) };
 });
 
-// Packs de baterías Li-Ion en serie (3.7 V nominal c/u)
-const roboticsBatteries = [];
-for (let cells = 2; cells <= 6; cells++) {
-  const nominal = (cells * 3.7).toFixed(1);
-  const opts = shuffle([nominal, (cells * 4.2).toFixed(1), (cells * 3.0).toFixed(1), (cells * 5).toFixed(1)].map(v => `${v} V`));
-  roboticsBatteries.push({
-    question: `Pack de ${cells} celdas Li-Ion en serie tiene voltaje nominal ≈`,
-    options: opts,
-    correct: opts.indexOf(`${nominal} V`)
-  });
-}
+const roboticsExtra = buildFromData([
+  ["Sensor que mide distancia con luz láser:", ["LiDAR", "IMU", "Encoder", "Potenciómetro"], "LiDAR"],
+  ["¿Qué protocolo usa MQTT?", ["Publicación/suscripción", "HTTP", "CAN", "UART"], "Publicación/suscripción"],
+  ["¿Qué hace el watchdog en un microcontrolador?", ["Reinicia si se cuelga", "Acelera CPU", "Carga firmware", "Amplifica señal"], "Reinicia si se cuelga"],
+  ["Tipo de comunicación entre Arduino y PC por defecto:", ["UART", "I2C", "SPI", "CAN"], "UART"],
+  ["¿Qué es un H-bridge?", ["Driver para invertir giro de motores DC", "Filtro de audio", "Sensor Hall", "Bus de red"], "Driver para invertir giro de motores DC"],
+  ["¿Qué mide un giroscopio?", ["Velocidad angular", "Aceleración lineal", "Campo magnético", "Temperatura"], "Velocidad angular"],
+  ["¿Qué es un encoder incremental?", ["Cuenta pulsos de giro", "Mide distancia láser", "Calcula corriente", "Convierte AC/DC"], "Cuenta pulsos de giro"],
+  ["¿Qué microcontrolador usa ESP32?", ["Xtensa dual core", "AVR 8-bit", "ARM Cortex-M0", "x86"], "Xtensa dual core"],
+  ["Batería típica de dron pequeño:", ["LiPo 3S", "Plomo 12V", "NiMH 9.6V", "Pila AA"], "LiPo 3S"],
+  ["¿Qué es ROS2?", ["Framework de robótica", "Sistema operativo en tiempo real", "Simulador 3D", "Driver de motor"], "Framework de robótica"],
+  ["Parámetro Kp en PID afecta:", ["Respuesta proporcional al error", "Memoria usada", "Ruido del sensor", "Consumo eléctrico"], "Respuesta proporcional al error"],
+  ["¿Qué es SLAM?", ["Localización y mapeo simultáneo", "Modo ahorro de energía", "Protocolo de radio", "Tipo de LiDAR"], "Localización y mapeo simultáneo"],
+  ["¿Qué es un servo?", ["Motor con control de posición", "Sensor de distancia", "CPU", "Pantalla"], "Motor con control de posición"],
+  ["¿Qué es una odometría?", ["Estimación de pose por movimiento", "Mapa de calor", "Tabla de pines", "Transformada de Fourier"], "Estimación de pose por movimiento"],
+  ["¿Qué bus permite múltiples maestros y esclavos con dos cables?", ["I2C", "SPI", "UART", "USB"], "I2C"],
+  ["¿Qué significa PWM?", ["Pulse Width Modulation", "Power Watt Mode", "Parallel Wire Mapping", "Protocol With Messages"], "Pulse Width Modulation"],
+  ["¿Qué driver popular controla motores paso a paso?", ["A4988", "L298N", "ULN2003", "TB6612"], "A4988"],
+  ["¿Qué archivo describe la cinemática y geometría en ROS?", ["URDF", "launch", "rviz", "bag"], "URDF"],
+  ["¿Qué mide un magnetómetro?", ["Campo magnético", "Temperatura", "Presión", "Distancia"], "Campo magnético"],
+  ["¿Qué es un IMU?", ["Unidad de medida inercial", "Motor industrial", "Unidad de memoria", "Sensor de luz"], "Unidad de medida inercial"],
+  ["¿Qué hace un optoacoplador?", ["Aísla eléctricamente dos circuitos", "Duplica voltaje", "Conecta a internet", "Mide rpm"], "Aísla eléctricamente dos circuitos"],
+  ["¿Qué es CAN bus?", ["Red robusta para vehículos", "Formato de video", "Sistema operativo", "Tipo de batería"], "Red robusta para vehículos"],
+  ["¿Qué es un limit switch?", ["Fin de carrera", "Regulador DC-DC", "Sensor óptico de color", "Driver MOSFET"], "Fin de carrera"],
+  ["¿Qué es un potenciómetro?", ["Resistencia variable", "Sensor óptico", "Motor paso a paso", "Memoria EEPROM"], "Resistencia variable"],
+  ["¿Qué hace un regulador buck?", ["Reduce voltaje", "Aumenta voltaje", "Convierte AC en DC", "Mide voltaje"], "Reduce voltaje"],
+  ["¿Qué es un MPU-6050?", ["IMU 6 ejes", "LiDAR 3D", "Servo digital", "Microcontrolador RISC-V"], "IMU 6 ejes"],
+  ["¿Qué es un relé de estado sólido?", ["Switch electrónico sin partes móviles", "Sensor de humedad", "Driver de paso a paso", "Conector waterproof"], "Switch electrónico sin partes móviles"],
+  ["¿Qué es la frecuencia de Nyquist?", ["Mitad de la frecuencia de muestreo", "Mínima frecuencia de un PWM", "Máxima de una batería", "Constante de Planck"], "Mitad de la frecuencia de muestreo"],
+  ["¿Qué es un Lidar 3D?", ["Sensor láser que genera nubes de puntos", "Cámara RGB", "Radar de microondas", "Sensor de ultrasonido"], "Sensor láser que genera nubes de puntos"],
+  ["¿Qué es un microservicio en robótica?", ["Nodo pequeño con una función", "Motor de precisión", "Sensor de presión", "Cableado modular"], "Nodo pequeño con una función"],
+  ["¿Qué es una cinemática inversa?", ["Calcular articulaciones desde la pose deseada", "Calcular pose desde articulaciones", "Muestrear PWM", "Filtrar ruido"], "Calcular articulaciones desde la pose deseada"],
+  ["¿Qué es un encoder absoluto?", ["Entrega ángulo real en cada lectura", "Cuenta pulsos relativos", "Mide temperatura", "Convierte voltaje"], "Entrega ángulo real en cada lectura"],
+  ["¿Qué es un puente H doble?", ["Driver para dos motores DC", "Fuente de poder", "Filtro de audio", "Bus de datos"], "Driver para dos motores DC"],
+  ["¿Qué es un MOSFET?", ["Transistor de efecto de campo", "Sensor térmico", "Motor sin escobillas", "Conector"], "Transistor de efecto de campo"],
+  ["¿Qué significa kinematic chain?", ["Cadena de eslabones articulados", "Lista de comandos ROS", "Secuencia de PWM", "Mapa de bits"], "Cadena de eslabones articulados"],
+  ["¿Qué se usa para medir corriente?", ["Shunt + amplificador", "Sensor capacitivo", "Fotodiodo", "Encoder"], "Shunt + amplificador"],
+  ["¿Qué es un limit torque?", ["Límite de par en control de motores", "Tipo de engrane", "Modo de comunicación", "Sensor de fuerza"], "Límite de par en control de motores"]
+]);
 
-// PWM estándar de servos hobby
-const roboticsPwm = [];
-for (let us = 1000; us <= 2000; us += 125) {
-  const opts = shuffle([`${us} µs`, `${us - 200} µs`, `${us + 200} µs`, `${us + 400} µs`]);
-  roboticsPwm.push({
-    question: `Control PWM de servo: ¿qué pulso cercano a ${us} µs está dentro del rango típico 1000-2000 µs?`,
-    options: opts,
-    correct: opts.indexOf(`${us} µs`)
-  });
-}
+const roboticsExtra2 = buildFromData([
+  ["¿Qué es un ESC en drones?", ["Controlador de motor BLDC", "Sensor de altitud", "Firmware de cámara", "Batería"], "Controlador de motor BLDC"],
+  ["Frecuencia PWM común en Arduino para motores DC:", ["490 Hz", "50 Hz", "5 kHz", "60 kHz"], "490 Hz"],
+  ["¿Qué mide un acelerómetro?", ["Aceleración lineal", "Ángulo absoluto", "Presión", "Temperatura"], "Aceleración lineal"],
+  ["¿Qué hace un fusible?", ["Se funde para cortar corriente", "Amplifica señal", "Reduce voltaje", "Guarda datos"], "Se funde para cortar corriente"],
+  ["¿Qué software planifica trayectorias sin colisiones?", ["Planificador de movimiento", "Compilador", "Firmware", "Bootloader"], "Planificador de movimiento"]
+]);
 
-const roboticsQuestions = padTo100(
-  [...roboticsBase, ...roboticsBoards, ...roboticsMotors, ...roboticsPins, ...roboticsVoltages, ...roboticsBatteries, ...roboticsPwm],
-  roboticsBase
-);
+const roboticsQuestions = uniqueQuestions([
+  ...roboticsBase,
+  ...roboticsBoards,
+  ...roboticsMotors,
+  ...roboticsPins,
+  ...roboticsVoltages,
+  ...roboticsExtra,
+  ...roboticsExtra2
+]);
 
 // ------------------ CHEMISTRY ------------------
 const chemistryBase = buildFromData([
@@ -485,10 +638,30 @@ for (let pH = 0; pH <= 14; pH += 2) {
   chemistryPh.push({ question: `Una solución con pH ${pH} es:`, options: opts, correct: opts.indexOf(category) });
 }
 
-const chemistryQuestions = padTo100(
-  [...chemistryBase, ...chemistryAcids, ...chemistryStates, ...chemistrySymbols, ...chemistryValence, ...chemistryPh],
-  chemistryBase
-);
+const chemistryExtra = buildFromData([
+  ["pH menor a 7 indica solución:", ["Ácida", "Básica", "Neutra", "Desconocida"], "Ácida"],
+  ["Elemento líquido (además de mercurio) cerca de 25°C:", ["Bromo", "Sodio", "Aluminio", "Potasio"], "Bromo"],
+  ["Enlace típico entre metal y no metal:", ["Iónico", "Covalente", "Metálico", "Puente de hidrógeno"], "Iónico"],
+  ["Neutralización ácido + base produce:", ["Sal y agua", "Solo agua", "Solo sal", "Oxígeno"], "Sal y agua"],
+  ["Unidad de molaridad:", ["mol/L", "g/L", "kg/m^3", "%"], "mol/L"],
+  ["Reacción que absorbe calor:", ["Endotérmica", "Exotérmica", "Redox", "Descomposición"], "Endotérmica"],
+  ["Gas noble usado en letreros luminosos:", ["Neón", "Argón", "Xenón", "Kriptón"], "Neón"],
+  ["Principal componente del acero:", ["Hierro", "Cobre", "Aluminio", "Plomo"], "Hierro"],
+  ["CO2 a -80°C y 1 atm está en estado:", ["Sólido", "Líquido", "Gas", "Plasma"], "Sólido"],
+  ["Nombre común de H2O2:", ["Peróxido de hidrógeno", "Perclorato", "Hipoclorito", "Ozono"], "Peróxido de hidrógeno"],
+  ["Número atómico del carbono:", ["4", "6", "8", "10"], "6"],
+  ["Gas usado para atmósferas inertes en soldadura:", ["Argón", "Oxígeno", "Cloro", "Helio"], "Argón"]
+]);
+
+const chemistryQuestions = uniqueQuestions([
+  ...chemistryBase,
+  ...chemistryAcids,
+  ...chemistryStates,
+  ...chemistrySymbols,
+  ...chemistryValence,
+  ...chemistryPh,
+  ...chemistryExtra
+]);
 
 // ------------------ TECHNOLOGY ------------------
 const techBase = buildFromData([
@@ -553,18 +726,6 @@ const techPorts = [
   return { question: `Puerto ${port} suele usarse para:`, options: opts, correct: opts.indexOf(svc) };
 });
 
-// Conversiones rápidas de almacenamiento
-const techStorage = [];
-for (let gb = 1; gb <= 10; gb += 2) {
-  const mb = gb * 1024;
-  const opts = shuffle([`${mb} MB`, `${mb - 128} MB`, `${mb + 256} MB`, `${gb * 1000} MB`]);
-  techStorage.push({
-    question: `${gb} GB equivalen a:`,
-    options: opts,
-    correct: opts.indexOf(`${mb} MB`)
-  });
-}
-
 // Significado de comandos git frecuentes
 const gitCommands = buildFromData([
   ["git clone", ["Crea copia local", "Sube cambios", "Muestra estado", "Cambia rama"], "Crea copia local"],
@@ -576,10 +737,54 @@ const gitCommands = buildFromData([
   ["git tag", ["Marca versión", "Borra stash", "Reinicia rama", "Configura remoto"], "Marca versión"]
 ]);
 
-const techQuestions = padTo100(
-  [...techBase, ...techHttp, ...techFiles, ...techPorts, ...techStorage, ...gitCommands],
-  techBase
-);
+const techExtra = buildFromData([
+  ["¿Qué es OAuth2?", ["Protocolo de autorización", "Base de datos", "Codec de audio", "Formato de imagen"], "Protocolo de autorización"],
+  ["¿Qué lenguaje se ejecuta en el navegador?", ["JavaScript", "Python", "Go", "Rust"], "JavaScript"],
+  ["¿Qué es un CDN?", ["Red de entrega de contenido", "Tipo de base relacional", "Algoritmo de hashing", "Compresor de video"], "Red de entrega de contenido"],
+  ["¿Qué es Docker?", ["Plataforma de contenedores", "Servidor web", "Framework frontend", "Librería de IA"], "Plataforma de contenedores"],
+  ["¿Qué comando lista procesos en Linux?", ["ps", "ls", "cat", "cp"], "ps"],
+  ["¿Qué significa SSD?", ["Solid State Drive", "Secure Socket Device", "Serial Storage Disk", "Software Defined Device"], "Solid State Drive"],
+  ["¿Qué framework es React?", ["Frontend JS", "Backend PHP", "Base de datos", "Servidor DNS"], "Frontend JS"],
+  ["¿Qué hace un balanceador de carga?", ["Distribuye tráfico entre instancias", "Encripta discos", "Compila código", "Mide latencia"], "Distribuye tráfico entre instancias"],
+  ["¿Qué es un webhook?", ["Llamada HTTP saliente por evento", "Dispositivo de red", "Tipo de hash", "Balanceador físico"], "Llamada HTTP saliente por evento"],
+  ["¿Qué significa CRUD?", ["Create, Read, Update, Delete", "Cache, Render, Update, Deploy", "Compile, Run, Unit, Debug", "Nada"], "Create, Read, Update, Delete"]
+]);
+
+const techExtra2 = buildFromData([
+  ["¿Qué es la RAM?", ["Memoria volátil", "Disco duro", "CPU", "GPU"], "Memoria volátil"],
+  ["CPU significa:", ["Central Processing Unit", "Computer Power Unit", "Control Peripheral Unit", "Core Performance Unit"], "Central Processing Unit"],
+  ["Comando para copiar archivos en Linux:", ["cp", "mv", "ls", "cat"], "cp"],
+  ["Protocolo de correo para sincronizar bandeja:", ["IMAP", "POP3", "SMTP", "FTP"], "IMAP"],
+  ["Estructura LIFO se llama:", ["Pila", "Cola", "Árbol", "Grafo"], "Pila"],
+  ["Algoritmo de ordenamiento O(n log n):", ["Merge sort", "Bubble sort", "Counting sort", "Selection sort"], "Merge sort"],
+  ["Base de datos clave-valor popular:", ["Redis", "PostgreSQL", "MySQL", "SQLite"], "Redis"],
+  ["CSS significa:", ["Cascading Style Sheets", "Central Style System", "Common Style Syntax", "Creative Sheet Styles"], "Cascading Style Sheets"],
+  ["`npm install` hace:", ["Instala dependencias", "Ejecuta tests", "Inicia servidor", "Compila nativo"], "Instala dependencias"],
+  ["Imagen con soporte de transparencia:", ["PNG", "JPEG", "BMP", "TIFF sin alfa"], "PNG"],
+  ["Herramienta común para probar APIs:", ["Postman", "Figma", "Photoshop", "Jira"], "Postman"],
+  ["GPU es:", ["Unidad de procesamiento gráfico", "Servidor de archivos", "Tarjeta de sonido", "Router"], "Unidad de procesamiento gráfico"],
+  ["BIOS es:", ["Firmware de arranque", "Sistema operativo", "Driver de red", "Aplicación web"], "Firmware de arranque"],
+  ["RAID 1 se conoce como:", ["Espejo", "Striping", "Paridad doble", "JBOD"], "Espejo"],
+  ["Firewall sirve para:", ["Filtrar tráfico de red", "Renderizar gráficos", "Comprimir archivos", "Desfragmentar discos"], "Filtrar tráfico de red"],
+  ["2FA significa:", ["Autenticación de dos factores", "Aplicación de archivos", "Framework de análisis", "Formato de audio"], "Autenticación de dos factores"],
+  ["Cookie en web es:", ["Dato pequeño almacenado en el navegador", "Malware", "Servidor proxy", "Formato de imagen"], "Dato pequeño almacenado en el navegador"],
+  ["WebAssembly es:", ["Bytecode portable para la web", "Framework CSS", "Servidor de correo", "Algoritmo de búsqueda"], "Bytecode portable para la web"],
+  ["SLA significa:", ["Service Level Agreement", "Secure Link Access", "Serial Link Adapter", "Standard License Agreement"], "Service Level Agreement"],
+  ["Comando para ver IP en Windows:", ["ipconfig", "ls", "ps", "route"], "ipconfig"],
+  ["Formato de compresión sin pérdida:", ["FLAC", "MP3", "AAC", "WMA"], "FLAC"],
+  ["Protocolo para transferencias seguras de archivos:", ["SFTP", "Telnet", "SMTP", "POP3"], "SFTP"],
+  ["Unidad básica de frecuencia:", ["Hertz", "Volt", "Ohm", "Joule"], "Hertz"]
+]);
+
+const techQuestions = uniqueQuestions([
+  ...techBase,
+  ...techHttp,
+  ...techFiles,
+  ...techPorts,
+  ...gitCommands,
+  ...techExtra,
+  ...techExtra2
+]);
 
 // ------------------ HISTORY ------------------
 const historyBase = buildFromData([
@@ -658,10 +863,44 @@ const historyEvents = buildFromData([
   ["Publicación de la Teoría de la Relatividad Especial:", ["1895", "1905", "1915", "1925"], "1905"]
 ]);
 
-const historyQuestions = padTo100(
-  [...historyBase, ...historyIndependence, ...historyLeaders, ...historyEvents],
-  historyBase
-);
+const historyExtra = buildFromData([
+  ["Muro de Berlín se construye:", ["1961", "1950", "1969", "1975"], "1961"],
+  ["Crack bursátil de Nueva York:", ["1929", "1919", "1939", "1959"], "1929"],
+  ["Ataque a Pearl Harbor:", ["1941", "1944", "1939", "1945"], "1941"],
+  ["Fin de la guerra de Vietnam:", ["1975", "1968", "1980", "1970"], "1975"],
+  ["Guerra Civil Española comienza:", ["1936", "1939", "1929", "1945"], "1936"],
+  ["Constitución de EE.UU. se firma:", ["1787", "1800", "1763", "1812"], "1787"],
+  ["Fin del apartheid en Sudáfrica:", ["1994", "1984", "2000", "1990"], "1994"],
+  ["Primavera Árabe inicia:", ["2010", "2011", "2012", "2013"], "2011"],
+  ["Revolución Cubana triunfa:", ["1959", "1949", "1965", "1970"], "1959"],
+  ["Fundación de la ONU:", ["1945", "1955", "1930", "1960"], "1945"],
+  ["Disolución oficial de la URSS:", ["1991", "1989", "1993", "1995"], "1991"],
+  ["Marcha sobre Washington de Martin Luther King:", ["1963", "1955", "1960", "1970"], "1963"],
+  ["Independencia de Brasil:", ["1822", "1808", "1889", "1850"], "1822"],
+  ["Primer mensaje de ARPANET:", ["1969", "1975", "1983", "1990"], "1969"],
+  ["Armisticio que detiene la Guerra de Corea:", ["1953", "1950", "1955", "1960"], "1953"],
+  ["Batalla de Hastings:", ["1066", "1215", "1415", "1666"], "1066"],
+  ["Declaración Universal de Derechos Humanos:", ["1948", "1955", "1968", "1984"], "1948"],
+  ["Voto femenino en EE.UU. (19ª enmienda):", ["1920", "1910", "1930", "1940"], "1920"],
+  ["Inicio de la Guerra del Golfo:", ["1990", "1995", "1980", "2001"], "1990"],
+  ["Tratado de Versalles se firma:", ["1919", "1925", "1933", "1905"], "1919"],
+  ["Descubrimiento de la penicilina:", ["1928", "1918", "1938", "1948"], "1928"],
+  ["Inicio de la Revolución Mexicana:", ["1910", "1920", "1898", "1905"], "1910"],
+  ["Revolución de Mayo en Buenos Aires:", ["1810", "1820", "1800", "1830"], "1810"],
+  ["Independencia de Haití:", ["1804", "1810", "1821", "1789"], "1804"],
+  ["Primera circunnavegación del mundo finaliza:", ["1522", "1498", "1600", "1700"], "1522"],
+  ["Caída de Saigón:", ["1975", "1969", "1982", "1990"], "1975"],
+  ["Derrota de la Armada Invencible:", ["1588", "1600", "1701", "1492"], "1588"],
+  ["Guerra de Crimea inicia:", ["1853", "1870", "1815", "1890"], "1853"]
+]);
+
+const historyQuestions = uniqueQuestions([
+  ...historyBase,
+  ...historyIndependence,
+  ...historyLeaders,
+  ...historyEvents,
+  ...historyExtra
+]);
 
 // ------------------ GEOGRAPHY ------------------
 const geographyBase = buildFromData([
@@ -782,47 +1021,51 @@ const geographyHemispheres = buildFromData([
   ["Ciudad de México se ubica en el hemisferio:", ["Norte", "Sur", "Solo Oeste", "Solo Este"], "Norte"]
 ]);
 
-const geographyQuestions = padTo100(
-  [...geographyBase, ...geographyCapitals, ...geographyExtremes, ...geographyMoreCapitals, ...geographyPeaks, ...geographyHemispheres],
-  geographyBase
-);
+const geographyExtra = buildFromData([
+  ["Capital de Nueva Zelanda:", ["Wellington", "Auckland", "Christchurch", "Hamilton"], "Wellington"],
+  ["Capital de Suiza:", ["Berna", "Zúrich", "Ginebra", "Basilea"], "Berna"],
+  ["País sin salida al mar:", ["Paraguay", "Perú", "Birmania", "Somalia"], "Paraguay"],
+  ["Montaña más alta de Europa:", ["Elbrus", "Mont Blanc", "Matterhorn", "Grossglockner"], "Elbrus"],
+  ["Lago más profundo del mundo:", ["Baikal", "Tanganica", "Caspio", "Superior"], "Baikal"],
+  ["Desierto de Atacama está en:", ["Chile", "Perú", "Argentina", "Bolivia"], "Chile"],
+  ["Cataratas del Iguazú se encuentran en:", ["Argentina/Brasil", "EEUU/Canadá", "Zambia/Zimbabue", "Croacia/Bosnia"], "Argentina/Brasil"],
+  ["Ciudad de Petra está en:", ["Jordania", "Israel", "Egipto", "Arabia Saudita"], "Jordania"],
+  ["El río Danubio desemboca en:", ["Mar Negro", "Mar Báltico", "Mar del Norte", "Mediterráneo"], "Mar Negro"],
+  ["Cordillera que divide Europa y Asia:", ["Urales", "Andes", "Rocosas", "Alpes"], "Urales"],
+  ["País con más pirámides:", ["Sudán", "Egipto", "México", "China"], "Sudán"],
+  ["Isla más poblada del mundo:", ["Java", "Sumatra", "Luzón", "Gran Bretaña"], "Java"],
+  ["La península ibérica está formada principalmente por:", ["España y Portugal", "Francia y Bélgica", "Italia y Suiza", "Croacia y Serbia"], "España y Portugal"],
+  ["Las islas Galápagos pertenecen a:", ["Ecuador", "Perú", "Chile", "Colombia"], "Ecuador"],
+  ["Capital de Nigeria:", ["Abuya", "Lagos", "Kano", "Ibadan"], "Abuya"],
+  ["Dubái se encuentra en:", ["Emiratos Árabes Unidos", "Qatar", "Arabia Saudita", "Omán"], "Emiratos Árabes Unidos"],
+  ["Capital de Pakistán:", ["Islamabad", "Karachi", "Lahore", "Peshawar"], "Islamabad"],
+  ["País famoso por sus fiordos:", ["Noruega", "Suecia", "Islandia", "Canadá"], "Noruega"],
+  ["Pico más alto de Norteamérica:", ["Denali", "Logan", "Rainier", "Whitney"], "Denali"],
+  ["Mar que separa Arabia e Irán:", ["Golfo Pérsico", "Mar Rojo", "Mar Arábigo", "Mar Caspio"], "Golfo Pérsico"],
+  ["Ciudad llamada 'Venecia del Norte':", ["Ámsterdam", "Estocolmo", "Brujas", "Copenhague"], "Ámsterdam"],
+  ["País más joven del mundo (2011):", ["Sudán del Sur", "Kosovo", "Eritrea", "Montenegro"], "Sudán del Sur"],
+  ["Capital de Etiopía:", ["Adís Abeba", "Asmara", "Nairobi", "Juba"], "Adís Abeba"]
+]);
 
-function padTo100(list, fillers) {
-  // 1) quitar duplicados por texto de pregunta
-  const seen = new Set();
-  const out = [];
-  [...list].forEach(q => {
-    if (!seen.has(q.question)) {
-      seen.add(q.question);
-      out.push(q);
-    }
-  });
-  // 2) agregar fillers solo si no existen ya
-  let i = 0;
-  while (out.length < 100 && i < fillers.length) {
-    const q = fillers[i];
-    if (!seen.has(q.question)) {
-      seen.add(q.question);
-      out.push(q);
-    }
-    i++;
-  }
-  // 3) si aun falta, recircular fillers pero cambiando un sufijo numérico para mantener unicidad
-  let suffix = 1;
-  while (out.length < 100) {
-    const base = fillers[(out.length + i) % fillers.length];
-    const cloned = {
-      ...base,
-      question: `${base.question} (var ${suffix})`
-    };
-    if (!seen.has(cloned.question)) {
-      seen.add(cloned.question);
-      out.push(cloned);
-    }
-    suffix++;
-  }
-  return out.slice(0, 100); // exactamente 100 únicas por categoría
-}
+const geographyExtra2 = buildFromData([
+  ["Capital de Filipinas:", ["Manila", "Cebú", "Dávao", "Quezón"], "Manila"],
+  ["Río más largo de Norteamérica:", ["Misisipi-Misuri", "Colorado", "Ohio", "Columbia"], "Misisipi-Misuri"],
+  ["Monte Fuji está en:", ["Japón", "China", "Corea", "Filipinas"], "Japón"],
+  ["Capital de Arabia Saudita:", ["Riad", "Yeda", "La Meca", "Medina"], "Riad"],
+  ["Mayor isla del Caribe:", ["Cuba", "Hispaniola", "Puerto Rico", "Jamaica"], "Cuba"],
+  ["Capital administrativa de Sudáfrica:", ["Pretoria", "Ciudad del Cabo", "Johannesburgo", "Durban"], "Pretoria"]
+]);
+
+const geographyQuestions = uniqueQuestions([
+  ...geographyBase,
+  ...geographyCapitals,
+  ...geographyExtremes,
+  ...geographyMoreCapitals,
+  ...geographyPeaks,
+  ...geographyHemispheres,
+  ...geographyExtra,
+  ...geographyExtra2
+]);
 
 // ------------------ ENSAMBLE FINAL ------------------
 const questionsDatabase = {

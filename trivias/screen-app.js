@@ -1047,7 +1047,7 @@ function endGame() {
         .filter(p => !p.disconnected)
         .sort((a, b) => b.score - a.score);
     
-    const trophyIcon = (color) => `<iconify-icon icon="mdi:trophy" class="medal-icon" style="font-size: 2.8rem; color: ${color};"></iconify-icon>`;
+    const trophyIcon = (color) => `<iconify-icon icon="mdi:trophy" class="medal-icon" style="color: ${color};"></iconify-icon>`;
     const medalIcon = (color) => `<iconify-icon icon="mdi:medal" class="medal-icon" style="font-size: 2.8rem; color: ${color};"></iconify-icon>`;
     const goldMedal = trophyIcon('#FFD700');
     const silverMedal = medalIcon('#C0C0C0');
