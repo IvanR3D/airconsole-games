@@ -41,36 +41,184 @@ function shuffle(arr) {
   return a;
 }
 
+function normalizeText(value) {
+  return String(value ?? "").trim();
+}
+
+function normalizeOptionKey(value) {
+  return normalizeText(value).toLowerCase();
+}
+
+function normalizeQuestionKey(value) {
+  return normalizeText(value)
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .replace(/([!?¿¡])\1+/g, "$1");
+}
+
 function buildFromData(data) {
-  return data.map(([q, opts, correctLabel]) => {
-    const optsShuffled = shuffle(opts);
-    return { question: q, options: optsShuffled, correct: optsShuffled.indexOf(correctLabel) };
+  if (!Array.isArray(data)) {
+    throw new Error("[buildFromData] data debe ser un array.");
+  }
+
+  return data.map((entry, index) => {
+    if (!Array.isArray(entry) || entry.length !== 3) {
+      throw new Error(`[buildFromData] entrada inválida en índice ${index}.`);
+    }
+
+    const [q, opts, correctLabel] = entry;
+    const question = normalizeText(q);
+    const optionsOriginal = Array.isArray(opts) ? opts.map(normalizeText) : null;
+    const correct = normalizeText(correctLabel);
+
+    if (!question) {
+      throw new Error(`[buildFromData] pregunta vacía en índice ${index}.`);
+    }
+    if (!Array.isArray(optionsOriginal) || optionsOriginal.length !== 4) {
+      throw new Error(`[buildFromData] "${question}" debe tener exactamente 4 opciones.`);
+    }
+    if (optionsOriginal.some(opt => !opt)) {
+      throw new Error(`[buildFromData] "${question}" tiene opciones vacías.`);
+    }
+
+    const normalizedOptions = optionsOriginal.map(normalizeOptionKey);
+    if (new Set(normalizedOptions).size !== normalizedOptions.length) {
+      throw new Error(`[buildFromData] "${question}" tiene opciones duplicadas: ${JSON.stringify(optionsOriginal)}.`);
+    }
+
+    // Debe existir exactamente en las opciones originales (tras trim).
+    if (!optionsOriginal.includes(correct)) {
+      throw new Error(
+        `[buildFromData] correctLabel no existe en options. question="${question}", correctLabel="${correct}", options=${JSON.stringify(optionsOriginal)}`
+      );
+    }
+
+    const optsShuffled = shuffle(optionsOriginal);
+    const correctIndex = optsShuffled.indexOf(correct);
+    if (correctIndex === -1) {
+      throw new Error(
+        `[buildFromData] indexOf falló tras shuffle. question="${question}", correctLabel="${correct}", options=${JSON.stringify(optionsOriginal)}`
+      );
+    }
+
+    return { question, options: optsShuffled, correct: correctIndex };
   });
 }
 
-// Deduplica manteniendo el primer elemento con el mismo texto de pregunta
+function buildQuestion(question, options, correctLabel) {
+  return buildFromData([[question, options, correctLabel]])[0];
+}
+
+// Deduplica manteniendo el primer elemento con el mismo texto normalizado de pregunta.
 function uniqueQuestions(list) {
   const seen = new Set();
   const out = [];
   for (const q of list) {
-    if (!seen.has(q.question)) {
-      seen.add(q.question);
+    const key = normalizeQuestionKey(q.question);
+    if (!seen.has(key)) {
+      seen.add(key);
       out.push(q);
     }
   }
   return out;
 }
 
+function validateQuestionsDatabase(db, { log = false } = {}) {
+  const summary = {};
+  const errors = [];
+
+  for (const [category, questions] of Object.entries(db || {})) {
+    if (!Array.isArray(questions)) {
+      errors.push({ category, index: -1, type: "category_not_array", value: questions });
+      continue;
+    }
+
+    let invalidCorrect = 0;
+    let duplicateOptions = 0;
+    let invalidOptions = 0;
+    let invalidQuestion = 0;
+    const questionBuckets = new Map();
+
+    questions.forEach((q, index) => {
+      const question = normalizeText(q?.question);
+      const options = Array.isArray(q?.options) ? q.options : null;
+      const correct = q?.correct;
+      const key = normalizeQuestionKey(question);
+
+      if (!question) {
+        invalidQuestion++;
+        errors.push({ category, index, type: "empty_question", question: q?.question });
+      }
+
+      if (!questionBuckets.has(key)) questionBuckets.set(key, []);
+      questionBuckets.get(key).push({ index, question: q?.question });
+
+      if (!options || options.length !== 4) {
+        invalidOptions++;
+        errors.push({ category, index, type: "invalid_options_length", length: options ? options.length : null, question });
+      } else {
+        const invalidValues = options.some(opt => typeof opt !== "string" || !normalizeText(opt));
+        if (invalidValues) {
+          invalidOptions++;
+          errors.push({ category, index, type: "invalid_option_value", options, question });
+        }
+
+        const optionKeys = options.map(normalizeOptionKey);
+        if (new Set(optionKeys).size !== optionKeys.length) {
+          duplicateOptions++;
+          errors.push({ category, index, type: "duplicate_options", options, question });
+        }
+      }
+
+      if (!Number.isInteger(correct) || correct < 0 || correct > 3) {
+        invalidCorrect++;
+        errors.push({ category, index, type: "invalid_correct_index", correct, question });
+      }
+    });
+
+    const top10DuplicateQuestions = [...questionBuckets.entries()]
+      .filter(([, list]) => list.length > 1)
+      .sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]))
+      .slice(0, 10)
+      .map(([normalized, list]) => ({ normalized, count: list.length, examples: list.slice(0, 3) }));
+
+    summary[category] = {
+      total: questions.length,
+      invalidCorrect,
+      duplicateOptions,
+      invalidOptions,
+      invalidQuestion,
+      top10DuplicateQuestions
+    };
+  }
+
+  if (log) {
+    console.log("[questions-data] Validation summary:");
+    console.log(JSON.stringify(summary, null, 2));
+    if (errors.length > 0) {
+      console.log("[questions-data] Sample errors:");
+      console.log(JSON.stringify(errors.slice(0, 25), null, 2));
+    }
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errorCount: errors.length,
+    summary,
+    errors
+  };
+}
+
 // ------------------ GENERAL ------------------
 const generalBase = buildFromData([
   ["¿Cuál de estos países NO tiene costa?", ["Bolivia", "Perú", "Ecuador", "Chile"], "Bolivia"],
-  ["Si en Nueva York son las 12:00 PM, ¿dónde es más probable que sean las 5:00 PM?", ["Lisboa", "Londres", "Madrid", "Buenos Aires"], "Madrid"],
+  ["Si en Nueva York son las 12:00 (UTC-5), ¿qué hora es en Londres (UTC+0)?", ["3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM"], "5:00 PM"],
   ["¿Qué idioma es oficial en más países?", ["Árabe", "Francés", "Inglés", "Español"], "Inglés"],
   ["¿Qué objeto pesa más? (mismo volumen)", ["1L de agua", "1L de mercurio", "1L de aceite", "1L de aire"], "1L de mercurio"],
   ["¿Cuál invento se comercializó primero?", ["Teléfono", "Bombilla incandescente", "Automóvil de gasolina", "Radio"], "Teléfono"],
   ["Un año bisiesto es divisible por 4, excepto si…", ["Es primo", "Termina en 00", "Es múltiplo de 100 pero no de 400", "Cae en domingo"], "Es múltiplo de 100 pero no de 400"],
-  ["¿Qué ciudad queda más al norte?", ["Beijing", "Roma", "Nueva York", "Madrid"], "Beijing"],
-  ["¿Cuántos países hay en la Unión Europea en 2026?", ["25", "27", "28", "30"], "27"],
+  ["¿Qué ciudad queda más al norte?", ["Beijing", "Roma", "Nueva York", "Madrid"], "Roma"],
+  ["¿Cuántas estrellas tiene la bandera de la Unión Europea?", ["10", "12", "15", "27"], "12"],
   ["¿Cuál es la capital real de Turquía?", ["Estambul", "Ankara", "Esmirna", "Antalya"], "Ankara"],
   ["Si mezclas azul y amarillo obtienes…", ["Cian", "Verde", "Magenta", "Naranja"], "Verde"],
   ["¿Qué pesa más?", ["1 kg de plumas", "1 kg de hierro", "1 kg de oro", "Todos pesan lo mismo"], "Todos pesan lo mismo"],
@@ -91,19 +239,19 @@ const generalComparisons = buildFromData([
   ["¿Qué ciudad está más al oeste?", ["Reikiavik", "Lisboa", "Dublín", "Londres"], "Reikiavik"],
   ["¿Qué ciudad está más alta sobre el nivel del mar?", ["La Paz", "Ciudad de México", "Quito", "Bogotá"], "La Paz"],
   ["¿Qué bandera tiene círculo rojo sobre fondo blanco?", ["Japón", "Bangladés", "Palau", "Groenlandia"], "Japón"],
-  ["¿Quién tiene mayor PIB per cápita?", ["Noruega", "Suiza", "Qatar", "Singapur"], "Qatar"],
+  ["¿Cuál de estos países es una ciudad-estado?", ["Noruega", "Suiza", "Qatar", "Singapur"], "Singapur"],
   ["¿Cuál lago es más profundo?", ["Baikal", "Tanganica", "Superior", "Victoria"], "Baikal"],
   ["¿Qué desierto es más grande?", ["Sahara", "Arábigo", "Gobi", "Kalahari"], "Sahara"],
   ["¿Cuál mar es más salado?", ["Muerto", "Rojo", "Caspio", "Báltico"], "Muerto"],
-  ["¿Qué país tiene más husos horarios?", ["Rusia", "EEUU", "Francia", "China"], "Francia"],
+  ["¿Qué país tiene la línea costera más larga del mundo?", ["Canadá", "Rusia", "Indonesia", "Australia"], "Canadá"],
   ["¿Cuál montaña es más alta fuera de Asia?", ["Aconcagua", "Kilimanjaro", "Denali", "Mont Blanc"], "Aconcagua"],
-  ["¿Cuál río es más largo?", ["Nilo", "Amazonas", "Yangtsé", "Misisipi"], "Nilo"],
-  ["¿Qué ciudad tiene más habitantes?", ["Tokio", "Delhi", "São Paulo", "Shanghái"], "Tokio"],
+  ["¿Qué río tiene mayor caudal promedio?", ["Nilo", "Amazonas", "Yangtsé", "Misisipi"], "Amazonas"],
+  ["¿Qué ciudad es la capital de Japón?", ["Tokio", "Delhi", "São Paulo", "Shanghái"], "Tokio"],
   ["¿Cuál continente tiene más países?", ["África", "Europa", "Asia", "América"], "África"],
   ["¿Qué isla es más grande?", ["Groenlandia", "Nueva Guinea", "Borneo", "Madagascar"], "Groenlandia"],
   ["¿Cuál país produce más café?", ["Brasil", "Colombia", "Vietnam", "Etiopía"], "Brasil"],
-  ["¿Qué país consume más chocolate per cápita?", ["Suiza", "Bélgica", "Alemania", "Reino Unido"], "Suiza"],
-  ["¿Qué ciudad es más antigua?", ["Jerusalén", "Atenas", "Roma", "Estambul"], "Jerusalén"],
+  ["¿Qué país tiene como capital a Berna?", ["Suiza", "Bélgica", "Alemania", "Reino Unido"], "Suiza"],
+  ["¿En qué ciudad está la Acrópolis?", ["Jerusalén", "Atenas", "Roma", "Estambul"], "Atenas"],
   ["¿Cuál es más ancho?", ["Canal de Panamá", "Canal de Suez", "Canal de Corinto", "Canal de Kiel"], "Canal de Suez"],
   ["¿Dónde llueve más al año?", ["Cherrapunji", "Londres", "Seattle", "Bogotá"], "Cherrapunji"],
   ["¿Qué capital está más cerca del ecuador?", ["Quito", "Nairobi", "Brasilia", "Yakarta"], "Quito"],
@@ -132,7 +280,7 @@ const generalExtra = buildFromData([
   ["¿Qué gas respiramos principalmente?", ["Nitrógeno", "Oxígeno", "Argón", "CO2"], "Nitrógeno"],
   ["¿Cuál es el único metal líquido a temperatura ambiente?", ["Mercurio", "Sodio", "Galio", "Cesio"], "Mercurio"],
   ["¿Qué ciencia estudia los fósiles?", ["Paleontología", "Geología", "Arqueología", "Antropología"], "Paleontología"],
-  ["¿Qué país tiene forma de bota?", ["Italia", "Chile", "India", "Noruega"], "Italia"],
+  ["¿Qué país es conocido por el Canal de Panamá?", ["Panamá", "Colombia", "Costa Rica", "México"], "Panamá"],
   ["¿Qué ciudad se conoce como “La Gran Manzana”?", ["Nueva York", "Londres", "Tokio", "Los Ángeles"], "Nueva York"],
   ["¿Qué instrumento mide la temperatura?", ["Termómetro", "Barómetro", "Anemómetro", "Higrómetro"], "Termómetro"],
   ["¿Qué deporte practica Lionel Messi?", ["Fútbol", "Baloncesto", "Tenis", "Béisbol"], "Fútbol"],
@@ -163,7 +311,7 @@ const generalExtra = buildFromData([
 
 const generalExtra2 = buildFromData([
   ["¿Qué instrumento mide el tiempo?", ["Reloj", "Balanza", "Termómetro", "Barómetro"], "Reloj"],
-  ["¿Qué país tiene hoy la mayor población?", ["India", "China", "EEUU", "Indonesia"], "India"],
+  ["¿Qué país superó a China como el más poblado en 2023?", ["India", "China", "EEUU", "Indonesia"], "India"],
   ["¿Cuál es la capital de Tailandia?", ["Bangkok", "Hanoi", "Phnom Penh", "Vientián"], "Bangkok"],
   ["Animal símbolo de Canadá:", ["Castor", "Lobo", "Águila", "Búfalo"], "Castor"],
   ["¿En qué continente está el Sahara?", ["África", "Asia", "Oceanía", "Europa"], "África"],
@@ -187,16 +335,16 @@ const scienceBase = buildFromData([
   ["Velocidad de la luz en vacío aprox:", ["3e5 km/s", "3e6 km/s", "3e7 m/s", "3e5 m/s"], "3e5 km/s"],
   ["¿Quién predijo los agujeros negros con relatividad general?", ["Newton", "Einstein", "Hawking", "Chandrasekhar"], "Einstein"],
   ["¿Cuál es la partícula portadora de la fuerza fuerte?", ["Fotón", "Gluón", "Bosón Z", "Gravitón"], "Gluón"],
-  ["pH 3 es:", ["Neutro", "Ácido fuerte", "Ácido débil", "Básico"], "Ácido fuerte"],
+  ["pH 3 es:", ["Neutro", "Ácido fuerte", "Ácido débil", "Básico"], "Ácido débil"],
   ["¿Qué gas es más abundante en la atmósfera terrestre?", ["Oxígeno", "Nitrógeno", "CO2", "Argón"], "Nitrógeno"],
-  ["¿Qué órgano bombea la linfa?", ["Corazón", "Pulmones", "Músculos esqueléticos", "Hígado"], "Músculos esqueléticos"],
+  ["El flujo de la linfa depende principalmente de:", ["Corazón", "Pulmones", "Músculos esqueléticos", "Hígado"], "Músculos esqueléticos"],
   ["Energía de un fotón depende de:", ["Amplitud", "Frecuencia", "Fase", "Polarización"], "Frecuencia"],
   ["¿Qué capa protege de rayos UV?", ["Troposfera", "Estratosfera (ozono)", "Mesosfera", "Ionosfera"], "Estratosfera (ozono)"],
   ["¿Qué unidad mide energía?", ["Watt", "Joule", "Volt", "Ohm"], "Joule"],
   ["¿Qué tipo de onda es la luz?", ["Transversal", "Longitudinal", "Ambas", "No es onda"], "Transversal"],
   ["¿Qué organismo no es célula?", ["Virus", "Bacteria", "Hongo", "Protozoo"], "Virus"],
   ["¿Qué vitamina sintetiza la piel con sol?", ["A", "B12", "C", "D"], "D"],
-  ["¿Qué elemento es líquido a 25°C?", ["Mercurio", "Cesio", "Galio", "Bromo"], "Mercurio"],
+  ["¿Qué metal es líquido a 25°C?", ["Mercurio", "Cesio", "Galio", "Bromo"], "Mercurio"],
   ["¿Qué tejido almacena glucógeno?", ["Muscular", "Adiposo", "Hepático", "Óseo"], "Hepático"]
 ]);
 
@@ -208,9 +356,16 @@ const elements = [
   ["Yodo", 53], ["Oro", 79], ["Mercurio", 80], ["Plomo", 82], ["Uranio", 92]
 ];
 const scienceElements = elements.map(([name, z]) => {
-  const distractors = [z - 1, z + 1, z + 2].map(v => Math.max(1, v));
-  const opts = shuffle([z.toString(), ...distractors.map(String)]);
-  return { question: `Número atómico de ${name}:`, options: opts, correct: opts.indexOf(z.toString()) };
+  const distractors = [];
+  for (const candidate of [z - 1, z + 1, z + 2, z - 2, z + 3, z + 4]) {
+    const bounded = Math.max(1, candidate);
+    if (bounded !== z && !distractors.includes(bounded)) {
+      distractors.push(bounded);
+    }
+    if (distractors.length === 3) break;
+  }
+  const opts = [String(z), ...distractors.map(String)];
+  return buildQuestion(`Número atómico de ${name}:`, opts, String(z));
 });
 
 const scienceTemps = [
@@ -219,8 +374,8 @@ const scienceTemps = [
   ["Cero absoluto", -273],
   ["Cuerpo humano", 37]
 ].map(([label, val]) => {
-  const opts = shuffle([`${val}°C`, `${val + 5}°C`, `${val - 5}°C`, `${val + 10}°C`]);
-  return { question: `${label} ≈`, options: opts, correct: opts.indexOf(`${val}°C`) };
+  const opts = [`${val}°C`, `${val + 5}°C`, `${val - 5}°C`, `${val + 10}°C`];
+  return buildQuestion(`${label} ≈`, opts, `${val}°C`);
 });
 
 // Prefijos métricos
@@ -229,16 +384,16 @@ const sciencePrefixes = [
   ["mili", -3], ["micro", -6], ["nano", -9], ["pico", -12],
   ["centi", -2], ["deci", -1]
 ].map(([name, exp]) => {
-  const opts = shuffle([exp, exp + 1, exp - 1, exp + 3].map(e => `10^${e}`));
-  return { question: `Prefijo ${name} corresponde a:`, options: opts, correct: opts.indexOf(`10^${exp}`) };
+  const opts = [exp, exp + 1, exp - 1, exp + 3].map(e => `10^${e}`);
+  return buildQuestion(`Prefijo ${name} corresponde a:`, opts, `10^${exp}`);
 });
 
 // Conversión Cº a Fº
 const scienceConversions = [];
 for (let c = -40; c <= 90; c += 10) {
   const f = Math.round(c * 9 / 5 + 32);
-  const opts = shuffle([f, f + 5, f - 5, f + 10].map(v => `${v}°F`));
-  scienceConversions.push({ question: `¿A cuántos °F equivale ${c}°C (aprox)?`, options: opts, correct: opts.indexOf(`${f}°F`) });
+  const opts = [f, f + 5, f - 5, f + 10].map(v => `${v}°F`);
+  scienceConversions.push(buildQuestion(`¿A cuántos °F equivale ${c}°C (aprox)?`, opts, `${f}°F`));
 }
 
 // Datos rápidos de cuerpo humano / biología
@@ -261,7 +416,7 @@ const sciencePhysics = buildFromData([
   ["Velocidad del sonido en aire (m/s, 20°C)", ["343", "1500", "270", "500"], "343"],
   ["Duración de un día en Marte (horas)", ["24.6", "20.0", "30.2", "10.0"], "24.6"],
   ["Planeta más denso del sistema solar", ["Tierra", "Saturno", "Júpiter", "Marte"], "Tierra"],
-  ["Planeta con más satélites conocidos", ["Saturno", "Júpiter", "Urano", "Neptuno"], "Saturno"],
+  ["Planeta con anillos más visibles", ["Saturno", "Júpiter", "Urano", "Neptuno"], "Saturno"],
   ["Valor de 1 atm en kPa", ["101.3", "1", "14.7", "120"], "101.3"],
   ["Unidad SI de energía", ["Joule", "Watt", "Newton", "Pascal"], "Joule"],
   ["Carga del electrón (signo)", ["Negativa", "Positiva", "Nula", "Depende"], "Negativa"],
@@ -270,7 +425,7 @@ const sciencePhysics = buildFromData([
 ]);
 
 const scienceExtra = buildFromData([
-  ["Grupo sanguíneo universal receptor:", ["AB+", "O-", "A", "B"], "AB+"],
+  ["Grupo sanguíneo universal donante:", ["AB+", "O-", "A", "B"], "O-"],
   ["Hormona que regula el metabolismo:", ["Tiroxina", "Insulina", "Adrenalina", "Progesterona"], "Tiroxina"],
   ["¿Qué órgano produce bilis?", ["Hígado", "Riñón", "Páncreas", "Pulmón"], "Hígado"]
 ]);
@@ -437,8 +592,8 @@ const boards = [
   ["LattePanda", "x86 embebido"]
 ];
 const roboticsBoards = boards.map(([name, role]) => {
-  const opts = shuffle([role, "Gateway IoT", "PLC industrial", "Sensor IMU"]);
-  return { question: `${name} se usa principalmente como:`, options: opts, correct: opts.indexOf(role) };
+  const opts = [role, "Gateway IoT", "PLC industrial", "Sensor IMU"];
+  return buildQuestion(`${name} se usa principalmente como:`, opts, role);
 });
 
 const motors = [
@@ -452,8 +607,8 @@ const motors = [
   ["Solenoide", "Golpe lineal"]
 ];
 const roboticsMotors = motors.map(([m, trait]) => {
-  const opts = shuffle([trait, "Solo torque alto", "Solo baja tensión", "Solo binario on/off"]);
-  return { question: `${m}: característica clave`, options: opts, correct: opts.indexOf(trait) };
+  const opts = [trait, "Solo torque alto", "Solo baja tensión", "Solo binario on/off"];
+  return buildQuestion(`${m}: característica clave`, opts, trait);
 });
 
 // Pines GPIO típicos por placa
@@ -470,8 +625,8 @@ const boardPins = [
   ["Micro:bit", 23]
 ];
 const roboticsPins = boardPins.map(([board, count]) => {
-  const opts = shuffle([count, count - 4, count + 4, count + 10].map(String));
-  return { question: `Pines GPIO aproximados en ${board}:`, options: opts, correct: opts.indexOf(String(count)) };
+  const opts = [count, count - 4, count + 4, count + 10].map(String);
+  return buildQuestion(`Pines GPIO aproximados en ${board}:`, opts, String(count));
 });
 
 // Voltaje lógico habitual
@@ -486,8 +641,10 @@ const boardVoltages = [
   ["ESP8266", "3.3V"]
 ];
 const roboticsVoltages = boardVoltages.map(([board, v]) => {
-  const opts = shuffle([v, "1.8V", "5V", "12V"]);
-  return { question: `Tensión lógica típica de ${board}:`, options: opts, correct: opts.indexOf(v) };
+  const voltagePool = ["1.8V", "3.3V", "5V", "12V", "24V"];
+  const distractors = shuffle(voltagePool.filter(value => value !== v)).slice(0, 3);
+  const opts = [v, ...distractors];
+  return buildQuestion(`Tensión lógica típica de ${board}:`, opts, v);
 });
 
 const roboticsExtra = buildFromData([
@@ -585,8 +742,8 @@ const acids = [
   ["HI", "Ácido yodhídrico"]
 ];
 const chemistryAcids = acids.map(([f, name]) => {
-  const opts = shuffle([name, "Base fuerte", "Sal", "Óxido"]);
-  return { question: `${f} es:`, options: opts, correct: opts.indexOf(name) };
+  const opts = [name, "Base fuerte", "Sal", "Óxido"];
+  return buildQuestion(`${f} es:`, opts, name);
 });
 
 const chemStates = [
@@ -602,8 +759,8 @@ const chemStates = [
   ["K a 25°C", "Sólido"]
 ];
 const chemistryStates = chemStates.map(([sub, st]) => {
-  const opts = shuffle(["Sólido", "Líquido", "Gas", "Plasma"]);
-  return { question: `${sub} está principalmente en estado:`, options: opts, correct: opts.indexOf(st) };
+  const opts = ["Sólido", "Líquido", "Gas", "Plasma"];
+  return buildQuestion(`${sub} está principalmente en estado:`, opts, st);
 });
 
 // Símbolos químicos
@@ -615,9 +772,11 @@ const chemSymbolsData = [
   ["Magnesio", "Mg"], ["Zinc", "Zn"], ["Aluminio", "Al"], ["Flúor", "F"], ["Níquel", "Ni"],
   ["Cobalto", "Co"], ["Manganeso", "Mn"], ["Titanio", "Ti"], ["Cromo", "Cr"], ["Neón", "Ne"]
 ];
+const chemistrySymbolPool = chemSymbolsData.map(([, sym]) => sym);
 const chemistrySymbols = chemSymbolsData.map(([elem, sym]) => {
-  const opts = shuffle([sym, sym.toLowerCase(), sym + sym, sym[0].toUpperCase() + sym[0].toLowerCase()]);
-  return { question: `Símbolo químico de ${elem}:`, options: opts, correct: opts.indexOf(sym) };
+  const distractors = shuffle(chemistrySymbolPool.filter(candidate => candidate.toLowerCase() !== sym.toLowerCase())).slice(0, 3);
+  const opts = [sym, ...distractors];
+  return buildQuestion(`Símbolo químico de ${elem}:`, opts, sym);
 });
 
 // Electrones de valencia en estado fundamental (representativo)
@@ -626,16 +785,18 @@ const chemValenceData = [
   ["Aluminio", 3], ["Silicio", 4], ["Cloro", 7], ["Azufre", 6], ["Fósforo", 5]
 ];
 const chemistryValence = chemValenceData.map(([elem, val]) => {
-  const opts = shuffle([val, val - 1, val + 1, val + 2].map(String));
-  return { question: `Electrones de valencia de ${elem}:`, options: opts, correct: opts.indexOf(String(val)) };
+  const opts = [val, val - 1, val + 1, val + 2].map(String);
+  return buildQuestion(`Electrones de valencia de ${elem}:`, opts, String(val));
 });
 
 // Clasificación por pH
 const chemistryPh = [];
+const phLabels = ["Ácido fuerte", "Ácido débil", "Neutral", "Básico", "Básico fuerte"];
 for (let pH = 0; pH <= 14; pH += 2) {
   const category = pH < 3 ? "Ácido fuerte" : pH < 7 ? "Ácido débil" : pH === 7 ? "Neutral" : pH <= 10 ? "Básico" : "Básico fuerte";
-  const opts = shuffle(["Ácido fuerte", "Ácido débil", "Neutral", "Básico", "Básico fuerte"].slice(0,5));
-  chemistryPh.push({ question: `Una solución con pH ${pH} es:`, options: opts, correct: opts.indexOf(category) });
+  const distractors = shuffle(phLabels.filter(label => label !== category)).slice(0, 3);
+  const opts = [category, ...distractors];
+  chemistryPh.push(buildQuestion(`Una solución con pH ${pH} es:`, opts, category));
 }
 
 const chemistryExtra = buildFromData([
@@ -693,8 +854,8 @@ const httpCodes = [
   [418, "I'm a teapot"], [500, "Internal Server Error"], [503, "Service Unavailable"]
 ];
 const techHttp = httpCodes.map(([code, text]) => {
-  const opts = shuffle([text, "Gateway Timeout", "Bad Gateway", "Not Acceptable"]);
-  return { question: `HTTP ${code} significa:`, options: opts, correct: opts.indexOf(text) };
+  const opts = [text, "Gateway Timeout", "Bad Gateway", "Not Acceptable"];
+  return buildQuestion(`HTTP ${code} significa:`, opts, text);
 });
 
 const fileTypes = [
@@ -713,8 +874,8 @@ const fileTypes = [
   ["EXE", "Ejecutable Windows"]
 ];
 const techFiles = fileTypes.map(([ext, desc]) => {
-  const opts = shuffle([desc, "Archivo ejecutable", "Base de datos", "Script de servidor"]);
-  return { question: `${ext} es:`, options: opts, correct: opts.indexOf(desc) };
+  const opts = [desc, "Archivo ejecutable", "Base de datos", "Script de servidor"];
+  return buildQuestion(`${ext} es:`, opts, desc);
 });
 
 const techPorts = [
@@ -722,8 +883,10 @@ const techPorts = [
   [143, "IMAP"], [3306, "MySQL"], [5432, "PostgreSQL"], [6379, "Redis"], [27017, "MongoDB"],
   [1883, "MQTT"], [21, "FTP"], [8080, "HTTP alterno"], [3389, "RDP"], [5900, "VNC"]
 ].map(([port, svc]) => {
-  const opts = shuffle([svc, "SSH", "HTTP", "SMTP"]);
-  return { question: `Puerto ${port} suele usarse para:`, options: opts, correct: opts.indexOf(svc) };
+  const servicePool = ["SSH", "SMTP", "DNS", "HTTP", "POP3", "IMAP", "MySQL", "PostgreSQL", "Redis", "MongoDB", "MQTT", "FTP", "HTTP alterno", "RDP", "VNC"];
+  const distractors = shuffle(servicePool.filter(item => item !== svc)).slice(0, 3);
+  const opts = [svc, ...distractors];
+  return buildQuestion(`Puerto ${port} suele usarse para:`, opts, svc);
 });
 
 // Significado de comandos git frecuentes
@@ -817,8 +980,8 @@ const independence = [
   ["Bolivia", 1825], ["Uruguay", 1825]
 ];
 const historyIndependence = independence.map(([country, year]) => {
-  const opts = shuffle([year, year + 1, year - 1, year + 10].map(String));
-  return { question: `Año de independencia de ${country}:`, options: opts, correct: opts.indexOf(String(year)) };
+  const opts = [year, year + 1, year - 1, year + 10].map(String);
+  return buildQuestion(`Año de independencia de ${country}:`, opts, String(year));
 });
 
 const leaders = [
@@ -835,9 +998,11 @@ const leaders = [
   ["Otto von Bismarck", "Alemania"],
   ["Juana de Arco", "Francia"]
 ];
+const historyPlacesPool = [...new Set(leaders.map(([, place]) => place))];
 const historyLeaders = leaders.map(([name, place]) => {
-  const opts = shuffle([place, "Francia", "España", "China"]);
-  return { question: `${name} lideró principalmente en:`, options: opts, correct: opts.indexOf(place) };
+  const distractors = shuffle(historyPlacesPool.filter(value => value !== place)).slice(0, 3);
+  const opts = [place, ...distractors];
+  return buildQuestion(`${name} lideró principalmente en:`, opts, place);
 });
 
 const historyEvents = buildFromData([
@@ -905,12 +1070,12 @@ const historyQuestions = uniqueQuestions([
 // ------------------ GEOGRAPHY ------------------
 const geographyBase = buildFromData([
   ["Río más largo de África:", ["Nilo", "Congo", "Níger", "Zambeze"], "Nilo"],
-  ["¿Qué país tiene más husos horarios?", ["Rusia", "EEUU", "Francia", "China"], "Francia"],
+  ["¿Qué país tiene más husos horarios contando territorios de ultramar?", ["Rusia", "EEUU", "Francia", "China"], "Francia"],
   ["Capital de Canadá:", ["Toronto", "Ottawa", "Vancouver", "Montreal"], "Ottawa"],
   ["Montaña más alta fuera de Asia:", ["Aconcagua", "Kilimanjaro", "Denali", "Mont Blanc"], "Aconcagua"],
   ["¿Qué mar está casi cerrado y es muy salado?", ["Báltico", "Rojo", "Muerto", "Tasman"], "Muerto"],
   ["País con más islas registradas:", ["Indonesia", "Suecia", "Filipinas", "Canadá"], "Suecia"],
-  ["Desierto más grande del mundo:", ["Sahara", "Arabia", "Antártida", "Gobi"], "Antártida"],
+  ["Desierto más grande del mundo (incluyendo desiertos polares):", ["Sahara", "Arabia", "Antártida", "Gobi"], "Antártida"],
   ["¿En qué continente está Georgia (país)?", ["Europa", "Asia", "Ambos según definición", "Oceanía"], "Ambos según definición"],
   ["¿Qué corriente oceánica calienta Europa Occidental?", ["Humboldt", "Gulf Stream", "Kuroshio", "Canarias"], "Gulf Stream"],
   ["Ciudad grande más alta:", ["La Paz", "Quito", "Bogotá", "Lhasa"], "Lhasa"],
@@ -928,29 +1093,22 @@ const geographyBase = buildFromData([
 
 const capitals = [
   ["Brasil", "Brasilia", "Río de Janeiro", "São Paulo", "Salvador"],
-  ["Egipto", "El Cairo", "Alejandría", "Giza", "Luxor"],
   ["Japón", "Tokio", "Kioto", "Osaka", "Nagoya"],
-  ["Sudáfrica", "Pretoria", "Ciudad del Cabo", "Johannesburgo", "Durban"],
-  ["Nigeria", "Abuya", "Lagos", "Kano", "Ibadan"],
   ["India", "Nueva Delhi", "Mumbai", "Bangalore", "Calcuta"],
-  ["Arabia Saudita", "Riad", "Jeddah", "La Meca", "Medina"],
   ["Corea del Sur", "Seúl", "Busan", "Incheon", "Daegu"],
   ["España", "Madrid", "Barcelona", "Sevilla", "Valencia"],
   ["Alemania", "Berlín", "Múnich", "Hamburgo", "Fráncfort"],
   ["Italia", "Roma", "Milán", "Nápoles", "Turín"],
   ["Francia", "París", "Lyon", "Marsella", "Toulouse"],
   ["China", "Pekín", "Shanghái", "Shenzhen", "Guangzhou"],
-  ["Australia", "Canberra", "Sídney", "Melbourne", "Brisbane"],
   ["Argentina", "Buenos Aires", "Córdoba", "Rosario", "Mendoza"],
-  ["Canadá", "Ottawa", "Toronto", "Vancouver", "Montreal"],
   ["Rusia", "Moscú", "San Petersburgo", "Novosibirsk", "Kazan"],
-  ["Tailandia", "Bangkok", "Chiang Mai", "Phuket", "Pattaya"],
   ["Vietnam", "Hanói", "Ho Chi Minh", "Da Nang", "Hue"],
   ["Grecia", "Atenas", "Tesalónica", "Patras", "Heraclión"]
 ];
 const geographyCapitals = capitals.map(([country, correct, ...rest]) => {
-  const opts = shuffle([correct, ...rest]);
-  return { question: `Capital de ${country}:`, options: opts, correct: opts.indexOf(correct) };
+  const opts = [correct, ...rest];
+  return buildQuestion(`Capital de ${country}:`, opts, correct);
 });
 
 const geoExtremes = [
@@ -959,15 +1117,15 @@ const geoExtremes = [
   ["Isla más remota habitada", "Tristán de Acuña"],
   ["Pico más alto", "Everest"],
   ["Río más caudaloso", "Amazonas"],
-  ["País más poblado", "India"],
+  ["País más poblado desde 2023", "India"],
   ["País más frío habitable", "Rusia (Siberia)"],
-  ["Ciudad con más túneles de metro", "Londres"],
-  ["País con más fronteras", "China"],
+  ["Capital federal de Australia", "Canberra"],
+  ["País con mayor superficie", "Rusia"],
   ["Lago más grande", "Caspio"]
 ];
 const geographyExtremes = geoExtremes.map(([label, answer]) => {
-  const opts = shuffle([answer, "Nilo", "Sahara", "Pacífico"]);
-  return { question: `${label} es:`, options: opts, correct: opts.indexOf(answer) };
+  const opts = [answer, "Nilo", "Sahara", "Pacífico"];
+  return buildQuestion(`${label} es:`, opts, answer);
 });
 
 const moreCapitals = [
@@ -993,8 +1151,8 @@ const moreCapitals = [
   ["Pakistán", "Islamabad", "Karachi", "Lahore", "Peshawar"]
 ];
 const geographyMoreCapitals = moreCapitals.map(([country, correct, ...rest]) => {
-  const opts = shuffle([correct, ...rest]);
-  return { question: `Capital de ${country}:`, options: opts, correct: opts.indexOf(correct) };
+  const opts = [correct, ...rest];
+  return buildQuestion(`Capital de ${country}:`, opts, correct);
 });
 
 // Montañas más altas por continente
@@ -1008,8 +1166,8 @@ const continentPeaks = [
   ["Oceanía", "Puncak Jaya"]
 ];
 const geographyPeaks = continentPeaks.map(([cont, peak]) => {
-  const opts = shuffle([peak, "Mont Blanc", "Matterhorn", "McKinley"]);
-  return { question: `Pico más alto de ${cont}:`, options: opts, correct: opts.indexOf(peak) };
+  const opts = [peak, "Mont Blanc", "Matterhorn", "McKinley"];
+  return buildQuestion(`Pico más alto de ${cont}:`, opts, peak);
 });
 
 // Hemisferios
@@ -1022,8 +1180,6 @@ const geographyHemispheres = buildFromData([
 ]);
 
 const geographyExtra = buildFromData([
-  ["Capital de Nueva Zelanda:", ["Wellington", "Auckland", "Christchurch", "Hamilton"], "Wellington"],
-  ["Capital de Suiza:", ["Berna", "Zúrich", "Ginebra", "Basilea"], "Berna"],
   ["País sin salida al mar:", ["Paraguay", "Perú", "Birmania", "Somalia"], "Paraguay"],
   ["Montaña más alta de Europa:", ["Elbrus", "Mont Blanc", "Matterhorn", "Grossglockner"], "Elbrus"],
   ["Lago más profundo del mundo:", ["Baikal", "Tanganica", "Caspio", "Superior"], "Baikal"],
@@ -1038,9 +1194,7 @@ const geographyExtra = buildFromData([
   ["Las islas Galápagos pertenecen a:", ["Ecuador", "Perú", "Chile", "Colombia"], "Ecuador"],
   ["Capital de Nigeria:", ["Abuya", "Lagos", "Kano", "Ibadan"], "Abuya"],
   ["Dubái se encuentra en:", ["Emiratos Árabes Unidos", "Qatar", "Arabia Saudita", "Omán"], "Emiratos Árabes Unidos"],
-  ["Capital de Pakistán:", ["Islamabad", "Karachi", "Lahore", "Peshawar"], "Islamabad"],
   ["País famoso por sus fiordos:", ["Noruega", "Suecia", "Islandia", "Canadá"], "Noruega"],
-  ["Pico más alto de Norteamérica:", ["Denali", "Logan", "Rainier", "Whitney"], "Denali"],
   ["Mar que separa Arabia e Irán:", ["Golfo Pérsico", "Mar Rojo", "Mar Arábigo", "Mar Caspio"], "Golfo Pérsico"],
   ["Ciudad llamada 'Venecia del Norte':", ["Ámsterdam", "Estocolmo", "Brujas", "Copenhague"], "Ámsterdam"],
   ["País más joven del mundo (2011):", ["Sudán del Sur", "Kosovo", "Eritrea", "Montenegro"], "Sudán del Sur"],
@@ -1078,6 +1232,15 @@ const questionsDatabase = {
   history: historyQuestions,
   geography: geographyQuestions
 };
+
+const questionsValidation = validateQuestionsDatabase(questionsDatabase);
+if (!questionsValidation.isValid) {
+  const first = questionsValidation.errors[0];
+  throw new Error(
+    `[questions-data] Banco inválido (${questionsValidation.errorCount} errores). ` +
+    `Primero: [${first.category}] #${first.index} ${first.type}.`
+  );
+}
 
 Object.keys(questionsDatabase).forEach(k => Object.freeze(questionsDatabase[k]));
 Object.freeze(questionsDatabase);

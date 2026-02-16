@@ -54,6 +54,29 @@ let introLoadingInterval = null;
 
 const domCache = {};
 
+function shuffleArray(arr) {
+    const copy = arr.slice();
+    for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+}
+
+function randomizeQuestionOptions(question) {
+    const optionsWithMeta = question.options.map((option, index) => ({
+        option,
+        isCorrect: index === question.correct
+    }));
+
+    const shuffled = shuffleArray(optionsWithMeta);
+    return {
+        ...question,
+        options: shuffled.map(item => item.option),
+        correct: shuffled.findIndex(item => item.isCorrect)
+    };
+}
+
 function cacheDomElements() {
     domCache.timerCircle = document.getElementById('timerCircle');
     domCache.questionNumber = document.getElementById('questionNumber');
@@ -694,7 +717,10 @@ function startGame() {
     const categoryQuestions = questions[selectedCategory] || questions.general;
     // Usar la cantidad de preguntas seleccionada, limitada al máximo disponible
     const maxQuestions = Math.min(selectedQuestionCount, categoryQuestions.length);
-    gameQuestions = [...categoryQuestions].sort(() => Math.random() - 0.5).slice(0, maxQuestions);
+    gameQuestions = [...categoryQuestions]
+        .sort(() => Math.random() - 0.5)
+        .slice(0, maxQuestions)
+        .map(randomizeQuestionOptions);
     
     Object.keys(players).forEach(id => {
         players[id].score = 0;
