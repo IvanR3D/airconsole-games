@@ -228,11 +228,9 @@ function init() {
         // Start on intro screen, stay there until players join
         showScreen('intro');
         
-        // Try to start music after AirConsole is ready
+        // Try to start music after AirConsole is ready (may fail until user interacts - browser autoplay policy)
         if (backgroundMusic && soundEnabled) {
-            backgroundMusic.play().catch(err => {
-                console.log('Music autoplay prevented, waiting for user interaction');
-            });
+            backgroundMusic.play().catch(() => { /* NotAllowedError expected before user interaction */ });
         }
     };
 
@@ -398,11 +396,9 @@ function toggleSound() {
     if (toggleEl) toggleEl.textContent = soundEnabled ? '🔊' : '🔇';
     
     // Control background music
-    if (backgroundMusic) {
+        if (backgroundMusic) {
         if (soundEnabled) {
-            backgroundMusic.play().catch(err => {
-                console.log('Could not play music:', err);
-            });
+            backgroundMusic.play().catch(() => { /* Autoplay may be blocked until user interaction */ });
         } else {
             backgroundMusic.pause();
         }
