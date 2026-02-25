@@ -1,5 +1,5 @@
 // Configuración compartida viene de shared-config.js (incluida en screen.html)
-if (typeof categories === 'undefined' || typeof categoryImages === 'undefined') {
+if (typeof categories === 'undefined' || typeof categoryImages === 'undefined' || typeof iconPaths === 'undefined') {
     console.error('shared-config.js no se cargó antes de screen-app.js');
 }
 
@@ -15,6 +15,15 @@ const categoryColors = (typeof categoryColorsScreen !== 'undefined')
         technology: '#0D9488', // esmeralda
         history: '#B45309',    // ámbar
         geography: '#2563EB'   // azul
+    };
+
+const uiIcons = (typeof iconPaths !== 'undefined')
+    ? iconPaths
+    : {
+        crown: 'assets/images/crown.webp',
+        gamepad: 'assets/images/gamepad.webp',
+        soundOn: 'assets/images/sound-on.webp',
+        soundOff: 'assets/images/sound-off.webp'
     };
 
 // Usar la base de datos de preguntas del archivo externo
@@ -271,7 +280,8 @@ function init() {
                         isAdmin: existingPlayer.isAdmin,
                         gameState: gameState,
                         selectedCategory: selectedCategory,
-                        score: existingPlayer.score
+                        score: existingPlayer.score,
+                        soundEnabled: soundEnabled
                     });
                     
                     updatePlayersDisplay();
@@ -284,7 +294,8 @@ function init() {
                         color: p.color,
                         isAdmin: p.isAdmin,
                         gameState: gameState,
-                        selectedCategory: selectedCategory
+                        selectedCategory: selectedCategory,
+                        soundEnabled: soundEnabled
                     });
                 }
             } else {
@@ -333,7 +344,8 @@ function init() {
                         color: playerColor,
                         isAdmin: isAdmin,
                         gameState: gameState,
-                        selectedCategory: selectedCategory
+                        selectedCategory: selectedCategory,
+                        soundEnabled: soundEnabled
                     });
                     
                     updatePlayersDisplay();
@@ -392,8 +404,11 @@ function broadcastGameState() {
 
 function toggleSound() {
     soundEnabled = !soundEnabled;
-    const toggleEl = document.getElementById('soundToggle');
-    if (toggleEl) toggleEl.textContent = soundEnabled ? '🔊' : '🔇';
+    const toggleIcon = document.getElementById('soundToggleImage');
+    if (toggleIcon) {
+        toggleIcon.src = soundEnabled ? uiIcons.soundOn : uiIcons.soundOff;
+        toggleIcon.alt = soundEnabled ? 'Sonido activado' : 'Sonido desactivado';
+    }
     
     // Control background music
         if (backgroundMusic) {
@@ -545,11 +560,11 @@ function updatePlayersDisplay() {
         avatar.style.border = `3px solid ${player.disconnected ? '#6b7280' : '#fff'}`;
         
         if (player.isAdmin && !player.disconnected) {
-            avatar.innerHTML = '<iconify-icon icon="mdi:crown" style="font-size: 1.5rem; color: white;"></iconify-icon>';
+            avatar.innerHTML = `<img src="${uiIcons.crown}" alt="Admin" class="player-role-icon">`;
         } else if (player.disconnected) {
-            avatar.innerHTML = '<iconify-icon icon="mdi:close-circle" style="font-size: 1.5rem; color: white;"></iconify-icon>';
+            avatar.innerHTML = '<span class="player-disconnected-mark">X</span>';
         } else {
-            avatar.innerHTML = '<iconify-icon icon="mdi:gamepad-variant" style="font-size: 1.5rem; color: white;"></iconify-icon>';
+            avatar.innerHTML = `<img src="${uiIcons.gamepad}" alt="Jugador" class="player-role-icon">`;
         }
         card.appendChild(avatar);
         
@@ -559,7 +574,7 @@ function updatePlayersDisplay() {
         info.innerHTML = `
             <div class="chalk-body text-base sm:text-lg font-black truncate" style="color: ${player.disconnected ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.95)'};">${player.name}</div>
             <div class="chalk-body text-xs sm:text-sm font-bold" style="color: ${player.disconnected ? 'rgba(255,255,255,0.4)' : cardColor};">
-                ${player.disconnected ? 'Desconectado' : (player.isAdmin ? '👑 Admin' : '✓ Conectado')}
+                ${player.disconnected ? 'Desconectado' : (player.isAdmin ? 'Admin' : 'Conectado')}
             </div>
         `;
         card.appendChild(info);

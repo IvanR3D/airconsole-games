@@ -43,14 +43,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Cabin+Sketch:wght@400;700&family=Caveat+Brush&family=Architects+Daughter&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="controller-styles.css">
 </head>
-<body class="text-steam-negro chalk-font" style="background: url('../assets/images/Pizarra-optimized.webp') center center / 100% 100% no-repeat fixed !important;">
+<body class="text-steam-negro chalk-font" style="background: url('assets/images/Pizarra-optimized.webp') center center / 100% 100% no-repeat fixed !important;">
     <div class="w-full h-full min-h-0 flex flex-col chalkboard-safe-area" style="height: 100vh; height: 100dvh;">
         
         <!-- JOIN SCREEN - sin scroll, usa todo el espacio, logo+trivia+rules cerca, aprovecha bordes -->
         <div class="screen active flex-col items-center justify-between text-center join-screen-layout" id="joinScreen">
             <!-- Logo + TRIVIA (juntos, compactos) -->
             <div class="join-header flex-shrink-0">
-                <img src="../assets/images/LogoSteamRD-Color.webp" alt="STEAM RD Logo" class="join-logo object-contain">
+                <img src="assets/images/LogoSteamRD-Color.webp" alt="STEAM RD Logo" class="join-logo object-contain">
                 <h1 class="font-black join-title">TRIVIA</h1>
                 <p class="font-semibold -mt-1 join-subtitle">Fundación STEAM RD</p>
             </div>
@@ -89,7 +89,7 @@
             <!-- Botón + mensajes -->
             <div class="join-footer flex-shrink-0 w-full px-1">
                 <button class="text-white py-3.5 px-6 text-base font-black rounded-full w-full shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-3 chalk-btn" style="background: rgba(115,160,63,0.85); border: 2px solid #73A03F;" id="joinBtn">
-                    <iconify-icon icon="mdi:gamepad-variant" class="text-2xl"></iconify-icon>
+                    <img src="assets/images/gamepad.webp" alt="" class="join-action-icon" loading="lazy">
                     UNIRSE AL JUEGO
                 </button>
                 <div class="rounded-2xl py-3 px-4 pulse hidden items-center gap-3 mt-3 chalk-box" style="background: transparent; border: 2px solid #73A03F;" id="connectingMsg">
@@ -113,12 +113,12 @@
             <div class="relative z-10 w-full mx-auto py-4 waiting-content">
                 <div class="mb-6">
                     <div class="mx-auto mb-4 rounded-full flex items-center justify-center border-4 shadow-lg" style="border-color: rgba(255,255,255,0.9); background: rgba(5,149,174,0.5);" id="playerAvatar">
-                        <iconify-icon icon="mdi:gamepad-variant" class="text-3xl text-white"></iconify-icon>
+                        <img src="assets/images/gamepad.webp" alt="" class="waiting-avatar-icon" loading="lazy">
                     </div>
                     <div class="text-lg font-black text-steam-turquesa" id="playerNameDisplay"></div>
                 </div>
                 
-                <iconify-icon icon="mdi:clock-outline" class="bounce-anim text-5xl text-steam-turquesa"></iconify-icon>
+                <img src="assets/images/clock.webp" alt="" class="bounce-anim waiting-clock-icon" loading="lazy">
                 
                 <div class="rounded-2xl py-4 px-6 my-4 shadow-lg chalk-box" style="background: transparent; border: 2px solid #73A03F;">
                     <p class="text-base font-black text-steam-verde">Esperando que inicie el juego...</p>
@@ -127,7 +127,7 @@
                 <div id="nonAdminWaiting" class="pb-6">
                     <p class="text-sm mb-4 text-white/80">El Jugador 1 está configurando la partida</p>
                     <div class="rounded-2xl p-4 chalk-box hidden" style="background: transparent; border: 2px solid #0595AE;" id="selectedCategoryDisplay">
-                        <img id="selectedCategoryEmoji" src="../assets/images/globo.webp" alt="" class="w-12 h-12 mx-auto mb-2 object-contain category-icon-img">
+                        <img id="selectedCategoryEmoji" src="assets/images/globo.webp" alt="" class="w-12 h-12 mx-auto mb-2 object-contain category-icon-img">
                         <div class="text-lg font-black text-steam-turquesa" id="selectedCategoryName">General</div>
                     </div>
                 </div>
@@ -142,11 +142,11 @@
                 <!-- Admin Badge - 1 corona (suficiente para identificar admin) -->
                 <div class="flex justify-between items-center mb-2 flex-shrink-0">
                     <div class="inline-flex items-center gap-2 rounded-full py-1.5 px-3 shadow-md chalk-box admin-badge" id="adminAvatar">
-                        <iconify-icon icon="mdi:crown" class="admin-crown"></iconify-icon>
+                        <img src="assets/images/crown.webp" alt="Admin" class="admin-crown-img" loading="lazy">
                         <span class="admin-label">Admin</span>
                     </div>
                     <button type="button" class="rounded-full flex items-center justify-center chalk-box active:scale-95 transition-transform" style="background: transparent; border: 2px solid rgba(255,255,255,0.6);" id="soundToggleBtn" title="Sonido">
-                        <span class="text-xl" id="soundToggleIcon">🔊</span>
+                        <img src="assets/images/sound-on.webp" alt="Sonido activado" id="soundToggleIcon" class="sound-icon-img">
                     </button>
                 </div>
 
@@ -201,7 +201,7 @@
                     </div>
 
                     <div class="rounded-lg p-3 mb-4 chalk-box flex items-center gap-3" style="background: transparent; border: 2px solid #0595AE;">
-                        <img id="selectedCatIcon" src="../assets/images/globo.webp" alt="" class="w-10 h-10 object-contain flex-shrink-0">
+                        <img id="selectedCatIcon" src="assets/images/globo.webp" alt="" class="w-10 h-10 object-contain flex-shrink-0">
                         <div>
                             <div class="text-sm text-white/70">Categoría</div>
                             <div class="font-bold text-base text-steam-turquesa" id="selectedCatName">General</div>
@@ -226,7 +226,7 @@
                     
                     <div class="rounded-xl p-3 sm:p-4 mb-4 chalk-box final-summary overflow-hidden" style="background: transparent; border: 2px solid #73A03F;">
                         <div class="flex flex-col items-center justify-center summary-icon">
-                            <img id="finalCatIcon" src="../assets/images/globo.webp" alt="" class="object-contain mx-auto">
+                            <img id="finalCatIcon" src="assets/images/globo.webp" alt="" class="object-contain mx-auto">
                         </div>
                         <div class="summary-details summary-details-horizontal">
                             <div class="flex justify-between items-center rounded-lg p-3 chalk-box" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.3);">
@@ -270,7 +270,7 @@
                     </button>
                 </div>
                 <button type="button" class="rounded-full flex items-center justify-center chalk-box active:scale-95 transition-transform flex-shrink-0" style="background: transparent; border: 2px solid rgba(255,255,255,0.6);" id="soundToggleBtnPlaying" title="Sonido">
-                    <span class="text-xl" id="soundToggleIconPlaying">🔊</span>
+                    <img src="assets/images/sound-on.webp" alt="Sonido activado" id="soundToggleIconPlaying" class="sound-icon-img">
                 </button>
             </div>
             

@@ -1,5 +1,5 @@
 // Configuración compartida viene de shared-config.js (incluida en controller.html)
-if (typeof categories === 'undefined' || typeof categoryImages === 'undefined') {
+if (typeof categories === 'undefined' || typeof categoryImages === 'undefined' || typeof iconPaths === 'undefined') {
     console.error('shared-config.js no se cargó antes de controller-app.js');
 }
 
@@ -15,6 +15,13 @@ const categoryColors = (typeof categoryColorsController !== 'undefined')
         technology: '#AB3D8B',
         history: '#EB8225',
         geography: '#0595AE'
+    };
+
+const uiIcons = (typeof iconPaths !== 'undefined')
+    ? iconPaths
+    : {
+        soundOn: 'assets/images/sound-on.webp',
+        soundOff: 'assets/images/sound-off.webp'
     };
 
 let airconsole;
@@ -169,9 +176,16 @@ function init() {
 function updateSoundToggleIcon(enabled) {
     const icon = document.getElementById('soundToggleIcon');
     const iconPlaying = document.getElementById('soundToggleIconPlaying');
-    const emoji = enabled ? '🔊' : '🔇';
-    if (icon) icon.textContent = emoji;
-    if (iconPlaying) iconPlaying.textContent = emoji;
+    const iconSrc = enabled ? uiIcons.soundOn : uiIcons.soundOff;
+    const iconAlt = enabled ? 'Sonido activado' : 'Sonido desactivado';
+    if (icon) {
+        icon.src = iconSrc;
+        icon.alt = iconAlt;
+    }
+    if (iconPlaying) {
+        iconPlaying.src = iconSrc;
+        iconPlaying.alt = iconAlt;
+    }
 }
 
 function updateQuestionCountDisplay() {
@@ -326,6 +340,10 @@ function handleJoined(data) {
     if (data.score !== undefined) {
         myScore = data.score;
     }
+
+    if (typeof data.soundEnabled === 'boolean') {
+        updateSoundToggleIcon(data.soundEnabled);
+    }
     
     updateAvatarDisplays();
     
@@ -355,6 +373,10 @@ function handleReconnected(data) {
     if (data.score !== undefined) {
         myScore = data.score;
         if (domCache.miniScore) domCache.miniScore.textContent = myScore;
+    }
+
+    if (typeof data.soundEnabled === 'boolean') {
+        updateSoundToggleIcon(data.soundEnabled);
     }
     
     updateAvatarDisplays();

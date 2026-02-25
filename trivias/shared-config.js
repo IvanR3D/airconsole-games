@@ -15,14 +15,14 @@ const categories = {
 
 // Imágenes por categoría (regla trivias-styling: usar assets/images)
 const categoryImages = {
-    general: '../assets/images/globo.webp',
-    science: '../assets/images/microscopio.webp',
-    mathematics: '../assets/images/calculadora.webp',
-    robotics: '../assets/images/programacion.webp',
-    chemistry: '../assets/images/estructura quimica.webp',
-    technology: '../assets/images/programacion.webp',
-    history: '../assets/images/libro.webp',
-    geography: '../assets/images/planeta.webp'
+    general: 'assets/images/globo.webp',
+    science: 'assets/images/microscopio.webp',
+    mathematics: 'assets/images/calculadora.webp',
+    robotics: 'assets/images/programacion.webp',
+    chemistry: 'assets/images/estructura quimica.webp',
+    technology: 'assets/images/programacion.webp',
+    history: 'assets/images/libro.webp',
+    geography: 'assets/images/planeta.webp'
 };
 
 // Colores: separados para respetar estilos actuales
@@ -62,17 +62,9 @@ const MAX_PLAYERS = 32;
 
 // Rutas de iconos locales (usados en html/js). Si añades nuevos, decláralos aquí.
 const iconPaths = {
-    crown: '../assets/images/crown.svg',
-    gamepad: '../assets/images/gamepad.svg',
-    clock: '../assets/images/clock.svg',
-    arrowLeft: '../assets/images/arrow-left.svg',
-    arrowRight: '../assets/images/arrow-right.svg',
-    rocket: '../assets/images/rocket.svg',
-    exit: '../assets/images/exit.svg',
-    trophy: '../assets/images/trophy.svg',
-    medal: '../assets/images/medal.svg',
-    soundOn: '../assets/images/sound-on.svg',
-    soundOff: '../assets/images/sound-off.svg',
-    star: '../assets/images/star.svg'
+    crown: 'assets/images/crown.webp',
+    gamepad: 'assets/images/gamepad.webp',
+    clock: 'assets/images/clock.webp',
+    soundOn: 'assets/images/sound-on.webp',
+    soundOff: 'assets/images/sound-off.webp'
 };
-

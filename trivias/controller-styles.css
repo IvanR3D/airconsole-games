@@ -113,7 +113,7 @@ body {
     touch-action: manipulation;
     overscroll-behavior: none;
     -webkit-font-smoothing: antialiased;
-    background: url('../assets/images/Pizarra%20.webp') center center / cover no-repeat fixed;
+    background: url('assets/images/Pizarra%20.webp') center center / cover no-repeat fixed;
 }
 
 /* ========================================
@@ -435,6 +435,12 @@ body {
     height: var(--btn-optimal-size);
 }
 
+.sound-icon-img {
+    width: clamp(1.2rem, 4.8vw, 1.7rem);
+    height: clamp(1.2rem, 4.8vw, 1.7rem);
+    object-fit: contain;
+}
+
 /* Badge Admin */
 .admin-badge {
     background: transparent !important;
@@ -442,15 +448,34 @@ body {
     color: rgba(255, 255, 255, 0.95);
     box-shadow: none !important;
 }
-.admin-crown {
-    color: #f6c344;
-    font-size: 1.35rem;
+.admin-crown-img {
+    width: 1.35rem;
+    height: 1.35rem;
+    object-fit: contain;
 }
 .admin-label {
     font-size: 0.95rem;
     font-weight: 700;
     letter-spacing: 0.01em;
     color: rgba(255, 255, 255, 0.95);
+}
+
+.join-action-icon {
+    width: clamp(1.25rem, 4.8vw, 1.8rem);
+    height: clamp(1.25rem, 4.8vw, 1.8rem);
+    object-fit: contain;
+}
+
+.waiting-avatar-icon {
+    width: clamp(1.45rem, 6vw, 2rem);
+    height: clamp(1.45rem, 6vw, 2rem);
+    object-fit: contain;
+}
+
+.waiting-clock-icon {
+    width: clamp(2.1rem, 9vw, 3rem);
+    height: clamp(2.1rem, 9vw, 3rem);
+    object-fit: contain;
 }
 
 /* ========================================

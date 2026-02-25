@@ -81,7 +81,7 @@ html, body {
 body {
     transition: background 0.5s ease;
     -webkit-font-smoothing: antialiased;
-    background: url('../assets/images/Pizarra%20.webp') center center / cover no-repeat fixed;
+    background: url('assets/images/Pizarra%20.webp') center center / cover no-repeat fixed;
 }
 
 /* Category backgrounds - Pizarra background */
@@ -411,7 +411,9 @@ body.cat-default {
     min-height: clamp(68px, 9vw, 110px);
 }
 .option-card .chalk-body {
-    font-size: clamp(1.05rem, 2.8vw, 1.4rem);
+    font-size: clamp(1.35rem, 3.35vw, 2.2rem);
+    line-height: 1.16;
+    letter-spacing: 0.01em;
 }
 
 .option-card .option-badge {
@@ -419,9 +421,9 @@ body.cat-default {
     border-right: var(--chalk-border-soft) !important;
     color: var(--chalk-white) !important;
     transition: background 0.3s ease, border-color 0.3s ease !important;
-    min-width: clamp(48px, 8vw, 70px);
+    min-width: clamp(54px, 8.5vw, 82px);
     justify-content: center;
-    font-size: clamp(1.3rem, 4vw, 1.7rem);
+    font-size: clamp(1.6rem, 4.7vw, 2.45rem);
 }
 
 /* Option cards (playing screen): prevent top edge clipping */
@@ -661,13 +663,20 @@ body.cat-default {
 }
 
 /* Responsive text */
+#questionNumber {
+    font-size: clamp(1.55rem, 3.8vw, 2.5rem) !important;
+    letter-spacing: 0.015em;
+}
+
 .responsive-title {
     font-size: clamp(1.75rem, 5.5vw, 4rem);
     font-family: 'Cabin Sketch', cursive, sans-serif !important;
 }
 
 .responsive-question {
-    font-size: clamp(1.2rem, 3.5vw, 2.5rem);
+    font-size: clamp(2rem, 4.8vw, 3.75rem);
+    line-height: 1.14;
+    letter-spacing: 0.01em;
     font-family: 'Caveat Brush', cursive, sans-serif !important;
 }
 
@@ -1016,6 +1025,12 @@ body.cat-default {
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
+.challenge-header-banner .challenge-icon-img {
+    width: clamp(1.6rem, 4.6vw, 2.3rem);
+    height: clamp(1.6rem, 4.6vw, 2.3rem);
+    object-fit: contain;
+}
+
 .challenge-header-banner .challenge-text {
     font-family: 'Cabin Sketch', cursive;
     font-weight: 700;
@@ -1025,6 +1040,36 @@ body.cat-default {
     line-height: 1.2;
     white-space: nowrap;
     font-size: clamp(1.15rem, 4vw, 1.6rem);
+}
+
+.waiting-clock-icon {
+    width: clamp(1.45rem, 3.9vw, 2rem);
+    height: clamp(1.45rem, 3.9vw, 2rem);
+    object-fit: contain;
+    opacity: 0.95;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+}
+
+.sound-indicator-icon {
+    width: clamp(2rem, 4.4vw, 2.7rem);
+    height: clamp(2rem, 4.4vw, 2.7rem);
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+}
+
+.player-role-icon {
+    width: 1.55rem;
+    height: 1.55rem;
+    object-fit: contain;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+}
+
+.player-disconnected-mark {
+    font-family: 'Cabin Sketch', cursive, sans-serif;
+    font-size: 1.45rem;
+    font-weight: 700;
+    line-height: 1;
+    color: rgba(255, 255, 255, 0.95);
 }
 
 @media (max-width: 640px) {

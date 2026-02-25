@@ -508,7 +508,7 @@ function renderIntroScreen() {
             <div id="floatingMolecules" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
             
             <div class="relative z-10 text-center w-full intro-content">
-                <img src="../assets/images/LogoSteamRD-Color.webp" alt="STEAM RD" class="intro-logo mx-auto float-element" style="filter: drop-shadow(0 4px 12px rgba(0,0,0,0.1));">
+                <img src="assets/images/LogoSteamRD-Color.webp" alt="STEAM RD" class="intro-logo mx-auto float-element" style="filter: drop-shadow(0 4px 12px rgba(0,0,0,0.1));">
                 
                 <h1 class="intro-title">LABORATORIO</h1>
                 <h2 class="subtitle">QUÍMICO</h2>

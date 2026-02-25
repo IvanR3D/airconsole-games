@@ -79,7 +79,7 @@ body {
     overflow: hidden;
     z-index: 0;
     pointer-events: none;
-    background: url('../assets/images/Laboratorio .webp') center center / cover no-repeat;
+    background: url('assets/images/Laboratorio .webp') center center / cover no-repeat;
 }
 
 /* ============================================
