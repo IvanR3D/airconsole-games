@@ -1117,7 +1117,7 @@ body.cat-default {
     align-items: center;
     justify-content: center;
     gap: clamp(0.6rem, 2vw, 1rem);
-    padding: clamp(0.75rem, 2.5vw, 1.25rem) clamp(1.5rem, 4vw, 2.5rem);
+    padding: clamp(0.75rem, 2.5vw, 1.25rem) clamp(2.125rem, 5.1vw, 3.125rem);
     background: transparent;
     border: 4px solid rgba(255, 255, 255, 0.95);
     border-radius: 9999px;

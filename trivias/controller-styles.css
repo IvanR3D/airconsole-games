@@ -441,6 +441,13 @@ body {
     height: var(--btn-optimal-size);
 }
 
+.sound-toggle-btn {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+}
+
 .sound-icon-img {
     width: clamp(2rem, 8.5vw, 2.8rem);
     height: clamp(2rem, 8.5vw, 2.8rem);
