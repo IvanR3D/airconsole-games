@@ -50,25 +50,25 @@
         <div class="screen active flex-col items-center justify-between text-center join-screen-layout" id="joinScreen">
             <!-- Logo + TRIVIA (juntos, compactos) -->
             <div class="join-header flex-shrink-0">
-                <img src="assets/images/steamrd-games-color.png" alt="STEAM RD Games Logo" class="join-logo object-contain">
+                <img src="assets/images/steamrd-games-white.webp" alt="STEAM RD Games Logo" class="join-logo object-contain">
                 <h1 class="font-black join-title">TRIVIA</h1>
-                <p class="font-semibold -mt-1 join-subtitle">Fundación STEAM RD</p>
+                <p class="font-semibold -mt-1 join-subtitle">STEAM RD Games</p>
             </div>
             
-            <!-- Reglas (flex-1 para ocupar espacio central, ancho fluido según dispositivo) -->
+            <!-- Reglas (flex-1 para ocupar espacio central, ancho fluido segun dispositivo) -->
             <div class="join-rules flex-1 min-h-0 flex flex-col justify-center gap-2 sm:gap-3 w-full px-1">
                 <div class="rounded-xl p-2.5 sm:p-3 chalk-box join-rule-card" style="background: transparent; border: 2px solid rgba(255,255,255,0.7);">
                     <div class="flex items-center gap-2">
-                        <div class="text-xl sm:text-2xl flex-shrink-0">🎯</div>
+                        <div class="text-xl sm:text-2xl flex-shrink-0">&#127919;</div>
                         <div class="text-left">
                             <h3 class="font-bold text-sm text-white/95">Pon a prueba tus conocimientos</h3>
-                            <p class="text-xs text-white/75">Responde preguntas de diferentes categorías</p>
+                            <p class="text-xs text-white/75">Responde preguntas de diferentes categorias</p>
                         </div>
                     </div>
                 </div>
                 <div class="rounded-xl p-2.5 sm:p-3 chalk-box join-rule-card" style="background: transparent; border: 2px solid rgba(255,255,255,0.7);">
                     <div class="flex items-center gap-2">
-                        <div class="text-xl sm:text-2xl flex-shrink-0">👥</div>
+                        <div class="text-xl sm:text-2xl flex-shrink-0">&#128101;</div>
                         <div class="text-left">
                             <h3 class="font-bold text-sm text-white/95">Juega con amigos</h3>
                             <p class="text-xs text-white/75">Hasta 32 jugadores pueden competir</p>
@@ -77,10 +77,10 @@
                 </div>
                 <div class="rounded-xl p-2.5 sm:p-3 chalk-box join-rule-card" style="background: transparent; border: 2px solid rgba(255,255,255,0.7);">
                     <div class="flex items-center gap-2">
-                        <div class="text-xl sm:text-2xl flex-shrink-0">⚡</div>
+                        <div class="text-xl sm:text-2xl flex-shrink-0">&#9889;</div>
                         <div class="text-left">
-                            <h3 class="font-bold text-sm text-white/95">Responde rápido</h3>
-                            <p class="text-xs text-white/75">Gana más puntos por velocidad</p>
+                            <h3 class="font-bold text-sm text-white/95">Responde rapido</h3>
+                            <p class="text-xs text-white/75">Gana mas puntos por velocidad</p>
                         </div>
                     </div>
                 </div>
@@ -89,7 +89,7 @@
             <!-- Botón + mensajes -->
             <div class="join-footer flex-shrink-0 w-full px-1">
                 <button class="text-white py-3.5 px-6 text-base font-black rounded-full w-full shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-3 chalk-btn" style="background: rgba(115,160,63,0.85); border: 2px solid #73A03F;" id="joinBtn">
-                    <img src="assets/images/gamepad.webp" alt="" class="join-action-icon" loading="lazy">
+                    <img src="assets/images/gamepad-white.webp" alt="" class="join-action-icon" loading="lazy">
                     UNIRSE AL JUEGO
                 </button>
                 <div class="rounded-2xl py-3 px-4 pulse hidden items-center gap-3 mt-3 chalk-box" style="background: transparent; border: 2px solid #73A03F;" id="connectingMsg">
@@ -97,7 +97,7 @@
                     <span class="font-bold text-steam-verde">Conectando...</span>
                 </div>
                 <div class="rounded-2xl py-3 px-4 hidden items-center gap-3 mt-3 chalk-box" style="background: rgba(229,57,53,0.15); border: 2px solid #E53935;" id="errorMsg">
-                    <div class="text-2xl">⚠</div>
+                    <div class="text-2xl">&#9888;</div>
                     <div class="text-left">
                         <p class="font-bold text-sm" style="color: #E53935;">Juego Lleno</p>
                         <p class="text-xs text-white/80">Ya hay 4 jugadores conectados</p>
@@ -113,7 +113,7 @@
             <div class="relative z-10 w-full mx-auto py-4 waiting-content">
                 <div class="mb-6">
                     <div class="mx-auto mb-4 rounded-full flex items-center justify-center border-4 shadow-lg" style="border-color: rgba(255,255,255,0.9); background: rgba(5,149,174,0.5);" id="playerAvatar">
-                        <img src="assets/images/gamepad.webp" alt="" class="waiting-avatar-icon" loading="lazy">
+                        <img src="assets/images/gamepad-white.webp" alt="" class="waiting-avatar-icon" loading="lazy">
                     </div>
                     <div class="text-lg font-black text-steam-turquesa" id="playerNameDisplay"></div>
                 </div>
@@ -309,7 +309,7 @@
         <!-- RESULT OVERLAY -->
         <div class="hidden items-center justify-center p-4 chalk-overlay" style="background: rgba(0,0,0,0.6);" id="resultOverlay">
             <div class="text-center pop-in" id="resultContent">
-                <div class="text-5xl mb-3">✓</div>
+                <div class="text-5xl mb-3">&#10003;</div>
                 <div class="text-xl font-bold mb-2">Correcto!</div>
                 <div class="text-lg">+500 pts</div>
             </div>
@@ -322,3 +322,4 @@
     <script src="controller-app.js"></script>
 </body>
 </html>
+

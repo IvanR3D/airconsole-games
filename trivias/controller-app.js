@@ -20,6 +20,7 @@ const categoryColors = (typeof categoryColorsController !== 'undefined')
 const uiIcons = (typeof iconPaths !== 'undefined')
     ? iconPaths
     : {
+        gamepad: 'assets/images/gamepad-white.webp',
         soundOn: 'assets/images/sound-on.webp',
         soundOff: 'assets/images/sound-off.webp'
     };

@@ -57,7 +57,10 @@ h1, h2, h3, .chalk-title {
 
 /* Chalkboard safe area - contenido dentro del área verde, lejos de los bordes marrones */
 .chalkboard-safe-area {
-    padding: clamp(3%, 5vw, 10%);
+    padding-top: clamp(1.6%, 2.4vh, 4.5%);
+    padding-bottom: clamp(1.6%, 2.4vh, 4.5%);
+    padding-left: clamp(0.6%, 1.3vw, 2.4%);
+    padding-right: clamp(0.6%, 1.3vw, 2.4%);
     box-sizing: border-box;
     max-width: 100%;
     overflow: hidden;
@@ -65,7 +68,10 @@ h1, h2, h3, .chalk-title {
 
 @media (max-height: 700px) {
     .chalkboard-safe-area {
-        padding: clamp(2%, 3vw, 6%);
+        padding-top: clamp(1.2%, 1.8vh, 3.2%);
+        padding-bottom: clamp(1.2%, 1.8vh, 3.2%);
+        padding-left: clamp(0.5%, 1.1vw, 2%);
+        padding-right: clamp(0.5%, 1.1vw, 2%);
     }
 }
 
@@ -88,6 +94,8 @@ body {
 /* Playing screen - Pizarra background, sin fondos blancos */
 #playingScreen {
     background: transparent !important;
+    min-height: 0;
+    overflow: hidden;
 }
 
 #playingScreen .chalk-header,
@@ -95,6 +103,21 @@ body {
 #playingScreen #playersFooter,
 #playingScreen #playersFooter > * {
     background: transparent !important;
+}
+
+#playingScreen .playing-main {
+    min-height: 0;
+    overflow: hidden;
+}
+
+#playingScreen .playing-question-block {
+    min-height: 0;
+    justify-content: flex-start !important;
+    padding-top: clamp(0.45rem, 1.8vh, 1.1rem);
+}
+
+#playingScreen .playing-footer {
+    flex-shrink: 0;
 }
 body.cat-science,
 body.cat-mathematics,
@@ -407,13 +430,34 @@ body.cat-default {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
     transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease !important;
     font-family: 'Caveat Brush', cursive, sans-serif !important;
-    padding: clamp(12px, 2vw, 22px) clamp(12px, 3vw, 26px);
-    min-height: clamp(68px, 9vw, 110px);
+    padding: clamp(10px, 1.5vw, 16px) clamp(10px, 1.8vw, 18px);
+    min-height: clamp(66px, 8vh, 102px);
+    max-height: clamp(82px, 16vh, 140px);
+    align-items: center;
+    overflow: hidden;
 }
-.option-card .chalk-body {
-    font-size: clamp(1.35rem, 3.35vw, 2.2rem);
-    line-height: 1.16;
-    letter-spacing: 0.01em;
+
+.option-card .option-text {
+    font-size: clamp(1.15rem, 2.55vw, 1.78rem);
+    line-height: 1.15;
+    letter-spacing: 0.006em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.option-card .option-text.option-text-long {
+    font-size: clamp(1.04rem, 2.2vw, 1.5rem);
+    -webkit-line-clamp: 3;
+}
+
+.option-card .option-text.option-text-xlong {
+    font-size: clamp(0.95rem, 2vw, 1.34rem);
+    -webkit-line-clamp: 3;
 }
 
 .option-card .option-badge {
@@ -421,9 +465,9 @@ body.cat-default {
     border-right: var(--chalk-border-soft) !important;
     color: var(--chalk-white) !important;
     transition: background 0.3s ease, border-color 0.3s ease !important;
-    min-width: clamp(54px, 8.5vw, 82px);
+    min-width: clamp(46px, 6vw, 68px);
     justify-content: center;
-    font-size: clamp(1.6rem, 4.7vw, 2.45rem);
+    font-size: clamp(1.35rem, 3.2vw, 2rem);
 }
 
 /* Option cards (playing screen): prevent top edge clipping */
@@ -593,6 +637,32 @@ body.cat-default {
     border-right-color: #E53935 !important;
 }
 
+.option-card .answer-indicator {
+    position: absolute;
+    bottom: clamp(5px, 1.2vh, 8px);
+    right: clamp(8px, 1.6vw, 12px);
+    margin-top: 0 !important;
+    padding: 2px 6px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    background: rgba(0, 0, 0, 0.18);
+    font-size: clamp(0.72rem, 1.25vw, 0.9rem) !important;
+    line-height: 1.05;
+    max-width: min(48%, 210px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.option-card .answer-indicator.correct {
+    color: #d8ffd8 !important;
+}
+
+.option-card .answer-indicator.wrong {
+    color: #ffd4d4 !important;
+}
+
 @keyframes winnerBounce {
     0% { transform: scale(0); opacity: 0; }
     50% { transform: scale(1.1); }
@@ -664,7 +734,7 @@ body.cat-default {
 
 /* Responsive text */
 #questionNumber {
-    font-size: clamp(1.55rem, 3.8vw, 2.5rem) !important;
+    font-size: clamp(1.35rem, 2.8vw, 2rem) !important;
     letter-spacing: 0.015em;
 }
 
@@ -674,10 +744,36 @@ body.cat-default {
 }
 
 .responsive-question {
-    font-size: clamp(2rem, 4.8vw, 3.75rem);
-    line-height: 1.14;
+    font-size: clamp(1.68rem, 3.35vw, 2.65rem);
+    line-height: 1.16;
     letter-spacing: 0.01em;
     font-family: 'Caveat Brush', cursive, sans-serif !important;
+}
+
+#questionText {
+    max-width: min(99vw, 1380px) !important;
+    margin-bottom: clamp(0.5rem, 1.8vh, 1rem) !important;
+    overflow-wrap: anywhere;
+}
+
+#playingScreen .playing-question-text {
+    max-width: min(99vw, 1380px) !important;
+}
+
+#playingScreen .playing-options-grid {
+    max-width: min(99vw, 1380px) !important;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#questionText.question-medium {
+    font-size: clamp(1.45rem, 2.75vw, 2.25rem) !important;
+    line-height: 1.15;
+}
+
+#questionText.question-long {
+    font-size: clamp(1.2rem, 2.25vw, 1.9rem) !important;
+    line-height: 1.14;
 }
 
 /* Intro logo animation */
@@ -963,6 +1059,19 @@ body.cat-default {
     font-size: clamp(1rem, 3vw, 1.35rem);
 }
 
+#playersFooter {
+    flex-wrap: nowrap !important;
+    justify-content: flex-start !important;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    padding-bottom: 2px;
+}
+
+#playersFooter > * {
+    flex: 0 0 auto;
+}
+
 /* Cajas genéricas estilo chalk */
 .chalk-box {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -1026,8 +1135,8 @@ body.cat-default {
 }
 
 .challenge-header-banner .challenge-icon-img {
-    width: clamp(1.6rem, 4.6vw, 2.3rem);
-    height: clamp(1.6rem, 4.6vw, 2.3rem);
+    width: clamp(2.1rem, 5.8vw, 3.15rem);
+    height: clamp(2.1rem, 5.8vw, 3.15rem);
     object-fit: contain;
 }
 
@@ -1039,7 +1148,7 @@ body.cat-default {
     letter-spacing: 0.02em;
     line-height: 1.2;
     white-space: nowrap;
-    font-size: clamp(1.15rem, 4vw, 1.6rem);
+    font-size: clamp(1.25rem, 4.4vw, 1.82rem);
 }
 
 .waiting-clock-icon {
@@ -1058,8 +1167,8 @@ body.cat-default {
 }
 
 .player-role-icon {
-    width: 1.55rem;
-    height: 1.55rem;
+    width: 1.85rem;
+    height: 1.85rem;
     object-fit: contain;
     filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
 }

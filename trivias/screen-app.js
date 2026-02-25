@@ -21,7 +21,7 @@ const uiIcons = (typeof iconPaths !== 'undefined')
     ? iconPaths
     : {
         crown: 'assets/images/crown.webp',
-        gamepad: 'assets/images/gamepad.webp',
+        gamepad: 'assets/images/gamepad-white.webp',
         soundOn: 'assets/images/sound-on.webp',
         soundOff: 'assets/images/sound-off.webp'
     };
@@ -757,7 +757,16 @@ function showQuestion() {
     
     const question = gameQuestions[currentQuestion];
     if (domCache.questionNumber) domCache.questionNumber.textContent = `Pregunta ${currentQuestion + 1} de ${gameQuestions.length}`;
-    if (domCache.questionText) domCache.questionText.textContent = question.question;
+    if (domCache.questionText) {
+        const qText = String(question.question || '');
+        domCache.questionText.textContent = qText;
+        domCache.questionText.classList.remove('question-medium', 'question-long');
+        if (qText.length > 75) {
+            domCache.questionText.classList.add('question-long');
+        } else if (qText.length > 46) {
+            domCache.questionText.classList.add('question-medium');
+        }
+    }
     
     displayOptions(question);
     updatePlayersStatus();
@@ -814,6 +823,7 @@ function displayOptions(question) {
     question.options.forEach((option, index) => {
         const card = document.createElement('div');
         const letter = letters[index];
+        const optionText = String(option || '');
         
         // Sin cursor-pointer: el screen es solo display, las respuestas vienen del controller
         card.className = 'option-card flex items-center rounded-2xl overflow-hidden border-3 shadow-lg transition-all relative chalk-option';
@@ -831,10 +841,16 @@ function displayOptions(question) {
         
         // Option text - Caveat Brush para respuestas
         const text = document.createElement('div');
-        text.className = 'chalk-body flex-1 p-3 sm:p-4 lg:p-5 text-base sm:text-lg lg:text-xl font-bold relative z-10';
+        text.className = 'option-text chalk-body flex-1 p-3 sm:p-4 lg:p-5 font-bold relative z-10';
+        if (optionText.length > 34) {
+            text.classList.add('option-text-xlong');
+        } else if (optionText.length > 22) {
+            text.classList.add('option-text-long');
+        }
         text.style.color = 'rgba(255,255,255,0.95)';
         text.style.textShadow = '0 1px 2px rgba(0,0,0,0.2)';
-        text.textContent = option;
+        text.textContent = optionText;
+        text.title = optionText;
         card.appendChild(text);
         
         fragment.appendChild(card);
@@ -998,14 +1014,10 @@ function showResults() {
             }
             
             // Agregar indicador de respuesta correcta
-            const textDiv = opt.querySelector('.flex-1');
-            if (textDiv) {
-                const indicator = document.createElement('div');
-                indicator.className = 'answer-indicator chalk-body text-xs sm:text-sm font-bold mt-2';
-                indicator.style.color = '#fff';
-                indicator.textContent = '✓ Respuesta correcta';
-                textDiv.appendChild(indicator);
-            }
+            const indicator = document.createElement('div');
+            indicator.className = 'answer-indicator correct chalk-body font-bold';
+            indicator.textContent = '✓ Correcta';
+            opt.appendChild(indicator);
         } else {
             const wasSelected = Object.values(answers).some(a => a.option === index);
             if (wasSelected) {
@@ -1021,14 +1033,10 @@ function showResults() {
                 }
                 
                 // Agregar indicador de tu respuesta
-                const textDiv = opt.querySelector('.flex-1');
-                if (textDiv) {
-                    const indicator = document.createElement('div');
-                    indicator.className = 'answer-indicator chalk-body text-xs sm:text-sm font-bold mt-2';
-                    indicator.style.color = '#fff';
-                    indicator.textContent = '✗ Tu respuesta';
-                    textDiv.appendChild(indicator);
-                }
+                const indicator = document.createElement('div');
+                indicator.className = 'answer-indicator wrong chalk-body font-bold';
+                indicator.textContent = '✗ Tu respuesta';
+                opt.appendChild(indicator);
             } else {
                 // No seleccionada - chalk tenue
                 opt.style.background = 'transparent';

@@ -18,8 +18,8 @@ const categoryImages = {
     general: 'assets/images/globo.webp',
     science: 'assets/images/microscopio.webp',
     mathematics: 'assets/images/calculadora.webp',
-    robotics: 'assets/images/programacion.webp',
-    chemistry: 'assets/images/estructura quimica.webp',
+    robotics: 'assets/images/Robot.webp',
+    chemistry: 'assets/images/test tube.webp',
     technology: 'assets/images/programacion.webp',
     history: 'assets/images/libro.webp',
     geography: 'assets/images/planeta.webp'
@@ -63,7 +63,7 @@ const MAX_PLAYERS = 32;
 // Rutas de iconos locales (usados en html/js). Si añades nuevos, decláralos aquí.
 const iconPaths = {
     crown: 'assets/images/crown.webp',
-    gamepad: 'assets/images/gamepad.webp',
+    gamepad: 'assets/images/gamepad-white.webp',
     clock: 'assets/images/clock.webp',
     soundOn: 'assets/images/sound-on.webp',
     soundOff: 'assets/images/sound-off.webp'
