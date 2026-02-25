@@ -105,6 +105,11 @@ body {
     background: transparent !important;
 }
 
+#playingScreen .chalk-header {
+    margin-left: clamp(8px, 1.1vw, 14px);
+    margin-right: clamp(14px, 1.8vw, 22px);
+}
+
 #playingScreen .playing-main {
     min-height: 0;
     overflow: hidden;
