@@ -660,7 +660,7 @@ body {
 }
 
 /* Step 1 específico - necesita flex para el scroll de categorías */
-#step1.active {
+#step2.active {
     flex: 1;
 }
 
@@ -693,7 +693,7 @@ body {
 }
 
 /* Paso 3: espacio extra para que el botón no se corte en la parte inferior */
-#step3 {
+#step4 {
     padding-bottom: clamp(1.5rem, 7vh, 3.5rem);
 }
 
@@ -773,6 +773,57 @@ body {
 
 .final-actions-row {
     width: 100%;
+}
+
+/* ========================================
+   DIFFICULTY GRID
+   ======================================== */
+.difficulty-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(0.4rem, 2vw, 0.75rem);
+}
+
+.difficulty-btn {
+    border: var(--chalk-border);
+    background: transparent;
+    border-radius: 0.75rem;
+    padding: clamp(0.65rem, 2vw, 0.9rem);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2rem;
+    min-height: max(72px, var(--btn-min-size));
+    transition: all 0.2s ease;
+    color: rgba(255,255,255,0.92);
+}
+
+.difficulty-btn .difficulty-title {
+    font-size: clamp(1.05rem, 4vw, 1.35rem);
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.difficulty-btn .difficulty-sub {
+    font-size: clamp(0.72rem, 2.7vw, 0.9rem);
+    color: rgba(255,255,255,0.75);
+}
+
+.difficulty-btn.selected {
+    border-color: #73A03F;
+    box-shadow: 0 0 20px rgba(115, 160, 63, 0.25);
+    transform: translateY(-1px);
+}
+
+.difficulty-btn.selected .difficulty-sub {
+    color: rgba(255,255,255,0.9);
+}
+
+@media (max-width: 420px) {
+    .difficulty-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* ========================================

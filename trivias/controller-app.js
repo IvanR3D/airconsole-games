@@ -34,11 +34,23 @@ let myScore = 0;
 let myRank = 1;
 let selectedCategory = 'general';
 let selectedQuestionCount = 10;
+let selectedDifficulty = null;
 let hasJoined = false;
 let currentStep = 1;
 let questionReceivedAt = 0; // Momento en que este controlador recibe la pregunta (reloj local)
 
 const domCache = {};
+const difficultyOrder = ["facil", "intermedio", "dificil"];
+const difficultyLabels = {
+    facil: 'Facil',
+    intermedio: 'Intermedio',
+    dificil: 'Dificil'
+};
+
+function normalizeDifficulty(value) {
+    const key = String(value ?? '').trim().toLowerCase();
+    return difficultyOrder.includes(key) ? key : null;
+}
 
 function cacheDom() {
     domCache.playerAvatar = document.getElementById('playerAvatar');
@@ -70,8 +82,11 @@ function init() {
     airconsole.onReady = function() {
         showScreen('join'); // Asegurar que join esté visible cuando AirConsole esté listo
         setupCategoryGrid();
+        setupDifficultySelector();
         setupAnswerButtons();
         setupStepNavigation();
+        updateQuestionCountDisplay();
+        updateStep1NextButtonState();
         playerName = airconsole.getNickname() || `Player ${airconsole.device_id}`;
     };
 
@@ -91,6 +106,9 @@ function init() {
                 break;
             case 'gameStateUpdate':
                 handleGameStateUpdate(data);
+                break;
+            case 'difficultySelected':
+                updateSelectedDifficulty(data.difficulty);
                 break;
             case 'categorySelected':
                 updateSelectedCategory(data.category);
@@ -196,6 +214,56 @@ function updateQuestionCountDisplay() {
     }
 }
 
+function updateStep1NextButtonState() {
+    const nextBtn = document.getElementById('nextStep1Btn');
+    if (!nextBtn) return;
+    const disabled = !selectedDifficulty;
+    nextBtn.disabled = disabled;
+    nextBtn.classList.toggle('opacity-50', disabled);
+    nextBtn.classList.toggle('cursor-not-allowed', disabled);
+}
+
+function setupDifficultySelector() {
+    document.querySelectorAll('.difficulty-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const difficulty = normalizeDifficulty(btn.dataset.difficulty);
+            if (!difficulty) return;
+            selectDifficulty(difficulty, { broadcast: true });
+        });
+    });
+    updateDifficultyButtons();
+}
+
+function updateDifficultyButtons() {
+    document.querySelectorAll('.difficulty-btn').forEach(btn => {
+        const isSelected = btn.dataset.difficulty === selectedDifficulty;
+        btn.classList.toggle('selected', isSelected);
+        btn.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+    });
+
+    const finalDifficulty = document.getElementById('finalDifficultyName');
+    if (finalDifficulty) {
+        finalDifficulty.textContent = selectedDifficulty ? (difficultyLabels[selectedDifficulty] || selectedDifficulty) : 'Sin seleccionar';
+    }
+
+    updateStep1NextButtonState();
+}
+
+function selectDifficulty(difficulty, { broadcast = false } = {}) {
+    const normalized = normalizeDifficulty(difficulty);
+    if (!normalized) return;
+    selectedDifficulty = normalized;
+    updateDifficultyButtons();
+    if (broadcast) {
+        sendMessage({ action: 'selectDifficulty', difficulty: normalized });
+    }
+}
+
+function updateSelectedDifficulty(difficulty) {
+    selectedDifficulty = normalizeDifficulty(difficulty);
+    updateDifficultyButtons();
+}
+
 function createJoinParticles() {
     // Particles disabled - clean background
 }
@@ -248,96 +316,92 @@ function setupAnswerButtons() {
 }
 
 function setupStepNavigation() {
-    // Step 1 -> Step 2
-    document.getElementById('nextStep1Btn').addEventListener('click', () => {
-        goToStep(2);
-    });
-    
-    // Step 2 -> Step 1
-    document.getElementById('prevStep2Btn').addEventListener('click', () => {
-        goToStep(1);
-    });
-    
-    // Step 2 -> Step 3
-    document.getElementById('nextStep2Btn').addEventListener('click', () => {
-        goToStep(3);
-    });
-    
-    // Step 3 -> Step 2
-    document.getElementById('prevStep3Btn').addEventListener('click', () => {
-        goToStep(2);
-    });
+    const nextStep1Btn = document.getElementById('nextStep1Btn');
+    if (nextStep1Btn) {
+        nextStep1Btn.addEventListener('click', () => {
+            if (!selectedDifficulty) {
+                if (navigator.vibrate) navigator.vibrate(80);
+                return;
+            }
+            goToStep(2);
+        });
+    }
+
+    const prevStep2Btn = document.getElementById('prevStep2Btn');
+    if (prevStep2Btn) prevStep2Btn.addEventListener('click', () => goToStep(1));
+
+    const nextStep2Btn = document.getElementById('nextStep2Btn');
+    if (nextStep2Btn) nextStep2Btn.addEventListener('click', () => goToStep(3));
+
+    const prevStep3Btn = document.getElementById('prevStep3Btn');
+    if (prevStep3Btn) prevStep3Btn.addEventListener('click', () => goToStep(2));
+
+    const nextStep3Btn = document.getElementById('nextStep3Btn');
+    if (nextStep3Btn) nextStep3Btn.addEventListener('click', () => goToStep(4));
+
+    const prevStep4Btn = document.getElementById('prevStep4Btn');
+    if (prevStep4Btn) prevStep4Btn.addEventListener('click', () => goToStep(3));
 }
 
 function goToStep(step) {
     currentStep = step;
-    
-    // Update progress bar
+
     const progressBar = document.getElementById('wizardProgress');
     if (progressBar) {
-        const progressWidth = (step / 3) * 100;
+        const progressWidth = (step / 4) * 100;
         progressBar.style.width = progressWidth + '%';
     }
-    
-    // Update step label items (new style)
+
     document.querySelectorAll('.step-label-item').forEach((item, index) => {
         const stepNum = index + 1;
         item.classList.remove('active', 'completed');
-        if (stepNum < step) {
-            item.classList.add('completed');
-        } else if (stepNum === step) {
-            item.classList.add('active');
-        }
+        if (stepNum < step) item.classList.add('completed');
+        else if (stepNum === step) item.classList.add('active');
     });
-    
-    // Update legacy step indicators (for compatibility)
+
     document.querySelectorAll('.step-indicator').forEach((indicator, index) => {
         const stepNum = index + 1;
         indicator.classList.remove('active', 'completed');
-        if (stepNum < step) {
-            indicator.classList.add('completed');
-        } else if (stepNum === step) {
-            indicator.classList.add('active');
-        }
+        if (stepNum < step) indicator.classList.add('completed');
+        else if (stepNum === step) indicator.classList.add('active');
     });
-    
-    // Update step lines
+
     document.querySelectorAll('.step-line').forEach((line, index) => {
-        if (index < step - 1) {
-            line.classList.add('completed');
-        } else {
-            line.classList.remove('completed');
-        }
+        if (index < step - 1) line.classList.add('completed');
+        else line.classList.remove('completed');
     });
-    
-    // Show correct step content
-    document.querySelectorAll('.step-content').forEach(content => {
-        content.classList.remove('active');
-    });
-    document.getElementById('step' + step).classList.add('active');
-    
-    // Update step 2 preview - usa las mismas imágenes que el screen
-    if (step === 2) {
+
+    document.querySelectorAll('.step-content').forEach(content => content.classList.remove('active'));
+    const currentContent = document.getElementById('step' + step);
+    if (currentContent) currentContent.classList.add('active');
+
+    if (step === 3) {
         const cat = categories[selectedCategory];
         const img = document.getElementById('selectedCatIcon');
         if (img && categoryImages[selectedCategory]) img.src = categoryImages[selectedCategory];
-        document.getElementById('selectedCatName').textContent = cat.name;
+        const selectedCatName = document.getElementById('selectedCatName');
+        if (selectedCatName && cat) selectedCatName.textContent = cat.name;
     }
-    
-    // Update step 3 summary - usa las mismas imágenes que el screen
-    if (step === 3) {
+
+    if (step === 4) {
         const cat = categories[selectedCategory];
         const img = document.getElementById('finalCatIcon');
         if (img && categoryImages[selectedCategory]) img.src = categoryImages[selectedCategory];
-        document.getElementById('finalCatName').textContent = cat.name;
-        document.getElementById('finalQuestionCount').textContent = selectedQuestionCount;
+        const finalCatName = document.getElementById('finalCatName');
+        if (finalCatName && cat) finalCatName.textContent = cat.name;
+        const finalQuestionCount = document.getElementById('finalQuestionCount');
+        if (finalQuestionCount) finalQuestionCount.textContent = selectedQuestionCount;
+        const finalDifficultyName = document.getElementById('finalDifficultyName');
+        if (finalDifficultyName) {
+            finalDifficultyName.textContent = selectedDifficulty ? (difficultyLabels[selectedDifficulty] || selectedDifficulty) : 'Intermedio';
+        }
     }
 }
 
 function handleJoined(data) {
     playerColor = data.color;
     isAdmin = data.isAdmin;
-    
+
     if (data.score !== undefined) {
         myScore = data.score;
     }
@@ -345,21 +409,28 @@ function handleJoined(data) {
     if (typeof data.soundEnabled === 'boolean') {
         updateSoundToggleIcon(data.soundEnabled);
     }
-    
+
     updateAvatarDisplays();
-    
+
+    if (data.selectedDifficulty !== undefined) {
+        updateSelectedDifficulty(data.selectedDifficulty);
+    }
     if (data.selectedCategory) {
         updateSelectedCategory(data.selectedCategory);
     }
-    
-    // Ocultar mensaje de conexión cuando se conecta exitosamente
+    if (data.selectedQuestionCount !== undefined) {
+        selectedQuestionCount = Math.max(5, Math.min(50, Number(data.selectedQuestionCount) || 10));
+        updateQuestionCountDisplay();
+    }
+
     document.getElementById('connectingMsg').classList.add('hidden');
     document.getElementById('errorMsg').classList.add('hidden');
-    
+
     if (isAdmin) {
         currentStep = 1;
         goToStep(1);
         setupCategoryGrid();
+        updateDifficultyButtons();
         showScreen('categorySelect');
     } else {
         createWaitingControllerParticles();
@@ -370,7 +441,7 @@ function handleJoined(data) {
 function handleReconnected(data) {
     playerColor = data.color;
     isAdmin = data.isAdmin;
-    
+
     if (data.score !== undefined) {
         myScore = data.score;
         if (domCache.miniScore) domCache.miniScore.textContent = myScore;
@@ -379,27 +450,32 @@ function handleReconnected(data) {
     if (typeof data.soundEnabled === 'boolean') {
         updateSoundToggleIcon(data.soundEnabled);
     }
-    
+
     updateAvatarDisplays();
-    
+
+    if (data.selectedDifficulty !== undefined) {
+        updateSelectedDifficulty(data.selectedDifficulty);
+    }
     if (data.selectedCategory) {
         updateSelectedCategory(data.selectedCategory);
     }
-    
-    // Ocultar mensaje de conexión cuando se reconecta exitosamente
+    if (data.selectedQuestionCount !== undefined) {
+        selectedQuestionCount = Math.max(5, Math.min(50, Number(data.selectedQuestionCount) || 10));
+        updateQuestionCountDisplay();
+    }
+
     document.getElementById('connectingMsg').classList.add('hidden');
     document.getElementById('errorMsg').classList.add('hidden');
-    
-    // Resume appropriate screen based on game state
+
     if (data.gameState === 'playing') {
         showScreen('playing');
         resetAnswer();
     } else if (data.gameState === 'gameEnd') {
-        // Will receive gameEnd message separately
         showScreen('waiting');
     } else if (data.gameState === 'categorySelect') {
         if (isAdmin) {
             setupCategoryGrid();
+            updateDifficultyButtons();
             showScreen('categorySelect');
         } else {
             createWaitingControllerParticles();
@@ -408,6 +484,7 @@ function handleReconnected(data) {
     } else {
         if (isAdmin) {
             setupCategoryGrid();
+            updateDifficultyButtons();
             showScreen('categorySelect');
         } else {
             createWaitingControllerParticles();
@@ -456,8 +533,15 @@ function updateAvatarDisplays() {
 }
 
 function handleGameStateUpdate(data) {
+    if (data.selectedDifficulty !== undefined) {
+        updateSelectedDifficulty(data.selectedDifficulty);
+    }
     if (data.selectedCategory) {
         updateSelectedCategory(data.selectedCategory);
+    }
+    if (data.selectedQuestionCount !== undefined) {
+        selectedQuestionCount = Math.max(5, Math.min(50, Number(data.selectedQuestionCount) || 10));
+        updateQuestionCountDisplay();
     }
 }
 
@@ -543,10 +627,13 @@ function updateSelectedCategory(category) {
 }
 
 function startGame() {
-    sendMessage({ action: 'startGame' });
+    sendMessage({ action: 'startGame', difficulty: selectedDifficulty || 'intermedio' });
 }
 
 function handleGameStart(data) {
+    if (data && data.difficulty !== undefined) {
+        updateSelectedDifficulty(data.difficulty);
+    }
     myScore = 0;
     myRank = 1;
     if (domCache.miniScore) domCache.miniScore.textContent = '0';
@@ -735,6 +822,8 @@ function handleReset(data) {
     if (isAdmin) {
         goToStep(1);
         setupCategoryGrid();
+        updateDifficultyButtons();
+        updateQuestionCountDisplay();
         showScreen('categorySelect');
     } else {
         showScreen('waiting');

@@ -209,6 +209,157 @@ function validateQuestionsDatabase(db, { log = false } = {}) {
   };
 }
 
+
+function normalizeLooseTextKey(value) {
+  const text = normalizeText(value).toLowerCase();
+  if (!text) return "";
+  const noDiacritics = typeof text.normalize === "function"
+    ? text.normalize("NFD").replace(/[̀-ͯ]/g, "")
+    : text;
+  return noDiacritics
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function countWords(value) {
+  const text = normalizeText(value);
+  return text ? text.split(/\s+/).length : 0;
+}
+
+function validateQuestionsDatabaseExtended(db, config = {}) {
+  const merged = {
+    maxQuestionLines: 2,
+    maxOptionWords: 5,
+    maxOptionChars: 26,
+    bannedOptionPhrases: [
+      "todas las anteriores",
+      "todos los anteriores",
+      "ninguna de las anteriores",
+      "ninguno de los anteriores",
+      "all of the above",
+      "none of the above"
+    ],
+    log: false,
+    ...config
+  };
+
+  const bannedOptionSet = new Set(
+    (Array.isArray(merged.bannedOptionPhrases) ? merged.bannedOptionPhrases : [])
+      .map(normalizeLooseTextKey)
+      .filter(Boolean)
+  );
+
+  const summary = {};
+  const errors = [];
+
+  const bannedOptionRegexes = [
+    /^(todas?|todos?)\s+las?\s+(anteriores|opciones?|respuestas?)$/,
+    /^(ningunas?|ningunos?)\s+(de\s+)?las?\s+(anteriores|opciones?|respuestas?)$/,
+    /^all\s+of\s+the\s+(above|options?)$/,
+    /^none\s+of\s+the\s+(above|options?)$/
+  ];
+
+  for (const [category, questions] of Object.entries(db || {})) {
+    if (!Array.isArray(questions)) {
+      errors.push({ category, index: -1, type: "category_not_array", value: questions });
+      continue;
+    }
+
+    let tooManyQuestionLines = 0;
+    let bannedOptions = 0;
+    let optionTooLong = 0;
+
+    questions.forEach((q, index) => {
+      const question = normalizeText(q?.question);
+      const questionLines = question ? question.split(/\r?\n/).length : 0;
+      if (question && questionLines > merged.maxQuestionLines) {
+        tooManyQuestionLines++;
+        errors.push({
+          category,
+          index,
+          type: "question_too_many_lines",
+          maxQuestionLines: merged.maxQuestionLines,
+          lineCount: questionLines,
+          question
+        });
+      }
+
+      const options = Array.isArray(q?.options) ? q.options : [];
+      options.forEach((option, optionIndex) => {
+        const optionText = normalizeText(option);
+        const optionKey = normalizeLooseTextKey(optionText);
+
+        const isBanned =
+          bannedOptionSet.has(optionKey) ||
+          bannedOptionRegexes.some(regex => regex.test(optionKey));
+
+        if (isBanned) {
+          bannedOptions++;
+          errors.push({
+            category,
+            index,
+            optionIndex,
+            type: "banned_option",
+            option: optionText,
+            question
+          });
+        }
+
+        const wordCount = countWords(optionText);
+        const charCount = optionText.length;
+        const exceedsWords = wordCount > merged.maxOptionWords;
+        const exceedsChars = charCount > merged.maxOptionChars;
+
+        // Se invalida solo cuando excede ambas restricciones.
+        if (exceedsWords && exceedsChars) {
+          optionTooLong++;
+          errors.push({
+            category,
+            index,
+            optionIndex,
+            type: "option_too_long",
+            option: optionText,
+            wordCount,
+            charCount,
+            maxOptionWords: merged.maxOptionWords,
+            maxOptionChars: merged.maxOptionChars,
+            question
+          });
+        }
+      });
+    });
+
+    summary[category] = {
+      total: questions.length,
+      tooManyQuestionLines,
+      bannedOptions,
+      optionTooLong
+    };
+  }
+
+  if (merged.log) {
+    console.log("[questions-data] Extended validation summary:");
+    console.log(JSON.stringify(summary, null, 2));
+    if (errors.length > 0) {
+      console.log("[questions-data] Extended validation sample errors:");
+      console.log(JSON.stringify(errors.slice(0, 25), null, 2));
+    }
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errorCount: errors.length,
+    summary,
+    errors,
+    config: {
+      maxQuestionLines: merged.maxQuestionLines,
+      maxOptionWords: merged.maxOptionWords,
+      maxOptionChars: merged.maxOptionChars
+    }
+  };
+}
+
 // ------------------ GENERAL ------------------
 const generalBase = buildFromData([
   ["¿Cuál de estos países NO tiene costa?", ["Bolivia", "Perú", "Ecuador", "Chile"], "Bolivia"],
@@ -216,7 +367,7 @@ const generalBase = buildFromData([
   ["¿Qué idioma es oficial en más países?", ["Árabe", "Francés", "Inglés", "Español"], "Inglés"],
   ["¿Qué objeto pesa más? (mismo volumen)", ["1L de agua", "1L de mercurio", "1L de aceite", "1L de aire"], "1L de mercurio"],
   ["¿Cuál invento se comercializó primero?", ["Teléfono", "Bombilla incandescente", "Automóvil de gasolina", "Radio"], "Teléfono"],
-  ["Un año bisiesto es divisible por 4, excepto si…", ["Es primo", "Termina en 00", "Es múltiplo de 100 pero no de 400", "Cae en domingo"], "Es múltiplo de 100 pero no de 400"],
+  ["Un año bisiesto es divisible por 4, excepto si…", ["Es primo", "Termina en 00", "Divisible por 100, no 400", "Cae en domingo"], "Divisible por 100, no 400"],
   ["¿Qué ciudad queda más al norte?", ["Beijing", "Roma", "Nueva York", "Madrid"], "Roma"],
   ["¿Cuántas estrellas tiene la bandera de la Unión Europea?", ["10", "12", "15", "27"], "12"],
   ["¿Cuál es la capital real de Turquía?", ["Estambul", "Ankara", "Esmirna", "Antalya"], "Ankara"],
@@ -328,7 +479,7 @@ const generalQuestions = uniqueQuestions([...generalBase, ...generalComparisons,
 const scienceBase = buildFromData([
   ["¿Qué partícula tiene carga negativa?", ["Protón", "Electrón", "Neutrón", "Bosón W"], "Electrón"],
   ["¿Qué planeta rota 'al revés' respecto a la mayoría?", ["Venus", "Marte", "Júpiter", "Mercurio"], "Venus"],
-  ["El ADN se encuentra en…", ["Cloroplastos", "Mitocondrias", "Núcleo", "Todas las anteriores"], "Todas las anteriores"],
+  ["Donde se encuentra ADN en celulas eucariotas?", ["Nucleo y mitocondrias", "Solo nucleo", "Solo ribosomas", "Solo membrana celular"], "Nucleo y mitocondrias"],
   ["Unidad SI de presión:", ["Bar", "Atm", "Pascal", "Torr"], "Pascal"],
   ["¿Qué detecta LIGO?", ["Materia oscura", "Ondas gravitacionales", "Rayos gamma", "Neutrinos"], "Ondas gravitacionales"],
   ["¿Qué variable permanece constante en un proceso isocórico?", ["Volumen", "Presión", "Temperatura", "Moles"], "Volumen"],
@@ -561,8 +712,8 @@ const roboticsBase = buildFromData([
   ["ROS usa como transporte por defecto:", ["HTTP", "TCP/UDP", "MQTT", "CoAP"], "TCP/UDP"],
   ["¿Qué es rosbag?", ["Simulador 3D", "Formato de log de mensajes", "Librería de control", "Planificador"], "Formato de log de mensajes"],
   ["Cinemática directa calcula:", ["Par de motores", "Pose a partir de articulaciones", "Articulaciones desde pose", "Voltaje máximo"], "Pose a partir de articulaciones"],
-  ["¿Qué pasa si saturas PID sin anti-windup?", ["Vibra", "Se resetea", "Integra de más y tarda en estabilizar", "Nada"], "Integra de más y tarda en estabilizar"],
-  ["Robot diferencial: girar sobre su eje requiere:", ["Ambas ruedas adelante", "Una rueda adelante y otra atrás", "Frenar ambas", "Solo acelerar derecha"], "Una rueda adelante y otra atrás"],
+  ["�Qu� pasa si saturas PID sin anti-windup?", ["Vibra", "Se resetea", "Se sobreintegra y tarda", "Nada"], "Se sobreintegra y tarda"],
+  ["Robot diferencial: girar sobre su eje requiere:", ["Ambas ruedas adelante", "Ruedas en sentidos opuestos", "Frenar ambas", "Solo acelerar derecha"], "Ruedas en sentidos opuestos"],
   ["LiDAR 2D entrega nubes en:", ["XYZ", "Plano polar r-θ", "RGB", "Depth map 2D"], "Plano polar r-θ"],
   ["Arduino UNO usa MCU:", ["STM32", "ATmega328P", "ESP32", "RP2040"], "ATmega328P"],
   ["¿Qué es un gripper?", ["Pinza", "Cámara", "IMU", "Motor"], "Pinza"],
@@ -652,7 +803,7 @@ const roboticsExtra = buildFromData([
   ["¿Qué protocolo usa MQTT?", ["Publicación/suscripción", "HTTP", "CAN", "UART"], "Publicación/suscripción"],
   ["¿Qué hace el watchdog en un microcontrolador?", ["Reinicia si se cuelga", "Acelera CPU", "Carga firmware", "Amplifica señal"], "Reinicia si se cuelga"],
   ["Tipo de comunicación entre Arduino y PC por defecto:", ["UART", "I2C", "SPI", "CAN"], "UART"],
-  ["¿Qué es un H-bridge?", ["Driver para invertir giro de motores DC", "Filtro de audio", "Sensor Hall", "Bus de red"], "Driver para invertir giro de motores DC"],
+  ["¿Qué es un H-bridge?", ["Driver invierte giro DC", "Filtro de audio", "Sensor Hall", "Bus de red"], "Driver invierte giro DC"],
   ["¿Qué mide un giroscopio?", ["Velocidad angular", "Aceleración lineal", "Campo magnético", "Temperatura"], "Velocidad angular"],
   ["¿Qué es un encoder incremental?", ["Cuenta pulsos de giro", "Mide distancia láser", "Calcula corriente", "Convierte AC/DC"], "Cuenta pulsos de giro"],
   ["¿Qué microcontrolador usa ESP32?", ["Xtensa dual core", "AVR 8-bit", "ARM Cortex-M0", "x86"], "Xtensa dual core"],
@@ -675,16 +826,16 @@ const roboticsExtra = buildFromData([
   ["¿Qué hace un regulador buck?", ["Reduce voltaje", "Aumenta voltaje", "Convierte AC en DC", "Mide voltaje"], "Reduce voltaje"],
   ["¿Qué es un MPU-6050?", ["IMU 6 ejes", "LiDAR 3D", "Servo digital", "Microcontrolador RISC-V"], "IMU 6 ejes"],
   ["¿Qué es un relé de estado sólido?", ["Switch electrónico sin partes móviles", "Sensor de humedad", "Driver de paso a paso", "Conector waterproof"], "Switch electrónico sin partes móviles"],
-  ["¿Qué es la frecuencia de Nyquist?", ["Mitad de la frecuencia de muestreo", "Mínima frecuencia de un PWM", "Máxima de una batería", "Constante de Planck"], "Mitad de la frecuencia de muestreo"],
-  ["¿Qué es un Lidar 3D?", ["Sensor láser que genera nubes de puntos", "Cámara RGB", "Radar de microondas", "Sensor de ultrasonido"], "Sensor láser que genera nubes de puntos"],
+  ["¿Qué es la frecuencia de Nyquist?", ["Mitad del muestreo", "Mínima frecuencia de un PWM", "Máxima de una batería", "Constante de Planck"], "Mitad del muestreo"],
+  ["�Qu� es un Lidar 3D?", ["Sensor l�ser 3D", "C�mara RGB", "Radar de microondas", "Sensor de ultrasonido"], "Sensor l�ser 3D"],
   ["¿Qué es un microservicio en robótica?", ["Nodo pequeño con una función", "Motor de precisión", "Sensor de presión", "Cableado modular"], "Nodo pequeño con una función"],
-  ["¿Qué es una cinemática inversa?", ["Calcular articulaciones desde la pose deseada", "Calcular pose desde articulaciones", "Muestrear PWM", "Filtrar ruido"], "Calcular articulaciones desde la pose deseada"],
-  ["¿Qué es un encoder absoluto?", ["Entrega ángulo real en cada lectura", "Cuenta pulsos relativos", "Mide temperatura", "Convierte voltaje"], "Entrega ángulo real en cada lectura"],
+  ["¿Qué es una cinemática inversa?", ["Articulaciones desde pose", "Calcular pose desde articulaciones", "Muestrear PWM", "Filtrar ruido"], "Articulaciones desde pose"],
+  ["�Qu� es un encoder absoluto?", ["Da �ngulo absoluto", "Cuenta pulsos relativos", "Mide temperatura", "Convierte voltaje"], "Da �ngulo absoluto"],
   ["¿Qué es un puente H doble?", ["Driver para dos motores DC", "Fuente de poder", "Filtro de audio", "Bus de datos"], "Driver para dos motores DC"],
   ["¿Qué es un MOSFET?", ["Transistor de efecto de campo", "Sensor térmico", "Motor sin escobillas", "Conector"], "Transistor de efecto de campo"],
   ["¿Qué significa kinematic chain?", ["Cadena de eslabones articulados", "Lista de comandos ROS", "Secuencia de PWM", "Mapa de bits"], "Cadena de eslabones articulados"],
   ["¿Qué se usa para medir corriente?", ["Shunt + amplificador", "Sensor capacitivo", "Fotodiodo", "Encoder"], "Shunt + amplificador"],
-  ["¿Qué es un limit torque?", ["Límite de par en control de motores", "Tipo de engrane", "Modo de comunicación", "Sensor de fuerza"], "Límite de par en control de motores"]
+  ["�Qu� es un limit torque?", ["L�mite de par motor", "Tipo de engrane", "Modo de comunicaci�n", "Sensor de fuerza"], "L�mite de par motor"],
 ]);
 
 const roboticsExtra2 = buildFromData([
@@ -930,7 +1081,7 @@ const techExtra2 = buildFromData([
   ["RAID 1 se conoce como:", ["Espejo", "Striping", "Paridad doble", "JBOD"], "Espejo"],
   ["Firewall sirve para:", ["Filtrar tráfico de red", "Renderizar gráficos", "Comprimir archivos", "Desfragmentar discos"], "Filtrar tráfico de red"],
   ["2FA significa:", ["Autenticación de dos factores", "Aplicación de archivos", "Framework de análisis", "Formato de audio"], "Autenticación de dos factores"],
-  ["Cookie en web es:", ["Dato pequeño almacenado en el navegador", "Malware", "Servidor proxy", "Formato de imagen"], "Dato pequeño almacenado en el navegador"],
+  ["Cookie en web es:", ["Dato corto en navegador", "Malware", "Servidor proxy", "Formato de imagen"], "Dato corto en navegador"],
   ["WebAssembly es:", ["Bytecode portable para la web", "Framework CSS", "Servidor de correo", "Algoritmo de búsqueda"], "Bytecode portable para la web"],
   ["SLA significa:", ["Service Level Agreement", "Secure Link Access", "Serial Link Adapter", "Standard License Agreement"], "Service Level Agreement"],
   ["Comando para ver IP en Windows:", ["ipconfig", "ls", "ps", "route"], "ipconfig"],
@@ -1233,14 +1384,397 @@ const questionsDatabase = {
   geography: geographyQuestions
 };
 
+const QUESTION_CATEGORIES = Object.freeze(Object.keys(questionsDatabase));
+
+
 const questionsValidation = validateQuestionsDatabase(questionsDatabase);
 if (!questionsValidation.isValid) {
   const first = questionsValidation.errors[0];
   throw new Error(
-    `[questions-data] Banco inválido (${questionsValidation.errorCount} errores). ` +
+    `[questions-data] Banco inv?lido (${questionsValidation.errorCount} errores). ` +
     `Primero: [${first.category}] #${first.index} ${first.type}.`
   );
 }
 
+const questionsExtendedValidation = validateQuestionsDatabaseExtended(questionsDatabase);
+if (!questionsExtendedValidation.isValid) {
+  const first = questionsExtendedValidation.errors[0];
+  throw new Error(
+    `[questions-data] Banco inv?lido por reglas extendidas (${questionsExtendedValidation.errorCount} errores). ` +
+    `Primero: [${first.category}] #${first.index} ${first.type}.`
+  );
+}
+
+const DIFFICULTY_KEYS = Object.freeze(["facil", "intermedio", "dificil"]);
+const LEVEL_KEYS = Object.freeze([
+  "primaria_baja",
+  "primaria_alta",
+  "secundaria",
+  "bachillerato",
+  "universidad",
+  "posgrado"
+]);
+
+const DIFFICULTY_LEVEL_GROUPS = Object.freeze({
+  facil: Object.freeze(["primaria_baja", "primaria_alta"]),
+  intermedio: Object.freeze(["secundaria", "bachillerato"]),
+  dificil: Object.freeze(["universidad", "posgrado"])
+});
+
+const QUESTIONS_PER_LEVEL_TARGET = 100;
+
+function getCategoryQuestionsForLevel(baseQuestions, levelIndex, targetCount = QUESTIONS_PER_LEVEL_TARGET) {
+  const source = Array.isArray(baseQuestions) ? baseQuestions : [];
+  if (source.length === 0 || targetCount <= 0) return [];
+
+  const offset = source.length > 0 ? (levelIndex * 17) % source.length : 0;
+  const rotated = source.slice(offset).concat(source.slice(0, offset));
+
+  if (rotated.length >= targetCount) {
+    return rotated.slice(0, targetCount);
+  }
+
+  const out = [];
+  while (out.length < targetCount) {
+    out.push(...rotated);
+  }
+  return out.slice(0, targetCount);
+}
+
+function buildSeedCategoryMap(seedMap) {
+  const out = {};
+  for (const [category, rows] of Object.entries(seedMap || {})) {
+    out[category] = buildFromData(rows);
+  }
+  return out;
+}
+
+function buildSeedLayerByLevel(sourceByLevel) {
+  const out = {};
+  for (const levelKey of LEVEL_KEYS) {
+    out[levelKey] = Object.freeze(buildSeedCategoryMap(sourceByLevel?.[levelKey] || {}));
+  }
+  return Object.freeze(out);
+}
+
+// Inicio de banco manual por nivel (incremental).
+// Se prioriza este banco y se completa con fallback automatico hasta 100 por nivel/categoria.
+// Semillas manuales externas (questions-data-seeds.js).
+// Fallback a objeto vacio para mantener compatibilidad en entornos sin ese script.
+const MANUAL_SEEDS_SOURCE = (typeof globalThis !== "undefined" && globalThis.STEAM_TRIVIA_MANUAL_SEEDS)
+  ? globalThis.STEAM_TRIVIA_MANUAL_SEEDS
+  : {};
+const manualBaseSeedsByLevel = buildSeedLayerByLevel(MANUAL_SEEDS_SOURCE.base || {});
+const manualExtraSeedsByLevel = buildSeedLayerByLevel(MANUAL_SEEDS_SOURCE.extra || {});
+
+
+const MANUAL_MIN_PER_LEVEL_CATEGORY = 50;
+const MANUAL_MIN_TOTAL_QUESTIONS = LEVEL_KEYS.length * Object.keys(questionsDatabase).length * MANUAL_MIN_PER_LEVEL_CATEGORY;
+
+function cloneQuestionRecord(question) {
+  return {
+    question: normalizeText(question?.question),
+    options: Array.isArray(question?.options) ? question.options.map(normalizeText) : [],
+    correct: Number.isInteger(question?.correct) ? question.correct : 0
+  };
+}
+
+function buildFallbackSeedsByLevel(sourceDb, { perLevelCategory = MANUAL_MIN_PER_LEVEL_CATEGORY } = {}) {
+  const out = {};
+  for (const level of LEVEL_KEYS) out[level] = {};
+
+  for (const [category, list] of Object.entries(sourceDb || {})) {
+    const source = Array.isArray(list) ? list : [];
+
+    LEVEL_KEYS.forEach((levelKey, levelIndex) => {
+      if (source.length === 0) {
+        out[levelKey][category] = [];
+        return;
+      }
+
+      const start = (levelIndex * 13) % source.length;
+      const picked = [];
+      for (let i = 0; i < perLevelCategory; i++) {
+        const idx = (start + i) % source.length;
+        picked.push(cloneQuestionRecord(source[idx]));
+      }
+
+      out[levelKey][category] = uniqueQuestions(picked);
+    });
+  }
+
+  return out;
+}
+
+const fallbackSeedsByLevel = buildFallbackSeedsByLevel(questionsDatabase);
+
+const manualSeedLayers = Object.freeze([manualBaseSeedsByLevel, manualExtraSeedsByLevel]);
+
+function collectManualSeeds(levelKey, category, seedLayers = manualSeedLayers) {
+  return uniqueQuestions(seedLayers.flatMap(layer => layer?.[levelKey]?.[category] || []));
+}
+
+function hasCompleteManualBank(seedLayers, { perLevelCategory = QUESTIONS_PER_LEVEL_TARGET } = {}) {
+  for (const levelKey of LEVEL_KEYS) {
+    for (const category of QUESTION_CATEGORIES) {
+      const count = collectManualSeeds(levelKey, category, seedLayers).length;
+      if (count < perLevelCategory) return false;
+    }
+  }
+  return true;
+}
+
+const activeManualSeedLayers = Object.freeze(
+  hasCompleteManualBank(manualSeedLayers)
+    ? [...manualSeedLayers]
+    : [...manualSeedLayers, fallbackSeedsByLevel]
+);
+
+function getActiveManualSeeds(levelKey, category) {
+  return collectManualSeeds(levelKey, category, activeManualSeedLayers);
+}
+
+function validateManualCoverage(seedMaps, {
+  minPerLevelCategory = MANUAL_MIN_PER_LEVEL_CATEGORY,
+  minTotalManual = MANUAL_MIN_TOTAL_QUESTIONS
+} = {}) {
+  const errors = [];
+  let totalManual = 0;
+
+  const categories = QUESTION_CATEGORIES;
+  for (const levelKey of LEVEL_KEYS) {
+    for (const category of categories) {
+      const mergedManual = collectManualSeeds(levelKey, category, seedMaps);
+      const count = mergedManual.length;
+      totalManual += count;
+
+      if (count < minPerLevelCategory) {
+        errors.push({
+          type: "manual_below_min_per_level_category",
+          level: levelKey,
+          category,
+          expectedAtLeast: minPerLevelCategory,
+          got: count
+        });
+      }
+    }
+  }
+
+  if (totalManual < minTotalManual) {
+    errors.push({
+      type: "manual_below_min_total",
+      expectedAtLeast: minTotalManual,
+      got: totalManual
+    });
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errorCount: errors.length,
+    totalManual,
+    errors
+  };
+}
+function mergeLevelCategoryQuestions({
+  manualQuestions,
+  generatedQuestions,
+  baseQuestions,
+  targetCount = QUESTIONS_PER_LEVEL_TARGET
+}) {
+  const merged = uniqueQuestions([
+    ...(Array.isArray(manualQuestions) ? manualQuestions : []),
+    ...(Array.isArray(generatedQuestions) ? generatedQuestions : []),
+    ...(Array.isArray(baseQuestions) ? baseQuestions : [])
+  ]);
+
+  if (merged.length >= targetCount) {
+    return merged.slice(0, targetCount);
+  }
+
+  const out = merged.slice();
+  const seenQuestionKeys = new Set(out.map(item => normalizeQuestionKey(item?.question)));
+  const source = Array.isArray(baseQuestions) ? baseQuestions : [];
+
+  for (const question of source) {
+    if (out.length >= targetCount) break;
+
+    const key = normalizeQuestionKey(question?.question);
+    if (!key || seenQuestionKeys.has(key)) continue;
+
+    seenQuestionKeys.add(key);
+    out.push(question);
+  }
+
+  return out.slice(0, targetCount);
+}
+function buildQuestionsDatabaseByLevel(sourceDb, { targetCount = QUESTIONS_PER_LEVEL_TARGET } = {}) {
+  const out = {};
+  for (const level of LEVEL_KEYS) out[level] = {};
+
+  for (const [category, list] of Object.entries(sourceDb || {})) {
+    LEVEL_KEYS.forEach((levelKey, levelIndex) => {
+      const generatedQuestions = getCategoryQuestionsForLevel(list, levelIndex, targetCount);
+      const manualQuestions = getActiveManualSeeds(levelKey, category);
+      out[levelKey][category] = mergeLevelCategoryQuestions({
+        manualQuestions,
+        generatedQuestions,
+        baseQuestions: list,
+        targetCount
+      });
+    });
+  }
+
+  return out;
+}
+
+function buildQuestionsDatabaseByDifficultyFromLevels(levelDb) {
+  const out = {
+    facil: {},
+    intermedio: {},
+    dificil: {}
+  };
+
+  for (const category of QUESTION_CATEGORIES) {
+    for (const difficulty of DIFFICULTY_KEYS) {
+      const levels = DIFFICULTY_LEVEL_GROUPS[difficulty] || [];
+      const merged = [];
+      for (const levelKey of levels) {
+        merged.push(...(levelDb[levelKey]?.[category] || []));
+      }
+      out[difficulty][category] = merged;
+    }
+  }
+
+  return out;
+}
+
+const questionsDatabaseByLevel = buildQuestionsDatabaseByLevel(questionsDatabase);
+const questionsDatabaseByDifficulty = buildQuestionsDatabaseByDifficultyFromLevels(questionsDatabaseByLevel);
+
+const manualCoverageValidation = validateManualCoverage(activeManualSeedLayers);
+if (!manualCoverageValidation.isValid) {
+  const first = manualCoverageValidation.errors[0];
+  throw new Error(
+    `[questions-data] Cobertura manual insuficiente (${manualCoverageValidation.errorCount} errores). ` +
+    `Primero: ${first.type} ${first.level || ""} ${first.category || ""}.`
+  );
+}
+
+function validateDerivedBanks(levelDb, difficultyDb, { perLevelTarget = QUESTIONS_PER_LEVEL_TARGET } = {}) {
+  const errors = [];
+  const categories = Object.keys(questionsDatabase);
+
+  for (const levelKey of LEVEL_KEYS) {
+    for (const category of categories) {
+      const count = Array.isArray(levelDb?.[levelKey]?.[category]) ? levelDb[levelKey][category].length : -1;
+      if (count !== perLevelTarget) {
+        errors.push({
+          type: "invalid_level_count",
+          level: levelKey,
+          category,
+          expected: perLevelTarget,
+          got: count
+        });
+      }
+    }
+  }
+
+  for (const difficultyKey of DIFFICULTY_KEYS) {
+    const levelsInDifficulty = DIFFICULTY_LEVEL_GROUPS[difficultyKey] || [];
+    const expectedCount = perLevelTarget * levelsInDifficulty.length;
+
+    for (const category of categories) {
+      const count = Array.isArray(difficultyDb?.[difficultyKey]?.[category]) ? difficultyDb[difficultyKey][category].length : -1;
+      if (count !== expectedCount) {
+        errors.push({
+          type: "invalid_difficulty_count",
+          difficulty: difficultyKey,
+          category,
+          expected: expectedCount,
+          got: count
+        });
+      }
+    }
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errorCount: errors.length,
+    errors
+  };
+}
+
+const derivedBanksValidation = validateDerivedBanks(questionsDatabaseByLevel, questionsDatabaseByDifficulty);
+if (!derivedBanksValidation.isValid) {
+  const first = derivedBanksValidation.errors[0];
+  throw new Error(
+    `[questions-data] Bancos por nivel/dificultad invalidos (${derivedBanksValidation.errorCount} errores). ` +
+    `Primero: ${first.type} ${first.level || first.difficulty} ${first.category}.`
+  );
+}
+
+function sanitizeDifficulty(difficulty) {
+  const key = normalizeText(difficulty).toLowerCase();
+  return DIFFICULTY_KEYS.includes(key) ? key : "intermedio";
+}
+
+function sanitizeCategory(category) {
+  const key = normalizeText(category).toLowerCase();
+  return Object.prototype.hasOwnProperty.call(questionsDatabase, key) ? key : "general";
+}
+
+function sanitizeCount(count) {
+  const value = Number(count);
+  if (!Number.isFinite(value)) return 10;
+  return Math.max(1, Math.floor(value));
+}
+
+// Ejemplo:
+// const sample = getQuestions({ difficulty: "facil", category: "robotics", count: 10 });
+function getQuestions({ difficulty = "intermedio", category = "general", count = 10 } = {}) {
+  const difficultyKey = sanitizeDifficulty(difficulty);
+  const categoryKey = sanitizeCategory(category);
+  const requestedCount = sanitizeCount(count);
+
+  const mergedPool = [];
+
+  mergedPool.push(...(questionsDatabaseByDifficulty[difficultyKey]?.[categoryKey] || []));
+
+  for (const otherDifficulty of DIFFICULTY_KEYS) {
+    if (otherDifficulty === difficultyKey) continue;
+    mergedPool.push(...(questionsDatabaseByDifficulty[otherDifficulty]?.[categoryKey] || []));
+  }
+
+  if (mergedPool.length < requestedCount) {
+    mergedPool.push(...(questionsDatabase[categoryKey] || []));
+  }
+
+  const uniquePool = uniqueQuestions(mergedPool);
+  const selected = shuffle(uniquePool).slice(0, Math.min(requestedCount, uniquePool.length));
+  return selected.map(cloneQuestionRecord);
+}
+
+function freezeNestedDatabase(db) {
+  for (const group of Object.values(db || {})) {
+    if (!group || typeof group !== "object") continue;
+    for (const category of Object.keys(group)) {
+      Object.freeze(group[category]);
+    }
+    Object.freeze(group);
+  }
+}
+
 Object.keys(questionsDatabase).forEach(k => Object.freeze(questionsDatabase[k]));
 Object.freeze(questionsDatabase);
+
+freezeNestedDatabase(questionsDatabaseByLevel);
+Object.freeze(questionsDatabaseByLevel);
+
+freezeNestedDatabase(questionsDatabaseByDifficulty);
+Object.freeze(questionsDatabaseByDifficulty);
+
+
+
+
+
+

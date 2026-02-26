@@ -152,31 +152,48 @@
 
                 <!-- Progress Bar -->
                 <div class="w-full h-1.5 rounded-full mb-2 overflow-hidden flex-shrink-0 chalk-progress" style="background: rgba(255,255,255,0.2);">
-                    <div id="wizardProgress" class="h-full bg-steam-turquesa transition-all duration-300" style="width: 33.33%"></div>
+                    <div id="wizardProgress" class="h-full bg-steam-turquesa transition-all duration-300" style="width: 25%"></div>
                 </div>
 
-                <!-- Step Labels -->
+                                <!-- Step Labels -->
                 <div class="flex items-center justify-between mb-2 flex-shrink-0">
                     <div class="step-label-item active" data-step="1">
                         <span class="step-dot"></span>
-                        <span class="step-text chalk-body chalk-step-text">Categoría</span>
+                        <span class="step-text chalk-body chalk-step-text">Dificultad</span>
                     </div>
                     <div class="step-label-item" data-step="2">
                         <span class="step-dot"></span>
-                        <span class="step-text chalk-body chalk-step-text">Preguntas</span>
+                        <span class="step-text chalk-body chalk-step-text">Categor?a</span>
                     </div>
                     <div class="step-label-item" data-step="3">
+                        <span class="step-dot"></span>
+                        <span class="step-text chalk-body chalk-step-text">Preguntas</span>
+                    </div>
+                    <div class="step-label-item" data-step="4">
                         <span class="step-dot"></span>
                         <span class="step-text chalk-body chalk-step-text">Iniciar</span>
                     </div>
                 </div>
 
-                <!-- STEP 1: Category Selection -->
+                <!-- STEP 1: Difficulty Selection -->
                 <div class="step-content active" id="step1">
-                    <h2 class="chalk-title text-sm sm:text-base font-black text-center mb-1.5 flex-shrink-0 text-steam-turquesa">Elige una Categoría</h2>
-                    <div id="categoryScrollContainer" class="min-h-0">
-                        <div id="categoryGrid"></div>
+                    <h2 class="chalk-title text-sm sm:text-base font-black text-center mb-2 flex-shrink-0 text-steam-turquesa">Elige una dificultad</h2>
+
+                    <div id="difficultyGrid" class="difficulty-grid mb-4">
+                        <button type="button" class="difficulty-btn chalk-box" data-difficulty="facil" aria-pressed="false">
+                            <span class="difficulty-title">F?cil</span>
+                            <span class="difficulty-sub">Niveles 1-2</span>
+                        </button>
+                        <button type="button" class="difficulty-btn chalk-box" data-difficulty="intermedio" aria-pressed="false">
+                            <span class="difficulty-title">Intermedio</span>
+                            <span class="difficulty-sub">Niveles 3-4</span>
+                        </button>
+                        <button type="button" class="difficulty-btn chalk-box" data-difficulty="dificil" aria-pressed="false">
+                            <span class="difficulty-title">Dif?cil</span>
+                            <span class="difficulty-sub">Nivel 5+</span>
+                        </button>
                     </div>
+
                     <div class="pt-2 pb-5 sm:pb-6 flex-shrink-0">
                         <button class="text-white py-3 px-4 text-sm font-black rounded-full w-full shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2 chalk-btn" style="background: rgba(5,149,174,0.85); border: 2px solid #0595AE;" id="nextStep1Btn">
                             Siguiente
@@ -185,33 +202,16 @@
                     </div>
                 </div>
 
-                <!-- STEP 2: Question Count -->
+                <!-- STEP 2: Category Selection -->
                 <div class="step-content" id="step2">
-                    <h2 class="text-base font-black text-center mb-4 text-steam-turquesa">¿Cuántas Preguntas?</h2>
-                    
-                    <div class="rounded-xl p-4 mb-4 chalk-box" style="background: transparent; border: 2px solid rgba(255,255,255,0.5);">
-                        <div class="flex items-center justify-center gap-4 mb-3">
-                            <button class="w-12 h-12 rounded-full text-white font-bold text-xl flex items-center justify-center shadow-md active:scale-95 transition-transform chalk-btn" style="background: rgba(171,61,139,0.85); border: 2px solid #AB3D8B;" id="decreaseQuestions">-</button>
-                            <div class="rounded-lg px-6 py-3 min-w-[5rem] text-center chalk-box" style="background: transparent; border: 2px solid #0595AE;">
-                                <span class="text-3xl font-black text-steam-turquesa" id="questionCountValue">10</span>
-                            </div>
-                            <button class="w-12 h-12 rounded-full text-white font-bold text-xl flex items-center justify-center shadow-md active:scale-95 transition-transform chalk-btn" style="background: rgba(115,160,63,0.85); border: 2px solid #73A03F;" id="increaseQuestions">+</button>
-                        </div>
-                        <p class="text-center text-sm text-white/70">Mínimo 5 - Máximo 50</p>
+                    <h2 class="chalk-title text-sm sm:text-base font-black text-center mb-1.5 flex-shrink-0 text-steam-turquesa">Elige una categor?a</h2>
+                    <div id="categoryScrollContainer" class="min-h-0">
+                        <div id="categoryGrid"></div>
                     </div>
-
-                    <div class="rounded-lg p-3 mb-4 chalk-box flex items-center gap-3" style="background: transparent; border: 2px solid #0595AE;">
-                        <img id="selectedCatIcon" src="assets/images/globo.webp" alt="" class="w-10 h-10 object-contain flex-shrink-0">
-                        <div>
-                            <div class="text-sm text-white/70">Categoría</div>
-                            <div class="font-bold text-base text-steam-turquesa" id="selectedCatName">General</div>
-                        </div>
-                    </div>
-                    
-                    <div class="flex gap-3 mt-auto pb-5 sm:pb-6">
+                    <div class="pt-2 pb-5 sm:pb-6 flex-shrink-0 flex gap-3">
                         <button class="flex-1 py-3 px-4 text-sm font-bold rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2 chalk-btn-outline" style="background: transparent; border: 2px solid rgba(255,255,255,0.6); color: rgba(255,255,255,0.95);" id="prevStep2Btn">
                             <iconify-icon icon="mdi:arrow-left"></iconify-icon>
-                            Atrás
+                            Atr?s
                         </button>
                         <button class="flex-1 text-white py-3 px-4 text-sm font-black rounded-full shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2 chalk-btn" style="background: rgba(5,149,174,0.85); border: 2px solid #0595AE;" id="nextStep2Btn">
                             Siguiente
@@ -220,17 +220,56 @@
                     </div>
                 </div>
 
-                <!-- STEP 3: Ready to Start -->
+                <!-- STEP 3: Question Count -->
                 <div class="step-content" id="step3">
-                    <h2 class="text-base font-black text-center mb-4 text-steam-turquesa">¿Todo listo?</h2>
-                    
+                    <h2 class="text-base font-black text-center mb-4 text-steam-turquesa">?Cu?ntas preguntas?</h2>
+
+                    <div class="rounded-xl p-4 mb-4 chalk-box" style="background: transparent; border: 2px solid rgba(255,255,255,0.5);">
+                        <div class="flex items-center justify-center gap-4 mb-3">
+                            <button class="w-12 h-12 rounded-full text-white font-bold text-xl flex items-center justify-center shadow-md active:scale-95 transition-transform chalk-btn" style="background: rgba(171,61,139,0.85); border: 2px solid #AB3D8B;" id="decreaseQuestions">-</button>
+                            <div class="rounded-lg px-6 py-3 min-w-[5rem] text-center chalk-box" style="background: transparent; border: 2px solid #0595AE;">
+                                <span class="text-3xl font-black text-steam-turquesa" id="questionCountValue">10</span>
+                            </div>
+                            <button class="w-12 h-12 rounded-full text-white font-bold text-xl flex items-center justify-center shadow-md active:scale-95 transition-transform chalk-btn" style="background: rgba(115,160,63,0.85); border: 2px solid #73A03F;" id="increaseQuestions">+</button>
+                        </div>
+                        <p class="text-center text-sm text-white/70">M?nimo 5 - M?ximo 50</p>
+                    </div>
+
+                    <div class="rounded-lg p-3 mb-4 chalk-box flex items-center gap-3" style="background: transparent; border: 2px solid #0595AE;">
+                        <img id="selectedCatIcon" src="assets/images/globo.webp" alt="" class="w-10 h-10 object-contain flex-shrink-0">
+                        <div>
+                            <div class="text-sm text-white/70">Categor?a</div>
+                            <div class="font-bold text-base text-steam-turquesa" id="selectedCatName">General</div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 mt-auto pb-5 sm:pb-6">
+                        <button class="flex-1 py-3 px-4 text-sm font-bold rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2 chalk-btn-outline" style="background: transparent; border: 2px solid rgba(255,255,255,0.6); color: rgba(255,255,255,0.95);" id="prevStep3Btn">
+                            <iconify-icon icon="mdi:arrow-left"></iconify-icon>
+                            Atr?s
+                        </button>
+                        <button class="flex-1 text-white py-3 px-4 text-sm font-black rounded-full shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2 chalk-btn" style="background: rgba(5,149,174,0.85); border: 2px solid #0595AE;" id="nextStep3Btn">
+                            Siguiente
+                            <iconify-icon icon="mdi:arrow-right"></iconify-icon>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 4: Ready to Start -->
+                <div class="step-content" id="step4">
+                    <h2 class="text-base font-black text-center mb-4 text-steam-turquesa">?Todo listo?</h2>
+
                     <div class="rounded-xl p-3 sm:p-4 mb-4 chalk-box final-summary overflow-hidden" style="background: transparent; border: 2px solid #73A03F;">
                         <div class="flex flex-col items-center justify-center summary-icon">
                             <img id="finalCatIcon" src="assets/images/globo.webp" alt="" class="object-contain mx-auto">
                         </div>
                         <div class="summary-details summary-details-horizontal">
                             <div class="flex justify-between items-center rounded-lg p-3 chalk-box" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.3);">
-                                <span class="text-white/80 text-sm">Categoría</span>
+                                <span class="text-white/80 text-sm">Dificultad</span>
+                                <span class="font-bold text-steam-verde" id="finalDifficultyName">Sin seleccionar</span>
+                            </div>
+                            <div class="flex justify-between items-center rounded-lg p-3 chalk-box" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.3);">
+                                <span class="text-white/80 text-sm">Categor?a</span>
                                 <span class="font-bold text-steam-turquesa" id="finalCatName">General</span>
                             </div>
                             <div class="flex justify-between items-center rounded-lg p-3 chalk-box" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.3);">
@@ -239,12 +278,12 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="mt-auto pb-5 sm:pb-6 final-actions">
                         <div class="final-actions-row flex gap-3 mb-3">
-                            <button class="flex-1 py-3 px-4 text-sm font-bold rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2 chalk-btn-outline" style="background: transparent; border: 2px solid rgba(255,255,255,0.6); color: rgba(255,255,255,0.95);" id="prevStep3Btn">
+                            <button class="flex-1 py-3 px-4 text-sm font-bold rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2 chalk-btn-outline" style="background: transparent; border: 2px solid rgba(255,255,255,0.6); color: rgba(255,255,255,0.95);" id="prevStep4Btn">
                                 <iconify-icon icon="mdi:arrow-left"></iconify-icon>
-                                Atrás
+                                Atr?s
                             </button>
                             <button class="flex-1 py-3 px-4 text-sm font-bold rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2 chalk-btn" style="background: rgba(229,57,53,0.85); border: 2px solid #E53935; color: white;" id="exitSetupBtn">
                                 <iconify-icon icon="mdi:exit-to-app"></iconify-icon>
@@ -253,7 +292,7 @@
                         </div>
                         <button class="text-white py-4 px-4 text-base font-black rounded-full w-full shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2 btn-3d btn-verde chalk-btn" style="background: rgba(115,160,63,0.9); border: 2px solid #73A03F;" id="startGameBtn">
                             <iconify-icon icon="mdi:rocket-launch" class="text-xl"></iconify-icon>
-                            ¡INICIAR JUEGO!
+                            ?INICIAR JUEGO!
                         </button>
                     </div>
                 </div>

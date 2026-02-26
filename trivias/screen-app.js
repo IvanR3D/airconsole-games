@@ -26,8 +26,8 @@ const uiIcons = (typeof iconPaths !== 'undefined')
         soundOff: 'assets/images/sound-off.webp'
     };
 
-// Usar la base de datos de preguntas del archivo externo
-const questions = questionsDatabase;
+// Selector de preguntas provisto por questions-data.js: getQuestions({ difficulty, category, count })
+
 
 // Colores para jugadores (expandido para soportar más jugadores)
 const screenPlayerColors = (typeof playerColors !== 'undefined')
@@ -53,6 +53,13 @@ let questionStartTime = 0;
 let answers = {};
 let selectedCategory = 'general';
 let selectedQuestionCount = 10; // Cantidad de preguntas seleccionada (por defecto 10)
+let selectedDifficulty = null;
+
+const difficultyKeys = ["facil", "intermedio", "dificil"];
+function normalizeDifficulty(value) {
+    const key = String(value ?? '').trim().toLowerCase();
+    return difficultyKeys.includes(key) ? key : null;
+}
 let timer = null;
 let timeLeft = 20;
 let soundEnabled = true;
@@ -280,6 +287,8 @@ function init() {
                         isAdmin: existingPlayer.isAdmin,
                         gameState: gameState,
                         selectedCategory: selectedCategory,
+                        selectedDifficulty: selectedDifficulty,
+                        selectedQuestionCount: selectedQuestionCount,
                         score: existingPlayer.score,
                         soundEnabled: soundEnabled
                     });
@@ -295,6 +304,8 @@ function init() {
                         isAdmin: p.isAdmin,
                         gameState: gameState,
                         selectedCategory: selectedCategory,
+                        selectedDifficulty: selectedDifficulty,
+                        selectedQuestionCount: selectedQuestionCount,
                         soundEnabled: soundEnabled
                     });
                 }
@@ -345,6 +356,8 @@ function init() {
                         isAdmin: isAdmin,
                         gameState: gameState,
                         selectedCategory: selectedCategory,
+                        selectedDifficulty: selectedDifficulty,
+                        selectedQuestionCount: selectedQuestionCount,
                         soundEnabled: soundEnabled
                     });
                     
@@ -364,6 +377,13 @@ function init() {
                 }
             }
             
+        } else if (data.action === 'selectDifficulty' && deviceId === adminDeviceId) {
+            selectedDifficulty = normalizeDifficulty(data.difficulty);
+            if (airconsole) {
+                airconsole.broadcast({ action: 'difficultySelected', difficulty: selectedDifficulty });
+            }
+            broadcastGameState();
+
         } else if (data.action === 'selectCategory' && deviceId === adminDeviceId) {
             selectCategoryOnScreen(data.category);
             
@@ -374,8 +394,12 @@ function init() {
             if (countDisplay) {
                 countDisplay.textContent = data.count + ' preguntas';
             }
+            broadcastGameState();
             
         } else if (data.action === 'startGame' && deviceId === adminDeviceId) {
+            if (data.difficulty) {
+                selectedDifficulty = normalizeDifficulty(data.difficulty);
+            }
             startGame();
             
         } else if (data.action === 'answer' && gameState === 'playing') {
@@ -397,6 +421,8 @@ function broadcastGameState() {
         action: 'gameStateUpdate',
         gameState: gameState,
         selectedCategory: selectedCategory,
+                        selectedDifficulty: selectedDifficulty,
+                        selectedQuestionCount: selectedQuestionCount,
         players: players,
         adminId: adminDeviceId
     });
@@ -488,6 +514,7 @@ function selectCategoryOnScreen(key) {
     if (airconsole) {
         airconsole.broadcast({ action: 'categorySelected', category: key });
     }
+    broadcastGameState();
 }
 
 function setupCategories() {
@@ -724,32 +751,43 @@ function updatePlayersStatus() {
 function startGame() {
     gameState = 'playing';
     currentQuestion = 0;
-    
-    const categoryQuestions = questions[selectedCategory] || questions.general;
-    // Usar la cantidad de preguntas seleccionada, limitada al máximo disponible
-    const maxQuestions = Math.min(selectedQuestionCount, categoryQuestions.length);
-    gameQuestions = [...categoryQuestions]
-        .sort(() => Math.random() - 0.5)
-        .slice(0, maxQuestions)
-        .map(randomizeQuestionOptions);
-    
+
+    const difficultyForGame = normalizeDifficulty(selectedDifficulty) || 'intermedio';
+    selectedDifficulty = difficultyForGame; // Compat: si viene null, se usa intermedio.
+
+    const maxQuestions = Math.max(1, Math.min(Number(selectedQuestionCount) || 10, 50));
+    if (typeof getQuestions === 'function') {
+        gameQuestions = getQuestions({
+            difficulty: difficultyForGame,
+            category: selectedCategory,
+            count: maxQuestions
+        }).map(randomizeQuestionOptions);
+    } else {
+        const fallbackCategoryQuestions = questionsDatabase[selectedCategory] || questionsDatabase.general || [];
+        gameQuestions = shuffleArray(fallbackCategoryQuestions)
+            .slice(0, Math.min(maxQuestions, fallbackCategoryQuestions.length))
+            .map(randomizeQuestionOptions);
+    }
+
     Object.keys(players).forEach(id => {
         players[id].score = 0;
     });
 
     setCategoryBackground(selectedCategory);
     showScreen('playing');
-    
+
     airconsole.broadcast({ 
         action: 'gameStart',
         category: selectedCategory,
+        difficulty: difficultyForGame,
         question: { index: currentQuestion, total: gameQuestions.length }
     });
-    
+
     setTimeout(() => showQuestion(), 300);
 }
 
 function showQuestion() {
+
     answers = {};
     resultsShown = false; // Resetear para la nueva pregunta
     questionStartTime = Date.now();
