@@ -42,14 +42,33 @@ let questionReceivedAt = 0; // Momento en que este controlador recibe la pregunt
 const domCache = {};
 const difficultyOrder = ["facil", "intermedio", "dificil"];
 const difficultyLabels = {
-    facil: 'Facil',
+    facil: 'F\u00e1cil',
     intermedio: 'Intermedio',
-    dificil: 'Dificil'
+    dificil: 'Dif\u00edcil'
 };
 
 function normalizeDifficulty(value) {
     const key = String(value ?? '').trim().toLowerCase();
     return difficultyOrder.includes(key) ? key : null;
+}
+function setText(node, value) {
+    if (node) node.textContent = String(value ?? '');
+}
+
+function clearNode(node) {
+    if (node) node.replaceChildren();
+}
+
+function createEl(tagName, { className = '', text = null } = {}) {
+    const el = document.createElement(tagName);
+    if (className) el.className = className;
+    if (text !== null) el.textContent = String(text);
+    return el;
+}
+
+function setHidden(node, hidden) {
+    if (!node) return;
+    node.classList.toggle('hidden', !!hidden);
 }
 
 function cacheDom() {
@@ -149,7 +168,7 @@ function init() {
         if (!hasJoined) {
             hasJoined = true;
             document.getElementById('joinBtn').classList.add('hidden');
-            document.getElementById('connectingMsg').classList.remove('hidden');
+            setHidden(document.getElementById('connectingMsg'), false);
             sendMessage({ action: 'join', name: playerName });
         }
     });
@@ -160,7 +179,7 @@ function init() {
     const exitSetupBtn = document.getElementById('exitSetupBtn');
     if (exitSetupBtn) {
         exitSetupBtn.addEventListener('click', () => {
-            if (confirm('¿Salir de la configuración? Volverás a la selección de categoría.')) {
+            if (confirm('\u00bfSalir de la configuraci\u00f3n? Volver\u00e1s a la selecci\u00f3n de categor\u00eda.')) {
                 sendMessage({ action: 'exitGame' });
             }
         });
@@ -423,8 +442,8 @@ function handleJoined(data) {
         updateQuestionCountDisplay();
     }
 
-    document.getElementById('connectingMsg').classList.add('hidden');
-    document.getElementById('errorMsg').classList.add('hidden');
+    setHidden(document.getElementById('connectingMsg'), true);
+    setHidden(document.getElementById('errorMsg'), true);
 
     if (isAdmin) {
         currentStep = 1;
@@ -464,8 +483,8 @@ function handleReconnected(data) {
         updateQuestionCountDisplay();
     }
 
-    document.getElementById('connectingMsg').classList.add('hidden');
-    document.getElementById('errorMsg').classList.add('hidden');
+    setHidden(document.getElementById('connectingMsg'), true);
+    setHidden(document.getElementById('errorMsg'), true);
 
     if (data.gameState === 'playing') {
         showScreen('playing');
@@ -494,15 +513,15 @@ function handleReconnected(data) {
 }
 
 function handleGameFull() {
-    document.getElementById('connectingMsg').classList.add('hidden');
-    document.getElementById('errorMsg').classList.remove('hidden');
+    setHidden(document.getElementById('connectingMsg'), true);
+    setHidden(document.getElementById('errorMsg'), false);
     if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
 }
 
 function handleGameInProgress(message) {
-    document.getElementById('connectingMsg').classList.add('hidden');
+    setHidden(document.getElementById('connectingMsg'), true);
     const errorMsg = document.getElementById('errorMsg');
-    errorMsg.classList.remove('hidden');
+    setHidden(errorMsg, false);
     
     // Update error message text
     const errorText = errorMsg.querySelector('p');
@@ -706,34 +725,45 @@ function showResult(correct, points) {
     const overlay = domCache.resultOverlay;
     const content = domCache.resultContent;
     if (!overlay || !content) return;
-    
+
+    const safePoints = Number.isFinite(Number(points)) ? Math.max(0, Math.floor(Number(points))) : 0;
+
+    clearNode(content);
+
+    const icon = createEl('div', {
+        className: `text-5xl sm:text-6xl mb-3 sm:mb-4 ${correct ? 'text-steam-verde' : 'text-steam-morado'}`,
+        text: correct ? '✓' : '✗'
+    });
+
+    const title = createEl('div', {
+        className: `text-xl sm:text-2xl font-bold mb-2 ${correct ? 'text-steam-verde' : 'text-steam-morado'}`,
+        text: correct ? 'Correcto!' : 'Incorrecto'
+    });
+
+    const scoreText = correct ? `+${safePoints} pts` : '0 pts';
+    const score = createEl('div', {
+        className: `text-lg sm:text-xl ${correct ? 'text-steam-naranja' : 'text-gray-500'}`,
+        text: scoreText
+    });
+
+    content.append(icon, title, score);
+
     if (correct) {
-        content.innerHTML = `
-            <div class="text-5xl sm:text-6xl mb-3 sm:mb-4 text-steam-verde">✓</div>
-            <div class="text-xl sm:text-2xl font-bold mb-2 text-steam-verde">Correcto!</div>
-            <div class="text-lg sm:text-xl text-steam-naranja">+${points} pts</div>
-        `;
-        myScore += points;
-        if (domCache.miniScore) domCache.miniScore.textContent = myScore;
+        myScore += safePoints;
+        setText(domCache.miniScore, myScore);
         if (navigator.vibrate) navigator.vibrate([40, 20, 40]);
-    } else {
-        content.innerHTML = `
-            <div class="text-5xl sm:text-6xl mb-3 sm:mb-4 text-steam-morado">✗</div>
-            <div class="text-xl sm:text-2xl font-bold mb-2 text-steam-morado">Incorrecto</div>
-            <div class="text-lg sm:text-xl text-gray-500">0 pts</div>
-        `;
-        if (navigator.vibrate) navigator.vibrate(150);
+    } else if (navigator.vibrate) {
+        navigator.vibrate(150);
     }
-    
+
     overlay.classList.remove('hidden');
     overlay.classList.add('flex');
-    
+
     setTimeout(() => {
         overlay.classList.add('hidden');
         overlay.classList.remove('flex');
     }, 1200);
 }
-
 function handleShowAnswer(correctIndex) {
     if (domCache.answerButtons) {
         domCache.answerButtons.forEach(btn => {
@@ -759,35 +789,43 @@ function updateRank(players) {
 
 function showEndScreen(winner, players) {
     showScreen('end');
-    
+
     const myPlayer = players.find(p => p.name === playerName);
     const rank = myPlayer ? players.indexOf(myPlayer) + 1 : players.length;
-    
+
     const medals = ['1ro', '2do', '3ro'];
-    document.getElementById('finalRank').textContent = medals[rank - 1] || `#${rank}`;
-    
-    // Premio según posición: trofeo oro 1º, plata 2º, bronce 3º
+    setText(document.getElementById('finalRank'), medals[rank - 1] || `#${rank}`);
+
+    // Premio según posición: trofeo oro 1º, plata 2º, bronce 3º.
     const prizeContainer = document.getElementById('resultPrize');
     if (prizeContainer) {
-        const prizes = [
-            { html: '<iconify-icon icon="mdi:trophy" style="font-size: 2.6rem; color: #FFD700;"></iconify-icon>' },
-            { html: '<iconify-icon icon="mdi:medal" style="font-size: 2.6rem; color: #C0C0C0;"></iconify-icon>' },
-            { html: '<iconify-icon icon="mdi:medal" style="font-size: 2.6rem; color: #CD7F32;"></iconify-icon>' }
-        ];
-        const prize = prizes[rank - 1] || prizes[2];
-        prizeContainer.innerHTML = prize.html;
+        clearNode(prizeContainer);
+
+        const prizeIcon = document.createElement('iconify-icon');
+        if (rank === 1) {
+            prizeIcon.setAttribute('icon', 'mdi:trophy');
+            prizeIcon.style.color = '#FFD700';
+        } else if (rank === 2) {
+            prizeIcon.setAttribute('icon', 'mdi:medal');
+            prizeIcon.style.color = '#C0C0C0';
+        } else {
+            prizeIcon.setAttribute('icon', 'mdi:medal');
+            prizeIcon.style.color = '#CD7F32';
+        }
+        prizeIcon.style.fontSize = '2.6rem';
+        prizeContainer.appendChild(prizeIcon);
     }
-    
+
     if (winner && winner.name === playerName) {
-        document.getElementById('finalMessage').textContent = 'GANASTE!';
+        setText(document.getElementById('finalMessage'), '\u00a1GANASTE!');
         if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 100]);
         launchConfetti('confettiControllerContainer', '#FFD700');
     } else if (winner) {
-        document.getElementById('finalMessage').textContent = `Ganó ${winner.name}`;
+        setText(document.getElementById('finalMessage'), `Ganó ${winner.name}`);
     }
-    
-    document.getElementById('finalScore').textContent = `${myPlayer?.score || 0} puntos`;
-    
+
+    setText(document.getElementById('finalScore'), `${myPlayer?.score || 0} puntos`);
+
     document.getElementById('playAgainBtn').classList.toggle('hidden', !isAdmin);
     document.getElementById('waitingNextText').classList.toggle('hidden', isAdmin);
 }
@@ -797,7 +835,7 @@ function playAgain() {
 }
 
 function exitGame() {
-    if (confirm('¿Estás seguro de que quieres salir del juego? Se perderá el progreso actual.')) {
+    if (confirm('\u00bfEst\u00e1s seguro de que quieres salir del juego? Se perder\u00e1 el progreso actual.')) {
         sendMessage({ action: 'exitGame' });
     }
 }
@@ -815,8 +853,8 @@ function handleReset(data) {
     if (header) header.classList.add('hidden');
     
     // Reset error messages
-    document.getElementById('connectingMsg').classList.remove('hidden');
-    document.getElementById('errorMsg').classList.add('hidden');
+    setHidden(document.getElementById('connectingMsg'), false);
+    setHidden(document.getElementById('errorMsg'), true);
     
     // Reset to step 1 for admin
     if (isAdmin) {
@@ -873,3 +911,12 @@ function showScreen(screen) {
 }
 
 window.onload = init;
+
+
+
+
+
+
+
+
+

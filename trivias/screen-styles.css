@@ -205,7 +205,7 @@ body.cat-default {
     transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
 }
 
-/* Colores por tiempo: verde >10s, amarillo 6-10s, rojo ≤5s (sin hover) */
+/* Colores por tiempo: verde >10s, amarillo 6-10s, rojo â‰¤5s (sin hover) */
 .timer-circle-standalone.timer-warning,
 #playingScreen .timer-circle-standalone.timer-warning {
     background: #FFA726 !important;
@@ -883,7 +883,7 @@ body.cat-default {
     letter-spacing: 2px;
 }
 
-/* Puntos animados: aparecen uno a uno . → .. → ... luego desaparecen uno a uno */
+/* Puntos animados: aparecen uno a uno . â†’ .. â†’ ... luego desaparecen uno a uno */
 .loading-dots {
     display: inline-block;
 }
@@ -1344,4 +1344,14 @@ body.cat-default {
 @keyframes titleReveal {
     0% { opacity: 0; transform: translateY(-20px); }
     100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Accesibilidad: foco visible para controles interactivos */
+button:focus-visible,
+[role="button"]:focus-visible,
+.sound-toggle-btn:focus-visible,
+.answer-btn:focus-visible,
+.category-btn:focus-visible {
+    outline: 3px solid rgba(255, 255, 255, 0.92);
+    outline-offset: 2px;
 }

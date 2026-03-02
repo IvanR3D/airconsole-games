@@ -69,6 +69,37 @@ let backgroundMusic = null;
 let introLoadingInterval = null;
 
 const domCache = {};
+function setText(node, value) {
+    if (node) node.textContent = String(value ?? '');
+}
+
+function clearNode(node) {
+    if (node) node.replaceChildren();
+}
+
+function createEl(tagName, { className = '', text = null } = {}) {
+    const el = document.createElement(tagName);
+    if (className) el.className = className;
+    if (text !== null) el.textContent = String(text);
+    return el;
+}
+
+function createPlayerIcon(src, alt) {
+    const img = document.createElement('img');
+    img.src = src;
+    img.alt = alt;
+    img.className = 'player-role-icon';
+    return img;
+}
+
+function createMedalIcon(iconName, color, size = '2.8rem') {
+    const icon = document.createElement('iconify-icon');
+    icon.setAttribute('icon', iconName);
+    icon.className = 'medal-icon';
+    icon.style.color = color;
+    icon.style.fontSize = size;
+    return icon;
+}
 
 function shuffleArray(arr) {
     const copy = arr.slice();
@@ -86,11 +117,18 @@ function randomizeQuestionOptions(question) {
     }));
 
     const shuffled = shuffleArray(optionsWithMeta);
+
     return {
         ...question,
         options: shuffled.map(item => item.option),
         correct: shuffled.findIndex(item => item.isCorrect)
     };
+}
+
+function sanitizeQuestionDisplayText(value) {
+    return String(value ?? '')
+        .replace(/\s*\((?:100|[1-9]\d?)\)\s*$/, '')
+        .trim();
 }
 
 function cacheDomElements() {
@@ -574,38 +612,44 @@ function updatePlayersDisplay() {
     visible.forEach((player, index) => {
         const card = document.createElement('div');
         const cardColor = screenPlayerColors[index % screenPlayerColors.length];
-        
+
         card.className = 'chalk-player-card rounded-2xl py-4 px-5 flex items-center gap-3 transition-all hover:scale-105 relative overflow-hidden';
         card.style.background = 'transparent';
         card.style.border = `2px solid ${player.disconnected ? 'rgba(255,255,255,0.35)' : cardColor}`;
         if (player.disconnected) card.style.opacity = '0.6';
-        
-        // Avatar
+
         const avatar = document.createElement('div');
         avatar.className = 'w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center relative flex-shrink-0 shadow-md';
         avatar.style.background = player.disconnected ? '#9ca3af' : player.color;
         avatar.style.border = `3px solid ${player.disconnected ? '#6b7280' : '#fff'}`;
-        
+
         if (player.isAdmin && !player.disconnected) {
-            avatar.innerHTML = `<img src="${uiIcons.crown}" alt="Admin" class="player-role-icon">`;
+            avatar.appendChild(createPlayerIcon(uiIcons.crown, 'Admin'));
         } else if (player.disconnected) {
-            avatar.innerHTML = '<span class="player-disconnected-mark">X</span>';
+            avatar.appendChild(createEl('span', { className: 'player-disconnected-mark', text: 'X' }));
         } else {
-            avatar.innerHTML = `<img src="${uiIcons.gamepad}" alt="Jugador" class="player-role-icon">`;
+            avatar.appendChild(createPlayerIcon(uiIcons.gamepad, 'Jugador'));
         }
         card.appendChild(avatar);
-        
-        // Info
+
         const info = document.createElement('div');
         info.className = 'flex-1 min-w-0';
-        info.innerHTML = `
-            <div class="chalk-body text-base sm:text-lg font-black truncate" style="color: ${player.disconnected ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.95)'};">${player.name}</div>
-            <div class="chalk-body text-xs sm:text-sm font-bold" style="color: ${player.disconnected ? 'rgba(255,255,255,0.4)' : cardColor};">
-                ${player.disconnected ? 'Desconectado' : (player.isAdmin ? 'Admin' : 'Conectado')}
-            </div>
-        `;
+
+        const name = createEl('div', {
+            className: 'chalk-body text-base sm:text-lg font-black truncate',
+            text: player.name
+        });
+        name.style.color = player.disconnected ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.95)';
+
+        const status = createEl('div', {
+            className: 'chalk-body text-xs sm:text-sm font-bold',
+            text: player.disconnected ? 'Desconectado' : (player.isAdmin ? 'Admin' : 'Conectado')
+        });
+        status.style.color = player.disconnected ? 'rgba(255,255,255,0.4)' : cardColor;
+
+        info.append(name, status);
         card.appendChild(info);
-        
+
         fragment.appendChild(card);
     });
 
@@ -614,29 +658,43 @@ function updatePlayersDisplay() {
         card.className = 'chalk-player-card rounded-2xl py-4 px-5 flex items-center gap-3 transition-all relative overflow-hidden';
         card.style.background = 'transparent';
         card.style.border = '2px dashed rgba(255,255,255,0.6)';
+
         const avatar = document.createElement('div');
         avatar.className = 'w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center relative flex-shrink-0 shadow-md';
         avatar.style.background = 'rgba(255,255,255,0.1)';
         avatar.style.border = '3px solid rgba(255,255,255,0.7)';
-        avatar.innerHTML = `<span class="chalk-body text-lg font-black" style="color: rgba(255,255,255,0.9);">+${overflow}</span>`;
+
+        const overflowText = createEl('span', {
+            className: 'chalk-body text-lg font-black',
+            text: `+${overflow}`
+        });
+        overflowText.style.color = 'rgba(255,255,255,0.9)';
+        avatar.appendChild(overflowText);
         card.appendChild(avatar);
 
         const info = document.createElement('div');
         info.className = 'flex-1 min-w-0';
-        info.innerHTML = `
-            <div class="chalk-body text-base sm:text-lg font-black truncate" style="color: rgba(255,255,255,0.95);">Jugadores extra</div>
-            <div class="chalk-body text-xs sm:text-sm font-bold" style="color: rgba(255,255,255,0.7);">
-                Total: ${activePlayers.length}
-            </div>
-        `;
+
+        const title = createEl('div', {
+            className: 'chalk-body text-base sm:text-lg font-black truncate',
+            text: 'Jugadores extra'
+        });
+        title.style.color = 'rgba(255,255,255,0.95)';
+
+        const total = createEl('div', {
+            className: 'chalk-body text-xs sm:text-sm font-bold',
+            text: `Total: ${activePlayers.length}`
+        });
+        total.style.color = 'rgba(255,255,255,0.7)';
+
+        info.append(title, total);
         card.appendChild(info);
         fragment.appendChild(card);
     }
-    
-    grid.innerHTML = '';
+
+    clearNode(grid);
     grid.appendChild(fragment);
 
-    // Create waiting particles
     createWaitingParticles();
 
     const adminHint = domCache.adminHint || document.getElementById('adminHint');
@@ -646,7 +704,6 @@ function updatePlayersDisplay() {
 
     updatePlayersStatus();
 }
-
 function createWaitingParticles() {
     // Particles disabled - clean white background
 }
@@ -654,100 +711,96 @@ function createWaitingParticles() {
 function updatePlayersStatus() {
     const footerContainer = document.getElementById('playersFooter');
     if (!footerContainer) return;
-    
+
     const footerFragment = document.createDocumentFragment();
     const activePlayers = Object.values(players);
     const visible = activePlayers.slice(0, 3);
     const overflow = Math.max(0, activePlayers.length - 3);
-    
-    // Mostrar máximo 3 jugadores individuales
+
     visible.forEach((player, index) => {
         const hasAnswered = answers[player.id] !== undefined;
-        
-        // Player colors for the card
+
         const cardColors = ['#0595AE', '#73A03F', '#EB8225', '#AB3D8B'];
         const cardColor = cardColors[index % cardColors.length];
-        
-        // Footer card - estilo chalk, layout horizontal (avatar | nombre | pts)
+
         const footerCard = document.createElement('div');
         footerCard.className = 'flex flex-row items-center gap-3 rounded-xl py-2 px-4 transition-all chalk-footer-card';
         footerCard.style.background = 'transparent';
         footerCard.style.border = `2px solid ${player.disconnected ? 'rgba(255,255,255,0.3)' : cardColor}`;
         footerCard.style.minWidth = 'clamp(140px, 22vw, 200px)';
         footerCard.style.opacity = player.disconnected ? '0.5' : '1';
-        
-        // Avatar
+
         const footerAvatar = document.createElement('div');
         footerAvatar.className = 'w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center relative flex-shrink-0';
         footerAvatar.style.background = player.disconnected ? '#BDBDBD' : player.color;
         footerAvatar.style.border = `3px solid ${player.disconnected ? '#9E9E9E' : '#fff'}`;
         footerAvatar.style.boxShadow = player.disconnected ? 'none' : `0 2px 8px ${cardColor}44`;
-        
-        // Status indicator
-        if (hasAnswered) {
-            footerAvatar.innerHTML = '<span class="text-base sm:text-lg">✓</span>';
-        } else if (player.disconnected) {
-            footerAvatar.innerHTML = '<span class="text-base sm:text-lg">❌</span>';
-        } else {
-            footerAvatar.innerHTML = '<span class="text-base sm:text-lg">⏳</span>';
-        }
+
+        const statusIcon = hasAnswered ? '✓' : (player.disconnected ? '❌' : '⏳');
+        footerAvatar.appendChild(createEl('span', { className: 'text-base sm:text-lg', text: statusIcon }));
         footerCard.appendChild(footerAvatar);
-        
-        // Name
-        const footerName = document.createElement('div');
-        footerName.className = 'chalk-body font-bold text-xs sm:text-sm truncate flex-1 min-w-0';
+
+        const footerName = createEl('div', {
+            className: 'chalk-body font-bold text-xs sm:text-sm truncate flex-1 min-w-0',
+            text: player.name
+        });
         footerName.style.color = player.disconnected ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.95)';
-        footerName.textContent = player.name;
         footerCard.appendChild(footerName);
-        
-        // Score - badge tipo chalk
-        const score = document.createElement('div');
-        score.className = 'chalk-body text-sm sm:text-base font-bold px-2 py-1 rounded-lg flex-shrink-0';
+
+        const score = createEl('div', {
+            className: 'chalk-body text-sm sm:text-base font-bold px-2 py-1 rounded-lg flex-shrink-0',
+            text: `${player.score} pts`
+        });
         score.style.background = player.disconnected ? 'rgba(255,255,255,0.2)' : cardColor;
         score.style.border = `1px solid ${player.disconnected ? 'rgba(255,255,255,0.3)' : cardColor}`;
         score.style.color = '#fff';
-        score.textContent = `${player.score} pts`;
         footerCard.appendChild(score);
-        
+
         footerFragment.appendChild(footerCard);
     });
-    
-    // 4ª tarjeta: cantidad de jugadores extra cuando hay más de 3
+
     if (overflow > 0) {
         const overflowCard = document.createElement('div');
         overflowCard.className = 'flex flex-row items-center gap-3 rounded-xl py-2 px-4 transition-all chalk-footer-card';
         overflowCard.style.background = 'transparent';
         overflowCard.style.border = '2px dashed rgba(255,255,255,0.6)';
         overflowCard.style.minWidth = 'clamp(140px, 22vw, 200px)';
-        
+
         const overflowAvatar = document.createElement('div');
         overflowAvatar.className = 'w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center relative flex-shrink-0';
         overflowAvatar.style.background = 'rgba(255,255,255,0.1)';
         overflowAvatar.style.border = '3px solid rgba(255,255,255,0.7)';
-        overflowAvatar.innerHTML = `<span class="chalk-body text-sm sm:text-base font-black" style="color: rgba(255,255,255,0.95);">+${overflow}</span>`;
+
+        const overflowCount = createEl('span', {
+            className: 'chalk-body text-sm sm:text-base font-black',
+            text: `+${overflow}`
+        });
+        overflowCount.style.color = 'rgba(255,255,255,0.95)';
+        overflowAvatar.appendChild(overflowCount);
         overflowCard.appendChild(overflowAvatar);
-        
-        const overflowInfo = document.createElement('div');
-        overflowInfo.className = 'chalk-body font-bold text-xs sm:text-sm flex-1 min-w-0';
+
+        const overflowInfo = createEl('div', {
+            className: 'chalk-body font-bold text-xs sm:text-sm flex-1 min-w-0',
+            text: 'Jugadores extra'
+        });
         overflowInfo.style.color = 'rgba(255,255,255,0.9)';
-        overflowInfo.textContent = `Jugadores extra`;
         overflowCard.appendChild(overflowInfo);
-        
-        const overflowBadge = document.createElement('div');
-        overflowBadge.className = 'chalk-body text-sm sm:text-base font-bold px-2 py-1 rounded-lg flex-shrink-0';
+
+        const overflowBadge = createEl('div', {
+            className: 'chalk-body text-sm sm:text-base font-bold px-2 py-1 rounded-lg flex-shrink-0',
+            text: `${activePlayers.length} total`
+        });
         overflowBadge.style.background = 'rgba(255,255,255,0.2)';
         overflowBadge.style.border = '1px solid rgba(255,255,255,0.5)';
         overflowBadge.style.color = '#fff';
-        overflowBadge.textContent = `${activePlayers.length} total`;
         overflowCard.appendChild(overflowBadge);
-        
+
         footerFragment.appendChild(overflowCard);
     }
-    
-    footerContainer.innerHTML = '';
+
+    clearNode(footerContainer);
     footerContainer.appendChild(footerFragment);
 }
-
 function startGame() {
     gameState = 'playing';
     currentQuestion = 0;
@@ -796,7 +849,7 @@ function showQuestion() {
     const question = gameQuestions[currentQuestion];
     if (domCache.questionNumber) domCache.questionNumber.textContent = `Pregunta ${currentQuestion + 1} de ${gameQuestions.length}`;
     if (domCache.questionText) {
-        const qText = String(question.question || '');
+        const qText = sanitizeQuestionDisplayText(question.question);
         domCache.questionText.textContent = qText;
         domCache.questionText.classList.remove('question-medium', 'question-long');
         if (qText.length > 75) {
@@ -1125,65 +1178,100 @@ function updateScoreboard() {
 function endGame() {
     gameState = 'gameEnd';
     showScreen('end');
-    
+
     const sortedPlayers = Object.values(players)
         .filter(p => !p.disconnected)
         .sort((a, b) => b.score - a.score);
-    
-    const trophyIcon = (color) => `<iconify-icon icon="mdi:trophy" class="medal-icon" style="color: ${color};"></iconify-icon>`;
-    const medalIcon = (color) => `<iconify-icon icon="mdi:medal" class="medal-icon" style="font-size: 2.8rem; color: ${color};"></iconify-icon>`;
-    const goldMedal = trophyIcon('#FFD700');
-    const silverMedal = medalIcon('#C0C0C0');
-    const bronzeMedal = medalIcon('#CD7F32');
 
     const winnerSection = document.getElementById('winnerSection');
-    if (sortedPlayers.length > 0) {
+    if (sortedPlayers.length > 0 && winnerSection) {
         const winner = sortedPlayers[0];
-        winnerSection.innerHTML = `
-            <div class="medal-trophy mb-1 sm:mb-2">${goldMedal}</div>
-            <div class="flex justify-center mb-1 sm:mb-2 medal-avatar-wrap">
-                <div class="player-avatar-visual-large" style="background-color: ${winner.color};"></div>
-            </div>
-            <div class="chalk-title text-2xl sm:text-3xl lg:text-4xl font-bold" style="color: rgba(255,255,255,0.98);">${winner.name}</div>
-            <div class="chalk-body text-lg sm:text-xl lg:text-2xl font-bold mt-0.5 sm:mt-1" style="color: rgba(255,255,255,0.98);">${winner.score} puntos</div>
-        `;
-        
+        clearNode(winnerSection);
+
+        const medal = createEl('div', { className: 'medal-trophy mb-1 sm:mb-2' });
+        medal.appendChild(createMedalIcon('mdi:trophy', '#FFD700'));
+
+        const avatarWrap = createEl('div', { className: 'flex justify-center mb-1 sm:mb-2 medal-avatar-wrap' });
+        const avatar = createEl('div', { className: 'player-avatar-visual-large' });
+        avatar.style.backgroundColor = winner.color;
+        avatarWrap.appendChild(avatar);
+
+        const winnerName = createEl('div', {
+            className: 'chalk-title text-2xl sm:text-3xl lg:text-4xl font-bold',
+            text: winner.name
+        });
+        winnerName.style.color = 'rgba(255,255,255,0.98)';
+
+        const winnerScore = createEl('div', {
+            className: 'chalk-body text-lg sm:text-xl lg:text-2xl font-bold mt-0.5 sm:mt-1',
+            text: `${winner.score} puntos`
+        });
+        winnerScore.style.color = 'rgba(255,255,255,0.98)';
+
+        winnerSection.append(medal, avatarWrap, winnerName, winnerScore);
+
         playSound('victory');
         createConfetti();
     }
-    
+
     const podium = document.getElementById('podium');
-    podium.innerHTML = '';
-    
-    // Solo mostrar 2º y 3º lugar; el 1º ya se anuncia como campeón arriba
-    const podiumMedals = [silverMedal, bronzeMedal];
+    if (podium) {
+        clearNode(podium);
+    }
+
     const podiumBorders = ['#C0C0C0', '#CD7F32'];
     const runnersUp = sortedPlayers.slice(1, 3);
-    
+
     runnersUp.forEach((player, index) => {
-        const item = document.createElement('div');
-        item.className = 'podium-item flex items-center justify-between p-2 sm:p-3 rounded-lg sm:rounded-xl border-2 sm:border-[3px] shadow-md chalk-box';
+        const item = createEl('div', {
+            className: 'podium-item flex items-center justify-between p-2 sm:p-3 rounded-lg sm:rounded-xl border-2 sm:border-[3px] shadow-md chalk-box'
+        });
         item.style.background = 'transparent';
         item.style.borderColor = podiumBorders[index] || 'rgba(255,255,255,0.5)';
-        const medalIcon = podiumMedals[index] || `<span class="chalk-body text-base font-bold" style="color: rgba(255,255,255,0.98);">#${index + 2}</span>`;
-        item.innerHTML = `
-            <div class="flex items-center gap-2 sm:gap-3">
-                <span class="medal-slot flex items-center justify-center">${medalIcon}</span>
-                <div class="player-avatar-visual" style="background-color: ${player.color};"></div>
-                <span class="chalk-body text-sm sm:text-base font-bold" style="color: rgba(255,255,255,0.98);">${player.name}</span>
-            </div>
-            <span class="chalk-body text-sm sm:text-base font-bold" style="color: rgba(255,255,255,0.98);">${player.score} pts</span>
-        `;
-        podium.appendChild(item);
+
+        const left = createEl('div', { className: 'flex items-center gap-2 sm:gap-3' });
+
+        const medalSlot = createEl('span', { className: 'medal-slot flex items-center justify-center' });
+        if (index === 0) {
+            medalSlot.appendChild(createMedalIcon('mdi:medal', '#C0C0C0'));
+        } else if (index === 1) {
+            medalSlot.appendChild(createMedalIcon('mdi:medal', '#CD7F32'));
+        } else {
+            const rankLabel = createEl('span', { className: 'chalk-body text-base font-bold', text: `#${index + 2}` });
+            rankLabel.style.color = 'rgba(255,255,255,0.98)';
+            medalSlot.appendChild(rankLabel);
+        }
+        left.appendChild(medalSlot);
+
+        const playerAvatar = createEl('div', { className: 'player-avatar-visual' });
+        playerAvatar.style.backgroundColor = player.color;
+        left.appendChild(playerAvatar);
+
+        const playerName = createEl('span', {
+            className: 'chalk-body text-sm sm:text-base font-bold',
+            text: player.name
+        });
+        playerName.style.color = 'rgba(255,255,255,0.98)';
+        left.appendChild(playerName);
+
+        const playerScore = createEl('span', {
+            className: 'chalk-body text-sm sm:text-base font-bold',
+            text: `${player.score} pts`
+        });
+        playerScore.style.color = 'rgba(255,255,255,0.98)';
+
+        item.append(left, playerScore);
+        if (podium) {
+            podium.appendChild(item);
+        }
     });
 
-    airconsole.broadcast({ 
-        action: 'gameEnd', 
+    airconsole.broadcast({
+        action: 'gameEnd',
         winner: sortedPlayers[0],
         players: sortedPlayers
     });
 }
-
 function resetGame() {
     gameState = 'categorySelect';
     currentQuestion = 0;
@@ -1234,3 +1322,10 @@ function showScreen(screen) {
 }
 
 window.onload = init;
+
+
+
+
+
+
+

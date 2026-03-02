@@ -41,8 +41,54 @@ function shuffle(arr) {
   return a;
 }
 
+const MOJIBAKE_REPLACEMENTS = Object.freeze([
+  ["¿", "¿"],
+  ["¡", "¡"],
+  ["°", "°"],
+  ["º", "º"],
+  ["ª", "ª"],
+  ["á", "á"],
+  ["é", "é"],
+  ["í", "í"],
+  ["ó", "ó"],
+  ["ú", "ú"],
+  ["Á", "Á"],
+  ["É", "É"],
+  ["Í", "Í"],
+  ["Ó", "Ó"],
+  ["Ú", "Ú"],
+  ["ñ", "ñ"],
+  ["Ñ", "Ñ"],
+  ["ü", "ü"],
+  ["Ü", "Ü"],
+  ["✓", "✓"],
+  ["✗", "✗"],
+  ["❌", "❌"],
+  ["⏳", "⏳"],
+  ["…", "…"],
+  ["–", "–"],
+  ["—", "—"],
+  ["\u00e2\u20ac\u009c", "“"],
+  ["\u00e2\u20ac\u009d", "”"],
+  ["\u00e2\u20ac\u0098", "‘"],
+  ["\u00e2\u20ac\u0099", "’"]
+]);
+
+function fixMojibakeText(value) {
+  let text = String(value ?? "");
+  if (!/[ÂÃâ]/.test(text)) return text;
+
+  for (const [broken, fixed] of MOJIBAKE_REPLACEMENTS) {
+    if (text.includes(broken)) {
+      text = text.split(broken).join(fixed);
+    }
+  }
+
+  return text;
+}
+
 function normalizeText(value) {
-  return String(value ?? "").trim();
+  return fixMojibakeText(value).trim();
 }
 
 function normalizeOptionKey(value) {
@@ -214,7 +260,7 @@ function normalizeLooseTextKey(value) {
   const text = normalizeText(value).toLowerCase();
   if (!text) return "";
   const noDiacritics = typeof text.normalize === "function"
-    ? text.normalize("NFD").replace(/[̀-ͯ]/g, "")
+    ? text.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
     : text;
   return noDiacritics
     .replace(/[^a-z0-9\s]/g, " ")
@@ -397,7 +443,7 @@ const generalComparisons = buildFromData([
   ["¿Qué país tiene la línea costera más larga del mundo?", ["Canadá", "Rusia", "Indonesia", "Australia"], "Canadá"],
   ["¿Cuál montaña es más alta fuera de Asia?", ["Aconcagua", "Kilimanjaro", "Denali", "Mont Blanc"], "Aconcagua"],
   ["¿Qué río tiene mayor caudal promedio?", ["Nilo", "Amazonas", "Yangtsé", "Misisipi"], "Amazonas"],
-  ["¿Qué ciudad es la capital de Japón?", ["Tokio", "Delhi", "São Paulo", "Shanghái"], "Tokio"],
+  ["¿Qué ciudad es la capital de Japón?", ["Tokio", "Delhi", "SÃ£o Paulo", "Shanghái"], "Tokio"],
   ["¿Cuál continente tiene más países?", ["África", "Europa", "Asia", "América"], "África"],
   ["¿Qué isla es más grande?", ["Groenlandia", "Nueva Guinea", "Borneo", "Madagascar"], "Groenlandia"],
   ["¿Cuál país produce más café?", ["Brasil", "Colombia", "Vietnam", "Etiopía"], "Brasil"],
@@ -526,7 +572,7 @@ const scienceTemps = [
   ["Cuerpo humano", 37]
 ].map(([label, val]) => {
   const opts = [`${val}°C`, `${val + 5}°C`, `${val - 5}°C`, `${val + 10}°C`];
-  return buildQuestion(`${label} ≈`, opts, `${val}°C`);
+  return buildQuestion(`${label} â‰ˆ`, opts, `${val}°C`);
 });
 
 // Prefijos métricos
@@ -563,7 +609,7 @@ const scienceBody = buildFromData([
 
 // Física y astronomía rápida
 const sciencePhysics = buildFromData([
-  ["Aceleración de la gravedad en la Tierra (m/s²)", ["9.8", "1.6", "3.7", "24.8"], "9.8"],
+  ["Aceleración de la gravedad en la Tierra (m/sÂ²)", ["9.8", "1.6", "3.7", "24.8"], "9.8"],
   ["Velocidad del sonido en aire (m/s, 20°C)", ["343", "1500", "270", "500"], "343"],
   ["Duración de un día en Marte (horas)", ["24.6", "20.0", "30.2", "10.0"], "24.6"],
   ["Planeta más denso del sistema solar", ["Tierra", "Saturno", "Júpiter", "Marte"], "Tierra"],
@@ -572,7 +618,7 @@ const sciencePhysics = buildFromData([
   ["Unidad SI de energía", ["Joule", "Watt", "Newton", "Pascal"], "Joule"],
   ["Carga del electrón (signo)", ["Negativa", "Positiva", "Nula", "Depende"], "Negativa"],
   ["Espectro visible aproximadamente va de", ["400-700 nm", "200-400 nm", "700-1200 nm", "1-10 mm"], "400-700 nm"],
-  ["Constante de Avogadro ≈", ["6.02e23", "3.14e8", "9.81", "1.60e-19"], "6.02e23"]
+  ["Constante de Avogadro â‰ˆ", ["6.02e23", "3.14e8", "9.81", "1.60e-19"], "6.02e23"]
 ]);
 
 const scienceExtra = buildFromData([
@@ -597,23 +643,23 @@ const mathBase = buildFromData([
   ["Si 2^x = 32, entonces x =", ["4", "5", "6", "2"], "5"],
   ["Derivada de sin(x):", ["cos(x)", "-cos(x)", "-sin(x)", "tan(x)"], "cos(x)"],
   ["Primo más pequeño > 90:", ["91", "97", "101", "103"], "97"],
-  ["Área de un círculo r=3:", ["6π", "9π", "12π", "18π"], "9π"],
-  ["Si A y B independientes, P(A∩B) =", ["P(A)+P(B)", "P(A)·P(B)", "P(A)/P(B)", "Depende"], "P(A)·P(B)"],
+  ["Área de un círculo r=3:", ["6Ï€", "9Ï€", "12Ï€", "18Ï€"], "9Ï€"],
+  ["Si A y B independientes, P(Aâˆ©B) =", ["P(A)+P(B)", "P(A)Â·P(B)", "P(A)/P(B)", "Depende"], "P(A)Â·P(B)"],
   ["Matriz 3x5 rango máximo:", ["3", "5", "8", "15"], "3"],
   ["¿Cuántos grados suma un triángulo esférico?", ["180", "Entre 180 y 540", "Menos de 180", "Exacto 270"], "Entre 180 y 540"],
-  ["e^(ln 7) =", ["1", "7", "ln 7", "e·7"], "7"],
+  ["e^(ln 7) =", ["1", "7", "ln 7", "eÂ·7"], "7"],
   ["Serie armónica 1/n es:", ["Convergente", "Divergente", "Alternante", "Condicional"], "Divergente"],
   ["log10(100000) =", ["4", "5", "6", "10"], "5"],
   ["Integral de 1/x dx =", ["ln|x|+C", "x+C", "1/(x^2)+C", "tan^{-1}(x)+C"], "ln|x|+C"],
-  ["Límite sin(x)/x cuando x→0:", ["0", "1", "infinito", "No existe"], "1"],
+  ["Límite sin(x)/x cuando xâ†’0:", ["0", "1", "infinito", "No existe"], "1"],
   ["Determinante de matriz identidad:", ["0", "1", "n", "n!"], "1"],
   ["Probabilidad de cara en moneda justa:", ["0", "0.25", "0.5", "0.75"], "0.5"],
   ["Varianza de una constante k:", ["k", "0", "k^2", "1/k"], "0"],
-  ["¿Cuál no es número irracional?", ["π", "√2", "e", "22/7"], "22/7"],
+  ["¿Cuál no es número irracional?", ["Ï€", "âˆš2", "e", "22/7"], "22/7"],
   ["Factorial de 0:", ["0", "1", "No existe", "-1"], "1"],
   ["Binomio de Newton (a+b)^2:", ["a^2+b^2", "a^2+2ab+b^2", "2ab", "a^2-2ab+b^2"], "a^2+2ab+b^2"],
-  ["Pendiente de recta horizontal:", ["0", "1", "∞", "Indefinida"], "0"],
-  ["¿Qué crece más rápido?", ["n^2", "n log n", "2^n", "√n"], "2^n"]
+  ["Pendiente de recta horizontal:", ["0", "1", "âˆž", "Indefinida"], "0"],
+  ["¿Qué crece más rápido?", ["n^2", "n log n", "2^n", "âˆšn"], "2^n"]
 ]);
 
 const mathExtra = buildFromData([
@@ -632,11 +678,11 @@ const mathExtra = buildFromData([
   ["50 es el ___% de 200:", ["10", "20", "25", "50"], "25"],
   ["Un ángulo recto mide:", ["45°", "60°", "90°", "120°"], "90°"],
   ["Suma de ángulos de un triángulo plano:", ["90°", "120°", "180°", "270°"], "180°"],
-  ["π radianes equivalen a:", ["90°", "180°", "270°", "360°"], "180°"],
+  ["Ï€ radianes equivalen a:", ["90°", "180°", "270°", "360°"], "180°"],
   ["f(x)=x^3, f'(2) =", ["6", "8", "12", "18"], "12"],
   ["Determinante de [[1,2],[3,4]]:", ["-2", "2", "5", "0"], "-2"],
   ["log_e(e) =", ["0", "1", "e", "10"], "1"],
-  ["x^2 - 9 = 0 tiene raíces:", ["±2", "±3", "±4", "±5"], "±3"],
+  ["x^2 - 9 = 0 tiene raíces:", ["Â±2", "Â±3", "Â±4", "Â±5"], "Â±3"],
   ["Inversa multiplicativa de 5:", ["1/5", "5", "0", "10"], "1/5"],
   ["PA con a1=2, d=3, a4 =", ["8", "9", "11", "14"], "11"],
   ["Número de diagonales de un pentágono:", ["3", "4", "5", "6"], "5"],
@@ -647,12 +693,12 @@ const mathExtra = buildFromData([
   ["Sistema 2x+y=5 y x-y=1, x =", ["1", "2", "3", "4"], "2"],
   ["Recta con pendiente 2 que pasa por (0,3):", ["y=2x+3", "y=2x-3", "y=3x+2", "y=3x-2"], "y=2x+3"],
   ["Hipotenusa de triángulo 3-4-?:", ["4", "5", "6", "7"], "5"],
-  ["Longitud circunferencia r=10:", ["10π", "15π", "20π", "25π"], "20π"],
-  ["tan(45°) =", ["0", "1", "√3/2", "∞"], "1"],
-  ["sin(30°) =", ["0.5", "√3/2", "1", "0"], "0.5"],
+  ["Longitud circunferencia r=10:", ["10Ï€", "15Ï€", "20Ï€", "25Ï€"], "20Ï€"],
+  ["tan(45°) =", ["0", "1", "âˆš3/2", "âˆž"], "1"],
+  ["sin(30°) =", ["0.5", "âˆš3/2", "1", "0"], "0.5"],
   ["cos(60°) =", ["0.5", "0.75", "1", "0"], "0.5"],
   ["¿Qué es el producto escalar de vectores perpendiculares?", ["0", "1", "-1", "Igual a su módulo"], "0"],
-  ["Límite (1+1/n)^n cuando n→∞:", ["e", "1", "0", "∞"], "e"],
+  ["Límite (1+1/n)^n cuando nâ†’âˆž:", ["e", "1", "0", "âˆž"], "e"],
   ["MCD de 28 y 35:", ["7", "14", "21", "28"], "7"],
   ["MCM de 6 y 8:", ["12", "18", "20", "24"], "24"],
   ["2^10 =", ["256", "512", "1024", "2048"], "1024"],
@@ -674,15 +720,15 @@ const mathExtra = buildFromData([
 
 const mathExtra2 = buildFromData([
   ["Número primo más pequeño:", ["2", "1", "3", "5"], "2"],
-  ["7 × 8 =", ["54", "56", "58", "60"], "56"],
-  ["9 × 9 =", ["72", "81", "90", "99"], "81"],
+  ["7 Ã— 8 =", ["54", "56", "58", "60"], "56"],
+  ["9 Ã— 9 =", ["72", "81", "90", "99"], "81"],
   ["(a - b)^2 =", ["a^2 - 2ab + b^2", "a^2 + 2ab + b^2", "a^2 - b^2", "2a^2 - b^2"], "a^2 - 2ab + b^2"],
   ["Inversa aditiva de 7:", ["-7", "1/7", "7", "0"], "-7"],
   ["Un millar equivale a:", ["100", "1000", "10000", "500"], "1000"],
   ["2/3 + 1/3 =", ["1/3", "2/3", "1", "4/3"], "1"],
   ["La mitad de 1/4 es:", ["1/8", "1/4", "1/2", "1/16"], "1/8"],
   ["3^0 =", ["0", "1", "3", "9"], "1"],
-  ["Base del logaritmo natural:", ["e", "10", "2", "π"], "e"],
+  ["Base del logaritmo natural:", ["e", "10", "2", "Ï€"], "e"],
   ["5^3 =", ["25", "75", "100", "125"], "125"],
   ["100% de 50 es:", ["25", "50", "75", "100"], "50"],
   ["Derivada de ln(x):", ["1/x", "x", "ln(x)", "0"], "1/x"],
@@ -690,14 +736,14 @@ const mathExtra2 = buildFromData([
   ["Área de un rectángulo 5x7:", ["30", "32", "35", "40"], "35"],
   ["Perímetro triángulo equilátero lado 4:", ["8", "10", "12", "14"], "12"],
   ["Media geométrica de 4 y 9:", ["5", "6", "6.5", "7"], "6"],
-  ["1 rad ≈", ["34°", "57°", "90°", "180°"], "57°"],
-  ["sin(90°) =", ["0", "0.5", "1", "√3/2"], "1"],
+  ["1 rad â‰ˆ", ["34°", "57°", "90°", "180°"], "57°"],
+  ["sin(90°) =", ["0", "0.5", "1", "âˆš3/2"], "1"],
   ["cos(0°) =", ["0", "0.5", "1", "-1"], "1"],
   ["C(4,1) =", ["1", "2", "3", "4"], "4"],
   ["3x = 12, x =", ["2", "3", "4", "5"], "4"],
   ["Una matriz con determinante 0 es:", ["Singular", "Inversa", "Ortogonal", "Diagonal"], "Singular"],
   ["log10(1) =", ["-1", "0", "1", "10"], "0"],
-  ["Diagonal de un cuadrado lado 1:", ["1", "√2", "2", "0.5"], "√2"],
+  ["Diagonal de un cuadrado lado 1:", ["1", "âˆš2", "2", "0.5"], "âˆš2"],
   ["Pendiente de recta vertical:", ["Indefinida", "0", "1", "-1"], "Indefinida"],
   ["Segundos en una hora:", ["600", "1800", "3600", "5400"], "3600"]
 ]);
@@ -712,9 +758,9 @@ const roboticsBase = buildFromData([
   ["ROS usa como transporte por defecto:", ["HTTP", "TCP/UDP", "MQTT", "CoAP"], "TCP/UDP"],
   ["¿Qué es rosbag?", ["Simulador 3D", "Formato de log de mensajes", "Librería de control", "Planificador"], "Formato de log de mensajes"],
   ["Cinemática directa calcula:", ["Par de motores", "Pose a partir de articulaciones", "Articulaciones desde pose", "Voltaje máximo"], "Pose a partir de articulaciones"],
-  ["�Qu� pasa si saturas PID sin anti-windup?", ["Vibra", "Se resetea", "Se sobreintegra y tarda", "Nada"], "Se sobreintegra y tarda"],
+  ["¿Qué pasa si saturas PID sin anti-windup?", ["Vibra", "Se resetea", "Se sobreintegra y tarda", "Nada"], "Se sobreintegra y tarda"],
   ["Robot diferencial: girar sobre su eje requiere:", ["Ambas ruedas adelante", "Ruedas en sentidos opuestos", "Frenar ambas", "Solo acelerar derecha"], "Ruedas en sentidos opuestos"],
-  ["LiDAR 2D entrega nubes en:", ["XYZ", "Plano polar r-θ", "RGB", "Depth map 2D"], "Plano polar r-θ"],
+  ["LiDAR 2D entrega nubes en:", ["XYZ", "Plano polar r-Î¸", "RGB", "Depth map 2D"], "Plano polar r-Î¸"],
   ["Arduino UNO usa MCU:", ["STM32", "ATmega328P", "ESP32", "RP2040"], "ATmega328P"],
   ["¿Qué es un gripper?", ["Pinza", "Cámara", "IMU", "Motor"], "Pinza"],
   ["Encoder óptico mide:", ["Corriente", "Distancia", "Ángulo/rotación", "Temperatura"], "Ángulo/rotación"],
@@ -827,15 +873,15 @@ const roboticsExtra = buildFromData([
   ["¿Qué es un MPU-6050?", ["IMU 6 ejes", "LiDAR 3D", "Servo digital", "Microcontrolador RISC-V"], "IMU 6 ejes"],
   ["¿Qué es un relé de estado sólido?", ["Switch electrónico sin partes móviles", "Sensor de humedad", "Driver de paso a paso", "Conector waterproof"], "Switch electrónico sin partes móviles"],
   ["¿Qué es la frecuencia de Nyquist?", ["Mitad del muestreo", "Mínima frecuencia de un PWM", "Máxima de una batería", "Constante de Planck"], "Mitad del muestreo"],
-  ["�Qu� es un Lidar 3D?", ["Sensor l�ser 3D", "C�mara RGB", "Radar de microondas", "Sensor de ultrasonido"], "Sensor l�ser 3D"],
+  ["¿Qué es un Lidar 3D?", ["Sensor láser 3D", "Cámara RGB", "Radar de microondas", "Sensor de ultrasonido"], "Sensor láser 3D"],
   ["¿Qué es un microservicio en robótica?", ["Nodo pequeño con una función", "Motor de precisión", "Sensor de presión", "Cableado modular"], "Nodo pequeño con una función"],
   ["¿Qué es una cinemática inversa?", ["Articulaciones desde pose", "Calcular pose desde articulaciones", "Muestrear PWM", "Filtrar ruido"], "Articulaciones desde pose"],
-  ["�Qu� es un encoder absoluto?", ["Da �ngulo absoluto", "Cuenta pulsos relativos", "Mide temperatura", "Convierte voltaje"], "Da �ngulo absoluto"],
+  ["¿Qué es un encoder absoluto?", ["Da ángulo absoluto", "Cuenta pulsos relativos", "Mide temperatura", "Convierte voltaje"], "Da ángulo absoluto"],
   ["¿Qué es un puente H doble?", ["Driver para dos motores DC", "Fuente de poder", "Filtro de audio", "Bus de datos"], "Driver para dos motores DC"],
   ["¿Qué es un MOSFET?", ["Transistor de efecto de campo", "Sensor térmico", "Motor sin escobillas", "Conector"], "Transistor de efecto de campo"],
   ["¿Qué significa kinematic chain?", ["Cadena de eslabones articulados", "Lista de comandos ROS", "Secuencia de PWM", "Mapa de bits"], "Cadena de eslabones articulados"],
   ["¿Qué se usa para medir corriente?", ["Shunt + amplificador", "Sensor capacitivo", "Fotodiodo", "Encoder"], "Shunt + amplificador"],
-  ["�Qu� es un limit torque?", ["L�mite de par motor", "Tipo de engrane", "Modo de comunicaci�n", "Sensor de fuerza"], "L�mite de par motor"],
+  ["¿Qué es un limit torque?", ["Límite de par motor", "Tipo de engrane", "Modo de comunicación", "Sensor de fuerza"], "Límite de par motor"],
 ]);
 
 const roboticsExtra2 = buildFromData([
@@ -1243,7 +1289,7 @@ const geographyBase = buildFromData([
 ]);
 
 const capitals = [
-  ["Brasil", "Brasilia", "Río de Janeiro", "São Paulo", "Salvador"],
+  ["Brasil", "Brasilia", "Río de Janeiro", "SÃ£o Paulo", "Salvador"],
   ["Japón", "Tokio", "Kioto", "Osaka", "Nagoya"],
   ["India", "Nueva Delhi", "Mumbai", "Bangalore", "Calcuta"],
   ["Corea del Sur", "Seúl", "Busan", "Incheon", "Daegu"],
@@ -1281,7 +1327,7 @@ const geographyExtremes = geoExtremes.map(([label, answer]) => {
 
 const moreCapitals = [
   ["Noruega", "Oslo", "Bergen", "Trondheim", "Stavanger"],
-  ["Suecia", "Estocolmo", "Gotemburgo", "Malmö", "Uppsala"],
+  ["Suecia", "Estocolmo", "Gotemburgo", "MalmÃ¶", "Uppsala"],
   ["Finlandia", "Helsinki", "Turku", "Tampere", "Oulu"],
   ["Polonia", "Varsovia", "Cracovia", "Gdansk", "Poznan"],
   ["Países Bajos", "Ámsterdam", "Rotterdam", "La Haya", "Utrecht"],
@@ -1391,7 +1437,7 @@ const questionsValidation = validateQuestionsDatabase(questionsDatabase);
 if (!questionsValidation.isValid) {
   const first = questionsValidation.errors[0];
   throw new Error(
-    `[questions-data] Banco inv?lido (${questionsValidation.errorCount} errores). ` +
+    `[questions-data] Banco inválido (${questionsValidation.errorCount} errores). ` +
     `Primero: [${first.category}] #${first.index} ${first.type}.`
   );
 }
@@ -1400,7 +1446,7 @@ const questionsExtendedValidation = validateQuestionsDatabaseExtended(questionsD
 if (!questionsExtendedValidation.isValid) {
   const first = questionsExtendedValidation.errors[0];
   throw new Error(
-    `[questions-data] Banco inv?lido por reglas extendidas (${questionsExtendedValidation.errorCount} errores). ` +
+    `[questions-data] Banco inválido por reglas extendidas (${questionsExtendedValidation.errorCount} errores). ` +
     `Primero: [${first.category}] #${first.index} ${first.type}.`
   );
 }
@@ -1477,6 +1523,132 @@ function cloneQuestionRecord(question) {
     options: Array.isArray(question?.options) ? question.options.map(normalizeText) : [],
     correct: Number.isInteger(question?.correct) ? question.correct : 0
   };
+}
+
+
+
+const PRIMARY_LEVEL_KEYS = Object.freeze(["primaria_baja", "primaria_alta"]);
+
+const ADVANCED_PRIMARY_TOKENS_BY_CATEGORY = Object.freeze({
+  general: Object.freeze(["utc", "bisiesto", "huso horario"]),
+  science: Object.freeze(["adn", "isocorico", "gravitacionales", "avogadro", "boson", "gluon", "pascal", "ligo"]),
+  mathematics: Object.freeze(["derivada", "integral", "logaritmo", "matriz", "limite", "varianza", "radianes", "binomio"]),
+  robotics: Object.freeze(["slam", "imu", "kalman", "urdf", "cinematica", "pwm", "nyquist", "mosfet", "can bus", "watchdog", "optoacoplador"]),
+  chemistry: Object.freeze(["ph", "redox", "electrolisis", "molaridad", "covalente", "ionico", "isotopo", "protones", "neutrones", "valencia"]),
+  technology: Object.freeze(["https", "dns", "api", "oauth", "kubernetes", "websocket", "sha 256", "protocol buffers", "tcp", "iaas", "cors", "mvc"]),
+  history: Object.freeze(["carta magna", "guerra fria", "armisticio", "apartheid", "primavera arabe", "tratado de versalles"]),
+  geography: Object.freeze(["husos horarios", "transcontinental", "corriente oceanica", "densidad de poblacion", "caudal promedio"])
+});
+
+function sanitizeQuestionTextArtifacts(value) {
+  const textValue = normalizeText(value)
+    .replace(/\s*\((?:[1-9]\d?|100)\)\s*$/g, "")
+    .replace(/\s*[??]\s*(?:[1-9]\d?|100)\s*$/g, "")
+    .replace(/\s*[:\-]\s*(?:[1-9]\d?|100)\s*$/g, "")
+    .trim();
+
+  return textValue;
+}
+
+function sanitizeQuestionRecord(question) {
+  const cloned = cloneQuestionRecord(question);
+  cloned.question = sanitizeQuestionTextArtifacts(cloned.question);
+  return cloned;
+}
+
+function sanitizeQuestionList(list) {
+  return uniqueQuestions((Array.isArray(list) ? list : []).map(sanitizeQuestionRecord));
+}
+
+function containsLooseToken(textValue, token) {
+  const haystack = " " + normalizeLooseTextKey(textValue) + " ";
+  const needle = " " + normalizeLooseTextKey(token) + " ";
+  return haystack.includes(needle);
+}
+
+function isTooAdvancedForPrimary(question, category) {
+  const tokens = ADVANCED_PRIMARY_TOKENS_BY_CATEGORY[category] || [];
+  if (tokens.length === 0) return false;
+
+  const q = normalizeText(question?.question);
+  const opts = Array.isArray(question?.options) ? question.options : [];
+  const fullText = [q, ...opts.map(normalizeText)].join(" ");
+
+  return tokens.some(token => containsLooseToken(fullText, token));
+}
+
+function readingComplexityScore(question) {
+  const qText = normalizeText(question?.question);
+  const words = qText ? qText.split(/\s+/) : [];
+  const longWords = words.filter(word => word.length >= 10).length;
+
+  const optionWordMax = (Array.isArray(question?.options) ? question.options : [])
+    .map(opt => countWords(opt))
+    .reduce((max, value) => Math.max(max, value), 0);
+
+  const hasManyNumbers = (qText.match(/\d+/g) || []).length >= 3;
+
+  return words.length + (longWords * 2) + optionWordMax + (hasManyNumbers ? 2 : 0);
+}
+
+function filterQuestionsForLevel(questions, levelKey, category) {
+  const sanitized = sanitizeQuestionList(questions);
+
+  if (!PRIMARY_LEVEL_KEYS.includes(levelKey)) {
+    return sanitized;
+  }
+
+  const filtered = sanitized.filter(question => !isTooAdvancedForPrimary(question, category));
+
+  if (levelKey === "primaria_baja") {
+    return filtered.slice().sort((a, b) => readingComplexityScore(a) - readingComplexityScore(b));
+  }
+
+  return filtered;
+}
+
+function questionKeySet(list) {
+  const set = new Set();
+  for (const question of Array.isArray(list) ? list : []) {
+    const key = normalizeQuestionKey(question?.question);
+    if (key) set.add(key);
+  }
+  return set;
+}
+
+function fillUniqueQuestions(targetCount, pools, { avoidKeys = null, allowAvoidFallback = false } = {}) {
+  const out = [];
+  const blocked = new Set();
+  if (avoidKeys && !allowAvoidFallback) {
+    for (const key of avoidKeys) blocked.add(key);
+  }
+
+  const seen = new Set(blocked);
+
+  for (const pool of Array.isArray(pools) ? pools : []) {
+    for (const question of Array.isArray(pool) ? pool : []) {
+      const key = normalizeQuestionKey(question?.question);
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      out.push(question);
+      if (out.length >= targetCount) return out;
+    }
+  }
+
+  if (allowAvoidFallback && avoidKeys && out.length < targetCount) {
+    const outKeys = questionKeySet(out);
+    for (const pool of Array.isArray(pools) ? pools : []) {
+      for (const question of Array.isArray(pool) ? pool : []) {
+        const key = normalizeQuestionKey(question?.question);
+        if (!key || outKeys.has(key)) continue;
+        outKeys.add(key);
+        out.push(question);
+        if (out.length >= targetCount) return out;
+      }
+    }
+  }
+
+  return out;
 }
 
 function buildFallbackSeedsByLevel(sourceDb, { perLevelCategory = MANUAL_MIN_PER_LEVEL_CATEGORY } = {}) {
@@ -1612,15 +1784,49 @@ function buildQuestionsDatabaseByLevel(sourceDb, { targetCount = QUESTIONS_PER_L
   for (const level of LEVEL_KEYS) out[level] = {};
 
   for (const [category, list] of Object.entries(sourceDb || {})) {
+    const baseSanitized = sanitizeQuestionList(list);
+    const crossLevelManualRaw = LEVEL_KEYS.flatMap(level => getActiveManualSeeds(level, category));
+    const crossLevelManualSanitized = sanitizeQuestionList(crossLevelManualRaw);
+
+    let primaryBajaKeys = null;
+
     LEVEL_KEYS.forEach((levelKey, levelIndex) => {
-      const generatedQuestions = getCategoryQuestionsForLevel(list, levelIndex, targetCount);
-      const manualQuestions = getActiveManualSeeds(levelKey, category);
-      out[levelKey][category] = mergeLevelCategoryQuestions({
-        manualQuestions,
-        generatedQuestions,
-        baseQuestions: list,
-        targetCount
-      });
+      const manualRaw = getActiveManualSeeds(levelKey, category);
+      const generatedRaw = getCategoryQuestionsForLevel(baseSanitized, levelIndex, targetCount);
+
+      const manualPreferred = filterQuestionsForLevel(manualRaw, levelKey, category);
+      const generatedPreferred = filterQuestionsForLevel(generatedRaw, levelKey, category);
+      const basePreferred = filterQuestionsForLevel(baseSanitized, levelKey, category);
+      const crossLevelPreferred = filterQuestionsForLevel(crossLevelManualSanitized, levelKey, category);
+
+      const avoidKeys = levelKey === "primaria_alta" ? primaryBajaKeys : null;
+
+      const preferredPools = PRIMARY_LEVEL_KEYS.includes(levelKey)
+        ? [manualPreferred, generatedPreferred, crossLevelPreferred, basePreferred]
+        : [manualPreferred, generatedPreferred, basePreferred];
+
+      let selected = fillUniqueQuestions(
+        targetCount,
+        preferredPools,
+        { avoidKeys, allowAvoidFallback: false }
+      );
+
+      if (selected.length < targetCount) {
+        const manualFallback = sanitizeQuestionList(manualRaw);
+        const generatedFallback = sanitizeQuestionList(generatedRaw);
+
+        selected = fillUniqueQuestions(
+          targetCount,
+          [selected, manualFallback, generatedFallback, crossLevelManualSanitized, baseSanitized],
+          { avoidKeys, allowAvoidFallback: true }
+        );
+      }
+
+      out[levelKey][category] = selected.slice(0, targetCount);
+
+      if (levelKey === "primaria_baja") {
+        primaryBajaKeys = questionKeySet(out[levelKey][category]);
+      }
     });
   }
 
@@ -1772,6 +1978,9 @@ Object.freeze(questionsDatabaseByLevel);
 
 freezeNestedDatabase(questionsDatabaseByDifficulty);
 Object.freeze(questionsDatabaseByDifficulty);
+
+
+
 
 
 

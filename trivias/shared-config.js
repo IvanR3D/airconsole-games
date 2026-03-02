@@ -68,3 +68,4 @@ const iconPaths = {
     soundOn: 'assets/images/sound-on.webp',
     soundOff: 'assets/images/sound-off.webp'
 };
+

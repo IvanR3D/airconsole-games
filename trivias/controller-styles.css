@@ -449,8 +449,8 @@ body {
 }
 
 .sound-icon-img {
-    width: clamp(2rem, 8.5vw, 2.8rem);
-    height: clamp(2rem, 8.5vw, 2.8rem);
+    width: clamp(2.35rem, 10vw, 3.25rem);
+    height: clamp(2.35rem, 10vw, 3.25rem);
     object-fit: contain;
 }
 
@@ -1249,4 +1249,16 @@ body {
 #categoryScrollContainer::-webkit-scrollbar-thumb {
     background: rgba(255,255,255,0.3);
     border-radius: 4px;
+}
+
+
+/* Accesibilidad: foco visible sin alterar layout */
+button:focus-visible,
+[role="button"]:focus-visible,
+.sound-toggle-btn:focus-visible,
+.difficulty-btn:focus-visible,
+.answer-btn:focus-visible,
+.category-btn:focus-visible {
+    outline: 3px solid rgba(255, 255, 255, 0.92);
+    outline-offset: 2px;
 }
