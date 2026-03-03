@@ -42,9 +42,9 @@ let questionReceivedAt = 0; // Momento en que este controlador recibe la pregunt
 const domCache = {};
 const difficultyOrder = ["facil", "intermedio", "dificil"];
 const difficultyLabels = {
-    facil: 'F\u00e1cil',
-    intermedio: 'Intermedio',
-    dificil: 'Dif\u00edcil'
+    facil: "Facil",
+    intermedio: "Intermedio",
+    dificil: "Dificil"
 };
 
 function normalizeDifficulty(value) {
@@ -412,7 +412,7 @@ function goToStep(step) {
         if (finalQuestionCount) finalQuestionCount.textContent = selectedQuestionCount;
         const finalDifficultyName = document.getElementById('finalDifficultyName');
         if (finalDifficultyName) {
-            finalDifficultyName.textContent = selectedDifficulty ? (difficultyLabels[selectedDifficulty] || selectedDifficulty) : 'Intermedio';
+            finalDifficultyName.textContent = selectedDifficulty ? (difficultyLabels[selectedDifficulty] || selectedDifficulty) : "Facil";
         }
     }
 }
@@ -646,7 +646,7 @@ function updateSelectedCategory(category) {
 }
 
 function startGame() {
-    sendMessage({ action: 'startGame', difficulty: selectedDifficulty || 'intermedio' });
+    sendMessage({ action: 'startGame', difficulty: selectedDifficulty || "facil" });
 }
 
 function handleGameStart(data) {

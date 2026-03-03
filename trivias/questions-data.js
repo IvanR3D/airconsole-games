@@ -1469,24 +1469,6 @@ const DIFFICULTY_LEVEL_GROUPS = Object.freeze({
 
 const QUESTIONS_PER_LEVEL_TARGET = 100;
 
-function getCategoryQuestionsForLevel(baseQuestions, levelIndex, targetCount = QUESTIONS_PER_LEVEL_TARGET) {
-  const source = Array.isArray(baseQuestions) ? baseQuestions : [];
-  if (source.length === 0 || targetCount <= 0) return [];
-
-  const offset = source.length > 0 ? (levelIndex * 17) % source.length : 0;
-  const rotated = source.slice(offset).concat(source.slice(0, offset));
-
-  if (rotated.length >= targetCount) {
-    return rotated.slice(0, targetCount);
-  }
-
-  const out = [];
-  while (out.length < targetCount) {
-    out.push(...rotated);
-  }
-  return out.slice(0, targetCount);
-}
-
 function buildSeedCategoryMap(seedMap) {
   const out = {};
   for (const [category, rows] of Object.entries(seedMap || {})) {
@@ -1503,8 +1485,8 @@ function buildSeedLayerByLevel(sourceByLevel) {
   return Object.freeze(out);
 }
 
-// Inicio de banco manual por nivel (incremental).
-// Se prioriza este banco y se completa con fallback automatico hasta 100 por nivel/categoria.
+// Inicio de banco manual por nivel.
+// Este proyecto usa solo semillas manuales (sin relleno automatico).
 // Semillas manuales externas (questions-data-seeds.js).
 // Fallback a objeto vacio para mantener compatibilidad en entornos sin ese script.
 const MANUAL_SEEDS_SOURCE = (typeof globalThis !== "undefined" && globalThis.STEAM_TRIVIA_MANUAL_SEEDS)
@@ -1514,7 +1496,7 @@ const manualBaseSeedsByLevel = buildSeedLayerByLevel(MANUAL_SEEDS_SOURCE.base ||
 const manualExtraSeedsByLevel = buildSeedLayerByLevel(MANUAL_SEEDS_SOURCE.extra || {});
 
 
-const MANUAL_MIN_PER_LEVEL_CATEGORY = 50;
+const MANUAL_MIN_PER_LEVEL_CATEGORY = QUESTIONS_PER_LEVEL_TARGET;
 const MANUAL_MIN_TOTAL_QUESTIONS = LEVEL_KEYS.length * Object.keys(questionsDatabase).length * MANUAL_MIN_PER_LEVEL_CATEGORY;
 
 function cloneQuestionRecord(question) {
@@ -1651,35 +1633,6 @@ function fillUniqueQuestions(targetCount, pools, { avoidKeys = null, allowAvoidF
   return out;
 }
 
-function buildFallbackSeedsByLevel(sourceDb, { perLevelCategory = MANUAL_MIN_PER_LEVEL_CATEGORY } = {}) {
-  const out = {};
-  for (const level of LEVEL_KEYS) out[level] = {};
-
-  for (const [category, list] of Object.entries(sourceDb || {})) {
-    const source = Array.isArray(list) ? list : [];
-
-    LEVEL_KEYS.forEach((levelKey, levelIndex) => {
-      if (source.length === 0) {
-        out[levelKey][category] = [];
-        return;
-      }
-
-      const start = (levelIndex * 13) % source.length;
-      const picked = [];
-      for (let i = 0; i < perLevelCategory; i++) {
-        const idx = (start + i) % source.length;
-        picked.push(cloneQuestionRecord(source[idx]));
-      }
-
-      out[levelKey][category] = uniqueQuestions(picked);
-    });
-  }
-
-  return out;
-}
-
-const fallbackSeedsByLevel = buildFallbackSeedsByLevel(questionsDatabase);
-
 const manualSeedLayers = Object.freeze([manualBaseSeedsByLevel, manualExtraSeedsByLevel]);
 
 function collectManualSeeds(levelKey, category, seedLayers = manualSeedLayers) {
@@ -1696,11 +1649,7 @@ function hasCompleteManualBank(seedLayers, { perLevelCategory = QUESTIONS_PER_LE
   return true;
 }
 
-const activeManualSeedLayers = Object.freeze(
-  hasCompleteManualBank(manualSeedLayers)
-    ? [...manualSeedLayers]
-    : [...manualSeedLayers, fallbackSeedsByLevel]
-);
+const activeManualSeedLayers = Object.freeze([...manualSeedLayers]);
 
 function getActiveManualSeeds(levelKey, category) {
   return collectManualSeeds(levelKey, category, activeManualSeedLayers);
@@ -1783,62 +1732,27 @@ function buildQuestionsDatabaseByLevel(sourceDb, { targetCount = QUESTIONS_PER_L
   const out = {};
   for (const level of LEVEL_KEYS) out[level] = {};
 
-  for (const [category, list] of Object.entries(sourceDb || {})) {
-    const baseSanitized = sanitizeQuestionList(list);
-    const crossLevelManualRaw = LEVEL_KEYS.flatMap(level => getActiveManualSeeds(level, category));
-    const crossLevelManualSanitized = sanitizeQuestionList(crossLevelManualRaw);
-
-    let primaryBajaKeys = null;
-
-    LEVEL_KEYS.forEach((levelKey, levelIndex) => {
-      const manualRaw = getActiveManualSeeds(levelKey, category);
-      const generatedRaw = getCategoryQuestionsForLevel(baseSanitized, levelIndex, targetCount);
-
-      const manualPreferred = filterQuestionsForLevel(manualRaw, levelKey, category);
-      const generatedPreferred = filterQuestionsForLevel(generatedRaw, levelKey, category);
-      const basePreferred = filterQuestionsForLevel(baseSanitized, levelKey, category);
-      const crossLevelPreferred = filterQuestionsForLevel(crossLevelManualSanitized, levelKey, category);
-
-      const avoidKeys = levelKey === "primaria_alta" ? primaryBajaKeys : null;
-
-      const preferredPools = PRIMARY_LEVEL_KEYS.includes(levelKey)
-        ? [manualPreferred, generatedPreferred, crossLevelPreferred, basePreferred]
-        : [manualPreferred, generatedPreferred, basePreferred];
-
-      let selected = fillUniqueQuestions(
-        targetCount,
-        preferredPools,
-        { avoidKeys, allowAvoidFallback: false }
-      );
-
-      if (selected.length < targetCount) {
-        const manualFallback = sanitizeQuestionList(manualRaw);
-        const generatedFallback = sanitizeQuestionList(generatedRaw);
-
-        selected = fillUniqueQuestions(
-          targetCount,
-          [selected, manualFallback, generatedFallback, crossLevelManualSanitized, baseSanitized],
-          { avoidKeys, allowAvoidFallback: true }
+  for (const category of Object.keys(sourceDb || {})) {
+    for (const levelKey of LEVEL_KEYS) {
+      const manualOnly = getActiveManualSeeds(levelKey, category).map(cloneQuestionRecord);
+      if (manualOnly.length < targetCount) {
+        throw new Error(
+          `[questions-data] Banco manual insuficiente para ${levelKey}/${category}. ` +
+          `Esperado=${targetCount}, got=${manualOnly.length}.`
         );
       }
-
-      out[levelKey][category] = selected.slice(0, targetCount);
-
-      if (levelKey === "primaria_baja") {
-        primaryBajaKeys = questionKeySet(out[levelKey][category]);
-      }
-    });
+      out[levelKey][category] = manualOnly.slice(0, targetCount);
+    }
   }
 
   return out;
 }
 
 function buildQuestionsDatabaseByDifficultyFromLevels(levelDb) {
-  const out = {
-    facil: {},
-    intermedio: {},
-    dificil: {}
-  };
+  const out = {};
+  for (const difficulty of DIFFICULTY_KEYS) {
+    out[difficulty] = {};
+  }
 
   for (const category of QUESTION_CATEGORIES) {
     for (const difficulty of DIFFICULTY_KEYS) {
@@ -1921,7 +1835,7 @@ if (!derivedBanksValidation.isValid) {
 
 function sanitizeDifficulty(difficulty) {
   const key = normalizeText(difficulty).toLowerCase();
-  return DIFFICULTY_KEYS.includes(key) ? key : "intermedio";
+  return DIFFICULTY_KEYS.includes(key) ? key : "facil";
 }
 
 function sanitizeCategory(category) {
@@ -1937,26 +1851,1081 @@ function sanitizeCount(count) {
 
 // Ejemplo:
 // const sample = getQuestions({ difficulty: "facil", category: "robotics", count: 10 });
-function getQuestions({ difficulty = "intermedio", category = "general", count = 10 } = {}) {
+const STRICT_CATEGORY_BOOST_DATA = Object.freeze({
+  "science": [
+    [
+      "Una supernova tipo Ia se usa para:",
+      [
+        "Medir distancias cosmicas",
+        "Detectar sismos",
+        "Estimar salinidad",
+        "Fabricar paneles solares"
+      ],
+      "Medir distancias cosmicas"
+    ],
+    [
+      "El fenomeno de cuchara doblada en agua se debe a:",
+      [
+        "Refraccion",
+        "Difraccion",
+        "Interferencia",
+        "Resonancia"
+      ],
+      "Refraccion"
+    ],
+    [
+      "Unidad SI de capacitancia electrica:",
+      [
+        "Faradio",
+        "Tesla",
+        "Newton",
+        "Lumen"
+      ],
+      "Faradio"
+    ],
+    [
+      "Gas noble usado en letreros luminosos rojos:",
+      [
+        "Neon",
+        "Argon",
+        "Helio",
+        "Xenon"
+      ],
+      "Neon"
+    ],
+    [
+      "Proceso celular que genera ATP con oxigeno en mitocondrias:",
+      [
+        "Respiracion aerobia",
+        "Fermentacion lactica",
+        "Fotosintesis",
+        "Osmosis"
+      ],
+      "Respiracion aerobia"
+    ],
+    [
+      "La escala de Mohs mide:",
+      [
+        "Dureza de minerales",
+        "Densidad de liquidos",
+        "Temperatura",
+        "Viscosidad"
+      ],
+      "Dureza de minerales"
+    ],
+    [
+      "Metodo para separar pigmentos por afinidad al solvente:",
+      [
+        "Cromatografia",
+        "Decantacion",
+        "Filtracion",
+        "Destilacion simple"
+      ],
+      "Cromatografia"
+    ],
+    [
+      "Radiacion electromagnetica de mayor frecuencia:",
+      [
+        "Rayos gamma",
+        "Microondas",
+        "Infrarrojo",
+        "Ondas de radio"
+      ],
+      "Rayos gamma"
+    ],
+    [
+      "Estructura foliar que regula intercambio de gases:",
+      [
+        "Estomas",
+        "Xilema",
+        "Estigmas",
+        "Cuticula"
+      ],
+      "Estomas"
+    ],
+    [
+      "Capa rigida formada por corteza y manto superior:",
+      [
+        "Litosfera",
+        "Hidrosfera",
+        "Astenosfera",
+        "Mesosfera"
+      ],
+      "Litosfera"
+    ],
+    [
+      "En ecologia, el nivel trofico que produce materia organica:",
+      [
+        "Productores primarios",
+        "Consumidores terciarios",
+        "Descomponedores",
+        "Depredadores tope"
+      ],
+      "Productores primarios"
+    ],
+    [
+      "Dispositivo que registra ondas sismicas:",
+      [
+        "Sismografo",
+        "Volimetro",
+        "Espectrometro",
+        "Refractometro"
+      ],
+      "Sismografo"
+    ]
+  ],
+  "mathematics": [
+    [
+      "La pendiente de una recta vertical es:",
+      [
+        "Cero",
+        "No definida",
+        "Uno",
+        "Negativa"
+      ],
+      "No definida"
+    ],
+    [
+      "Teorema que relaciona catetos e hipotenusa:",
+      [
+        "Teorema de Pitagoras",
+        "Teorema de Tales",
+        "Teorema de Bayes",
+        "Teorema de Gauss"
+      ],
+      "Teorema de Pitagoras"
+    ],
+    [
+      "El numero irracional asociado a la circunferencia es:",
+      [
+        "Pi",
+        "Euler",
+        "Phi",
+        "Gamma"
+      ],
+      "Pi"
+    ],
+    [
+      "La mediana en estadistica es:",
+      [
+        "Valor central ordenado",
+        "Promedio ponderado",
+        "Valor mas repetido",
+        "Diferencia maxima"
+      ],
+      "Valor central ordenado"
+    ],
+    [
+      "Dos angulos que suman 90 grados son:",
+      [
+        "Suplementarios",
+        "Complementarios",
+        "Conjugados",
+        "Alternos"
+      ],
+      "Complementarios"
+    ],
+    [
+      "La matriz identidad de 2x2 tiene:",
+      [
+        "Unos en la diagonal principal",
+        "Ceros en toda la diagonal",
+        "Todos sus elementos iguales",
+        "Solo numeros primos"
+      ],
+      "Unos en la diagonal principal"
+    ],
+    [
+      "Base de los logaritmos naturales:",
+      [
+        "e",
+        "2",
+        "10",
+        "pi"
+      ],
+      "e"
+    ],
+    [
+      "La derivada de una constante es:",
+      [
+        "0",
+        "1",
+        "La constante",
+        "Infinita"
+      ],
+      "0"
+    ],
+    [
+      "Una integral definida suele representar:",
+      [
+        "Area bajo la curva",
+        "Pendiente de la recta",
+        "Promedio simple",
+        "Desviacion media"
+      ],
+      "Area bajo la curva"
+    ],
+    [
+      "La distancia entre dos puntos en el plano usa:",
+      [
+        "Formula euclidiana",
+        "Regla de Laplace",
+        "Metodo de Newton-Raphson",
+        "Producto vectorial"
+      ],
+      "Formula euclidiana"
+    ],
+    [
+      "Un evento seguro en probabilidad vale:",
+      [
+        "1",
+        "0",
+        "0.5",
+        "Depende del dado"
+      ],
+      "1"
+    ],
+    [
+      "Sucesion con diferencia constante:",
+      [
+        "Aritmetica",
+        "Geometrica",
+        "Arm?nica",
+        "Caotica"
+      ],
+      "Aritmetica"
+    ],
+    [
+      "Regla de divisibilidad por 3:",
+      [
+        "Suma de cifras divisible por 3",
+        "Termina en 0",
+        "Tiene numero par de cifras",
+        "Empieza en numero impar"
+      ],
+      "Suma de cifras divisible por 3"
+    ],
+    [
+      "Poligono de diez lados:",
+      [
+        "Decagono",
+        "Octagono",
+        "Dodecagono",
+        "Heptagono"
+      ],
+      "Decagono"
+    ],
+    [
+      "En estadistica, valor mas frecuente:",
+      [
+        "Moda",
+        "Media",
+        "Rango",
+        "Varianza"
+      ],
+      "Moda"
+    ]
+  ],
+  "chemistry": [
+    [
+      "Enlace donde se comparten electrones:",
+      [
+        "Covalente",
+        "Ionico",
+        "Metalico",
+        "Puente de hidrogeno"
+      ],
+      "Covalente"
+    ],
+    [
+      "Segun Bronsted-Lowry, un acido:",
+      [
+        "Dona protones",
+        "Acepta protones",
+        "Dona neutrones",
+        "Acepta electrones"
+      ],
+      "Dona protones"
+    ],
+    [
+      "El numero atomico indica cantidad de:",
+      [
+        "Protones",
+        "Neutrones",
+        "Electrones de valencia",
+        "Orbitales"
+      ],
+      "Protones"
+    ],
+    [
+      "Acido con carbonato suele liberar:",
+      [
+        "Dioxido de carbono",
+        "Oxigeno",
+        "Nitrogeno",
+        "Helio"
+      ],
+      "Dioxido de carbono"
+    ],
+    [
+      "Cambio de solido a gas sin pasar por liquido:",
+      [
+        "Sublimacion",
+        "Fusion",
+        "Condensacion",
+        "Licuefaccion"
+      ],
+      "Sublimacion"
+    ],
+    [
+      "Concentracion expresada en mol/L:",
+      [
+        "Molaridad",
+        "Normalidad",
+        "Molalidad",
+        "Fraccion molar"
+      ],
+      "Molaridad"
+    ],
+    [
+      "Un pH menor que 7 indica medio:",
+      [
+        "Acido",
+        "Basico",
+        "Neutro",
+        "Inerte"
+      ],
+      "Acido"
+    ],
+    [
+      "En redox, oxidacion significa:",
+      [
+        "Perdida de electrones",
+        "Ganancia de electrones",
+        "Perdida de protones",
+        "Ganancia de neutrones"
+      ],
+      "Perdida de electrones"
+    ],
+    [
+      "Un indicador acido-base sirve para:",
+      [
+        "Cambiar color segun pH",
+        "Aumentar presion",
+        "Reducir masa",
+        "Calcular densidad"
+      ],
+      "Cambiar color segun pH"
+    ],
+    [
+      "Destilacion simple separa liquidos por:",
+      [
+        "Diferencia de punto de ebullicion",
+        "Diferencia de color",
+        "Diferencia de dureza",
+        "Diferencia de carga"
+      ],
+      "Diferencia de punto de ebullicion"
+    ],
+    [
+      "Aleacion de hierro y carbono:",
+      [
+        "Acero",
+        "Bronce",
+        "Laton",
+        "Cobre"
+      ],
+      "Acero"
+    ],
+    [
+      "Un anion tiene carga:",
+      [
+        "Negativa",
+        "Positiva",
+        "Neutra",
+        "Variable siempre"
+      ],
+      "Negativa"
+    ],
+    [
+      "Isotopos de un elemento difieren en:",
+      [
+        "Numero de neutrones",
+        "Numero de protones",
+        "Numero atomico",
+        "Tipo de enlace"
+      ],
+      "Numero de neutrones"
+    ],
+    [
+      "Catalizador en una reaccion:",
+      [
+        "Disminuye energia de activacion",
+        "Aumenta masa de productos",
+        "Cambia equilibrio permanentemente",
+        "Se consume por completo"
+      ],
+      "Disminuye energia de activacion"
+    ],
+    [
+      "Una reaccion exotermica:",
+      [
+        "Libera calor",
+        "Absorbe calor",
+        "No intercambia energia",
+        "Siempre enfria"
+      ],
+      "Libera calor"
+    ]
+  ],
+  "technology": [
+    [
+      "CDN significa:",
+      [
+        "Red de distribucion de contenido",
+        "Canal de datos numericos",
+        "Controlador digital de nodos",
+        "Centro de desarrollo nacional"
+      ],
+      "Red de distribucion de contenido"
+    ],
+    [
+      "Tecnologia para pagos acercando telefono a un lector:",
+      [
+        "NFC",
+        "USB",
+        "HDMI",
+        "SATA"
+      ],
+      "NFC"
+    ],
+    [
+      "Tecnica para segmentar red en subredes logicas:",
+      [
+        "VLAN",
+        "VPN",
+        "NAT",
+        "DHCP"
+      ],
+      "VLAN"
+    ],
+    [
+      "Una replica de solo lectura en base de datos se usa para:",
+      [
+        "Escalar consultas",
+        "Reducir RAM fisica",
+        "Eliminar indices",
+        "Cifrar disco"
+      ],
+      "Escalar consultas"
+    ],
+    [
+      "TOTP en 2FA significa:",
+      [
+        "Codigo de un solo uso basado en tiempo",
+        "Token offline de transporte",
+        "Tabla optima de permisos",
+        "Tunel operativo de puerto"
+      ],
+      "Codigo de un solo uso basado en tiempo"
+    ],
+    [
+      "Protocolo pub/sub ligero usado en IoT:",
+      [
+        "MQTT",
+        "IMAP",
+        "FTP",
+        "SNMP"
+      ],
+      "MQTT"
+    ],
+    [
+      "Hipervisor que corre directo en hardware:",
+      [
+        "Tipo 1",
+        "Tipo 2",
+        "Anidado",
+        "Portable"
+      ],
+      "Tipo 1"
+    ],
+    [
+      "Estrategia para acercar contenido al usuario final:",
+      [
+        "Cache en el borde",
+        "Defragmentacion",
+        "Submuestreo",
+        "Overclock"
+      ],
+      "Cache en el borde"
+    ],
+    [
+      "Objetivo principal de alta disponibilidad:",
+      [
+        "Evitar punto unico de falla",
+        "Aumentar tamano de fuente",
+        "Reducir resolucion",
+        "Eliminar respaldos"
+      ],
+      "Evitar punto unico de falla"
+    ],
+    [
+      "Algoritmo de compresion usado por PNG:",
+      [
+        "DEFLATE",
+        "Huffman fijo",
+        "Brotli",
+        "LZMA"
+      ],
+      "DEFLATE"
+    ],
+    [
+      "HTTP/3 usa QUIC sobre:",
+      [
+        "UDP",
+        "TCP",
+        "ICMP",
+        "ARP"
+      ],
+      "UDP"
+    ],
+    [
+      "Un balanceador de carga hace:",
+      [
+        "Distribuye trafico entre servidores",
+        "Compila codigo fuente",
+        "Sincroniza reloj BIOS",
+        "Renderiza video"
+      ],
+      "Distribuye trafico entre servidores"
+    ],
+    [
+      "Arquitectura headless separa:",
+      [
+        "Frontend y backend por API",
+        "CPU y RAM",
+        "Router y switch",
+        "Cliente y monitor"
+      ],
+      "Frontend y backend por API"
+    ],
+    [
+      "Integracion continua busca:",
+      [
+        "Ejecutar build y pruebas en cada cambio",
+        "Reiniciar red cada hora",
+        "Duplicar commits",
+        "Eliminar ramas"
+      ],
+      "Ejecutar build y pruebas en cada cambio"
+    ],
+    [
+      "Proteccion recomendada para hashes de contrasena:",
+      [
+        "Usar sal unica por usuario",
+        "Guardar en texto plano",
+        "Usar misma sal global",
+        "Recortar caracteres"
+      ],
+      "Usar sal unica por usuario"
+    ],
+    [
+      "Formato binario compacto para APIs:",
+      [
+        "Protocol Buffers",
+        "CSV",
+        "HTML",
+        "BMP"
+      ],
+      "Protocol Buffers"
+    ],
+    [
+      "Modelo serverless ejecuta codigo:",
+      [
+        "Bajo demanda por eventos",
+        "Solo en escritorio",
+        "Sin internet",
+        "En modo lectura"
+      ],
+      "Bajo demanda por eventos"
+    ],
+    [
+      "Una base de datos key-value optimiza:",
+      [
+        "Acceso por clave directa",
+        "Consultas GIS",
+        "Render 3D",
+        "Compilacion paralela"
+      ],
+      "Acceso por clave directa"
+    ],
+    [
+      "Medida para frenar fuerza bruta en login:",
+      [
+        "Limitar intentos",
+        "Aumentar brillo",
+        "Reducir cache",
+        "Desactivar DNS"
+      ],
+      "Limitar intentos"
+    ],
+    [
+      "Tecnologia comun para aislar dependencias por app:",
+      [
+        "Contenedores",
+        "Macros",
+        "Sprites",
+        "Registros DNS"
+      ],
+      "Contenedores"
+    ]
+  ],
+  "history": [
+    [
+      "En 1492, Cristobal Colon llego a:",
+      [
+        "America",
+        "India",
+        "China",
+        "Australia"
+      ],
+      "America"
+    ],
+    [
+      "La Carta Magna fue firmada en:",
+      [
+        "Inglaterra",
+        "Francia",
+        "Espana",
+        "Alemania"
+      ],
+      "Inglaterra"
+    ],
+    [
+      "La Revolucion Francesa comenzo en:",
+      [
+        "1789",
+        "1776",
+        "1810",
+        "1914"
+      ],
+      "1789"
+    ],
+    [
+      "El Muro de Berlin cayo en:",
+      [
+        "1989",
+        "1975",
+        "1995",
+        "1961"
+      ],
+      "1989"
+    ],
+    [
+      "La Primera Guerra Mundial inicio en:",
+      [
+        "1914",
+        "1939",
+        "1905",
+        "1929"
+      ],
+      "1914"
+    ],
+    [
+      "La ONU fue fundada en:",
+      [
+        "1945",
+        "1919",
+        "1959",
+        "1933"
+      ],
+      "1945"
+    ],
+    [
+      "Caida del Imperio romano de Occidente:",
+      [
+        "476",
+        "711",
+        "1066",
+        "1492"
+      ],
+      "476"
+    ],
+    [
+      "La independencia de Estados Unidos se declaro en:",
+      [
+        "1776",
+        "1789",
+        "1804",
+        "1865"
+      ],
+      "1776"
+    ],
+    [
+      "El Renacimiento tuvo origen principal en:",
+      [
+        "Italia",
+        "Inglaterra",
+        "Rusia",
+        "Egipto"
+      ],
+      "Italia"
+    ],
+    [
+      "La imprenta de tipos moviles se asocia a:",
+      [
+        "Gutenberg",
+        "Galileo",
+        "Da Vinci",
+        "Newton"
+      ],
+      "Gutenberg"
+    ],
+    [
+      "La Revolucion Industrial inicio en:",
+      [
+        "Reino Unido",
+        "Japon",
+        "Mexico",
+        "Brasil"
+      ],
+      "Reino Unido"
+    ],
+    [
+      "La Guerra Fria enfrento principalmente a:",
+      [
+        "EEUU y URSS",
+        "Francia y Alemania",
+        "China y Japon",
+        "India y Pakistan"
+      ],
+      "EEUU y URSS"
+    ],
+    [
+      "La Ruta de la Seda conectaba Asia con:",
+      [
+        "Europa y Mediterraneo",
+        "Oceania",
+        "America del Sur",
+        "Africa austral"
+      ],
+      "Europa y Mediterraneo"
+    ],
+    [
+      "El Tratado de Versalles se firmo tras:",
+      [
+        "Primera Guerra Mundial",
+        "Segunda Guerra Mundial",
+        "Guerra de Crimea",
+        "Guerra Civil Espanola"
+      ],
+      "Primera Guerra Mundial"
+    ],
+    [
+      "Constantinopla cayo ante los otomanos en:",
+      [
+        "1453",
+        "1204",
+        "1517",
+        "1683"
+      ],
+      "1453"
+    ]
+  ],
+  "geography": [
+    [
+      "La latitud 0 corresponde al:",
+      [
+        "Ecuador",
+        "Tropico de Cancer",
+        "Meridiano de Greenwich",
+        "Circulo polar artico"
+      ],
+      "Ecuador"
+    ],
+    [
+      "El meridiano de referencia mundial es:",
+      [
+        "Greenwich",
+        "Quito",
+        "Paris",
+        "Roma"
+      ],
+      "Greenwich"
+    ],
+    [
+      "El continente mas pequeno por superficie es:",
+      [
+        "Oceania",
+        "Europa",
+        "Antartida",
+        "America"
+      ],
+      "Oceania"
+    ],
+    [
+      "Rio que atraviesa Egipto:",
+      [
+        "Nilo",
+        "Danubio",
+        "Amazonas",
+        "Misisipi"
+      ],
+      "Nilo"
+    ],
+    [
+      "Pais con mayor superficie del mundo:",
+      [
+        "Rusia",
+        "Canada",
+        "China",
+        "Estados Unidos"
+      ],
+      "Rusia"
+    ],
+    [
+      "El desierto calido mas grande es:",
+      [
+        "Sahara",
+        "Atacama",
+        "Gobi",
+        "Kalahari"
+      ],
+      "Sahara"
+    ],
+    [
+      "El istmo de Panama une:",
+      [
+        "America del Norte y America del Sur",
+        "Europa y Asia",
+        "Asia y Africa",
+        "Africa y Europa"
+      ],
+      "America del Norte y America del Sur"
+    ],
+    [
+      "Mar entre Europa y Africa:",
+      [
+        "Mediterraneo",
+        "Baltico",
+        "Negro",
+        "Rojo"
+      ],
+      "Mediterraneo"
+    ],
+    [
+      "Capital de Canada:",
+      [
+        "Ottawa",
+        "Toronto",
+        "Montreal",
+        "Vancouver"
+      ],
+      "Ottawa"
+    ],
+    [
+      "La cordillera del Himalaya esta en:",
+      [
+        "Asia",
+        "Europa",
+        "America",
+        "Africa"
+      ],
+      "Asia"
+    ],
+    [
+      "Zona climatica cercana al ecuador:",
+      [
+        "Tropical",
+        "Polar",
+        "Subartica",
+        "Mediterranea"
+      ],
+      "Tropical"
+    ],
+    [
+      "Pais sudamericano sin salida al mar:",
+      [
+        "Bolivia",
+        "Uruguay",
+        "Ecuador",
+        "Surinam"
+      ],
+      "Bolivia"
+    ],
+    [
+      "Lago navegable mas alto del mundo:",
+      [
+        "Titicaca",
+        "Baikal",
+        "Victoria",
+        "Michigan"
+      ],
+      "Titicaca"
+    ],
+    [
+      "Corriente fria frente a Peru y Chile:",
+      [
+        "Humboldt",
+        "Gulf Stream",
+        "Kuroshio",
+        "Canarias"
+      ],
+      "Humboldt"
+    ],
+    [
+      "Capital de Australia:",
+      [
+        "Canberra",
+        "Sidney",
+        "Melbourne",
+        "Perth"
+      ],
+      "Canberra"
+    ]
+  ]
+});
+
+const strictCategoryBoostQuestions = Object.freeze(
+  Object.fromEntries(
+    Object.entries(STRICT_CATEGORY_BOOST_DATA).map(([category, rows]) => [category, buildFromData(rows)])
+  )
+);
+
+function normalizeQuestionFamilyKey(value) {
+  return sanitizeQuestionTextArtifacts(value)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/\d+/g, "#")
+    .replace(/#+/g, "#")
+    .replace(/\b(kg|g|gramo|gramos|hora|horas|minuto|minutos|segundo|segundos|ano|anos)\b/g, "#")
+    .replace(/\(s\)/g, "")
+    .replace(/[^\w\s#]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+const STRICT_MIN_POOL_SIZE = 200;
+const STRICT_MAX_POOL_SIZE = 300;
+
+function buildStrictFamilyUniquePool(pool, { minSize = STRICT_MIN_POOL_SIZE, maxSize = STRICT_MAX_POOL_SIZE } = {}) {
+  const uniquePool = shuffle(uniqueQuestions(pool));
+  const familyBuckets = new Map();
+
+  for (const question of uniquePool) {
+    const questionKey = normalizeQuestionKey(question?.question);
+    if (!questionKey) continue;
+
+    const familyKey = normalizeQuestionFamilyKey(question?.question) || questionKey;
+    if (!familyBuckets.has(familyKey)) familyBuckets.set(familyKey, []);
+    familyBuckets.get(familyKey).push(question);
+  }
+
+  const buckets = shuffle(
+    [...familyBuckets.values()].map(bucket => shuffle(bucket))
+  );
+
+  const selected = [];
+  let round = 0;
+
+  while (selected.length < maxSize) {
+    let addedInRound = false;
+
+    for (const bucket of buckets) {
+      if (round >= bucket.length) continue;
+      selected.push(bucket[round]);
+      addedInRound = true;
+      if (selected.length >= maxSize) break;
+    }
+
+    if (!addedInRound) break;
+    round++;
+  }
+
+  if (selected.length < minSize && selected.length < uniquePool.length) {
+    const seenKeys = new Set(selected.map(q => normalizeQuestionKey(q?.question)));
+    const targetFloor = Math.min(minSize, maxSize, uniquePool.length);
+
+    for (const question of uniquePool) {
+      if (selected.length >= targetFloor) break;
+      const key = normalizeQuestionKey(question?.question);
+      if (!key || seenKeys.has(key)) continue;
+      seenKeys.add(key);
+      selected.push(question);
+    }
+  }
+
+  return shuffle(selected).slice(0, maxSize);
+}
+
+function buildStrictPoolDatabaseByDifficulty() {
+  const out = {};
+
+  for (const difficultyKey of DIFFICULTY_KEYS) {
+    out[difficultyKey] = {};
+
+    for (const categoryKey of QUESTION_CATEGORIES) {
+      const difficultyPool = questionsDatabaseByDifficulty[difficultyKey]?.[categoryKey] || [];
+      const baseCuratedPool = questionsDatabase[categoryKey] || [];
+      const boostPool = strictCategoryBoostQuestions[categoryKey] || [];
+
+      out[difficultyKey][categoryKey] = buildStrictFamilyUniquePool([
+        ...difficultyPool,
+        ...baseCuratedPool,
+        ...boostPool
+      ]);
+    }
+  }
+
+  return out;
+}
+
+function validateStrictPoolCoverage(strictDb, { minSize = STRICT_MIN_POOL_SIZE, maxSize = STRICT_MAX_POOL_SIZE } = {}) {
+  const errors = [];
+
+  for (const difficultyKey of DIFFICULTY_KEYS) {
+    for (const categoryKey of QUESTION_CATEGORIES) {
+      const count = Array.isArray(strictDb?.[difficultyKey]?.[categoryKey])
+        ? strictDb[difficultyKey][categoryKey].length
+        : -1;
+
+      if (count < minSize || count > maxSize) {
+        errors.push({
+          difficulty: difficultyKey,
+          category: categoryKey,
+          expectedMin: minSize,
+          expectedMax: maxSize,
+          got: count
+        });
+      }
+    }
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errorCount: errors.length,
+    errors
+  };
+}
+
+const strictQuestionsDatabaseByDifficulty = buildStrictPoolDatabaseByDifficulty();
+const strictPoolCoverageValidation = validateStrictPoolCoverage(strictQuestionsDatabaseByDifficulty);
+if (!strictPoolCoverageValidation.isValid) {
+  const first = strictPoolCoverageValidation.errors[0];
+  throw new Error(
+    "[questions-data] Cobertura de pool estricto invalida (" + strictPoolCoverageValidation.errorCount + " errores). " +
+    "Primero: " + first.difficulty + "/" + first.category + " got=" + first.got + " esperado=" + first.expectedMin + "-" + first.expectedMax
+  );
+}
+
+function getQuestions({ difficulty = "facil", category = "general", count = 10 } = {}) {
   const difficultyKey = sanitizeDifficulty(difficulty);
   const categoryKey = sanitizeCategory(category);
   const requestedCount = sanitizeCount(count);
 
-  const mergedPool = [];
-
-  mergedPool.push(...(questionsDatabaseByDifficulty[difficultyKey]?.[categoryKey] || []));
-
-  for (const otherDifficulty of DIFFICULTY_KEYS) {
-    if (otherDifficulty === difficultyKey) continue;
-    mergedPool.push(...(questionsDatabaseByDifficulty[otherDifficulty]?.[categoryKey] || []));
-  }
-
-  if (mergedPool.length < requestedCount) {
-    mergedPool.push(...(questionsDatabase[categoryKey] || []));
-  }
-
-  const uniquePool = uniqueQuestions(mergedPool);
-  const selected = shuffle(uniquePool).slice(0, Math.min(requestedCount, uniquePool.length));
+  const strictPool = strictQuestionsDatabaseByDifficulty[difficultyKey]?.[categoryKey] || [];
+  const selected = shuffle(strictPool).slice(0, Math.min(requestedCount, strictPool.length));
   return selected.map(cloneQuestionRecord);
 }
 
@@ -1978,6 +2947,9 @@ Object.freeze(questionsDatabaseByLevel);
 
 freezeNestedDatabase(questionsDatabaseByDifficulty);
 Object.freeze(questionsDatabaseByDifficulty);
+
+freezeNestedDatabase(strictQuestionsDatabaseByDifficulty);
+Object.freeze(strictQuestionsDatabaseByDifficulty);
 
 
 

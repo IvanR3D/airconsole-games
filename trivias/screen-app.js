@@ -805,8 +805,8 @@ function startGame() {
     gameState = 'playing';
     currentQuestion = 0;
 
-    const difficultyForGame = normalizeDifficulty(selectedDifficulty) || 'intermedio';
-    selectedDifficulty = difficultyForGame; // Compat: si viene null, se usa intermedio.
+    const difficultyForGame = normalizeDifficulty(selectedDifficulty) || "facil";
+    selectedDifficulty = difficultyForGame; // Compat: si viene null, se usa facil.
 
     const maxQuestions = Math.max(1, Math.min(Number(selectedQuestionCount) || 10, 50));
     if (typeof getQuestions === 'function') {
