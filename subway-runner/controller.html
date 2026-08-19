@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>LINE RUN — Mando</title>
+<style>
+  :root{
+    --bg:#f4f3ef; --ink:#1c1c1a; --muted:#6f6d66; --line:#d8d5cc; --accent:#c76b3f; --mycolor:#c76b3f;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+  html,body{
+    width:100%; height:100%; overflow:hidden; background:var(--bg); color:var(--ink);
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    -webkit-user-select:none; user-select:none; touch-action:none;
+  }
+  .screen{ position:fixed; inset:0; display:flex; flex-direction:column; }
+  .hidden{ display:none !important; }
+
+  /* ---------- top bar ---------- */
+  #topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:12px 16px; border-bottom:1px solid var(--line); flex-shrink:0;
+  }
+  #meBadge{ display:flex; align-items:center; gap:8px; font-weight:700; font-size:14px; }
+  #meDot{ width:12px; height:12px; border-radius:50%; background:var(--mycolor); }
+  #muteBtn{ font-size:20px; background:none; border:none; padding:6px; color:var(--ink); }
+
+  /* ---------- lobby ---------- */
+  #lobbyView{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:24px; gap:14px; }
+  #lobbyView .title{ font-size:26px; font-weight:800; }
+  #lobbyView .title span{ color:var(--accent); }
+  #lobbyMsg{ font-size:14px; color:var(--muted); max-width:280px; }
+  #startBtn{
+    margin-top:10px; padding:16px 40px; font-size:16px; font-weight:700; border:none; border-radius:10px;
+    background:var(--ink); color:#fdfdfb;
+  }
+  #startBtn:active{ opacity:0.8; }
+
+  /* ---------- control mode switch ---------- */
+  #modeSwitch{ display:flex; border:1px solid var(--line); border-radius:20px; overflow:hidden; margin-top:8px; }
+  #modeSwitch button{ padding:8px 18px; font-size:12px; font-weight:600; border:none; background:#fff; color:var(--muted); }
+  #modeSwitch button.active{ background:var(--ink); color:#fff; }
+
+  /* ---------- playing: buttons mode ---------- */
+  #playView{ flex:1; display:flex; flex-direction:column; }
+  #playHeader{ text-align:center; padding:8px; font-size:12px; color:var(--muted); flex-shrink:0; }
+  #buttonPad{ flex:1; display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; gap:10px; padding:10px; }
+  .padBtn{
+    display:flex; align-items:center; justify-content:center; flex-direction:column; gap:4px;
+    border-radius:16px; border:2px solid var(--line); background:#fff; font-size:34px; color:var(--ink);
+  }
+  .padBtn span.lbl{ font-size:11px; font-weight:600; color:var(--muted); }
+  .padBtn:active{ background:var(--accent); color:#fff; border-color:var(--accent); }
+  .padBtn:active span.lbl{ color:#fff; }
+
+  /* ---------- playing: swipe mode ---------- */
+  #swipeArea{ flex:1; position:relative; display:flex; align-items:center; justify-content:center; }
+  #swipeHint{ font-size:13px; color:var(--muted); text-align:center; line-height:1.8; pointer-events:none; }
+  #swipeArea .arrow{ font-size:20px; }
+
+  /* ---------- eliminated / gameover ---------- */
+  #resultView{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; padding:24px; text-align:center; }
+  #resultView .big{ font-size:22px; font-weight:800; }
+  #resultView .score{ font-size:40px; font-weight:800; color:var(--accent); }
+  #resultView .rankTag{ font-size:13px; color:var(--muted); }
+  #playAgainBtn{ margin-top:14px; padding:14px 34px; font-size:15px; font-weight:700; border:none; border-radius:10px; background:var(--ink); color:#fff; }
+</style>
+</head>
+<body>
+
+<div class="screen">
+  <div id="topbar">
+    <div id="meBadge"><div id="meDot"></div><span id="meName">…</span></div>
+    <button id="muteBtn">🔊</button>
+  </div>
+
+  <!-- LOBBY -->
+  <div id="lobbyView">
+    <div class="title">LINE<span>RUN</span></div>
+    <div id="lobbyMsg">Conectando…</div>
+    <button id="startBtn" class="hidden">Empezar partida</button>
+    <div id="modeSwitch">
+      <button id="modeButtonsBtn" class="active">Botones</button>
+      <button id="modeSwipeBtn">Deslizar</button>
+    </div>
+  </div>
+
+  <!-- PLAYING -->
+  <div id="playView" class="hidden">
+    <div id="playHeader">Corre, salta y esquiva</div>
+
+    <div id="buttonPad">
+      <div class="padBtn" id="btnLeft" style="grid-column:1; grid-row:2;">⬅ <span class="lbl">CARRIL</span></div>
+      <div class="padBtn" id="btnJump" style="grid-column:1/3; grid-row:1;">⬆ <span class="lbl">SALTAR</span></div>
+      <div class="padBtn" id="btnRight" style="grid-column:2; grid-row:2;">➡ <span class="lbl">CARRIL</span></div>
+    </div>
+    <div id="buttonPadDuck" style="padding:0 10px 10px;">
+      <div class="padBtn" id="btnDuck" style="width:100%;">⬇ <span class="lbl">DESLIZARSE</span></div>
+    </div>
+
+    <div id="swipeArea" class="hidden">
+      <div id="swipeHint">
+        <div class="arrow">⬆ Saltar</div>
+        <div class="arrow">⬇ Deslizarse</div>
+        <div class="arrow">⬅ ➡ Cambiar carril</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="resultView" class="hidden">
+    <div class="big" id="resultTitle">¡Eliminado!</div>
+    <div class="score" id="resultScore">0</div>
+    <div class="rankTag" id="resultRank"></div>
+    <button id="playAgainBtn" class="hidden">Jugar de nuevo</button>
+    <div id="waitHostMsg" class="rankTag hidden">Esperando al anfitrión…</div>
+  </div>
+</div>
+
+<script src="https://www.airconsole.com/api/airconsole-latest.js"></script>
+<script src="audio.js"></script>
+<script>
+(function(){
+"use strict";
+
+const PLAYER_COLORS = ["#c76b3f", "#3f7fc7", "#4fa872", "#b256c7"];
+const airconsole = new AirConsole({ orientation: AirConsole.ORIENTATION_PORTRAIT });
+
+let controlMode = localStorage.getItem('linerun_mode') || 'buttons';
+let isMaster = false;
+let myPlayerNumber = -1;
+let uiState = 'connecting'; // connecting | lobby | playing | result
+
+function el(id){ return document.getElementById(id); }
+
+function setControlMode(mode){
+  controlMode = mode;
+  localStorage.setItem('linerun_mode', mode);
+  el('modeButtonsBtn').classList.toggle('active', mode==='buttons');
+  el('modeSwipeBtn').classList.toggle('active', mode==='swipe');
+  el('buttonPad').classList.toggle('hidden', mode!=='buttons');
+  el('buttonPadDuck').classList.toggle('hidden', mode!=='buttons');
+  el('swipeArea').classList.toggle('hidden', mode!=='swipe');
+}
+el('modeButtonsBtn').addEventListener('click', ()=>{ GameAudio.playClick(); setControlMode('buttons'); });
+el('modeSwipeBtn').addEventListener('click', ()=>{ GameAudio.playClick(); setControlMode('swipe'); });
+
+function refreshMe(){
+  const myId = airconsole.getDeviceId();
+  myPlayerNumber = airconsole.convertDeviceIdToPlayerNumber(myId);
+  isMaster = (myId === airconsole.getMasterControllerDeviceId());
+  const nick = airconsole.getNickname(myId) || ('Jugador ' + (myPlayerNumber>=0 ? myPlayerNumber+1 : '?'));
+  el('meName').textContent = nick;
+  const color = myPlayerNumber>=0 ? PLAYER_COLORS[myPlayerNumber] : '#999';
+  el('meDot').style.background = color;
+  document.documentElement.style.setProperty('--mycolor', color);
+}
+
+function showView(id){
+  ['lobbyView','playView','resultView'].forEach(v=> el(v).classList.toggle('hidden', v!==id));
+}
+
+function goLobbyUI(){
+  uiState = 'lobby';
+  refreshMe();
+  showView('lobbyView');
+  if(myPlayerNumber === -1){
+    el('lobbyMsg').textContent = 'La partida está llena (máx. 4 jugadores). Puedes mirar. ';
+    el('startBtn').classList.add('hidden');
+  } else if(isMaster){
+    el('lobbyMsg').textContent = 'Eres el anfitrión. Pulsa Empezar cuando todos estén listos.';
+    el('startBtn').classList.remove('hidden');
+  } else {
+    el('lobbyMsg').textContent = 'Esperando a que el anfitrión inicie la partida…';
+    el('startBtn').classList.add('hidden');
+  }
+}
+
+el('startBtn').addEventListener('click', ()=>{
+  GameAudio.unlock(); GameAudio.playClick();
+  airconsole.message(AirConsole.SCREEN, { action:'start' });
+});
+
+/* ============================================================
+   PLAYING CONTROLS
+   ============================================================ */
+function sendInput(type, dir){
+  airconsole.message(AirConsole.SCREEN, { action:'input', type, dir });
+  if(navigator.vibrate) navigator.vibrate(15);
+}
+
+function bindHold(elm, onDown){
+  elm.addEventListener('touchstart', (e)=>{ e.preventDefault(); GameAudio.playClick(); onDown(); }, {passive:false});
+  elm.addEventListener('mousedown', (e)=>{ e.preventDefault(); GameAudio.playClick(); onDown(); });
+}
+bindHold(el('btnLeft'),  ()=> sendInput('lane', -1));
+bindHold(el('btnRight'), ()=> sendInput('lane', 1));
+bindHold(el('btnJump'),  ()=> sendInput('jump'));
+bindHold(el('btnDuck'),  ()=> sendInput('duck'));
+
+// swipe surface
+let touchStartX=0, touchStartY=0, touchActive=false;
+const swipeArea = el('swipeArea');
+swipeArea.addEventListener('touchstart', (e)=>{
+  const t = e.changedTouches[0];
+  touchStartX = t.clientX; touchStartY = t.clientY; touchActive = true;
+}, {passive:true});
+swipeArea.addEventListener('touchend', (e)=>{
+  if(!touchActive) return;
+  touchActive = false;
+  const t = e.changedTouches[0];
+  const dx = t.clientX - touchStartX, dy = t.clientY - touchStartY;
+  const absX = Math.abs(dx), absY = Math.abs(dy);
+  const THRESH = 24;
+  if(absX < THRESH && absY < THRESH) return;
+  GameAudio.playClick();
+  if(navigator.vibrate) navigator.vibrate(15);
+  if(absX > absY){ sendInput('lane', dx>0?1:-1); }
+  else { if(dy<0) sendInput('jump'); else sendInput('duck'); }
+}, {passive:true});
+
+function goPlayingUI(){
+  uiState = 'playing';
+  showView('playView');
+}
+
+/* ============================================================
+   RESULT VIEW
+   ============================================================ */
+function showEliminated(score){
+  uiState = 'result';
+  showView('resultView');
+  el('resultTitle').textContent = '¡Eliminado!';
+  el('resultScore').textContent = score;
+  el('resultRank').textContent = 'Esperando a los demás jugadores…';
+  el('playAgainBtn').classList.add('hidden');
+  el('waitHostMsg').classList.add('hidden');
+}
+
+function showScoreboard(results){
+  uiState = 'result';
+  showView('resultView');
+  refreshMe();
+  const mine = results.find(r=>r.playerNumber===myPlayerNumber);
+  if(mine){
+    el('resultTitle').textContent = mine.rank===1 ? '¡Ganaste! 🏆' : 'Partida terminada';
+    el('resultScore').textContent = mine.score;
+    el('resultRank').textContent = 'Puesto #'+mine.rank+' de '+results.length+' · '+mine.coins+' monedas';
+  } else {
+    el('resultTitle').textContent = 'Partida terminada';
+    el('resultScore').textContent = results.length ? results[0].score : 0;
+    el('resultRank').textContent = 'No participaste en esta ronda';
+  }
+  if(isMaster){
+    el('playAgainBtn').classList.remove('hidden');
+    el('waitHostMsg').classList.add('hidden');
+  } else {
+    el('playAgainBtn').classList.add('hidden');
+    el('waitHostMsg').classList.remove('hidden');
+  }
+}
+el('playAgainBtn').addEventListener('click', ()=>{
+  GameAudio.playClick();
+  airconsole.message(AirConsole.SCREEN, { action:'restart' });
+});
+
+/* ============================================================
+   MUTE
+   ============================================================ */
+let muted = localStorage.getItem('linerun_muted') === '1';
+function applyMute(){ GameAudio.setMuted(muted); el('muteBtn').textContent = muted ? '🔇' : '🔊'; }
+el('muteBtn').addEventListener('click', ()=>{
+  GameAudio.unlock();
+  muted = !muted;
+  localStorage.setItem('linerun_muted', muted ? '1':'0');
+  applyMute();
+});
+
+/* ============================================================
+   AIRCONSOLE EVENTS
+   ============================================================ */
+airconsole.onReady = function(){
+  GameAudio.unlock();
+  applyMute();
+  setControlMode(controlMode);
+  goLobbyUI();
+};
+airconsole.onConnect = function(){ if(uiState==='lobby') goLobbyUI(); };
+airconsole.onDisconnect = function(){ if(uiState==='lobby') goLobbyUI(); };
+airconsole.onActivePlayersChange = function(){ if(uiState==='lobby') goLobbyUI(); };
+
+airconsole.onMessage = function(from, data){
+  if(from !== 0 || !data || !data.action) return; // only trust the screen
+  if(data.action === 'state'){
+    refreshMe();
+    if(data.state === 'lobby') goLobbyUI();
+    else if(data.state === 'countdown'){ /* keep current view, gameplay begins shortly */ }
+    else if(data.state === 'playing') goPlayingUI();
+  } else if(data.action === 'playerEliminated'){
+    // only react if this message concerns me (screen also targets us directly)
+    showEliminated(data.score);
+  } else if(data.action === 'scoreboard'){
+    showScoreboard(data.results || []);
+  }
+};
+
+document.body.addEventListener('touchstart', ()=> GameAudio.unlock(), { once:true, passive:true });
+
+})();
+</script>
+</body>
+</html>
