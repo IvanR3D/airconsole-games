@@ -11,16 +11,26 @@
   *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
   html,body{ width:100%; height:100%; overflow:hidden; background:var(--bg); color:var(--ink);
     font-family:-apple-system, BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
-    -webkit-user-select:none; user-select:none; touch-action:none; }
+    -webkit-user-select:none; user-select:none; }
 
-  .screen{ position:fixed; inset:0; display:flex; flex-direction:column; padding:16px; }
+  .screen{ position:fixed; inset:0; display:flex; flex-direction:column; padding:16px;
+    overflow-y:auto; -webkit-overflow-scrolling:touch; touch-action:pan-y; padding-bottom:32px; }
   .hidden{ display:none !important; }
+  /* Only the in-game control pads need to block native touch gestures
+     (scroll/zoom) so swipes and taps are read as game input instead. */
+  #playScreen{ overflow:hidden; touch-action:none; }
 
   h1{ font-size:22px; font-weight:700; text-align:center; margin-top:10px; }
   h1 span{ color:var(--accent); }
   .sub{ text-align:center; font-size:12px; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-top:4px; }
 
   /* ---- CUSTOMIZE / MENU ---- */
+  .preview-box{ position:relative; width:100%; height:130px; margin-top:14px; border:1px solid var(--line);
+    background:linear-gradient(180deg,#ffffff,#efeee7); border-radius:8px; overflow:hidden; flex-shrink:0; }
+  .preview-box canvas{ width:100%; height:100%; display:block; }
+  .preview-caption{ position:absolute; bottom:6px; left:0; right:0; text-align:center; font-size:10px;
+    letter-spacing:2px; text-transform:uppercase; color:var(--muted); pointer-events:none; }
+
   .field{ margin-top:18px; }
   .field label{ font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); font-weight:600; }
   input[type="text"]{ width:100%; margin-top:6px; padding:12px; font-size:16px; border:1px solid var(--line);
@@ -86,6 +96,11 @@
 <div id="menuScreen" class="screen hidden">
   <h1>LINE<span>RUN</span></h1>
   <div class="sub" id="playerNumLabel">Jugador</div>
+
+  <div class="preview-box">
+    <canvas id="previewCanvas"></canvas>
+    <div class="preview-caption">Vista previa</div>
+  </div>
 
   <div class="field">
     <label>Nickname</label>
@@ -162,6 +177,7 @@
   <div class="status-line">Esperando al resto de jugadores…</div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://www.airconsole.com/api/airconsole-latest.js"></script>
 <script>
 (function(){
@@ -185,6 +201,96 @@ let playerNumber = null;
 
 const airconsole = new AirConsole({ orientation: AirConsole.ORIENTATION_PORTRAIT });
 
+/* ---------- live character preview ---------- */
+let previewScene, previewCamera, previewRenderer, previewGroup, previewMats;
+
+function buildPreviewHat(hatGroup, mat){
+  while(hatGroup.children.length){ const c = hatGroup.children.pop(); hatGroup.remove(c); c.geometry.dispose(); }
+  if(cust.hat === 'cap'){
+    const cap = new THREE.Mesh(new THREE.ConeGeometry(0.28,0.22,12), mat);
+    cap.position.y = 1.74; hatGroup.add(cap);
+  } else if(cust.hat === 'mohawk'){
+    for(let i=-1;i<=1;i++){
+      const spike = new THREE.Mesh(new THREE.ConeGeometry(0.05,0.22,8), mat);
+      spike.position.set(0,1.86,i*0.09); hatGroup.add(spike);
+    }
+  }
+}
+
+function initPreview(){
+  const canvas = document.getElementById('previewCanvas');
+  if(!canvas || !window.THREE) return;
+  previewScene = new THREE.Scene();
+  previewCamera = new THREE.PerspectiveCamera(35, 1, 0.1, 20);
+  previewCamera.position.set(0, 1.35, 3.4);
+  previewCamera.lookAt(0, 1.0, 0);
+  previewRenderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
+  previewRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  const hemi = new THREE.HemisphereLight(0xffffff, 0xd8d4c8, 1.1);
+  previewScene.add(hemi);
+  const dir = new THREE.DirectionalLight(0xffffff, 0.6);
+  dir.position.set(2,4,3);
+  previewScene.add(dir);
+
+  previewMats = {
+    bodyMat: new THREE.MeshStandardMaterial({ color:cust.suit, roughness:0.8 }),
+    skinMat: new THREE.MeshStandardMaterial({ color:cust.skin, roughness:0.9 }),
+    accentMat: new THREE.MeshStandardMaterial({ color:cust.accent, roughness:0.8 })
+  };
+
+  const group = new THREE.Group();
+  const torso = new THREE.Mesh(new THREE.BoxGeometry(0.62,0.75,0.38), previewMats.bodyMat);
+  torso.position.y = 1.0; group.add(torso);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.26,12,12), previewMats.skinMat);
+  head.position.y = 1.55; group.add(head);
+  const hatGroup = new THREE.Group(); group.add(hatGroup);
+  buildPreviewHat(hatGroup, previewMats.accentMat);
+  group.userData.hatGroup = hatGroup;
+
+  const legL = new THREE.Mesh(new THREE.BoxGeometry(0.22,0.62,0.26), previewMats.accentMat);
+  legL.position.set(-0.17,0.35,0); group.add(legL);
+  const legR = legL.clone(); legR.position.x = 0.17; group.add(legR);
+  const armL = new THREE.Mesh(new THREE.BoxGeometry(0.16,0.55,0.2), previewMats.bodyMat);
+  armL.position.set(-0.42,1.0,0); group.add(armL);
+  const armR = armL.clone(); armR.position.x = 0.42; group.add(armR);
+
+  previewGroup = group;
+  previewScene.add(previewGroup);
+  resizePreview();
+  previewLoop();
+}
+
+function resizePreview(){
+  if(!previewRenderer) return;
+  const canvas = document.getElementById('previewCanvas');
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  if(!w || !h) return;
+  previewCamera.aspect = w/h;
+  previewCamera.updateProjectionMatrix();
+  previewRenderer.setSize(w, h, false);
+}
+
+function updatePreviewColors(){
+  if(!previewMats) return;
+  previewMats.bodyMat.color.set(cust.suit);
+  previewMats.skinMat.color.set(cust.skin);
+  previewMats.accentMat.color.set(cust.accent);
+}
+
+function updatePreviewHat(){
+  if(!previewGroup) return;
+  buildPreviewHat(previewGroup.userData.hatGroup, previewMats.accentMat);
+}
+
+function previewLoop(){
+  requestAnimationFrame(previewLoop);
+  if(previewGroup) previewGroup.rotation.y += 0.012;
+  if(previewRenderer) previewRenderer.render(previewScene, previewCamera);
+}
+
+window.addEventListener('resize', resizePreview);
+
 function show(id){
   ['connectScreen','menuScreen','playScreen','resultScreen'].forEach(s=>{
     document.getElementById(s).classList.toggle('hidden', s!==id);
@@ -206,6 +312,7 @@ function buildSwatches(containerId, colors, key){
       el.querySelectorAll('.swatch').forEach(s=>s.classList.remove('selected'));
       b.classList.add('selected');
       cust[key] = hex;
+      updatePreviewColors();
       sendCustomize();
     });
     el.appendChild(b);
@@ -227,6 +334,7 @@ function initMenu(){
       document.querySelectorAll('#hatOptions .chip').forEach(c=>c.classList.remove('selected'));
       chip.classList.add('selected');
       cust.hat = chip.dataset.hat;
+      updatePreviewHat();
       sendCustomize();
     });
   });
@@ -320,6 +428,7 @@ airconsole.onMessage = function(from, data){
     sendCustomize();
     send('controlMode', { mode:cust.mode });
     show('menuScreen');
+    requestAnimationFrame(resizePreview);
   } else if(data.action === 'state'){
     isMaster = data.isMaster;
     document.getElementById('startBtn').classList.toggle('hidden', !isMaster);
@@ -328,6 +437,7 @@ airconsole.onMessage = function(from, data){
       document.getElementById('readyBtn').textContent = 'Estoy listo';
       document.getElementById('readyAgainBtn').textContent = 'Jugar otra vez';
       show('menuScreen');
+      requestAnimationFrame(resizePreview);
     } else if(data.state === 'playing'){
       document.getElementById('playNick').textContent = cust.nickname;
       updateModeIndicator();
@@ -344,6 +454,7 @@ airconsole.onMessage = function(from, data){
 
 initMenu();
 initPlayControls();
+initPreview();
 show('connectScreen');
 
 })();

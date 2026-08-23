@@ -678,7 +678,7 @@ function checkAutoStart(){
    AIRCONSOLE CALLBACKS
    ============================================================ */
 function initAirConsole(){
-  airconsole = new AirConsole({ orientation: AirConsole.ORIENTATION_PORTRAIT, synchronize_time:false });
+  airconsole = new AirConsole({ synchronize_time:false });
 
   airconsole.onConnect = function(deviceId){
     if(sessionState !== 'lobby') return; // no joining mid-round
@@ -735,7 +735,16 @@ function initAirConsole(){
     }
   };
 
-  airconsole.setActivePlayers(MAX_PLAYERS);
+  // Only the screen device is allowed to call this. If this file is ever
+  // opened in a context where AirConsole hasn't recognized it as the screen
+  // (e.g. opened directly instead of through the AirConsole app/simulator),
+  // this throws — catch it so the rest of the game (and the render loop)
+  // still starts instead of the page going black.
+  try{
+    airconsole.setActivePlayers(MAX_PLAYERS);
+  } catch(e){
+    console.warn('setActivePlayers failed — is this page running as the AirConsole screen?', e);
+  }
 }
 
 /* ============================================================
@@ -752,7 +761,11 @@ function loop(){
 window.addEventListener('resize', ()=> instances.forEach(inst => inst && inst.onResize()));
 
 renderLobby();
-initAirConsole();
+try{
+  initAirConsole();
+} catch(e){
+  console.error('AirConsole failed to initialize. This page must be loaded through the AirConsole app or Simulator, not opened directly.', e);
+}
 loop();
 
 })();
