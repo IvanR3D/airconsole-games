@@ -1,86 +1,65 @@
-# LINE RUN — AirConsole Edition
+# LineRun — AirConsole Edition
 
-A 4‑player split‑screen endless runner for [AirConsole](https://www.airconsole.com), adapted from the
-original single‑player `subway-runner.html`.
+A 4-player party conversion of the original single-player Three.js endless
+runner, built for the [AirConsole](https://www.airconsole.com) platform.
 
 ## Files
 
-| File | Role |
-|---|---|
-| `screen.html` | The **TV/screen** app: lobby, countdown, up‑to‑4‑player split‑screen gameplay, scoreboard. |
-| `controller.html` | The **phone** app: lobby "Start" button (host only), button‑pad or swipe controls, results screen. |
-| `audio.js` | Shared, dependency‑free music + sound‑effects engine (Web Audio API, no binary assets). |
-| `README.md` | This file. |
+- **screen.html** — what's shown on the TV/big screen. Handles the lobby
+  (waiting for controllers, showing who's connected/ready), the split-screen
+  gameplay (1 player = full screen, 2 = side by side, 3–4 = 2×2 grid, each
+  player running their own independent 3D lane), and the final scoreboard.
+- **controller.html** — what loads on each player's phone. Lets them pick a
+  nickname, suit/accent/skin colors and a hairstyle, choose between **button
+  controls** (left/right/jump/duck pads) or **swipe controls** (drag on a pad
+  to change lanes, jump, or slide), and drives their runner in-game.
 
-Both HTML files load `three.js r128` and the AirConsole API from their public CDNs, so no build step
-or bundler is needed — it's plain static files, exactly what AirConsole expects.
+Both files must stay in the same folder — AirConsole loads `controller.html`
+onto phones automatically once `screen.html` is running as the game screen.
 
-## How the multiplayer flow works
+## How multiplayer works
 
-1. **Lobby** (`screen.html` shows 4 slots, `controller.html` shows a nickname + Start button on the
-   host's phone). Up to 4 controllers can join; slots are assigned with
-   `airconsole.setActivePlayers(4)`, so the first four phones to connect become Player 1‑4 and any
-   extra phones become spectators.
-2. The **host** (the first/master controller) taps **"Empezar partida"**, which sends
-   `{action:'start'}` to the screen. Everyone else's phone just waits.
-3. A shared **3‑2‑1‑GO** countdown plays on the screen (with beeps), then the screen builds one
-   independent 3D track per connected player and splits the canvas:
-   - 1 player → full screen
-   - 2 players → side‑by‑side
-   - 3‑4 players → 2×2 grid
-   Each quadrant has its own camera and HUD (name tag, score, coins, level) rendered with a single
-   shared `THREE.WebGLRenderer` using scissor/viewport splitting, so it stays cheap even with 4 tracks
-   running at once.
-4. Each phone sends `{action:'input', type:'lane'|'jump'|'duck', dir}` messages to the screen, which
-   routes them to that player's track via `airconsole.convertDeviceIdToPlayerNumber`.
-5. When a player crashes, only their quadrant freezes with an "ELIMINADO" banner — the others keep
-   racing. Once everyone has crashed, the screen shows a ranked **scoreboard** and every phone gets its
-   own final score/rank.
-6. The host's phone gets a **"Jugar de nuevo"** button that restarts the countdown with whoever is
-   still connected — no need to return to the lobby.
-
-## Controller input modes
-
-Each phone has a switch at the top of the lobby screen:
-
-- **Botones** — an on‑screen D‑pad (Left / Right / Jump / Duck) using `touchstart` for low latency,
-  with a quick click sound + haptic buzz (`navigator.vibrate`) per tap.
-- **Deslizar** — the whole screen becomes a swipe surface: swipe up to jump, down to duck, left/right
-  to change lanes (same gesture mapping as the original single‑player build).
-
-The choice is saved in `localStorage`, so it's remembered between rounds.
-
-## Audio
-
-`audio.js` synthesizes everything on the fly with the Web Audio API — a looping chiptune‑style
-background track, jump/duck/lane‑change blips, a coin chime, a crash noise burst, countdown beeps, a
-join chime, and win/game‑over jingles. There are no external audio files, so there's nothing extra to
-upload or license.
+- Up to **4 active players** (`AirConsole.setActivePlayers(4)`); anyone who
+  joins after that connects as a spectator only.
+- The **first controller to connect** is the host (AirConsole's "master
+  controller") and gets an extra **"Iniciar partida"** button in the lobby.
+- Each player customizes their runner and taps **"Estoy listo"**; the host
+  can start the round any time with 1–4 players connected.
+- During play every player has their own camera/scene/physics — running
+  into an obstacle only ends that player's run; the round ends once everyone
+  has crashed, then the scoreboard (sorted by score) is broadcast to every
+  phone before returning to the lobby.
 
 ## Testing locally
 
-AirConsole devices need the game served over HTTP(S) (not `file://`) and requires a screen + at least
-one controller to connect. The easiest way to iterate locally:
+AirConsole provides a browser-based simulator so you don't need real phones
+to test:
 
-1. Serve this folder, e.g. `npx serve .` or `python3 -m http.server 8080`.
-2. Use [AirConsole's Screen/Controller simulator](https://developers.airconsole.com/#!/guide/hosting)
-   during development, or upload the folder as a new game in the
-   [AirConsole Dev Center](https://developers.airconsole.com) to test with real phones.
+1. Host the folder anywhere reachable over HTTPS (AirConsole requires HTTPS
+   in production; for quick local testing you can use the
+   [AirConsole Simulator](https://developers.airconsole.com/#!/guides/simulator),
+   which serves your local files and simulates 1–4 virtual controllers in
+   browser tabs).
+2. Open `screen.html` through the simulator — it plays the role of the TV.
+3. Open the generated controller URLs (or the simulator's virtual controller
+   tabs) to join as players.
 
-## Deploying to AirConsole
+## Publishing
 
-1. Zip the contents of this folder (not the folder itself — `screen.html` should be at the zip root).
-2. Create a new game in the [AirConsole Dev Center](https://developers.airconsole.com) and upload the
-   zip.
-3. AirConsole automatically serves `screen.html` on the TV/host device and `controller.html` on each
-   connected phone.
+To ship it for real, create a game on the
+[AirConsole Developer Center](https://developers.airconsole.com/), point it
+at your hosted `screen.html`, and upload/verify `controller.html` alongside
+it per their submission checklist (icon, screenshots, `AIRCONSOLE-DEBUG`
+removed, etc.).
 
-## Notes / possible next steps
+## Notes / simplifications made during the conversion
 
-- Obstacle layouts, speed ramp, and scoring are unchanged from the original single‑player game — only
-  the presentation layer (lobby/split‑screen/scoreboard) and I/O (AirConsole messages, synth audio)
-  are new.
-- Shadows are automatically disabled once more than one player is active to keep frame rate stable
-  across 2‑4 simultaneous tracks; solo play keeps full shadow quality.
-- Want persistent high scores across rounds, power‑ups, or a "ghost" of the leader on each quadrant?
-  Those would be natural follow‑ups on top of this structure.
+- Music and sound effects are generated with the Web Audio API (as in the
+  original) but are now a **single shared soundtrack** for the whole screen
+  rather than per-player audio, since all players share one screen/speaker.
+- Each player's 3D character preview was simplified from a live rotating
+  canvas (used in the original single-player customization screen) to flat
+  color swatches on the phone, since the controller is a 2D web page — the
+  chosen colors/hat still apply to their in-game 3D model on the TV.
+- Difficulty, speed ramp, obstacle patterns, coin values and physics
+  constants are unchanged from the original single-player build.

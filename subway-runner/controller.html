@@ -3,309 +3,348 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>LINE RUN — Mando</title>
+<title>LINERUN — Mando</title>
 <style>
   :root{
-    --bg:#f4f3ef; --ink:#1c1c1a; --muted:#6f6d66; --line:#d8d5cc; --accent:#c76b3f; --mycolor:#c76b3f;
+    --bg:#f4f3ef; --ink:#1c1c1a; --muted:#6f6d66; --line:#d8d5cc; --accent:#c76b3f;
   }
   *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
-  html,body{
-    width:100%; height:100%; overflow:hidden; background:var(--bg); color:var(--ink);
-    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-    -webkit-user-select:none; user-select:none; touch-action:none;
-  }
-  .screen{ position:fixed; inset:0; display:flex; flex-direction:column; }
+  html,body{ width:100%; height:100%; overflow:hidden; background:var(--bg); color:var(--ink);
+    font-family:-apple-system, BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+    -webkit-user-select:none; user-select:none; touch-action:none; }
+
+  .screen{ position:fixed; inset:0; display:flex; flex-direction:column; padding:16px; }
   .hidden{ display:none !important; }
 
-  /* ---------- top bar ---------- */
-  #topbar{
-    display:flex; align-items:center; justify-content:space-between;
-    padding:12px 16px; border-bottom:1px solid var(--line); flex-shrink:0;
-  }
-  #meBadge{ display:flex; align-items:center; gap:8px; font-weight:700; font-size:14px; }
-  #meDot{ width:12px; height:12px; border-radius:50%; background:var(--mycolor); }
-  #muteBtn{ font-size:20px; background:none; border:none; padding:6px; color:var(--ink); }
+  h1{ font-size:22px; font-weight:700; text-align:center; margin-top:10px; }
+  h1 span{ color:var(--accent); }
+  .sub{ text-align:center; font-size:12px; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-top:4px; }
 
-  /* ---------- lobby ---------- */
-  #lobbyView{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:24px; gap:14px; }
-  #lobbyView .title{ font-size:26px; font-weight:800; }
-  #lobbyView .title span{ color:var(--accent); }
-  #lobbyMsg{ font-size:14px; color:var(--muted); max-width:280px; }
-  #startBtn{
-    margin-top:10px; padding:16px 40px; font-size:16px; font-weight:700; border:none; border-radius:10px;
-    background:var(--ink); color:#fdfdfb;
-  }
-  #startBtn:active{ opacity:0.8; }
+  /* ---- CUSTOMIZE / MENU ---- */
+  .field{ margin-top:18px; }
+  .field label{ font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); font-weight:600; }
+  input[type="text"]{ width:100%; margin-top:6px; padding:12px; font-size:16px; border:1px solid var(--line);
+    border-radius:6px; background:#fff; color:var(--ink); font-family:inherit; }
+  .swatches{ display:flex; gap:10px; margin-top:8px; flex-wrap:wrap; }
+  .swatch{ width:34px; height:34px; border-radius:50%; border:2px solid transparent; box-shadow:inset 0 0 0 1px rgba(0,0,0,.15); }
+  .swatch.selected{ border-color:var(--ink); transform:scale(1.1); }
+  .row-btns{ display:flex; gap:8px; margin-top:8px; }
+  .chip{ flex:1; padding:10px 6px; text-align:center; font-size:13px; font-weight:600; border:1px solid var(--line);
+    background:#fff; border-radius:6px; color:var(--muted); }
+  .chip.selected{ border-color:var(--ink); color:var(--ink); background:#efeee8; }
 
-  /* ---------- control mode switch ---------- */
-  #modeSwitch{ display:flex; border:1px solid var(--line); border-radius:20px; overflow:hidden; margin-top:8px; }
-  #modeSwitch button{ padding:8px 18px; font-size:12px; font-weight:600; border:none; background:#fff; color:var(--muted); }
-  #modeSwitch button.active{ background:var(--ink); color:#fff; }
+  .btn{ margin-top:22px; padding:16px; font-size:16px; font-weight:700; letter-spacing:0.5px; border:1px solid var(--ink);
+    background:var(--ink); color:#fdfdfb; border-radius:8px; text-align:center; }
+  .btn.secondary{ background:#fff; color:var(--ink); }
+  .btn.ready{ background:#2f7a4a; border-color:#2f7a4a; }
+  .btn:active{ opacity:0.85; }
+  .status-line{ text-align:center; margin-top:14px; font-size:13px; color:var(--muted); }
 
-  /* ---------- playing: buttons mode ---------- */
-  #playView{ flex:1; display:flex; flex-direction:column; }
-  #playHeader{ text-align:center; padding:8px; font-size:12px; color:var(--muted); flex-shrink:0; }
-  #buttonPad{ flex:1; display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; gap:10px; padding:10px; }
-  .padBtn{
-    display:flex; align-items:center; justify-content:center; flex-direction:column; gap:4px;
-    border-radius:16px; border:2px solid var(--line); background:#fff; font-size:34px; color:var(--ink);
-  }
-  .padBtn span.lbl{ font-size:11px; font-weight:600; color:var(--muted); }
-  .padBtn:active{ background:var(--accent); color:#fff; border-color:var(--accent); }
-  .padBtn:active span.lbl{ color:#fff; }
+  /* ---- PLAY SCREEN ---- */
+  #playScreen{ padding:0; justify-content:space-between; }
+  .play-top{ display:flex; justify-content:space-between; align-items:center; padding:14px 16px; }
+  .play-top .badge{ font-size:13px; font-weight:700; }
+  .mode-toggle{ font-size:11px; color:var(--muted); border:1px solid var(--line); border-radius:6px; padding:6px 10px; background:#fff; }
 
-  /* ---------- playing: swipe mode ---------- */
-  #swipeArea{ flex:1; position:relative; display:flex; align-items:center; justify-content:center; }
-  #swipeHint{ font-size:13px; color:var(--muted); text-align:center; line-height:1.8; pointer-events:none; }
-  #swipeArea .arrow{ font-size:20px; }
+  .controls-area{ flex:1; display:flex; }
 
-  /* ---------- eliminated / gameover ---------- */
-  #resultView{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; padding:24px; text-align:center; }
-  #resultView .big{ font-size:22px; font-weight:800; }
-  #resultView .score{ font-size:40px; font-weight:800; color:var(--accent); }
-  #resultView .rankTag{ font-size:13px; color:var(--muted); }
-  #playAgainBtn{ margin-top:14px; padding:14px 34px; font-size:15px; font-weight:700; border:none; border-radius:10px; background:var(--ink); color:#fff; }
+  /* Button mode: left/right split with jump/duck stacked on the right */
+  .buttons-mode{ display:flex; width:100%; }
+  .pad-btn{ flex:1; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:700;
+    color:var(--ink); border:1px solid var(--line); }
+  .pad-left, .pad-right{ flex:1; background:#fff; }
+  .pad-mid{ width:38%; display:flex; flex-direction:column; }
+  .pad-mid .pad-btn{ flex:1; }
+  .pad-jump{ background:#efeee8; }
+  .pad-duck{ background:#e7e5dc; }
+  .pad-btn:active{ background:var(--accent); color:#fff; }
+
+  /* Swipe mode: single full pad with hint text */
+  .swipe-mode{ width:100%; display:flex; align-items:center; justify-content:center; flex-direction:column;
+    background:#fff; border-top:1px solid var(--line); position:relative; }
+  .swipe-hint{ font-size:13px; color:var(--muted); text-align:center; line-height:1.8; pointer-events:none; }
+  .swipe-hint b{ color:var(--ink); }
+
+  .play-bottom{ padding:12px 16px 20px; display:flex; gap:10px; }
+  .play-bottom .btn{ margin-top:0; flex:1; padding:12px; font-size:14px; }
+
+  #resultScreen .field, #resultScreen .btn{ align-self:stretch; }
+  .result-score{ text-align:center; margin-top:26px; }
+  .result-score .num{ font-size:48px; font-weight:800; color:var(--accent); }
+  .result-score .rank{ margin-top:8px; font-size:14px; color:var(--muted); }
 </style>
 </head>
 <body>
 
-<div class="screen">
-  <div id="topbar">
-    <div id="meBadge"><div id="meDot"></div><span id="meName">…</span></div>
-    <button id="muteBtn">🔊</button>
+<!-- CONNECTING -->
+<div id="connectScreen" class="screen">
+  <h1>LINE<span>RUN</span></h1>
+  <div class="sub">Conectando…</div>
+</div>
+
+<!-- CUSTOMIZE / LOBBY -->
+<div id="menuScreen" class="screen hidden">
+  <h1>LINE<span>RUN</span></h1>
+  <div class="sub" id="playerNumLabel">Jugador</div>
+
+  <div class="field">
+    <label>Nickname</label>
+    <input type="text" id="nicknameInput" maxlength="14" placeholder="Jugador">
   </div>
 
-  <!-- LOBBY -->
-  <div id="lobbyView">
-    <div class="title">LINE<span>RUN</span></div>
-    <div id="lobbyMsg">Conectando…</div>
-    <button id="startBtn" class="hidden">Empezar partida</button>
-    <div id="modeSwitch">
-      <button id="modeButtonsBtn" class="active">Botones</button>
-      <button id="modeSwipeBtn">Deslizar</button>
+  <div class="field">
+    <label>Traje</label>
+    <div class="swatches" id="suitSwatches"></div>
+  </div>
+  <div class="field">
+    <label>Acento</label>
+    <div class="swatches" id="accentSwatches"></div>
+  </div>
+  <div class="field">
+    <label>Piel</label>
+    <div class="swatches" id="skinSwatches"></div>
+  </div>
+  <div class="field">
+    <label>Estilo</label>
+    <div class="row-btns" id="hatOptions">
+      <div class="chip" data-hat="cap">Gorra</div>
+      <div class="chip" data-hat="none">Sin gorra</div>
+      <div class="chip" data-hat="mohawk">Cresta</div>
+    </div>
+  </div>
+  <div class="field">
+    <label>Modo de control</label>
+    <div class="row-btns" id="modeOptions">
+      <div class="chip" data-mode="buttons">Botones</div>
+      <div class="chip" data-mode="swipe">Deslizar</div>
     </div>
   </div>
 
-  <!-- PLAYING -->
-  <div id="playView" class="hidden">
-    <div id="playHeader">Corre, salta y esquiva</div>
+  <button class="btn ready" id="readyBtn">Estoy listo</button>
+  <button class="btn secondary hidden" id="startBtn">Iniciar partida (anfitrión)</button>
+  <div class="status-line" id="lobbyStatus">Esperando a otros jugadores…</div>
+</div>
 
-    <div id="buttonPad">
-      <div class="padBtn" id="btnLeft" style="grid-column:1; grid-row:2;">⬅ <span class="lbl">CARRIL</span></div>
-      <div class="padBtn" id="btnJump" style="grid-column:1/3; grid-row:1;">⬆ <span class="lbl">SALTAR</span></div>
-      <div class="padBtn" id="btnRight" style="grid-column:2; grid-row:2;">➡ <span class="lbl">CARRIL</span></div>
-    </div>
-    <div id="buttonPadDuck" style="padding:0 10px 10px;">
-      <div class="padBtn" id="btnDuck" style="width:100%;">⬇ <span class="lbl">DESLIZARSE</span></div>
-    </div>
+<!-- PLAYING -->
+<div id="playScreen" class="screen hidden">
+  <div class="play-top">
+    <div class="badge" id="playNick">Jugador</div>
+    <div class="mode-toggle" id="modeIndicator">Botones</div>
+  </div>
 
-    <div id="swipeArea" class="hidden">
-      <div id="swipeHint">
-        <div class="arrow">⬆ Saltar</div>
-        <div class="arrow">⬇ Deslizarse</div>
-        <div class="arrow">⬅ ➡ Cambiar carril</div>
+  <div class="controls-area">
+    <div class="buttons-mode" id="buttonsMode">
+      <div class="pad-btn pad-left" data-action="left">◀</div>
+      <div class="pad-mid">
+        <div class="pad-btn pad-jump" data-action="jump">▲ SALTAR</div>
+        <div class="pad-btn pad-duck" data-action="duck">▼ DESLIZAR</div>
       </div>
+      <div class="pad-btn pad-right" data-action="right">▶</div>
+    </div>
+    <div class="swipe-mode hidden" id="swipeMode">
+      <div class="swipe-hint">Desliza <b>izquierda / derecha</b> para cambiar de carril<br>Desliza <b>arriba</b> para saltar<br>Desliza <b>abajo</b> para deslizarte</div>
     </div>
   </div>
 
-  <!-- RESULT -->
-  <div id="resultView" class="hidden">
-    <div class="big" id="resultTitle">¡Eliminado!</div>
-    <div class="score" id="resultScore">0</div>
-    <div class="rankTag" id="resultRank"></div>
-    <button id="playAgainBtn" class="hidden">Jugar de nuevo</button>
-    <div id="waitHostMsg" class="rankTag hidden">Esperando al anfitrión…</div>
+  <div class="play-bottom">
+    <div class="btn secondary" id="switchModeBtn">Cambiar modo</div>
   </div>
 </div>
 
+<!-- GAME OVER / RESULT -->
+<div id="resultScreen" class="screen hidden">
+  <h1>GAME<span>OVER</span></h1>
+  <div class="result-score">
+    <div class="num" id="resultScoreNum">0</div>
+    <div class="rank" id="resultRank">Puntuación</div>
+  </div>
+  <button class="btn ready" id="readyAgainBtn">Jugar otra vez</button>
+  <div class="status-line">Esperando al resto de jugadores…</div>
+</div>
+
 <script src="https://www.airconsole.com/api/airconsole-latest.js"></script>
-<script src="audio.js"></script>
 <script>
 (function(){
 "use strict";
 
-const PLAYER_COLORS = ["#c76b3f", "#3f7fc7", "#4fa872", "#b256c7"];
+const SUIT_COLORS   = ['#2b2b28','#2f3b52','#33443a','#5a2f2f','#4a4a46'];
+const ACCENT_COLORS = ['#c76b3f','#3f8f8a','#c79a3f','#7a4a8f','#4a7fa6'];
+const SKIN_COLORS   = ['#e7c9a3','#c48a5c','#8a5a3a'];
+
+let cust = {
+  nickname: '',
+  suit: SUIT_COLORS[0],
+  accent: ACCENT_COLORS[0],
+  skin: SKIN_COLORS[0],
+  hat: 'cap',
+  mode: 'buttons'
+};
+let isReady = false;
+let isMaster = false;
+let playerNumber = null;
+
 const airconsole = new AirConsole({ orientation: AirConsole.ORIENTATION_PORTRAIT });
 
-let controlMode = localStorage.getItem('linerun_mode') || 'buttons';
-let isMaster = false;
-let myPlayerNumber = -1;
-let uiState = 'connecting'; // connecting | lobby | playing | result
-
-function el(id){ return document.getElementById(id); }
-
-function setControlMode(mode){
-  controlMode = mode;
-  localStorage.setItem('linerun_mode', mode);
-  el('modeButtonsBtn').classList.toggle('active', mode==='buttons');
-  el('modeSwipeBtn').classList.toggle('active', mode==='swipe');
-  el('buttonPad').classList.toggle('hidden', mode!=='buttons');
-  el('buttonPadDuck').classList.toggle('hidden', mode!=='buttons');
-  el('swipeArea').classList.toggle('hidden', mode!=='swipe');
-}
-el('modeButtonsBtn').addEventListener('click', ()=>{ GameAudio.playClick(); setControlMode('buttons'); });
-el('modeSwipeBtn').addEventListener('click', ()=>{ GameAudio.playClick(); setControlMode('swipe'); });
-
-function refreshMe(){
-  const myId = airconsole.getDeviceId();
-  myPlayerNumber = airconsole.convertDeviceIdToPlayerNumber(myId);
-  isMaster = (myId === airconsole.getMasterControllerDeviceId());
-  const nick = airconsole.getNickname(myId) || ('Jugador ' + (myPlayerNumber>=0 ? myPlayerNumber+1 : '?'));
-  el('meName').textContent = nick;
-  const color = myPlayerNumber>=0 ? PLAYER_COLORS[myPlayerNumber] : '#999';
-  el('meDot').style.background = color;
-  document.documentElement.style.setProperty('--mycolor', color);
+function show(id){
+  ['connectScreen','menuScreen','playScreen','resultScreen'].forEach(s=>{
+    document.getElementById(s).classList.toggle('hidden', s!==id);
+  });
 }
 
-function showView(id){
-  ['lobbyView','playView','resultView'].forEach(v=> el(v).classList.toggle('hidden', v!==id));
+function send(action, extra){
+  airconsole.message(AirConsole.SCREEN, Object.assign({ action }, extra||{}));
 }
 
-function goLobbyUI(){
-  uiState = 'lobby';
-  refreshMe();
-  showView('lobbyView');
-  if(myPlayerNumber === -1){
-    el('lobbyMsg').textContent = 'La partida está llena (máx. 4 jugadores). Puedes mirar. ';
-    el('startBtn').classList.add('hidden');
-  } else if(isMaster){
-    el('lobbyMsg').textContent = 'Eres el anfitrión. Pulsa Empezar cuando todos estén listos.';
-    el('startBtn').classList.remove('hidden');
-  } else {
-    el('lobbyMsg').textContent = 'Esperando a que el anfitrión inicie la partida…';
-    el('startBtn').classList.add('hidden');
-  }
+/* ---------- customization UI ---------- */
+function buildSwatches(containerId, colors, key){
+  const el = document.getElementById(containerId);
+  colors.forEach(hex=>{
+    const b = document.createElement('div');
+    b.className = 'swatch' + (cust[key]===hex ? ' selected':'');
+    b.style.background = hex;
+    b.addEventListener('click', ()=>{
+      el.querySelectorAll('.swatch').forEach(s=>s.classList.remove('selected'));
+      b.classList.add('selected');
+      cust[key] = hex;
+      sendCustomize();
+    });
+    el.appendChild(b);
+  });
 }
 
-el('startBtn').addEventListener('click', ()=>{
-  GameAudio.unlock(); GameAudio.playClick();
-  airconsole.message(AirConsole.SCREEN, { action:'start' });
+function sendCustomize(){
+  send('customize', { nickname:cust.nickname, suit:cust.suit, accent:cust.accent, skin:cust.skin, hat:cust.hat });
+}
+
+function initMenu(){
+  buildSwatches('suitSwatches', SUIT_COLORS, 'suit');
+  buildSwatches('accentSwatches', ACCENT_COLORS, 'accent');
+  buildSwatches('skinSwatches', SKIN_COLORS, 'skin');
+
+  document.querySelectorAll('#hatOptions .chip').forEach(chip=>{
+    if(chip.dataset.hat === cust.hat) chip.classList.add('selected');
+    chip.addEventListener('click', ()=>{
+      document.querySelectorAll('#hatOptions .chip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      cust.hat = chip.dataset.hat;
+      sendCustomize();
+    });
+  });
+
+  document.querySelectorAll('#modeOptions .chip').forEach(chip=>{
+    if(chip.dataset.mode === cust.mode) chip.classList.add('selected');
+    chip.addEventListener('click', ()=>{
+      document.querySelectorAll('#modeOptions .chip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      cust.mode = chip.dataset.mode;
+      send('controlMode', { mode:cust.mode });
+      updateModeIndicator();
+    });
+  });
+
+  const nicknameInput = document.getElementById('nicknameInput');
+  nicknameInput.addEventListener('input', ()=>{
+    cust.nickname = nicknameInput.value.trim().slice(0,14);
+    sendCustomize();
+  });
+
+  document.getElementById('readyBtn').addEventListener('click', ()=>{
+    isReady = !isReady;
+    document.getElementById('readyBtn').textContent = isReady ? 'Cancelar' : 'Estoy listo';
+    document.getElementById('lobbyStatus').textContent = isReady ? 'Listo. Esperando al anfitrión…' : 'Esperando a otros jugadores…';
+    send('ready', { value:isReady });
+  });
+
+  document.getElementById('startBtn').addEventListener('click', ()=>{
+    send('start');
+  });
+}
+
+/* ---------- play screen ---------- */
+function updateModeIndicator(){
+  document.getElementById('modeIndicator').textContent = cust.mode==='swipe' ? 'Deslizar' : 'Botones';
+  document.getElementById('buttonsMode').classList.toggle('hidden', cust.mode==='swipe');
+  document.getElementById('swipeMode').classList.toggle('hidden', cust.mode!=='swipe');
+}
+
+function initPlayControls(){
+  document.querySelectorAll('.pad-btn').forEach(btn=>{
+    const act = btn.dataset.action;
+    btn.addEventListener('touchstart', (e)=>{ e.preventDefault(); send('input', { input:act }); }, {passive:false});
+    btn.addEventListener('mousedown', ()=> send('input', { input:act }));
+  });
+
+  document.getElementById('switchModeBtn').addEventListener('click', ()=>{
+    cust.mode = cust.mode==='swipe' ? 'buttons' : 'swipe';
+    send('controlMode', { mode:cust.mode });
+    updateModeIndicator();
+  });
+
+  const swipeEl = document.getElementById('swipeMode');
+  let sx=0, sy=0, active=false;
+  swipeEl.addEventListener('touchstart', (e)=>{
+    const t = e.changedTouches[0]; sx=t.clientX; sy=t.clientY; active=true;
+  }, {passive:true});
+  swipeEl.addEventListener('touchend', (e)=>{
+    if(!active) return; active=false;
+    const t = e.changedTouches[0];
+    const dx = t.clientX-sx, dy = t.clientY-sy;
+    const ax = Math.abs(dx), ay = Math.abs(dy);
+    const THRESH = 26;
+    if(ax<THRESH && ay<THRESH) return;
+    if(ax>ay) send('input', { input: dx>0 ? 'right' : 'left' });
+    else send('input', { input: dy<0 ? 'jump' : 'duck' });
+  }, {passive:true});
+}
+
+document.getElementById('readyAgainBtn').addEventListener('click', ()=>{
+  send('restart', { value:true });
+  document.getElementById('readyAgainBtn').textContent = 'Esperando…';
 });
 
-/* ============================================================
-   PLAYING CONTROLS
-   ============================================================ */
-function sendInput(type, dir){
-  airconsole.message(AirConsole.SCREEN, { action:'input', type, dir });
-  if(navigator.vibrate) navigator.vibrate(15);
-}
-
-function bindHold(elm, onDown){
-  elm.addEventListener('touchstart', (e)=>{ e.preventDefault(); GameAudio.playClick(); onDown(); }, {passive:false});
-  elm.addEventListener('mousedown', (e)=>{ e.preventDefault(); GameAudio.playClick(); onDown(); });
-}
-bindHold(el('btnLeft'),  ()=> sendInput('lane', -1));
-bindHold(el('btnRight'), ()=> sendInput('lane', 1));
-bindHold(el('btnJump'),  ()=> sendInput('jump'));
-bindHold(el('btnDuck'),  ()=> sendInput('duck'));
-
-// swipe surface
-let touchStartX=0, touchStartY=0, touchActive=false;
-const swipeArea = el('swipeArea');
-swipeArea.addEventListener('touchstart', (e)=>{
-  const t = e.changedTouches[0];
-  touchStartX = t.clientX; touchStartY = t.clientY; touchActive = true;
-}, {passive:true});
-swipeArea.addEventListener('touchend', (e)=>{
-  if(!touchActive) return;
-  touchActive = false;
-  const t = e.changedTouches[0];
-  const dx = t.clientX - touchStartX, dy = t.clientY - touchStartY;
-  const absX = Math.abs(dx), absY = Math.abs(dy);
-  const THRESH = 24;
-  if(absX < THRESH && absY < THRESH) return;
-  GameAudio.playClick();
-  if(navigator.vibrate) navigator.vibrate(15);
-  if(absX > absY){ sendInput('lane', dx>0?1:-1); }
-  else { if(dy<0) sendInput('jump'); else sendInput('duck'); }
-}, {passive:true});
-
-function goPlayingUI(){
-  uiState = 'playing';
-  showView('playView');
-}
-
-/* ============================================================
-   RESULT VIEW
-   ============================================================ */
-function showEliminated(score){
-  uiState = 'result';
-  showView('resultView');
-  el('resultTitle').textContent = '¡Eliminado!';
-  el('resultScore').textContent = score;
-  el('resultRank').textContent = 'Esperando a los demás jugadores…';
-  el('playAgainBtn').classList.add('hidden');
-  el('waitHostMsg').classList.add('hidden');
-}
-
-function showScoreboard(results){
-  uiState = 'result';
-  showView('resultView');
-  refreshMe();
-  const mine = results.find(r=>r.playerNumber===myPlayerNumber);
-  if(mine){
-    el('resultTitle').textContent = mine.rank===1 ? '¡Ganaste! 🏆' : 'Partida terminada';
-    el('resultScore').textContent = mine.score;
-    el('resultRank').textContent = 'Puesto #'+mine.rank+' de '+results.length+' · '+mine.coins+' monedas';
-  } else {
-    el('resultTitle').textContent = 'Partida terminada';
-    el('resultScore').textContent = results.length ? results[0].score : 0;
-    el('resultRank').textContent = 'No participaste en esta ronda';
-  }
-  if(isMaster){
-    el('playAgainBtn').classList.remove('hidden');
-    el('waitHostMsg').classList.add('hidden');
-  } else {
-    el('playAgainBtn').classList.add('hidden');
-    el('waitHostMsg').classList.remove('hidden');
-  }
-}
-el('playAgainBtn').addEventListener('click', ()=>{
-  GameAudio.playClick();
-  airconsole.message(AirConsole.SCREEN, { action:'restart' });
-});
-
-/* ============================================================
-   MUTE
-   ============================================================ */
-let muted = localStorage.getItem('linerun_muted') === '1';
-function applyMute(){ GameAudio.setMuted(muted); el('muteBtn').textContent = muted ? '🔇' : '🔊'; }
-el('muteBtn').addEventListener('click', ()=>{
-  GameAudio.unlock();
-  muted = !muted;
-  localStorage.setItem('linerun_muted', muted ? '1':'0');
-  applyMute();
-});
-
-/* ============================================================
-   AIRCONSOLE EVENTS
-   ============================================================ */
-airconsole.onReady = function(){
-  GameAudio.unlock();
-  applyMute();
-  setControlMode(controlMode);
-  goLobbyUI();
+/* ---------- AirConsole callbacks ---------- */
+airconsole.onConnect = function(){
+  // wait for onMessage 'joined' / 'state' from screen
 };
-airconsole.onConnect = function(){ if(uiState==='lobby') goLobbyUI(); };
-airconsole.onDisconnect = function(){ if(uiState==='lobby') goLobbyUI(); };
-airconsole.onActivePlayersChange = function(){ if(uiState==='lobby') goLobbyUI(); };
 
 airconsole.onMessage = function(from, data){
-  if(from !== 0 || !data || !data.action) return; // only trust the screen
-  if(data.action === 'state'){
-    refreshMe();
-    if(data.state === 'lobby') goLobbyUI();
-    else if(data.state === 'countdown'){ /* keep current view, gameplay begins shortly */ }
-    else if(data.state === 'playing') goPlayingUI();
-  } else if(data.action === 'playerEliminated'){
-    // only react if this message concerns me (screen also targets us directly)
-    showEliminated(data.score);
-  } else if(data.action === 'scoreboard'){
-    showScoreboard(data.results || []);
+  if(from !== AirConsole.SCREEN || !data || !data.action) return;
+
+  if(data.action === 'joined'){
+    playerNumber = data.playerNumber;
+    isMaster = data.isMaster;
+    document.getElementById('playerNumLabel').textContent = 'Jugador ' + playerNumber;
+    document.getElementById('startBtn').classList.toggle('hidden', !isMaster);
+    cust.nickname = 'Jugador ' + playerNumber;
+    document.getElementById('nicknameInput').value = cust.nickname;
+    sendCustomize();
+    send('controlMode', { mode:cust.mode });
+    show('menuScreen');
+  } else if(data.action === 'state'){
+    isMaster = data.isMaster;
+    document.getElementById('startBtn').classList.toggle('hidden', !isMaster);
+    if(data.state === 'lobby'){
+      isReady = false;
+      document.getElementById('readyBtn').textContent = 'Estoy listo';
+      document.getElementById('readyAgainBtn').textContent = 'Jugar otra vez';
+      show('menuScreen');
+    } else if(data.state === 'playing'){
+      document.getElementById('playNick').textContent = cust.nickname;
+      updateModeIndicator();
+      show('playScreen');
+    } else if(data.state === 'scoreboard'){
+      // handled by 'yourResult' for the score screen content
+    }
+  } else if(data.action === 'yourResult'){
+    document.getElementById('resultScoreNum').textContent = data.score;
+    document.getElementById('resultRank').textContent = 'Puesto ' + data.rank + ' de ' + data.total;
+    show('resultScreen');
   }
 };
 
-document.body.addEventListener('touchstart', ()=> GameAudio.unlock(), { once:true, passive:true });
+initMenu();
+initPlayControls();
+show('connectScreen');
 
 })();
 </script>
