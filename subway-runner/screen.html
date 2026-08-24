@@ -115,15 +115,67 @@ const SEGMENT_LENGTH = 12;
 const SPAWN_AHEAD = 90;
 const REMOVE_BEHIND = 12;
 const COIN_VALUE = 10;
-const PLAYER_HALF_W = 0.55;
-const PLAYER_HEIGHT = 1.8;
-const PLAYER_DUCK_H = 0.9;
-
 const DEFAULT_SUITS   = ['#2b2b28','#2f3b52','#33443a','#5a2f2f'];
 const DEFAULT_ACCENTS = ['#c76b3f','#3f8f8a','#c79a3f','#7a4a8f'];
 const DEFAULT_SKIN    = '#e7c9a3';
+const PLAYER_HALF_W = 0.55;
+const PLAYER_HEIGHT = 1.8;
+const PLAYER_DUCK_H = 0.9;
+const REACTION_TIME_SECONDS = 2; // guaranteed obstacle-free window after a round starts
 
 function lerp(a,b,t){ return a + (b-a)*t; }
+
+/* ============================================================
+   SHARED TRACK — every player instance builds its geometry from the
+   same sequence of pattern descriptors (indexed by segment number),
+   so all courts are identical no matter how many players are racing.
+   Descriptors are generated lazily and cached the first time any
+   instance reaches a given index, then reused by everyone else.
+   ============================================================ */
+const REACTION_SEGMENTS = Math.max(2, Math.ceil(REACTION_TIME_SECONDS*BASE_SPEED/SEGMENT_LENGTH)+1);
+let trackPatternCache = new Map();
+
+function getTrackPattern(index){
+  if(trackPatternCache.has(index)) return trackPatternCache.get(index);
+
+  let pattern;
+  if(index < REACTION_SEGMENTS){
+    // Safe warm-up segments: no obstacles, just a coin line to run toward.
+    pattern = { kind:'empty', coinLane:1 };
+  } else {
+    const distanceAtSegment = index * SEGMENT_LENGTH;
+    const difficulty = Math.min(1, distanceAtSegment/DIFFICULTY_DISTANCE);
+    const wEmpty = lerp(0.16,0.05,difficulty);
+    const wBarrier = lerp(0.26,0.16,difficulty);
+    const wTrain = lerp(0.24,0.30,difficulty);
+    const wOverhead = lerp(0.20,0.22,difficulty);
+    const roll = Math.random(); let acc = 0;
+    if(roll < (acc+=wEmpty)){
+      pattern = { kind:'empty', coinLane:1 };
+    } else if(roll < (acc+=wBarrier)){
+      const lane = Math.floor(Math.random()*3);
+      pattern = { kind:'barrier', lane, freeLane:(lane+1)%3 };
+    } else if(roll < (acc+=wTrain)){
+      const blockTwoChance = lerp(0.5,0.8,difficulty);
+      const blockedCount = Math.random()<blockTwoChance ? 2 : 1;
+      const lanes = [0,1,2].sort(()=>Math.random()-0.5).slice(0,blockedCount);
+      const openLane = [0,1,2].find(l=>!lanes.includes(l));
+      pattern = { kind:'train', lanes, openLane };
+    } else if(roll < (acc+=wOverhead)){
+      pattern = { kind:'overhead' };
+    } else {
+      const bLane = Math.floor(Math.random()*3);
+      const oLanes = [0,1,2].filter(l=>l!==bLane);
+      let secondBarrierLane = null;
+      if(difficulty>0.5 && Math.random()<0.35){
+        secondBarrierLane = (bLane+1+Math.floor(Math.random()*2))%3;
+      }
+      pattern = { kind:'combo', bLane, oLanes, secondBarrierLane };
+    }
+  }
+  trackPatternCache.set(index, pattern);
+  return pattern;
+}
 
 /* ============================================================
    SHARED MATERIALS / GEOMETRY (reused across all instances)
@@ -311,6 +363,7 @@ class RunnerInstance{
     this.player.rotation.set(0,0,0); this.player.scale.set(1,1,1);
     this.velocityY = 0; this.isJumping=false; this.isDucking=false; this.duckTimer=0;
     this.gameSpeed = BASE_SPEED; this.distance = 0; this.coins = 0; this.score = 0;
+    this.segmentIndex = 0;
     for(let i=0;i<Math.ceil(SPAWN_AHEAD/SEGMENT_LENGTH);i++) this.generateSegment();
   }
 
@@ -358,42 +411,40 @@ class RunnerInstance{
   generateSegment(){
     const worldZ = this.nextSpawnZ;
     const group = this.makeGroundTile(worldZ);
+    const pattern = getTrackPattern(this.segmentIndex++);
     const obstacles = []; let coins = [];
-    const difficulty = Math.min(1, this.distance/DIFFICULTY_DISTANCE);
-    const wEmpty = lerp(0.16,0.05,difficulty);
-    const wBarrier = lerp(0.26,0.16,difficulty);
-    const wTrain = lerp(0.24,0.30,difficulty);
-    const wOverhead = lerp(0.20,0.22,difficulty);
-    const roll = Math.random(); let acc = 0;
-    if(roll < (acc+=wEmpty)){
-      coins = coins.concat(this.spawnCoinRow(group,1,3,6,1.1));
-    } else if(roll < (acc+=wBarrier)){
-      const lane = Math.floor(Math.random()*3);
-      const ob = this.makeBarrier(lane); ob.position.z=0; group.add(ob); obstacles.push(ob);
-      const freeLane = (lane+1)%3;
-      coins = coins.concat(this.spawnCoinRow(group,freeLane,2,5,1.1));
-    } else if(roll < (acc+=wTrain)){
-      const blockTwoChance = lerp(0.5,0.8,difficulty);
-      const blockedCount = Math.random()<blockTwoChance ? 2 : 1;
-      const lanes = [0,1,2].sort(()=>Math.random()-0.5).slice(0,blockedCount);
-      lanes.forEach(l=>{ const ob=this.makeTrainWall(l); ob.position.z=0; group.add(ob); obstacles.push(ob); });
-      const openLane = [0,1,2].find(l=>!lanes.includes(l));
-      coins = coins.concat(this.spawnCoinRow(group,openLane,2.5,5,1.1));
-    } else if(roll < (acc+=wOverhead)){
-      [0,1,2].forEach(l=>{ const ob=this.makeOverhead(l); ob.position.z=0; group.add(ob); obstacles.push(ob); });
-      coins = coins.concat(this.spawnCoinRow(group,1,2.5,4,0.55));
-    } else {
-      const bLane = Math.floor(Math.random()*3);
-      const barrier = this.makeBarrier(bLane); barrier.position.z=-2; group.add(barrier); obstacles.push(barrier);
-      const oLanes = [0,1,2].filter(l=>l!==bLane);
-      oLanes.forEach(l=>{ const ob=this.makeOverhead(l); ob.position.z=3; group.add(ob); obstacles.push(ob); });
-      coins = coins.concat(this.spawnCoinRow(group,bLane,3.5,3,1.1));
-      if(difficulty>0.5 && Math.random()<0.35){
-        const bLane2 = (bLane+1+Math.floor(Math.random()*2))%3;
-        const barrier2 = this.makeBarrier(bLane2); barrier2.position.z=5.5; group.add(barrier2); obstacles.push(barrier2);
+
+    switch(pattern.kind){
+      case 'empty':
+        coins = coins.concat(this.spawnCoinRow(group, pattern.coinLane, 3, 6, 1.1));
+        break;
+      case 'barrier': {
+        const ob = this.makeBarrier(pattern.lane); ob.position.z = 0; group.add(ob); obstacles.push(ob);
+        coins = coins.concat(this.spawnCoinRow(group, pattern.freeLane, 2, 5, 1.1));
+        break;
+      }
+      case 'train': {
+        pattern.lanes.forEach(l=>{ const ob=this.makeTrainWall(l); ob.position.z=0; group.add(ob); obstacles.push(ob); });
+        coins = coins.concat(this.spawnCoinRow(group, pattern.openLane, 2.5, 5, 1.1));
+        break;
+      }
+      case 'overhead': {
+        [0,1,2].forEach(l=>{ const ob=this.makeOverhead(l); ob.position.z=0; group.add(ob); obstacles.push(ob); });
+        coins = coins.concat(this.spawnCoinRow(group, 1, 2.5, 4, 0.55));
+        break;
+      }
+      case 'combo': {
+        const barrier = this.makeBarrier(pattern.bLane); barrier.position.z=-2; group.add(barrier); obstacles.push(barrier);
+        pattern.oLanes.forEach(l=>{ const ob=this.makeOverhead(l); ob.position.z=3; group.add(ob); obstacles.push(ob); });
+        coins = coins.concat(this.spawnCoinRow(group, pattern.bLane, 3.5, 3, 1.1));
+        if(pattern.secondBarrierLane !== null){
+          const barrier2 = this.makeBarrier(pattern.secondBarrierLane); barrier2.position.z=5.5; group.add(barrier2); obstacles.push(barrier2);
+        }
+        break;
       }
     }
-    this.segments.push({ group, z:worldZ, obstacles, coins });
+
+    this.segments.push({ group, z: worldZ, obstacles, coins });
     this.nextSpawnZ -= SEGMENT_LENGTH;
   }
 
@@ -609,6 +660,7 @@ function activeCount(){ return slots.filter(Boolean).length; }
 function startSession(){
   if(activeCount() < 1) return;
   sessionState = 'playing';
+  trackPatternCache = new Map();
   document.getElementById('lobbyScreen').classList.add('hidden');
   document.getElementById('scoreboardScreen').classList.add('hidden');
   document.getElementById('gameGrid').classList.remove('hidden');

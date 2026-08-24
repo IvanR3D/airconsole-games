@@ -92,8 +92,8 @@
   <div class="sub">Conectando…</div>
 </div>
 
-<!-- CUSTOMIZE / LOBBY -->
-<div id="menuScreen" class="screen hidden">
+<!-- CUSTOMIZE -->
+<div id="customizeScreen" class="screen hidden">
   <h1>LINE<span>RUN</span></h1>
   <div class="sub" id="playerNumLabel">Jugador</div>
 
@@ -135,9 +135,17 @@
     </div>
   </div>
 
+  <button class="btn" id="continueBtn">Continuar</button>
+</div>
+
+<!-- LOBBY / READY -->
+<div id="lobbyScreen" class="screen hidden">
+  <h1>LINE<span>RUN</span></h1>
+  <div class="sub" id="lobbyPlayerLabel">Jugador</div>
   <button class="btn ready" id="readyBtn">Estoy listo</button>
   <button class="btn secondary hidden" id="startBtn">Iniciar partida (anfitrión)</button>
   <div class="status-line" id="lobbyStatus">Esperando a otros jugadores…</div>
+  <button class="btn secondary" id="editAppearanceBtn">Editar apariencia</button>
 </div>
 
 <!-- PLAYING -->
@@ -292,7 +300,7 @@ function previewLoop(){
 window.addEventListener('resize', resizePreview);
 
 function show(id){
-  ['connectScreen','menuScreen','playScreen','resultScreen'].forEach(s=>{
+  ['connectScreen','customizeScreen','lobbyScreen','playScreen','resultScreen'].forEach(s=>{
     document.getElementById(s).classList.toggle('hidden', s!==id);
   });
 }
@@ -356,6 +364,18 @@ function initMenu(){
     sendCustomize();
   });
 
+  document.getElementById('continueBtn').addEventListener('click', ()=>{
+    document.getElementById('lobbyPlayerLabel').textContent = 'Jugador ' + playerNumber;
+    show('lobbyScreen');
+  });
+
+  document.getElementById('editAppearanceBtn').addEventListener('click', ()=>{
+    show('customizeScreen');
+    requestAnimationFrame(resizePreview);
+  });
+}
+
+function initLobby(){
   document.getElementById('readyBtn').addEventListener('click', ()=>{
     isReady = !isReady;
     document.getElementById('readyBtn').textContent = isReady ? 'Cancelar' : 'Estoy listo';
@@ -427,7 +447,7 @@ airconsole.onMessage = function(from, data){
     document.getElementById('nicknameInput').value = cust.nickname;
     sendCustomize();
     send('controlMode', { mode:cust.mode });
-    show('menuScreen');
+    show('customizeScreen');
     requestAnimationFrame(resizePreview);
   } else if(data.action === 'state'){
     isMaster = data.isMaster;
@@ -435,9 +455,17 @@ airconsole.onMessage = function(from, data){
     if(data.state === 'lobby'){
       isReady = false;
       document.getElementById('readyBtn').textContent = 'Estoy listo';
+      document.getElementById('lobbyStatus').textContent = 'Esperando a otros jugadores…';
       document.getElementById('readyAgainBtn').textContent = 'Jugar otra vez';
-      show('menuScreen');
-      requestAnimationFrame(resizePreview);
+      // Only bounce back to the appearance screen the first time (right
+      // after 'joined'); once a player has continued past it, subsequent
+      // returns to 'lobby' (e.g. after a round ends) land on the ready screen.
+      if(!document.getElementById('customizeScreen').classList.contains('hidden')){
+        // still on customize screen, leave them there
+      } else {
+        document.getElementById('lobbyPlayerLabel').textContent = 'Jugador ' + playerNumber;
+        show('lobbyScreen');
+      }
     } else if(data.state === 'playing'){
       document.getElementById('playNick').textContent = cust.nickname;
       updateModeIndicator();
@@ -453,6 +481,7 @@ airconsole.onMessage = function(from, data){
 };
 
 initMenu();
+initLobby();
 initPlayControls();
 initPreview();
 show('connectScreen');
