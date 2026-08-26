@@ -1,230 +1,3402 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Flappy Draw</title>
+
 <style>
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    text-align: center;
-    background: #87CEEB;
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
 }
 
-h2 { margin-top: 10px; }
-
-canvas {
-    border: 2px solid black;
+:root{
+    --bg:#f4f3ee;
+    --card:#ffffff;
+    --text:#171717;
+    --muted:#757575;
+    --border:#d9d8d2;
+    --yellow:#ffd84d;
+    --green:#78d39c;
+    --sky:#cceeff;
 }
 
-#drawCanvas {
-    background: white;
-    cursor: crosshair;
+html,
+body{
+    height:100%;
 }
 
-#gameCanvas {
-    display: none;
-    background: skyblue;
+body{
+    font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    overflow:hidden;
 }
 
-.controls {
-    margin-top: 10px;
+button,
+input{
+    font:inherit;
 }
 
-button {
-    padding: 8px 15px;
-    margin: 5px;
-    font-size: 14px;
-    cursor: pointer;
+button{
+    cursor:pointer;
 }
 
-#score {
-    font-size: 20px;
-    font-weight: bold;
+.app{
+    height:100dvh;
+    max-height:100dvh;
+    display:flex;
+    flex-direction:column;
+    padding:14px clamp(12px,2vw,24px);
+    max-width:1100px;
+    margin:auto;
+}
+
+/* HEADER */
+
+.header{
+    flex:0 0 auto;
+    height:64px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:14px;
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.logo{
+    width:40px;
+    height:40px;
+    display:grid;
+    place-items:center;
+    background:var(--yellow);
+    border:2px solid var(--text);
+    border-radius:12px;
+    font-size:20px;
+    font-weight:900;
+    transform:rotate(-3deg);
+}
+
+.brand h1{
+    font-size:clamp(20px,3vw,28px);
+    letter-spacing:-1px;
+    line-height:1;
+}
+
+.brand p{
+    color:var(--muted);
+    font-size:11px;
+    margin-top:3px;
+}
+
+.header-actions{
+    display:flex;
+    gap:8px;
+    align-items:center;
+}
+
+.header-button{
+    border:1px solid var(--border);
+    background:white;
+    color:var(--text);
+    border-radius:10px;
+    min-height:38px;
+    padding:8px 13px;
+    font-weight:700;
+    font-size:12px;
+}
+
+.header-button:hover{
+    background:#f7f7f4;
+}
+
+.best{
+    font-size:12px;
+    color:var(--muted);
+    white-space:nowrap;
+}
+
+.best strong{
+    color:var(--text);
+    font-size:17px;
+}
+
+/* SCREENS */
+
+.main{
+    flex:1;
+    min-height:0;
+}
+
+.screen{
+    display:none;
+    width:100%;
+    height:100%;
+    min-height:0;
+}
+
+.screen.active{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+/* CHARACTER STUDIO */
+
+.studio{
+    width:min(100%,900px);
+    height:100%;
+    min-height:0;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:22px;
+    padding:clamp(14px,2.2vw,24px);
+    display:grid;
+    grid-template-columns:minmax(280px,1.1fr) minmax(240px,.9fr);
+    gap:clamp(14px,2vw,24px);
+    overflow:hidden;
+}
+
+.draw-column{
+    min-width:0;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+}
+
+.studio-copy{
+    flex:0 0 auto;
+}
+
+.eyebrow{
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:1.3px;
+    color:var(--muted);
+    margin-bottom:4px;
+}
+
+h2{
+    font-size:clamp(20px,3vw,28px);
+    letter-spacing:-.8px;
+    line-height:1.05;
+}
+
+.description{
+    color:var(--muted);
+    font-size:12px;
+    line-height:1.4;
+    margin-top:6px;
+}
+
+.draw-area{
+    flex:1;
+    min-height:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:12px 0;
+}
+
+.canvas-wrap{
+    position:relative;
+    height:100%;
+    max-height:440px;
+    aspect-ratio:1/1;
+    max-width:100%;
+    border:2px dashed #bbb9b1;
+    border-radius:18px;
+    overflow:hidden;
+    background:
+        linear-gradient(45deg,#f7f7f7 25%,transparent 25%),
+        linear-gradient(-45deg,#f7f7f7 25%,transparent 25%),
+        linear-gradient(45deg,transparent 75%,#f7f7f7 75%),
+        linear-gradient(-45deg,transparent 75%,#f7f7f7 75%);
+    background-size:22px 22px;
+    background-position:0 0,0 11px,11px -11px,-11px 0;
+}
+
+#drawCanvas{
+    display:block;
+    width:100%;
+    height:100%;
+    touch-action:none;
+}
+
+.placeholder{
+    position:absolute;
+    inset:0;
+    display:grid;
+    place-items:center;
+    text-align:center;
+    pointer-events:none;
+    color:#aaa;
+    font-size:12px;
+    padding:25px;
+}
+
+.placeholder.hidden{
+    display:none;
+}
+
+.tools{
+    flex:0 0 auto;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:9px;
+}
+
+/* DRAW / ERASE TOGGLE */
+
+.mode-toggle{
+    position:relative;
+    display:flex;
+    align-items:center;
+    width:150px;
+    height:42px;
+    padding:3px;
+    border:1px solid var(--border);
+    border-radius:12px;
+    background:#f4f4f1;
+}
+
+.mode-indicator{
+    position:absolute;
+    left:3px;
+    top:3px;
+    width:calc(50% - 3px);
+    height:34px;
+    background:var(--text);
+    border-radius:9px;
+    transition:transform .18s ease;
+}
+
+.mode-toggle.erase .mode-indicator{
+    transform:translateX(100%);
+}
+
+.mode-option{
+    position:relative;
+    z-index:2;
+    flex:1;
+    border:0;
+    background:transparent;
+    min-height:34px;
+    font-size:11px;
+    font-weight:700;
+    color:var(--muted);
+}
+
+.mode-option.active{
+    color:white;
+}
+
+input[type="color"]{
+    width:42px;
+    height:42px;
+    border:1px solid var(--border);
+    border-radius:11px;
+    background:white;
+    padding:4px;
+}
+
+input[type="range"]{
+    width:90px;
+}
+
+.small-button{
+    min-height:42px;
+    border:1px solid var(--border);
+    background:white;
+    border-radius:11px;
+    padding:9px 12px;
+    font-size:11px;
+    font-weight:700;
+}
+
+.small-button:hover{
+    background:#f5f5f2;
+}
+
+/* STUDIO OPTIONS */
+
+.options{
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap:12px;
+}
+
+.field label{
+    display:block;
+    font-size:11px;
+    font-weight:800;
+    margin-bottom:6px;
+}
+
+.field input{
+    width:100%;
+    min-height:44px;
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:10px 12px;
+    outline:none;
+    font-size:16px;
+}
+
+.field input:focus{
+    border-color:var(--text);
+}
+
+.character-status{
+    min-height:48px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:#f5f5f1;
+    border:1px solid var(--border);
+    border-radius:13px;
+    padding:8px 10px;
+}
+
+.character-thumb{
+    width:38px;
+    height:38px;
+    display:grid;
+    place-items:center;
+    flex:0 0 auto;
+}
+
+.character-thumb img{
+    max-width:100%;
+    max-height:100%;
+    object-fit:contain;
+}
+
+.character-copy{
+    min-width:0;
+}
+
+.character-copy strong{
+    display:block;
+    font-size:12px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.character-copy span{
+    display:block;
+    color:var(--muted);
+    font-size:10px;
+    margin-top:2px;
+}
+
+.option-buttons{
+    display:grid;
+    gap:8px;
+}
+
+.action{
+    width:100%;
+    min-height:44px;
+    border-radius:12px;
+    border:1px solid var(--border);
+    background:white;
+    color:var(--text);
+    font-weight:750;
+    font-size:12px;
+}
+
+.action:hover{
+    background:#f5f5f2;
+}
+
+.action.dark{
+    background:var(--text);
+    color:white;
+    border-color:var(--text);
+}
+
+.action.play{
+    background:var(--yellow);
+    color:var(--text);
+    border:2px solid var(--text);
+    font-size:14px;
+    min-height:50px;
+}
+
+.saved-row{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    overflow-x:auto;
+    padding-bottom:2px;
+    min-height:50px;
+}
+
+.saved-row::-webkit-scrollbar{
+    height:4px;
+}
+
+.saved-char{
+    position:relative;
+    flex:0 0 48px;
+    width:48px;
+    height:48px;
+    border:1px solid var(--border);
+    border-radius:11px;
+    background:#f8f8f5;
+    display:grid;
+    place-items:center;
+    padding:5px;
+}
+
+.saved-char.selected{
+    border:2px solid var(--text);
+}
+
+.saved-char img{
+    max-width:100%;
+    max-height:100%;
+}
+
+.saved-char button{
+    position:absolute;
+    top:-5px;
+    right:-5px;
+    width:17px;
+    height:17px;
+    border:0;
+    border-radius:50%;
+    background:var(--text);
+    color:white;
+    font-size:10px;
+    line-height:17px;
+}
+
+.saved-label{
+    color:var(--muted);
+    font-size:10px;
+}
+
+/* GAME */
+
+#gameScreen{
+    align-items:center;
+}
+
+.game-shell{
+    width:min(100%,850px);
+    height:100%;
+    min-height:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.game-container{
+    position:relative;
+    height:min(100%,650px);
+    max-width:100%;
+    aspect-ratio:900/620;
+    border:1px solid var(--border);
+    border-radius:20px;
+    overflow:hidden;
+    background:var(--sky);
+}
+
+#gameCanvas{
+    display:block;
+    width:100%;
+    height:100%;
+    touch-action:manipulation;
+}
+
+.game-hud{
+    position:absolute;
+    top:12px;
+    left:12px;
+    right:12px;
+    display:flex;
+    justify-content:space-between;
+    pointer-events:none;
+}
+
+.score{
+    min-width:62px;
+    padding:7px 10px;
+    background:rgba(255,255,255,.92);
+    border:2px solid var(--text);
+    border-radius:10px;
+    font-size:12px;
+    font-weight:900;
+    text-align:center;
+}
+
+.game-message{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    background:rgba(255,255,255,.95);
+    border:2px solid var(--text);
+    border-radius:15px;
+    padding:14px 20px;
+    text-align:center;
+    pointer-events:none;
+    white-space:nowrap;
+}
+
+.game-message strong{
+    display:block;
+    font-size:18px;
+}
+
+.game-message span{
+    color:var(--muted);
+    font-size:10px;
+}
+
+.game-message.hidden{
+    display:none;
+}
+
+/* RESULTS */
+
+.results{
+    width:min(100%,800px);
+    height:100%;
+    min-height:0;
+    background:white;
+    border:1px solid var(--border);
+    border-radius:22px;
+    padding:clamp(14px,2vw,22px);
+    display:grid;
+    grid-template-columns:.75fr 1.25fr;
+    gap:20px;
+    overflow:hidden;
+}
+
+.result-main{
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+}
+
+.result-character{
+    width:85px;
+    height:85px;
+    background:#f5f5f1;
+    border-radius:17px;
+    display:grid;
+    place-items:center;
+    margin:10px 0;
+    padding:10px;
+}
+
+.result-character img{
+    max-width:100%;
+    max-height:100%;
+}
+
+.final-score{
+    font-size:clamp(42px,8vw,68px);
+    font-weight:950;
+    line-height:.95;
+    letter-spacing:-4px;
+}
+
+.score-caption{
+    color:var(--muted);
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    margin-top:3px;
+}
+
+.personal-best{
+    font-size:11px;
+    font-weight:800;
+    margin:9px 0 12px;
+    background:var(--yellow);
+    padding:6px 9px;
+    border-radius:9px;
+    border:1px solid var(--text);
+}
+
+.result-actions{
+    width:100%;
+    display:grid;
+    gap:7px;
+}
+
+.leaderboard-panel{
+    min-height:0;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+}
+
+.leaderboard{
+    flex:1;
+    min-height:0;
+    overflow:auto;
+    margin-top:10px;
+}
+
+.leader-row{
+    display:grid;
+    grid-template-columns:25px 38px 1fr 45px;
+    align-items:center;
+    gap:8px;
+    padding:7px 0;
+    border-bottom:1px solid #eee;
+}
+
+.rank{
+    font-size:11px;
+    font-weight:900;
+}
+
+.avatar{
+    width:36px;
+    height:36px;
+    display:grid;
+    place-items:center;
+    background:#f5f5f1;
+    border-radius:8px;
+    padding:4px;
+}
+
+.avatar img{
+    max-width:100%;
+    max-height:100%;
+}
+
+.leader-name{
+    min-width:0;
+}
+
+.leader-name strong{
+    display:block;
+    font-size:11px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.leader-name span{
+    color:var(--muted);
+    font-size:9px;
+}
+
+.leader-score{
+    text-align:right;
+    font-size:16px;
+    font-weight:950;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:700px){
+
+    .app{
+        padding:8px 10px;
+    }
+
+    .header{
+        height:54px;
+    }
+
+    .brand p{
+        display:none;
+    }
+
+    .best{
+        display:none;
+    }
+
+    .studio{
+        grid-template-columns:1fr;
+        grid-template-rows:minmax(0,1fr) auto;
+        padding:12px;
+        gap:8px;
+        border-radius:16px;
+    }
+
+    .studio-copy .description{
+        display:none;
+    }
+
+    .draw-area{
+        padding:6px 0;
+    }
+
+    .canvas-wrap{
+        max-height:none;
+    }
+
+    .options{
+        gap:7px;
+    }
+
+    .character-status{
+        display:none;
+    }
+
+    .option-buttons{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .option-buttons .play{
+        grid-column:1 / -1;
+    }
+
+    .saved-wrap{
+        display:flex;
+        align-items:center;
+        gap:8px;
+    }
+
+    .saved-label{
+        flex:0 0 auto;
+    }
+
+    .saved-row{
+        min-height:42px;
+        flex:1;
+    }
+
+    .saved-char{
+        width:40px;
+        height:40px;
+        flex-basis:40px;
+    }
+
+    .tools{
+        gap:6px;
+    }
+
+    .mode-toggle{
+        width:130px;
+        height:38px;
+    }
+
+    .mode-indicator{
+        height:30px;
+    }
+
+    input[type="color"],
+    .small-button{
+        width:38px;
+        height:38px;
+        min-height:38px;
+        padding:5px;
+    }
+
+    input[type="range"]{
+        width:70px;
+    }
+
+    .game-container{
+        width:100%;
+        height:auto;
+        max-height:100%;
+    }
+
+    .results{
+        grid-template-columns:1fr;
+        grid-template-rows:auto minmax(0,1fr);
+        gap:10px;
+        padding:12px;
+        border-radius:16px;
+    }
+
+    .result-main{
+        display:grid;
+        grid-template-columns:auto 1fr;
+        grid-template-areas:
+            "char info"
+            "actions actions";
+        gap:8px 14px;
+        text-align:left;
+        align-items:center;
+    }
+
+    .result-character{
+        grid-area:char;
+        width:70px;
+        height:70px;
+        margin:0;
+    }
+
+    .result-info{
+        grid-area:info;
+    }
+
+    .final-score{
+        font-size:42px;
+        letter-spacing:-2px;
+    }
+
+    .personal-best{
+        display:inline-block;
+        margin:5px 0 0;
+    }
+
+    .result-actions{
+        grid-area:actions;
+        grid-template-columns:1fr 1fr;
+    }
+}
+
+@media(max-width:430px){
+
+    .brand h1{
+        font-size:19px;
+    }
+
+    .logo{
+        width:34px;
+        height:34px;
+    }
+
+    .header-button{
+        padding:7px 9px;
+        font-size:10px;
+    }
+
+    h2{
+        font-size:19px;
+    }
+
+    .studio{
+        padding:9px;
+    }
+
+    .field input{
+        min-height:40px;
+    }
+
+    .action{
+        min-height:39px;
+        font-size:10px;
+    }
+
+    .action.play{
+        min-height:44px;
+        font-size:12px;
+    }
+}
+
+@media(max-height:650px){
+
+    .header{
+        height:48px;
+    }
+
+    .logo{
+        width:34px;
+        height:34px;
+    }
+
+    .brand p{
+        display:none;
+    }
+
+    .studio{
+        padding:10px;
+    }
+
+    .description{
+        display:none;
+    }
+
+    .tools{
+        gap:5px;
+    }
+
+    .field input{
+        min-height:38px;
+        padding:7px 10px;
+    }
+
+    .action{
+        min-height:38px;
+    }
+
+    .action.play{
+        min-height:42px;
+    }
+
+    .character-status{
+        min-height:40px;
+    }
 }
 </style>
 </head>
+
 <body>
 
-<div id="drawScreen">
-    <h2>Dibuja tu personaje</h2>
-    <canvas id="drawCanvas" width="150" height="150"></canvas>
-    <div class="controls">
-        <button id="clearBtn">Limpiar</button>
-        <button id="saveBtn">Guardar & Jugar</button>
+<div class="app">
+
+<header class="header">
+
+    <div class="brand">
+        <div class="logo">✎</div>
+
+        <div>
+            <h1>Flappy Draw</h1>
+            <p>Draw it. Fly it. Beat your score.</p>
+        </div>
     </div>
+
+    <div class="header-actions">
+
+        <div class="best">
+            Best
+            <strong id="globalBest">0</strong>
+        </div>
+
+        <button
+            id="studioHeaderButton"
+            class="header-button"
+            type="button"
+            hidden
+        >
+            ← Character Studio
+        </button>
+
+    </div>
+
+</header>
+
+
+<main class="main">
+
+<!-- =========================================
+     CHARACTER STUDIO
+========================================== -->
+
+<section
+    id="studioScreen"
+    class="screen active"
+>
+
+    <div class="studio">
+
+        <div class="draw-column">
+
+            <div class="studio-copy">
+
+                <div class="eyebrow">
+                    Character Studio
+                </div>
+
+                <h2>Draw your flappy.</h2>
+
+                <p class="description">
+                    Draw your character. Its visible border becomes the collision hitbox.
+                </p>
+
+            </div>
+
+
+            <div class="draw-area">
+
+                <div class="canvas-wrap">
+
+                    <canvas
+                        id="drawCanvas"
+                        width="420"
+                        height="420"
+                    ></canvas>
+
+                    <div
+                        id="canvasPlaceholder"
+                        class="placeholder"
+                    >
+                        Draw here
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="tools">
+
+                <div
+                    id="modeToggle"
+                    class="mode-toggle"
+                >
+
+                    <div class="mode-indicator"></div>
+
+                    <button
+                        id="brushButton"
+                        class="mode-option active"
+                        type="button"
+                    >
+                        Brush
+                    </button>
+
+                    <button
+                        id="eraserButton"
+                        class="mode-option"
+                        type="button"
+                    >
+                        Erase
+                    </button>
+
+                </div>
+
+
+                <input
+                    id="colorPicker"
+                    type="color"
+                    value="#171717"
+                    title="Color"
+                >
+
+                <input
+                    id="brushSize"
+                    type="range"
+                    min="3"
+                    max="38"
+                    value="12"
+                    title="Brush size"
+                >
+
+                <button
+                    id="clearButton"
+                    class="small-button"
+                    type="button"
+                    title="Clear drawing"
+                >
+                    Clear
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="options">
+
+            <div class="field">
+
+                <label for="playerName">
+                    Player name
+                </label>
+
+                <input
+                    id="playerName"
+                    type="text"
+                    maxlength="18"
+                    value="Player"
+                >
+
+            </div>
+
+
+            <div class="character-status">
+
+                <div class="character-thumb">
+                    <img
+                        id="characterPreview"
+                        alt="Selected character"
+                    >
+                </div>
+
+                <div class="character-copy">
+
+                    <strong id="characterTitle">
+                        Default character
+                    </strong>
+
+                    <span id="characterStatus">
+                        Ready to play
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="option-buttons">
+
+                <button
+                    id="useDrawingButton"
+                    class="action dark"
+                    type="button"
+                >
+                    Use My Drawing
+                </button>
+
+                <button
+                    id="defaultButton"
+                    class="action"
+                    type="button"
+                >
+                    Use Default
+                </button>
+
+                <button
+                    id="saveCharacterButton"
+                    class="action"
+                    type="button"
+                >
+                    Save Drawing
+                </button>
+
+                <button
+                    id="playButton"
+                    class="action play"
+                    type="button"
+                >
+                    ▶ Play
+                </button>
+
+            </div>
+
+
+            <div class="saved-wrap">
+
+                <div class="saved-label">
+                    Saved
+                </div>
+
+                <div
+                    id="savedCharacters"
+                    class="saved-row"
+                ></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     GAME
+========================================== -->
+
+<section
+    id="gameScreen"
+    class="screen"
+>
+
+    <div class="game-shell">
+
+        <div class="game-container">
+
+            <canvas
+                id="gameCanvas"
+                width="900"
+                height="620"
+            ></canvas>
+
+
+            <div class="game-hud">
+
+                <div class="score">
+                    <span id="gameScore">0</span>
+                </div>
+
+                <div class="score">
+                    Best
+                    <span id="gameBest">0</span>
+                </div>
+
+            </div>
+
+
+            <div
+                id="gameMessage"
+                class="game-message"
+            >
+                <strong>Get ready!</strong>
+
+                <span>
+                    Click, tap or press SPACE
+                </span>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     RESULTS
+========================================== -->
+
+<section
+    id="resultScreen"
+    class="screen"
+>
+
+    <div class="results">
+
+        <div class="result-main">
+
+            <div class="result-character">
+
+                <img
+                    id="resultCharacter"
+                    alt="Character"
+                >
+
+            </div>
+
+
+            <div class="result-info">
+
+                <div class="eyebrow">
+                    Game Over
+                </div>
+
+                <h2 id="resultName">
+                    Player
+                </h2>
+
+                <div
+                    id="finalScore"
+                    class="final-score"
+                >
+                    0
+                </div>
+
+                <div class="score-caption">
+                    Score
+                </div>
+
+                <div class="personal-best">
+                    Best:
+                    <span id="personalBest">
+                        0
+                    </span>
+                </div>
+
+            </div>
+
+
+            <div class="result-actions">
+
+                <button
+                    id="playAgainButton"
+                    class="action play"
+                    type="button"
+                >
+                    ▶ Play Again
+                </button>
+
+                <button
+                    id="backStudioButton"
+                    class="action"
+                    type="button"
+                >
+                    Character Studio
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="leaderboard-panel">
+
+            <div class="eyebrow">
+                Local Records
+            </div>
+
+            <h2>Scoreboard</h2>
+
+            <div
+                id="leaderboard"
+                class="leaderboard"
+            ></div>
+
+        </div>
+
+    </div>
+
+</section>
+
+</main>
+
 </div>
 
-<div id="gameUI">
-    <canvas id="gameCanvas" width="400" height="600"></canvas>
-    <div id="score"></div>
-    <button id="restartBtn" style="display:none;">Jugar de nuevo</button>
-</div>
 
 <script>
-// ===================== DRAW SYSTEM =====================
-const drawCanvas = document.getElementById("drawCanvas");
-const drawCtx = drawCanvas.getContext("2d");
+(() => {
+
+"use strict";
+
+
+/* ==========================================
+   ELEMENTS
+========================================== */
+
+const studioScreen =
+    document.getElementById("studioScreen");
+
+const gameScreen =
+    document.getElementById("gameScreen");
+
+const resultScreen =
+    document.getElementById("resultScreen");
+
+const studioHeaderButton =
+    document.getElementById("studioHeaderButton");
+
+const globalBestElement =
+    document.getElementById("globalBest");
+
+
+/* DRAW */
+
+const drawCanvas =
+    document.getElementById("drawCanvas");
+
+const drawCtx =
+    drawCanvas.getContext(
+        "2d",
+        {willReadFrequently:true}
+    );
+
+const canvasPlaceholder =
+    document.getElementById("canvasPlaceholder");
+
+const modeToggle =
+    document.getElementById("modeToggle");
+
+const brushButton =
+    document.getElementById("brushButton");
+
+const eraserButton =
+    document.getElementById("eraserButton");
+
+const colorPicker =
+    document.getElementById("colorPicker");
+
+const brushSize =
+    document.getElementById("brushSize");
+
+const clearButton =
+    document.getElementById("clearButton");
+
+
+/* PLAYER */
+
+const playerNameInput =
+    document.getElementById("playerName");
+
+const characterPreview =
+    document.getElementById("characterPreview");
+
+const characterTitle =
+    document.getElementById("characterTitle");
+
+const characterStatus =
+    document.getElementById("characterStatus");
+
+const useDrawingButton =
+    document.getElementById("useDrawingButton");
+
+const defaultButton =
+    document.getElementById("defaultButton");
+
+const saveCharacterButton =
+    document.getElementById("saveCharacterButton");
+
+const playButton =
+    document.getElementById("playButton");
+
+const savedCharactersContainer =
+    document.getElementById("savedCharacters");
+
+
+/* GAME */
+
+const gameCanvas =
+    document.getElementById("gameCanvas");
+
+const gameCtx =
+    gameCanvas.getContext("2d");
+
+const gameScoreElement =
+    document.getElementById("gameScore");
+
+const gameBestElement =
+    document.getElementById("gameBest");
+
+const gameMessage =
+    document.getElementById("gameMessage");
+
+
+/* RESULTS */
+
+const resultCharacter =
+    document.getElementById("resultCharacter");
+
+const resultName =
+    document.getElementById("resultName");
+
+const finalScore =
+    document.getElementById("finalScore");
+
+const personalBest =
+    document.getElementById("personalBest");
+
+const leaderboard =
+    document.getElementById("leaderboard");
+
+const playAgainButton =
+    document.getElementById("playAgainButton");
+
+const backStudioButton =
+    document.getElementById("backStudioButton");
+
+
+/* ==========================================
+   STORAGE
+========================================== */
+
+const CHARACTER_KEY =
+    "flappyDrawCharactersV2";
+
+const SCORE_KEY =
+    "flappyDrawScoresV2";
+
+
+function getSavedCharacters(){
+
+    try{
+
+        return JSON.parse(
+            localStorage.getItem(CHARACTER_KEY)
+        ) || [];
+
+    }catch{
+
+        return [];
+
+    }
+
+}
+
+
+function saveCharacters(data){
+
+    localStorage.setItem(
+        CHARACTER_KEY,
+        JSON.stringify(data)
+    );
+
+}
+
+
+function getScores(){
+
+    try{
+
+        return JSON.parse(
+            localStorage.getItem(SCORE_KEY)
+        ) || [];
+
+    }catch{
+
+        return [];
+
+    }
+
+}
+
+
+function saveScores(data){
+
+    localStorage.setItem(
+        SCORE_KEY,
+        JSON.stringify(data)
+    );
+
+}
+
+
+/* ==========================================
+   DRAW STATE
+========================================== */
 
 let drawing = false;
+let hasDrawn = false;
 
-function getPos(canvas, evt) {
-    const rect = canvas.getBoundingClientRect();
-    const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
-    const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
-    return {
-        x: clientX - rect.left,
-        y: clientY - rect.top
+let tool = "brush";
+
+let lastX = 0;
+let lastY = 0;
+
+let activeCharacter = null;
+
+
+drawCtx.lineCap = "round";
+drawCtx.lineJoin = "round";
+
+
+function canvasPoint(event){
+
+    const rect =
+        drawCanvas.getBoundingClientRect();
+
+    return{
+
+        x:
+            (event.clientX - rect.left) *
+            drawCanvas.width /
+            rect.width,
+
+        y:
+            (event.clientY - rect.top) *
+            drawCanvas.height /
+            rect.height
+
     };
+
 }
 
-function startDraw(e) { drawing = true; }
-function endDraw() { drawing = false; }
 
-function draw(e) {
-    if (!drawing) return;
-    e.preventDefault();
-    const pos = getPos(drawCanvas, e);
-    drawCtx.fillStyle = "black";
+function startDrawing(event){
+
+    event.preventDefault();
+
+    drawing = true;
+    hasDrawn = true;
+
+    canvasPlaceholder.classList.add(
+        "hidden"
+    );
+
+    const point =
+        canvasPoint(event);
+
+    lastX = point.x;
+    lastY = point.y;
+
     drawCtx.beginPath();
-    drawCtx.arc(pos.x, pos.y, 3, 0, Math.PI * 2);
+
+    drawCtx.arc(
+        point.x,
+        point.y,
+        Number(brushSize.value) / 2,
+        0,
+        Math.PI * 2
+    );
+
+    if(tool === "eraser"){
+
+        drawCtx.globalCompositeOperation =
+            "destination-out";
+
+        drawCtx.fillStyle = "#000";
+
+    }else{
+
+        drawCtx.globalCompositeOperation =
+            "source-over";
+
+        drawCtx.fillStyle =
+            colorPicker.value;
+
+    }
+
     drawCtx.fill();
+
 }
 
-drawCanvas.addEventListener("mousedown", startDraw);
-drawCanvas.addEventListener("mouseup", endDraw);
-drawCanvas.addEventListener("mouseleave", endDraw);
-drawCanvas.addEventListener("mousemove", draw);
 
-drawCanvas.addEventListener("touchstart", startDraw);
-drawCanvas.addEventListener("touchend", endDraw);
-drawCanvas.addEventListener("touchmove", draw);
+function moveDrawing(event){
 
-document.getElementById("clearBtn").onclick = () => {
-    drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
-};
+    if(!drawing) return;
 
-// ===================== GAME SYSTEM =====================
-const gameCanvas = document.getElementById("gameCanvas");
-const ctx = gameCanvas.getContext("2d");
+    event.preventDefault();
 
-let playerImage = new Image();
-let animationId;
-let gameRunning = false;
+    const point =
+        canvasPoint(event);
 
-let player, pipes, frame, score;
+    drawCtx.lineWidth =
+        Number(brushSize.value);
 
-function initGame() {
-    player = {
-        x: 80,
-        y: 200,
-        width: 40,
-        height: 40,
-        velocity: 0,
-        gravity: 0.5,
-        jump: -8
+    if(tool === "eraser"){
+
+        drawCtx.globalCompositeOperation =
+            "destination-out";
+
+        drawCtx.strokeStyle = "#000";
+
+    }else{
+
+        drawCtx.globalCompositeOperation =
+            "source-over";
+
+        drawCtx.strokeStyle =
+            colorPicker.value;
+
+    }
+
+    drawCtx.beginPath();
+
+    drawCtx.moveTo(
+        lastX,
+        lastY
+    );
+
+    drawCtx.lineTo(
+        point.x,
+        point.y
+    );
+
+    drawCtx.stroke();
+
+    lastX = point.x;
+    lastY = point.y;
+
+}
+
+
+function endDrawing(){
+
+    drawing = false;
+
+}
+
+
+drawCanvas.addEventListener(
+    "pointerdown",
+    startDrawing
+);
+
+drawCanvas.addEventListener(
+    "pointermove",
+    moveDrawing
+);
+
+window.addEventListener(
+    "pointerup",
+    endDrawing
+);
+
+
+/* ==========================================
+   BRUSH / ERASE TOGGLE
+========================================== */
+
+function setTool(newTool){
+
+    tool = newTool;
+
+    const erasing =
+        newTool === "eraser";
+
+    modeToggle.classList.toggle(
+        "erase",
+        erasing
+    );
+
+    brushButton.classList.toggle(
+        "active",
+        !erasing
+    );
+
+    eraserButton.classList.toggle(
+        "active",
+        erasing
+    );
+
+}
+
+
+brushButton.addEventListener(
+    "click",
+    () => setTool("brush")
+);
+
+eraserButton.addEventListener(
+    "click",
+    () => setTool("eraser")
+);
+
+
+clearButton.addEventListener(
+    "click",
+    () => {
+
+        drawCtx.clearRect(
+            0,
+            0,
+            drawCanvas.width,
+            drawCanvas.height
+        );
+
+        hasDrawn = false;
+
+        canvasPlaceholder.classList.remove(
+            "hidden"
+        );
+
+        characterStatus.textContent =
+            "Canvas cleared";
+
+    }
+);
+
+
+/* ==========================================
+   HITBOX DETECTION
+========================================== */
+
+function detectVisibleBounds(canvas){
+
+    const context =
+        canvas.getContext(
+            "2d",
+            {willReadFrequently:true}
+        );
+
+    const width =
+        canvas.width;
+
+    const height =
+        canvas.height;
+
+    const pixels =
+        context.getImageData(
+            0,
+            0,
+            width,
+            height
+        ).data;
+
+    let minX = width;
+    let minY = height;
+    let maxX = -1;
+    let maxY = -1;
+
+
+    for(let y = 0; y < height; y++){
+
+        for(let x = 0; x < width; x++){
+
+            const alpha =
+                pixels[
+                    (y * width + x) * 4 + 3
+                ];
+
+            if(alpha > 20){
+
+                if(x < minX) minX = x;
+                if(y < minY) minY = y;
+
+                if(x > maxX) maxX = x;
+                if(y > maxY) maxY = y;
+
+            }
+
+        }
+
+    }
+
+
+    if(maxX < minX){
+        return null;
+    }
+
+
+    return{
+
+        x:minX,
+        y:minY,
+
+        width:
+            maxX - minX + 1,
+
+        height:
+            maxY - minY + 1
+
     };
 
-    pipes = [];
-    frame = 0;
-    score = 0;
-    gameRunning = true;
-    document.getElementById("score").innerText = "Puntuación: 0";
-    document.getElementById("restartBtn").style.display = "none";
 }
 
-function createPipe() {
-    let gap = 150;
-    let topHeight = Math.random() * 250 + 50;
 
-    pipes.push({
-        x: gameCanvas.width,
-        top: topHeight,
-        bottom: topHeight + gap,
-        passed: false
+/* ==========================================
+   CUSTOM CHARACTER
+========================================== */
+
+function createCharacterFromDrawing(){
+
+    const bounds =
+        detectVisibleBounds(
+            drawCanvas
+        );
+
+    if(!bounds){
+
+        characterStatus.textContent =
+            "Draw something first";
+
+        return null;
+
+    }
+
+
+    const padding = 8;
+
+    const cropped =
+        document.createElement("canvas");
+
+    cropped.width =
+        bounds.width +
+        padding * 2;
+
+    cropped.height =
+        bounds.height +
+        padding * 2;
+
+
+    const ctx =
+        cropped.getContext("2d");
+
+
+    ctx.drawImage(
+
+        drawCanvas,
+
+        bounds.x,
+        bounds.y,
+        bounds.width,
+        bounds.height,
+
+        padding,
+        padding,
+        bounds.width,
+        bounds.height
+
+    );
+
+
+    return{
+
+        id:
+            "custom-" +
+            Date.now(),
+
+        name:
+            playerNameInput.value.trim()
+            || "Player",
+
+        image:
+            cropped.toDataURL(
+                "image/png"
+            ),
+
+        hitbox:{
+
+            left:
+                padding /
+                cropped.width,
+
+            top:
+                padding /
+                cropped.height,
+
+            right:
+                (padding +
+                bounds.width) /
+                cropped.width,
+
+            bottom:
+                (padding +
+                bounds.height) /
+                cropped.height
+
+        }
+
+    };
+
+}
+
+
+/* ==========================================
+   DEFAULT CHARACTER
+========================================== */
+
+function createDefaultCharacter(){
+
+    const canvas =
+        document.createElement("canvas");
+
+    canvas.width = 150;
+    canvas.height = 120;
+
+    const ctx =
+        canvas.getContext("2d");
+
+
+    ctx.lineWidth = 6;
+    ctx.strokeStyle = "#171717";
+    ctx.lineJoin = "round";
+
+
+    /* body */
+
+    ctx.fillStyle = "#ffd84d";
+
+    ctx.beginPath();
+
+    ctx.ellipse(
+        72,
+        64,
+        48,
+        37,
+        0,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+    ctx.stroke();
+
+
+    /* wing */
+
+    ctx.fillStyle = "#fff";
+
+    ctx.beginPath();
+
+    ctx.ellipse(
+        57,
+        73,
+        23,
+        16,
+        -.2,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+    ctx.stroke();
+
+
+    /* eye */
+
+    ctx.beginPath();
+
+    ctx.arc(
+        99,
+        48,
+        12,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+    ctx.stroke();
+
+
+    ctx.fillStyle = "#171717";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        103,
+        49,
+        4,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+
+    /* beak */
+
+    ctx.fillStyle = "#ff8a70";
+
+    ctx.beginPath();
+
+    ctx.moveTo(119,61);
+    ctx.lineTo(145,70);
+    ctx.lineTo(119,79);
+    ctx.closePath();
+
+    ctx.fill();
+    ctx.stroke();
+
+
+    const bounds =
+        detectVisibleBounds(canvas);
+
+
+    return{
+
+        id:"default",
+
+        name:"Default character",
+
+        image:
+            canvas.toDataURL(
+                "image/png"
+            ),
+
+        hitbox:{
+
+            left:
+                bounds.x /
+                canvas.width,
+
+            top:
+                bounds.y /
+                canvas.height,
+
+            right:
+                (bounds.x +
+                bounds.width) /
+                canvas.width,
+
+            bottom:
+                (bounds.y +
+                bounds.height) /
+                canvas.height
+
+        }
+
+    };
+
+}
+
+
+/* ==========================================
+   CHARACTER SELECTION
+========================================== */
+
+function selectCharacter(character){
+
+    activeCharacter =
+        character;
+
+    characterPreview.src =
+        character.image;
+
+    characterTitle.textContent =
+        character.name;
+
+    characterStatus.textContent =
+        character.id === "default"
+        ? "Ready to play"
+        : "Custom hitbox detected";
+
+    renderSavedCharacters();
+
+}
+
+
+useDrawingButton.addEventListener(
+    "click",
+    () => {
+
+        const character =
+            createCharacterFromDrawing();
+
+        if(character){
+
+            selectCharacter(character);
+
+        }
+
+    }
+);
+
+
+defaultButton.addEventListener(
+    "click",
+    () => {
+
+        selectCharacter(
+            createDefaultCharacter()
+        );
+
+    }
+);
+
+
+saveCharacterButton.addEventListener(
+    "click",
+    () => {
+
+        let character =
+            createCharacterFromDrawing();
+
+        if(!character){
+            return;
+        }
+
+
+        character.id =
+            "saved-" +
+            Date.now();
+
+
+        const saved =
+            getSavedCharacters();
+
+
+        saved.unshift(
+            character
+        );
+
+
+        saveCharacters(
+            saved.slice(0,12)
+        );
+
+
+        selectCharacter(
+            character
+        );
+
+
+        characterStatus.textContent =
+            "Drawing saved locally";
+
+    }
+);
+
+
+/* ==========================================
+   SAVED CHARACTERS
+========================================== */
+
+function renderSavedCharacters(){
+
+    const saved =
+        getSavedCharacters();
+
+    savedCharactersContainer.innerHTML =
+        "";
+
+
+    if(!saved.length){
+
+        const empty =
+            document.createElement("span");
+
+        empty.className =
+            "saved-label";
+
+        empty.textContent =
+            "No characters yet";
+
+        savedCharactersContainer.appendChild(
+            empty
+        );
+
+        return;
+
+    }
+
+
+    saved.forEach(character => {
+
+        const item =
+            document.createElement("div");
+
+        item.className =
+            "saved-char";
+
+
+        if(
+            activeCharacter &&
+            character.id ===
+            activeCharacter.id
+        ){
+
+            item.classList.add(
+                "selected"
+            );
+
+        }
+
+
+        const img =
+            document.createElement("img");
+
+        img.src =
+            character.image;
+
+        img.alt =
+            character.name;
+
+
+        const deleteButton =
+            document.createElement("button");
+
+        deleteButton.type =
+            "button";
+
+        deleteButton.textContent =
+            "×";
+
+
+        item.append(
+            img,
+            deleteButton
+        );
+
+
+        item.addEventListener(
+            "click",
+            () => {
+
+                selectCharacter(
+                    character
+                );
+
+            }
+        );
+
+
+        deleteButton.addEventListener(
+            "click",
+            event => {
+
+                event.stopPropagation();
+
+
+                const remaining =
+                    getSavedCharacters()
+                    .filter(
+                        entry =>
+                        entry.id !==
+                        character.id
+                    );
+
+
+                saveCharacters(
+                    remaining
+                );
+
+
+                renderSavedCharacters();
+
+            }
+        );
+
+
+        savedCharactersContainer.appendChild(
+            item
+        );
+
     });
+
 }
 
-function update() {
-    if (!gameRunning) return;
 
-    ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
-    frame++;
+/* ==========================================
+   SCREEN HANDLING
+========================================== */
 
-    // Player physics
-    player.velocity += player.gravity;
-    player.y += player.velocity;
+function showScreen(screen){
 
-    ctx.drawImage(playerImage, player.x, player.y, player.width, player.height);
+    [
+        studioScreen,
+        gameScreen,
+        resultScreen
+    ].forEach(
+        element =>
+        element.classList.remove(
+            "active"
+        )
+    );
 
-    if (frame % 100 === 0) createPipe();
 
-    for (let i = 0; i < pipes.length; i++) {
-        let p = pipes[i];
-        p.x -= 2;
+    screen.classList.add(
+        "active"
+    );
 
-        ctx.fillStyle = "green";
-        ctx.fillRect(p.x, 0, 50, p.top);
-        ctx.fillRect(p.x, p.bottom, 50, gameCanvas.height);
 
-        // Collision
-        if (
-            player.x < p.x + 50 &&
-            player.x + player.width > p.x &&
-            (player.y < p.top || player.y + player.height > p.bottom)
-        ) {
-            gameOver();
-        }
+    studioHeaderButton.hidden =
+        screen === studioScreen;
 
-        // Score
-        if (!p.passed && p.x + 50 < player.x) {
-            p.passed = true;
-            score++;
-            document.getElementById("score").innerText = "Score: " + score;
-        }
-    }
-
-    // Ground / ceiling
-    if (player.y + player.height > gameCanvas.height || player.y < 0) {
-        gameOver();
-    }
-
-    animationId = requestAnimationFrame(update);
 }
 
-function gameOver() {
-    gameRunning = false;
-    cancelAnimationFrame(animationId);
-    document.getElementById("restartBtn").style.display = "inline-block";
-}
 
-// Jump
-function jump() {
-    if (gameRunning) player.velocity = player.jump;
-}
+/* ==========================================
+   GAME STATE
+========================================== */
 
-document.addEventListener("keydown", jump);
-gameCanvas.addEventListener("click", jump);
-gameCanvas.addEventListener("touchstart", jump);
+const game = {
 
-// Restart
-document.getElementById("restartBtn").onclick = () => {
-    initGame();
-    update();
+    running:false,
+
+    started:false,
+
+    score:0,
+
+    frame:0,
+
+    gravity:.42,
+
+    flapPower:-7.2,
+
+    pipeSpeed:3.1,
+
+    pipeWidth:82,
+
+    pipeGap:180,
+
+    pipes:[],
+
+    player:{
+
+        x:190,
+
+        y:300,
+
+        width:64,
+
+        height:64,
+
+        velocity:0,
+
+        rotation:0
+
+    },
+
+    characterImage:
+        new Image(),
+
+    animationId:null
+
 };
 
-// ===================== SAVE & START =====================
-document.getElementById("saveBtn").onclick = () => {
-    const dataURL = drawCanvas.toDataURL();
-    playerImage.src = dataURL;
 
-    playerImage.onload = () => {
-        document.getElementById("drawScreen").style.display = "none";
-        gameCanvas.style.display = "block";
-        initGame();
-        update();
+/* ==========================================
+   GAME START
+========================================== */
+
+function currentPlayerName(){
+
+    return(
+        playerNameInput.value
+        .trim()
+        .slice(0,18)
+        ||
+        "Player"
+    );
+
+}
+
+
+playButton.addEventListener(
+    "click",
+    () => {
+
+        if(!activeCharacter){
+
+            selectCharacter(
+                createDefaultCharacter()
+            );
+
+        }
+
+        startGame();
+
+    }
+);
+
+
+function startGame(){
+
+    showScreen(
+        gameScreen
+    );
+
+
+    cancelAnimationFrame(
+        game.animationId
+    );
+
+
+    game.running = true;
+
+    game.started = false;
+
+    game.score = 0;
+
+    game.frame = 0;
+
+    game.pipes = [];
+
+
+    game.player.x = 190;
+
+    game.player.y =
+        gameCanvas.height / 2;
+
+    game.player.velocity = 0;
+
+    game.player.rotation = 0;
+
+
+    gameScoreElement.textContent =
+        "0";
+
+    gameBestElement.textContent =
+        getGlobalBest();
+
+
+    gameMessage.classList.remove(
+        "hidden"
+    );
+
+
+    game.characterImage =
+        new Image();
+
+    game.characterImage.src =
+        activeCharacter.image;
+
+
+    game.animationId =
+        requestAnimationFrame(
+            gameLoop
+        );
+
+}
+
+
+/* ==========================================
+   FLAP
+========================================== */
+
+function flap(){
+
+    if(!game.running){
+        return;
+    }
+
+
+    if(!game.started){
+
+        game.started = true;
+
+        gameMessage.classList.add(
+            "hidden"
+        );
+
+    }
+
+
+    game.player.velocity =
+        game.flapPower;
+
+}
+
+
+gameCanvas.addEventListener(
+    "pointerdown",
+    event => {
+
+        event.preventDefault();
+
+        flap();
+
+    }
+);
+
+
+window.addEventListener(
+    "keydown",
+    event => {
+
+        if(
+            event.code === "Space" &&
+            gameScreen.classList.contains(
+                "active"
+            )
+        ){
+
+            event.preventDefault();
+
+            flap();
+
+        }
+
+    }
+);
+
+
+/* ==========================================
+   PIPES
+========================================== */
+
+function spawnPipe(){
+
+    const margin = 75;
+
+    const range =
+        gameCanvas.height -
+        game.pipeGap -
+        margin * 2;
+
+
+    const top =
+        margin +
+        Math.random() *
+        range;
+
+
+    game.pipes.push({
+
+        x:
+            gameCanvas.width +
+            20,
+
+        top,
+
+        bottom:
+            top +
+            game.pipeGap,
+
+        scored:false
+
+    });
+
+}
+
+
+/* ==========================================
+   HITBOX
+========================================== */
+
+function getPlayerHitbox(){
+
+    const player =
+        game.player;
+
+    const hit =
+        activeCharacter.hitbox;
+
+
+    const forgiveness = 3;
+
+
+    return{
+
+        left:
+            player.x +
+            player.width *
+            hit.left +
+            forgiveness,
+
+        top:
+            player.y +
+            player.height *
+            hit.top +
+            forgiveness,
+
+        right:
+            player.x +
+            player.width *
+            hit.right -
+            forgiveness,
+
+        bottom:
+            player.y +
+            player.height *
+            hit.bottom -
+            forgiveness
+
     };
-};
+
+}
+
+
+/* ==========================================
+   COLLISION
+========================================== */
+
+function checkCollision(){
+
+    const hit =
+        getPlayerHitbox();
+
+
+    if(
+        hit.top <= 0 ||
+        hit.bottom >=
+        gameCanvas.height
+    ){
+
+        return true;
+
+    }
+
+
+    for(const pipe of game.pipes){
+
+        const overlapX =
+
+            hit.right >
+            pipe.x
+
+            &&
+
+            hit.left <
+            pipe.x +
+            game.pipeWidth;
+
+
+        if(!overlapX){
+            continue;
+        }
+
+
+        if(
+            hit.top <
+            pipe.top
+
+            ||
+
+            hit.bottom >
+            pipe.bottom
+        ){
+
+            return true;
+
+        }
+
+    }
+
+
+    return false;
+
+}
+
+
+/* ==========================================
+   BACKGROUND
+========================================== */
+
+function drawBackground(){
+
+    gameCtx.clearRect(
+        0,
+        0,
+        gameCanvas.width,
+        gameCanvas.height
+    );
+
+
+    gameCtx.fillStyle =
+        "#cceeff";
+
+    gameCtx.fillRect(
+        0,
+        0,
+        gameCanvas.width,
+        gameCanvas.height
+    );
+
+
+    gameCtx.fillStyle =
+        "rgba(255,255,255,.55)";
+
+
+    const offset =
+        game.frame * .25 %
+        gameCanvas.width;
+
+
+    for(let i = -1; i < 5; i++){
+
+        const x =
+            i * 260 -
+            offset;
+
+        const y =
+            85 +
+            (i % 2) * 100;
+
+
+        gameCtx.beginPath();
+
+        gameCtx.arc(
+            x,
+            y,
+            40,
+            0,
+            Math.PI * 2
+        );
+
+        gameCtx.arc(
+            x + 40,
+            y + 5,
+            28,
+            0,
+            Math.PI * 2
+        );
+
+        gameCtx.arc(
+            x - 37,
+            y + 10,
+            27,
+            0,
+            Math.PI * 2
+        );
+
+        gameCtx.fill();
+
+    }
+
+}
+
+
+/* ==========================================
+   DRAW PIPES
+========================================== */
+
+function drawPipes(){
+
+    gameCtx.fillStyle =
+        "#78d39c";
+
+    gameCtx.strokeStyle =
+        "#171717";
+
+    gameCtx.lineWidth = 4;
+
+
+    game.pipes.forEach(pipe => {
+
+
+        gameCtx.fillRect(
+            pipe.x,
+            0,
+            game.pipeWidth,
+            pipe.top
+        );
+
+        gameCtx.strokeRect(
+            pipe.x,
+            -5,
+            game.pipeWidth,
+            pipe.top + 5
+        );
+
+
+        gameCtx.fillRect(
+            pipe.x - 7,
+            pipe.top - 25,
+            game.pipeWidth + 14,
+            25
+        );
+
+        gameCtx.strokeRect(
+            pipe.x - 7,
+            pipe.top - 25,
+            game.pipeWidth + 14,
+            25
+        );
+
+
+        gameCtx.fillRect(
+            pipe.x,
+            pipe.bottom,
+            game.pipeWidth,
+            gameCanvas.height -
+            pipe.bottom
+        );
+
+        gameCtx.strokeRect(
+            pipe.x,
+            pipe.bottom,
+            game.pipeWidth,
+            gameCanvas.height -
+            pipe.bottom +
+            5
+        );
+
+
+        gameCtx.fillRect(
+            pipe.x - 7,
+            pipe.bottom,
+            game.pipeWidth + 14,
+            25
+        );
+
+        gameCtx.strokeRect(
+            pipe.x - 7,
+            pipe.bottom,
+            game.pipeWidth + 14,
+            25
+        );
+
+    });
+
+}
+
+
+/* ==========================================
+   DRAW PLAYER
+========================================== */
+
+function drawPlayer(){
+
+    const player =
+        game.player;
+
+
+    gameCtx.save();
+
+
+    gameCtx.translate(
+
+        player.x +
+        player.width / 2,
+
+        player.y +
+        player.height / 2
+
+    );
+
+
+    gameCtx.rotate(
+        player.rotation
+    );
+
+
+    gameCtx.drawImage(
+
+        game.characterImage,
+
+        -player.width / 2,
+        -player.height / 2,
+
+        player.width,
+        player.height
+
+    );
+
+
+    gameCtx.restore();
+
+}
+
+
+/* ==========================================
+   LOOP
+========================================== */
+
+function gameLoop(){
+
+    if(!game.running){
+        return;
+    }
+
+
+    game.frame++;
+
+
+    if(game.started){
+
+
+        game.player.velocity +=
+            game.gravity;
+
+
+        game.player.y +=
+            game.player.velocity;
+
+
+        game.player.rotation =
+            Math.max(
+                -.35,
+                Math.min(
+                    .65,
+                    game.player.velocity *
+                    .055
+                )
+            );
+
+
+        if(
+            game.frame % 92 === 0
+        ){
+
+            spawnPipe();
+
+        }
+
+
+        game.pipes.forEach(
+            pipe => {
+
+                pipe.x -=
+                    game.pipeSpeed;
+
+
+                if(
+                    !pipe.scored &&
+                    pipe.x +
+                    game.pipeWidth <
+                    game.player.x
+                ){
+
+                    pipe.scored = true;
+
+                    game.score++;
+
+                    gameScoreElement.textContent =
+                        game.score;
+
+                }
+
+            }
+        );
+
+
+        game.pipes =
+            game.pipes.filter(
+                pipe =>
+                pipe.x >
+                -game.pipeWidth -
+                20
+            );
+
+
+        if(checkCollision()){
+
+            endGame();
+
+            return;
+
+        }
+
+    }
+
+
+    drawBackground();
+
+    drawPipes();
+
+    drawPlayer();
+
+
+    game.animationId =
+        requestAnimationFrame(
+            gameLoop
+        );
+
+}
+
+
+/* ==========================================
+   GAME OVER
+========================================== */
+
+function endGame(){
+
+    game.running = false;
+
+
+    cancelAnimationFrame(
+        game.animationId
+    );
+
+
+    const player =
+        currentPlayerName();
+
+
+    const scores =
+        getScores();
+
+
+    let oldBest = 0;
+
+
+    scores.forEach(score => {
+
+        if(
+            score.player ===
+            player
+        ){
+
+            oldBest =
+                Math.max(
+                    oldBest,
+                    Number(score.score)
+                    || 0
+                );
+
+        }
+
+    });
+
+
+    scores.push({
+
+        id:
+            "score-" +
+            Date.now(),
+
+        player,
+
+        score:
+            game.score,
+
+        character:
+            activeCharacter.image,
+
+        date:
+            new Date()
+            .toISOString()
+
+    });
+
+
+    scores.sort(
+        (a,b) =>
+        b.score -
+        a.score
+    );
+
+
+    saveScores(
+        scores.slice(0,100)
+    );
+
+
+    resultName.textContent =
+        player;
+
+    resultCharacter.src =
+        activeCharacter.image;
+
+    finalScore.textContent =
+        game.score;
+
+    personalBest.textContent =
+        Math.max(
+            oldBest,
+            game.score
+        );
+
+
+    updateGlobalBest();
+
+    renderLeaderboard();
+
+
+    showScreen(
+        resultScreen
+    );
+
+}
+
+
+/* ==========================================
+   LEADERBOARD
+========================================== */
+
+function renderLeaderboard(){
+
+    const scores =
+        getScores();
+
+
+    const records =
+        new Map();
+
+
+    scores.forEach(record => {
+
+        const old =
+            records.get(
+                record.player
+            );
+
+
+        if(
+            !old ||
+            record.score >
+            old.score
+        ){
+
+            records.set(
+                record.player,
+                record
+            );
+
+        }
+
+    });
+
+
+    const leaders =
+        [...records.values()]
+        .sort(
+            (a,b) =>
+            b.score -
+            a.score
+        )
+        .slice(0,10);
+
+
+    leaderboard.innerHTML =
+        "";
+
+
+    if(!leaders.length){
+
+        leaderboard.textContent =
+            "No scores yet.";
+
+        return;
+
+    }
+
+
+    leaders.forEach(
+        (record,index) => {
+
+
+            const row =
+                document.createElement(
+                    "div"
+                );
+
+            row.className =
+                "leader-row";
+
+
+            const rank =
+                document.createElement(
+                    "div"
+                );
+
+            rank.className =
+                "rank";
+
+            rank.textContent =
+                "#" +
+                (index + 1);
+
+
+            const avatar =
+                document.createElement(
+                    "div"
+                );
+
+            avatar.className =
+                "avatar";
+
+
+            const img =
+                document.createElement(
+                    "img"
+                );
+
+            img.src =
+                record.character;
+
+            avatar.appendChild(img);
+
+
+            const info =
+                document.createElement(
+                    "div"
+                );
+
+            info.className =
+                "leader-name";
+
+
+            const name =
+                document.createElement(
+                    "strong"
+                );
+
+            name.textContent =
+                record.player;
+
+
+            const date =
+                document.createElement(
+                    "span"
+                );
+
+            date.textContent =
+                new Date(
+                    record.date
+                ).toLocaleDateString();
+
+
+            info.append(
+                name,
+                date
+            );
+
+
+            const score =
+                document.createElement(
+                    "div"
+                );
+
+            score.className =
+                "leader-score";
+
+            score.textContent =
+                record.score;
+
+
+            row.append(
+                rank,
+                avatar,
+                info,
+                score
+            );
+
+
+            leaderboard.appendChild(
+                row
+            );
+
+        }
+    );
+
+}
+
+
+/* ==========================================
+   BEST SCORE
+========================================== */
+
+function getGlobalBest(){
+
+    const scores =
+        getScores();
+
+
+    if(!scores.length){
+        return 0;
+    }
+
+
+    return Math.max(
+        ...scores.map(
+            entry =>
+            Number(entry.score)
+            || 0
+        )
+    );
+
+}
+
+
+function updateGlobalBest(){
+
+    globalBestElement.textContent =
+        getGlobalBest();
+
+}
+
+
+/* ==========================================
+   NAVIGATION
+========================================== */
+
+function backToStudio(){
+
+    game.running = false;
+
+    cancelAnimationFrame(
+        game.animationId
+    );
+
+    showScreen(
+        studioScreen
+    );
+
+}
+
+
+studioHeaderButton.addEventListener(
+    "click",
+    backToStudio
+);
+
+
+backStudioButton.addEventListener(
+    "click",
+    backToStudio
+);
+
+
+playAgainButton.addEventListener(
+    "click",
+    startGame
+);
+
+
+/* ==========================================
+   INITIALIZE
+========================================== */
+
+function initialize(){
+
+    activeCharacter =
+        createDefaultCharacter();
+
+
+    selectCharacter(
+        activeCharacter
+    );
+
+
+    updateGlobalBest();
+
+    renderSavedCharacters();
+
+    renderLeaderboard();
+
+}
+
+
+initialize();
+
+})();
 </script>
+
 </body>
 </html>
