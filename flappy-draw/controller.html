@@ -17,18 +17,24 @@ button{cursor:pointer}
 .brand{display:flex;align-items:center;gap:8px;font-weight:900;font-size:18px}
 .logo{width:32px;height:32px;display:grid;place-items:center;border:2px solid var(--text);border-radius:10px;background:var(--yellow);transform:rotate(-3deg)}
 .role{font-size:10px;font-weight:800;padding:6px 8px;border:1px solid var(--border);border-radius:999px;background:white}
-.view{display:none;flex:1;min-height:0}
+.view{display:none;flex:1;min-height:0;opacity:0;transform:translateY(8px)}
+.view.active{animation:viewIn .28s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes viewIn{to{opacity:1;transform:none}}
+@keyframes readyPop{0%{transform:scale(.96)}55%{transform:scale(1.035)}100%{transform:scale(1)}}
+@keyframes flapPulse{0%{transform:scale(1)}45%{transform:scale(.965)}100%{transform:scale(1)}}
+@keyframes resultPop{0%{transform:scale(.9);opacity:0}100%{transform:scale(1);opacity:1}}
 .view.active{display:flex}
 .card{background:var(--card);border:1px solid var(--border);border-radius:18px}
 .lobby{width:100%;height:100%;padding:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;overflow:hidden}
 .drawside{width:100%;flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.canvas-wrap{position:relative;width:min(88vw,440px);height:min(58vh,440px);aspect-ratio:1/1;flex:0 1 auto;border:2px dashed #bdbbb4;border-radius:18px;overflow:hidden;background:
+.canvas-wrap{position:relative;transition:transform .18s ease,border-color .18s ease;width:min(88vw,440px);height:min(58vh,440px);aspect-ratio:1/1;flex:0 1 auto;border:2px dashed #bdbbb4;border-radius:18px;overflow:hidden;background:
 linear-gradient(45deg,#f8f8f8 25%,transparent 25%),
 linear-gradient(-45deg,#f8f8f8 25%,transparent 25%),
 linear-gradient(45deg,transparent 75%,#f8f8f8 75%),
 linear-gradient(-45deg,transparent 75%,#f8f8f8 75%);
 background-size:22px 22px;background-position:0 0,0 11px,11px -11px,-11px 0}
 #drawCanvas{width:100%;height:100%;display:block;touch-action:none}
+.canvas-wrap:focus-within,.canvas-wrap.drawing-now{border-color:#8f8d86;transform:scale(1.008)}
 .placeholder{position:absolute;inset:0;display:grid;place-items:center;color:#aaa;font-size:13px;pointer-events:none}
 .placeholder.hidden{display:none}
 .tools{width:min(88vw,440px);height:48px;flex:0 0 48px;display:flex;align-items:center;justify-content:center;gap:8px;padding-top:8px}
@@ -45,7 +51,8 @@ input[type=color]{width:38px;height:38px;border:1px solid var(--border);border-r
 .name:focus{border-color:var(--text)}
 .action{width:100%;min-height:42px;border:1px solid var(--border);border-radius:11px;background:#fff;font-size:11px;font-weight:850}
 .action.primary{background:var(--text);color:#fff;border-color:var(--text)}
-.action.ready{background:var(--yellow);color:var(--text);border:2px solid var(--text);font-size:13px}
+.action.ready{background:var(--yellow);color:var(--text);border:2px solid var(--text);font-size:13px;transition:transform .15s ease,filter .15s ease}
+.action.ready.ready-pop{animation:readyPop .34s ease}
 .action.start{background:var(--green);border:2px solid var(--text);font-size:13px}
 .action:disabled{opacity:.42;cursor:not-allowed}
 .preview{grid-column:1/-1;height:46px;display:flex;align-items:center;gap:8px;padding:5px 8px;background:#f6f6f2;border-radius:11px;border:1px solid var(--border)}
@@ -54,15 +61,16 @@ input[type=color]{width:38px;height:38px;border:1px solid var(--border);border-r
 .preview span{font-size:9px;color:var(--muted)}
 .status{grid-column:1/-1;font-size:10px;line-height:1.25;color:var(--muted);text-align:center;min-height:20px;display:grid;place-items:center}
 .wait-wrap,.result-wrap,.game-wrap{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
-.wait-card,.result-card{width:min(100%,520px);max-height:100%;padding:18px;text-align:center}
+.wait-card,.result-card{width:min(100%,520px);max-height:100%;padding:18px;text-align:center;animation:resultPop .38s cubic-bezier(.2,.8,.2,1)}
 .wait-char{width:100px;height:100px;margin:12px auto;background:#f5f5f1;border-radius:18px;display:grid;place-items:center;padding:12px}
 .wait-char img{max-width:100%;max-height:100%}
 .wait-card h2,.result-card h2{font-size:24px;letter-spacing:-.8px}
 .wait-card p,.result-card p{font-size:11px;color:var(--muted);margin-top:6px}
 .admin-start{margin-top:14px}
 .game-wrap{padding:4px}
-.flap{width:100%;height:100%;border:3px solid var(--text);border-radius:24px;background:var(--yellow);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;user-select:none}
-.flap:active{transform:scale(.985)}
+.flap{width:100%;height:100%;border:3px solid var(--text);transition:background .2s ease,transform .08s ease;border-radius:24px;background:var(--yellow);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;user-select:none}
+.flap:active{transform:scale(.975)}
+.flap.flap-pulse{animation:flapPulse .16s ease}
 .flap .icon{font-size:56px;line-height:1}
 .flap strong{font-size:30px;letter-spacing:-1px}
 .flap span{font-size:11px;color:#4b4b4b}
@@ -79,6 +87,7 @@ input[type=color]{width:38px;height:38px;border:1px solid var(--border);border-r
 .row small{display:block;font-size:9px;color:var(--muted)}
 .row b{font-size:13px}
 .admin-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
 @media(max-width:520px){
   .app{padding:6px}
   .top{height:40px;flex-basis:40px}
@@ -251,6 +260,39 @@ input[type=color]{width:38px;height:38px;border:1px solid var(--border);border-r
   let ready = false;
   let selectedCharacter = null;
   let lastFlapAt = 0;
+  let audioCtx = null;
+  let audioUnlocked = false;
+
+  function unlockAudio(){
+    try{
+      if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if(audioCtx.state === "suspended") audioCtx.resume();
+      audioUnlocked = true;
+    }catch(e){}
+  }
+
+  function tone(freq=440,duration=.08,type="sine",volume=.045,delay=0){
+    if(!audioUnlocked || !audioCtx) return;
+    const now=audioCtx.currentTime+delay;
+    const osc=audioCtx.createOscillator();
+    const gain=audioCtx.createGain();
+    osc.type=type; osc.frequency.setValueAtTime(freq,now);
+    gain.gain.setValueAtTime(0.0001,now);
+    gain.gain.exponentialRampToValueAtTime(volume,now+.008);
+    gain.gain.exponentialRampToValueAtTime(0.0001,now+duration);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(now); osc.stop(now+duration+.02);
+  }
+
+  function sfx(name){
+    if(name==="flap"){ tone(520,.07,"square",.028); tone(700,.05,"sine",.018,.035); }
+    if(name==="ready"){ tone(440,.08,"sine",.035); tone(660,.10,"sine",.035,.07); }
+    if(name==="out"){ tone(260,.13,"sawtooth",.025); tone(180,.18,"sine",.03,.08); }
+    if(name==="result"){ tone(523,.10,"sine",.035); tone(659,.10,"sine",.035,.09); tone(784,.16,"sine",.04,.18); }
+  }
+
+  document.addEventListener("pointerdown",unlockAudio,{once:true,capture:true});
+
 
   function showView(name) {
     Object.entries(views).forEach(([key, el]) => el.classList.toggle("active", key === name));
@@ -341,7 +383,7 @@ input[type=color]{width:38px;height:38px;border:1px solid var(--border);border-r
     return {x:(e.clientX-r.left)*drawCanvas.width/r.width,y:(e.clientY-r.top)*drawCanvas.height/r.height};
   }
   function startDraw(e){
-    e.preventDefault(); drawing=true; hasDrawing=true; placeholder.classList.add("hidden");
+    e.preventDefault(); unlockAudio(); document.querySelector(".canvas-wrap")?.classList.add("drawing-now"); drawing=true; hasDrawing=true; placeholder.classList.add("hidden");
     const p=canvasPoint(e); lastX=p.x;lastY=p.y;
     ctx.globalCompositeOperation=tool==="eraser"?"destination-out":"source-over";
     ctx.fillStyle=tool==="eraser"?"#000":color.value;
@@ -355,7 +397,7 @@ input[type=color]{width:38px;height:38px;border:1px solid var(--border);border-r
     ctx.beginPath();ctx.moveTo(lastX,lastY);ctx.lineTo(p.x,p.y);ctx.stroke();
     lastX=p.x;lastY=p.y;
   }
-  function stopDraw(){drawing=false}
+  function stopDraw(){drawing=false;document.querySelector(".canvas-wrap")?.classList.remove("drawing-now")}
   drawCanvas.addEventListener("pointerdown",startDraw);
   drawCanvas.addEventListener("pointermove",moveDraw);
   window.addEventListener("pointerup",stopDraw);
@@ -390,6 +432,7 @@ input[type=color]{width:38px;height:38px;border:1px solid var(--border);border-r
     if(!selectedCharacter) chooseCharacter(makeDefaultCharacter(),"Default character");
     const name=(playerName.value.trim()||"Player").slice(0,18);
     ready=true;
+    sfx("ready"); readyBtn.classList.remove("ready-pop"); void readyBtn.offsetWidth; readyBtn.classList.add("ready-pop");
     send({type:"player_ready",name,character:selectedCharacter});
     waitChar.src=selectedCharacter.image;waitName.textContent=name;
     waitText.textContent=isAdmin?"You're ready. Start when everyone is ready.":"You're ready. Waiting for the admin.";
@@ -412,6 +455,7 @@ input[type=color]{width:38px;height:38px;border:1px solid var(--border);border-r
     const now=Date.now();
     if(now-lastFlapAt<55)return;
     lastFlapAt=now;
+    sfx("flap"); flapBtn.classList.remove("flap-pulse"); void flapBtn.offsetWidth; flapBtn.classList.add("flap-pulse");
     send({type:"flap"});
   }
   flapBtn.addEventListener("pointerdown",e=>{e.preventDefault();flap()});
@@ -480,6 +524,7 @@ input[type=color]{width:38px;height:38px;border:1px solid var(--border);border-r
     }
 
     if(data.type==="player_out"){
+      sfx("out");
       flapBtn.disabled=true;
       flapBtn.classList.add("out");
       flapBtn.querySelector("strong").textContent="YOU'RE OUT";
@@ -487,6 +532,7 @@ input[type=color]{width:38px;height:38px;border:1px solid var(--border);border-r
     }
 
     if(data.type==="results"){
+      sfx("result");
       flapBtn.querySelector("strong").textContent="TAP TO FLAP";
       renderResults(data);
     }
