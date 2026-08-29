@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Flappy Selfies Controller</title>
+<script src="https://www.airconsole.com/api/airconsole-1.11.0.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#f4f3ee;--card:#fff;--text:#171717;--muted:#727272;--border:#d9d8d2;--yellow:#ffd84d;--green:#84d7a2;--red:#ff7c73}
+html,body{width:100%;height:100%;overflow:hidden}
+body{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);touch-action:manipulation}
+button,input{font:inherit}
+button{cursor:pointer}
+.app{height:100dvh;display:flex;flex-direction:column;padding:10px;max-width:680px;margin:auto}
+.top{height:48px;flex:0 0 48px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.brand{display:flex;align-items:center;gap:8px;font-weight:900;font-size:18px}
+.logo{width:32px;height:32px;display:grid;place-items:center;border:2px solid var(--text);border-radius:10px;background:var(--yellow);transform:rotate(-3deg)}
+.role{font-size:10px;font-weight:800;padding:6px 8px;border:1px solid var(--border);border-radius:999px;background:white}
+.view{display:none;flex:1;min-height:0;opacity:0;transform:translateY(8px)}
+.view.active{animation:viewIn .28s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes viewIn{to{opacity:1;transform:none}}
+@keyframes readyPop{0%{transform:scale(.96)}55%{transform:scale(1.035)}100%{transform:scale(1)}}
+@keyframes flapPulse{0%{transform:scale(1)}45%{transform:scale(.965)}100%{transform:scale(1)}}
+@keyframes resultPop{0%{transform:scale(.9);opacity:0}100%{transform:scale(1);opacity:1}}
+.view.active{display:flex}
+.card{background:var(--card);border:1px solid var(--border);border-radius:18px}
+.lobby{width:100%;height:100%;padding:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;overflow:hidden}
+.drawside{width:100%;flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.selfie-wrap{position:relative;transition:transform .18s ease,border-color .18s ease;width:min(72vw,340px);height:min(72vw,340px);max-height:52vh;aspect-ratio:1/1;flex:0 1 auto;border:3px dashed #bdbbb4;border-radius:50%;overflow:hidden;background:#f3f3ef;display:grid;place-items:center}
+.selfie-wrap.live,.selfie-wrap.captured{border-style:solid;border-color:#8f8d86}
+#cameraVideo,#photoPreview{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#cameraVideo{transform:scaleX(-1)}
+.placeholder{position:absolute;inset:0;display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;color:#9a9890;font-size:12px;text-align:center;padding:0 20px;pointer-events:none}
+.placeholder .picon{font-size:34px}
+.placeholder.hidden{display:none}
+.tools{width:min(88vw,440px);flex:0 0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;padding-top:10px}
+input[type=color]{width:38px;height:38px;border:1px solid var(--border);border-radius:10px;padding:3px;background:#fff;flex:0 0 auto}
+.small{height:38px;border:1px solid var(--border);background:white;border-radius:10px;padding:0 12px;font-size:10px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:4px}
+.small.primary{background:var(--text);color:#fff;border-color:var(--text)}
+.upload-label{position:relative;overflow:hidden;cursor:pointer}
+.upload-label input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.privacy-note{width:min(88vw,440px);font-size:9px;color:var(--muted);text-align:center;margin-top:6px;line-height:1.4}
+.options{width:min(88vw,440px);flex:0 0 auto;display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:center}
+.label{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+.name{width:100%;height:42px;border:1px solid var(--border);border-radius:11px;padding:0 11px;font-size:16px;outline:none}
+.name:focus{border-color:var(--text)}
+.action{width:100%;min-height:42px;border:1px solid var(--border);border-radius:11px;background:#fff;font-size:11px;font-weight:850}
+.action.primary{background:var(--text);color:#fff;border-color:var(--text)}
+.action.ready{background:var(--yellow);color:var(--text);border:2px solid var(--text);font-size:13px;transition:transform .15s ease,filter .15s ease}
+.action.ready.ready-pop{animation:readyPop .34s ease}
+.action.start{background:var(--green);border:2px solid var(--text);font-size:13px}
+.action:disabled{opacity:.42;cursor:not-allowed}
+.preview{grid-column:1/-1;height:46px;display:flex;align-items:center;gap:8px;padding:5px 8px;background:#f6f6f2;border-radius:11px;border:1px solid var(--border)}
+.preview img{width:38px;height:38px;object-fit:contain}
+.preview strong{font-size:11px;display:block}
+.preview span{font-size:9px;color:var(--muted)}
+.status{grid-column:1/-1;font-size:10px;line-height:1.25;color:var(--muted);text-align:center;min-height:20px;display:grid;place-items:center}
+.wait-wrap,.result-wrap,.game-wrap{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+.wait-card,.result-card{width:min(100%,520px);max-height:100%;padding:18px;text-align:center;animation:resultPop .38s cubic-bezier(.2,.8,.2,1)}
+.wait-char{width:100px;height:100px;margin:12px auto;background:#f5f5f1;border-radius:18px;display:grid;place-items:center;padding:12px}
+.wait-char img{max-width:100%;max-height:100%}
+.wait-card h2,.result-card h2{font-size:24px;letter-spacing:-.8px}
+.wait-card p,.result-card p{font-size:11px;color:var(--muted);margin-top:6px}
+.admin-start{margin-top:14px}
+.game-wrap{padding:4px}
+.flap{width:100%;height:100%;border:3px solid var(--text);transition:background .2s ease,transform .08s ease;border-radius:24px;background:var(--yellow);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;user-select:none}
+.flap:active{transform:scale(.975)}
+.flap.flap-pulse{animation:flapPulse .16s ease}
+.flap .icon{font-size:56px;line-height:1}
+.flap strong{font-size:30px;letter-spacing:-1px}
+.flap span{font-size:11px;color:#4b4b4b}
+.out{background:#e8e8e4;color:#777;border-color:#aaa}
+.result-top{display:grid;grid-template-columns:85px 1fr;gap:12px;align-items:center;text-align:left}
+.result-avatar{width:85px;height:85px;background:#f5f5f1;border-radius:16px;display:grid;place-items:center;padding:10px}
+.result-avatar img{max-width:100%;max-height:100%}
+.place{font-size:42px;font-weight:950;line-height:1;letter-spacing:-2px}
+.scoreline{font-size:12px;color:var(--muted);margin-top:4px}
+.compare{margin-top:12px;max-height:190px;overflow:auto;text-align:left;border-top:1px solid #eee}
+.row{display:grid;grid-template-columns:26px 34px 1fr auto;gap:7px;align-items:center;padding:7px 0;border-bottom:1px solid #eee}
+.row img{width:32px;height:32px;object-fit:contain;background:#f6f6f2;border-radius:8px;padding:3px}
+.row strong{font-size:11px}
+.row small{display:block;font-size:9px;color:var(--muted)}
+.row b{font-size:13px}
+.admin-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
+@media(max-width:520px){
+  .app{padding:6px}
+  .top{height:40px;flex-basis:40px}
+  .lobby{padding:6px;gap:6px}
+  .selfie-wrap{width:min(64vw,300px);max-height:44vh}
+  .tools,.options,.privacy-note{width:min(92vw,430px)}
+  .options{gap:6px}
+  .preview{display:none}
+  .status{display:none}
+  .action{min-height:38px}
+  .name{height:38px}
+}
+@media(max-width:390px){
+  .selfie-wrap{max-height:40vh}
+  .options{grid-template-columns:1fr 1fr}
+  .options .full{grid-column:1/-1}
+}
+@media(max-height:620px){
+  .selfie-wrap{width:min(56vw,260px);max-height:34vh}
+  .tools,.options,.privacy-note{width:min(78vw,360px)}
+  .preview,.status{display:none}
+  .action{min-height:36px}
+  .name{height:36px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand"><div class="logo">🤳</div><span>Flappy Selfies</span></div>
+    <div id="roleBadge" class="role">Connecting…</div>
+  </header>
+
+  <section id="lobbyView" class="view active">
+    <div class="card lobby">
+      <div class="drawside">
+        <div id="selfieWrap" class="selfie-wrap">
+          <video id="cameraVideo" playsinline muted autoplay hidden></video>
+          <img id="photoPreview" alt="Your selfie" hidden>
+          <div id="selfiePlaceholder" class="placeholder"><span class="picon">🤳</span>Take a selfie to become a bird</div>
+        </div>
+        <div class="tools">
+          <button id="startCamBtn" class="small primary" type="button">📷 Enable Camera</button>
+          <button id="captureBtn" class="small primary" type="button" hidden>📸 Capture</button>
+          <button id="retakeBtn" class="small" type="button" hidden>Retake</button>
+          <label class="small upload-label">Upload photo<input id="fileInput" type="file" accept="image/*" capture="user"></label>
+          <input id="color" type="color" value="#ff7c73" aria-label="Wing color">
+        </div>
+        <div class="privacy-note">Your photo stays on this device and this game screen — it's only used to build your bird avatar.</div>
+      </div>
+
+      <div class="options">
+        <div class="full">
+          <div class="label">Player name</div>
+          <input id="playerName" class="name" maxlength="18" value="Player">
+        </div>
+
+        <div class="preview full">
+          <img id="selectedPreview" alt="Selected character">
+          <div><strong id="selectedTitle">Default character</strong><span id="selectedStatus">Ready to use</span></div>
+        </div>
+
+        <button id="useDrawingBtn" class="action primary" type="button">Use Selfie</button>
+        <button id="defaultBtn" class="action" type="button">Use Default Bird</button>
+        <button id="readyBtn" class="action ready full" type="button">✓ I'm Ready</button>
+        <div id="lobbyStatus" class="status full">Take a selfie, pick a wing color, then mark yourself ready.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="waitView" class="view">
+    <div class="wait-wrap">
+      <div class="card wait-card">
+        <div class="label">Lobby</div>
+        <div class="wait-char"><img id="waitChar" alt="Your character"></div>
+        <h2 id="waitName">Player</h2>
+        <p id="waitText">You're ready. Waiting for the admin.</p>
+        <button id="startBtn" class="action start admin-start" type="button" hidden>Start Game</button>
+        <button id="editBtn" class="action admin-start" type="button">Edit Character</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="gameView" class="view">
+    <div class="game-wrap">
+      <button id="flapBtn" class="flap" type="button">
+        <span class="icon">↑</span>
+        <strong>TAP TO FLAP</strong>
+        <span id="gameHint">Keep flying!</span>
+      </button>
+    </div>
+  </section>
+
+  <section id="resultView" class="view">
+    <div class="result-wrap">
+      <div class="card result-card">
+        <div class="result-top">
+          <div class="result-avatar"><img id="resultChar" alt="Your character"></div>
+          <div>
+            <div class="label">Final result</div>
+            <div id="resultPlace" class="place">#1</div>
+            <div id="resultScore" class="scoreline">Score 0</div>
+          </div>
+        </div>
+        <div id="comparison" class="compare"></div>
+        <div id="adminActions" class="admin-actions" hidden>
+          <button id="restartBtn" class="action start" type="button">Restart Same Chars</button>
+          <button id="lobbyBtn" class="action" type="button">Back to Lobby</button>
+        </div>
+        <p id="resultWait">Waiting for the admin…</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const airconsole = new AirConsole();
+
+  const views = {
+    lobby: document.getElementById("lobbyView"),
+    wait: document.getElementById("waitView"),
+    game: document.getElementById("gameView"),
+    result: document.getElementById("resultView")
+  };
+
+  const roleBadge = document.getElementById("roleBadge");
+  const selfieWrap = document.getElementById("selfieWrap");
+  const cameraVideo = document.getElementById("cameraVideo");
+  const photoPreview = document.getElementById("photoPreview");
+  const selfiePlaceholder = document.getElementById("selfiePlaceholder");
+  const startCamBtn = document.getElementById("startCamBtn");
+  const captureBtn = document.getElementById("captureBtn");
+  const retakeBtn = document.getElementById("retakeBtn");
+  const fileInput = document.getElementById("fileInput");
+  const color = document.getElementById("color");
+  const playerName = document.getElementById("playerName");
+  const selectedPreview = document.getElementById("selectedPreview");
+  const selectedTitle = document.getElementById("selectedTitle");
+  const selectedStatus = document.getElementById("selectedStatus");
+  const useDrawingBtn = document.getElementById("useDrawingBtn");
+  const defaultBtn = document.getElementById("defaultBtn");
+  const readyBtn = document.getElementById("readyBtn");
+  const lobbyStatus = document.getElementById("lobbyStatus");
+  const waitChar = document.getElementById("waitChar");
+  const waitName = document.getElementById("waitName");
+  const waitText = document.getElementById("waitText");
+  const startBtn = document.getElementById("startBtn");
+  const editBtn = document.getElementById("editBtn");
+  const flapBtn = document.getElementById("flapBtn");
+  const gameHint = document.getElementById("gameHint");
+  const resultChar = document.getElementById("resultChar");
+  const resultPlace = document.getElementById("resultPlace");
+  const resultScore = document.getElementById("resultScore");
+  const comparison = document.getElementById("comparison");
+  const adminActions = document.getElementById("adminActions");
+  const restartBtn = document.getElementById("restartBtn");
+  const lobbyBtn = document.getElementById("lobbyBtn");
+  const resultWait = document.getElementById("resultWait");
+
+  let isAdmin = false;
+  let allReady = false;
+  let mediaStream = null;
+  let rawPhotoCanvas = null;
+  let ready = false;
+  let selectedCharacter = null;
+  let lastFlapAt = 0;
+  let audioCtx = null;
+  let audioUnlocked = false;
+
+  function unlockAudio(){
+    try{
+      if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if(audioCtx.state === "suspended") audioCtx.resume();
+      audioUnlocked = true;
+    }catch(e){}
+  }
+
+  function tone(freq=440,duration=.08,type="sine",volume=.045,delay=0){
+    if(!audioUnlocked || !audioCtx) return;
+    const now=audioCtx.currentTime+delay;
+    const osc=audioCtx.createOscillator();
+    const gain=audioCtx.createGain();
+    osc.type=type; osc.frequency.setValueAtTime(freq,now);
+    gain.gain.setValueAtTime(0.0001,now);
+    gain.gain.exponentialRampToValueAtTime(volume,now+.008);
+    gain.gain.exponentialRampToValueAtTime(0.0001,now+duration);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(now); osc.stop(now+duration+.02);
+  }
+
+  function sfx(name){
+    if(name==="flap"){ tone(520,.07,"square",.028); tone(700,.05,"sine",.018,.035); }
+    if(name==="ready"){ tone(440,.08,"sine",.035); tone(660,.10,"sine",.035,.07); }
+    if(name==="out"){ tone(260,.13,"sawtooth",.025); tone(180,.18,"sine",.03,.08); }
+    if(name==="result"){ tone(523,.10,"sine",.035); tone(659,.10,"sine",.035,.09); tone(784,.16,"sine",.04,.18); }
+  }
+
+  document.addEventListener("pointerdown",unlockAudio,{once:true,capture:true});
+
+
+  function showView(name) {
+    Object.entries(views).forEach(([key, el]) => el.classList.toggle("active", key === name));
+  }
+
+  function send(data) {
+    airconsole.message(AirConsole.SCREEN, data);
+  }
+
+  function makeDefaultCharacter() {
+    const c = document.createElement("canvas");
+    c.width = 110; c.height = 90;
+    const g = c.getContext("2d");
+    g.lineWidth = 5; g.strokeStyle = "#171717"; g.lineJoin = "round";
+    g.fillStyle = "#ffd84d";
+    g.beginPath(); g.ellipse(52,48,36,28,0,0,Math.PI*2); g.fill(); g.stroke();
+    g.fillStyle = "#fff";
+    g.beginPath(); g.ellipse(42,54,17,12,-.2,0,Math.PI*2); g.fill(); g.stroke();
+    g.beginPath(); g.arc(73,36,9,0,Math.PI*2); g.fill(); g.stroke();
+    g.fillStyle = "#171717"; g.beginPath(); g.arc(76,36,3,0,Math.PI*2); g.fill();
+    g.fillStyle = "#ff8a70";
+    g.beginPath(); g.moveTo(89,46); g.lineTo(108,52); g.lineTo(89,59); g.closePath(); g.fill(); g.stroke();
+    const bounds = visibleBounds(c);
+    return {
+      kind:"default",
+      image:c.toDataURL("image/png"),
+      hitbox:{
+        left:bounds.x/c.width, top:bounds.y/c.height,
+        right:(bounds.x+bounds.width)/c.width, bottom:(bounds.y+bounds.height)/c.height
+      }
+    };
+  }
+
+  function visibleBounds(canvas) {
+    const g = canvas.getContext("2d",{willReadFrequently:true});
+    const w = canvas.width, h = canvas.height;
+    const data = g.getImageData(0,0,w,h).data;
+    let minX=w,minY=h,maxX=-1,maxY=-1;
+    for(let y=0;y<h;y++){
+      for(let x=0;x<w;x++){
+        if(data[(y*w+x)*4+3] > 20){
+          if(x<minX)minX=x;if(y<minY)minY=y;if(x>maxX)maxX=x;if(y>maxY)maxY=y;
+        }
+      }
+    }
+    if(maxX<minX) return null;
+    return {x:minX,y:minY,width:maxX-minX+1,height:maxY-minY+1};
+  }
+
+  function chooseCharacter(character, title) {
+    selectedCharacter = character;
+    selectedPreview.src = character.image;
+    selectedTitle.textContent = title;
+    selectedStatus.textContent = character.kind === "default" ? "Ready to use" : "Custom hitbox detected";
+  }
+
+  // ---- Selfie capture ----
+
+  function setSelfieStage(stage){
+    // stage: "idle" | "camera" | "captured"
+    cameraVideo.hidden = stage!=="camera";
+    photoPreview.hidden = stage!=="captured";
+    selfiePlaceholder.classList.toggle("hidden", stage!=="idle");
+    selfieWrap.classList.toggle("live", stage==="camera");
+    selfieWrap.classList.toggle("captured", stage==="captured");
+    captureBtn.hidden = stage!=="camera";
+    retakeBtn.hidden = stage!=="captured";
+    startCamBtn.hidden = stage==="camera";
+  }
+
+  function stopCamera(){
+    if(mediaStream){ mediaStream.getTracks().forEach(t=>t.stop()); mediaStream=null; }
+  }
+
+  async function startCamera(){
+    unlockAudio();
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      lobbyStatus.textContent="Camera not supported here — upload a selfie instead.";
+      return;
+    }
+    try{
+      mediaStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:"user"},audio:false});
+      cameraVideo.srcObject = mediaStream;
+      setSelfieStage("camera");
+      lobbyStatus.textContent="Smile! Tap Capture when ready.";
+    }catch(err){
+      lobbyStatus.textContent="Couldn't access the camera — upload a selfie instead.";
+    }
+  }
+
+  function squareCanvasFrom(source, sw, sh, mirror){
+    const size=260;
+    const c=document.createElement("canvas"); c.width=size;c.height=size;
+    const g=c.getContext("2d");
+    const side=Math.min(sw,sh);
+    const sx=(sw-side)/2, sy=(sh-side)/2;
+    if(mirror){ g.translate(size,0); g.scale(-1,1); }
+    g.drawImage(source, sx,sy,side,side, 0,0,size,size);
+    return c;
+  }
+
+  function capturePhoto(){
+    if(!mediaStream) return;
+    rawPhotoCanvas = squareCanvasFrom(cameraVideo, cameraVideo.videoWidth, cameraVideo.videoHeight, true);
+    photoPreview.src = rawPhotoCanvas.toDataURL("image/jpeg",0.92);
+    stopCamera();
+    setSelfieStage("captured");
+    lobbyStatus.textContent="Nice! Pick a wing color, then tap Use Selfie.";
+  }
+
+  startCamBtn.addEventListener("click",startCamera);
+  captureBtn.addEventListener("click",capturePhoto);
+  retakeBtn.addEventListener("click",()=>{ rawPhotoCanvas=null; startCamera(); });
+
+  fileInput.addEventListener("change", e=>{
+    const file = e.target.files && e.target.files[0];
+    if(!file) return;
+    const img = new Image();
+    img.onload = ()=>{
+      rawPhotoCanvas = squareCanvasFrom(img, img.naturalWidth, img.naturalHeight, false);
+      photoPreview.src = rawPhotoCanvas.toDataURL("image/jpeg",0.92);
+      stopCamera();
+      setSelfieStage("captured");
+      lobbyStatus.textContent="Nice! Pick a wing color, then tap Use Selfie.";
+      URL.revokeObjectURL(img.src);
+    };
+    img.onerror = ()=>{ lobbyStatus.textContent="Couldn't read that photo — try another."; };
+    img.src = URL.createObjectURL(file);
+    fileInput.value="";
+  });
+
+  // ---- Bird avatar builder: circular selfie + colored ring + wings ----
+
+  function buildBirdCharacter(photoCanvas, hexColor){
+    const W=150,H=132,cx=75,cy=64,R=44;
+    const c=document.createElement("canvas"); c.width=W;c.height=H;
+    const g=c.getContext("2d");
+    g.lineJoin="round"; g.lineCap="round";
+
+    function wing(side){
+      g.save();
+      g.translate(cx+side*R*0.72, cy+6);
+      g.scale(side,1);
+      g.beginPath();
+      g.moveTo(0,-10);
+      g.bezierCurveTo(30,-36,48,-6,34,26);
+      g.bezierCurveTo(20,20,6,20,-6,10);
+      g.closePath();
+      g.fillStyle=hexColor;
+      g.lineWidth=4; g.strokeStyle="#171717";
+      g.fill(); g.stroke();
+      g.beginPath();
+      g.moveTo(4,-6); g.lineTo(26,3);
+      g.moveTo(2,6); g.lineTo(22,15);
+      g.lineWidth=2; g.strokeStyle="rgba(23,23,23,.5)";
+      g.stroke();
+      g.restore();
+    }
+    wing(-1); wing(1);
+
+    g.save();
+    g.beginPath(); g.arc(cx,cy,R,0,Math.PI*2); g.closePath(); g.clip();
+    g.fillStyle="#fff"; g.fillRect(cx-R,cy-R,R*2,R*2);
+    g.drawImage(photoCanvas,0,0,photoCanvas.width,photoCanvas.height,cx-R,cy-R,R*2,R*2);
+    g.restore();
+
+    g.beginPath(); g.arc(cx,cy,R,0,Math.PI*2);
+    g.lineWidth=7; g.strokeStyle=hexColor; g.stroke();
+    g.lineWidth=2.5; g.strokeStyle="#171717"; g.stroke();
+
+    g.beginPath();
+    g.moveTo(cx+R-8,cy+2);
+    g.lineTo(cx+R+17,cy+9);
+    g.lineTo(cx+R-8,cy+17);
+    g.closePath();
+    g.fillStyle="#ff8a70"; g.fill();
+    g.lineWidth=3; g.strokeStyle="#171717"; g.stroke();
+
+    const bounds=visibleBounds(c);
+    return {
+      kind:"selfie",
+      image:c.toDataURL("image/png"),
+      hitbox:{
+        left:bounds.x/c.width, top:bounds.y/c.height,
+        right:(bounds.x+bounds.width)/c.width, bottom:(bounds.y+bounds.height)/c.height
+      }
+    };
+  }
+
+  useDrawingBtn.addEventListener("click",()=>{
+    if(!rawPhotoCanvas){lobbyStatus.textContent="Take or upload a selfie first.";return}
+    const character=buildBirdCharacter(rawPhotoCanvas,color.value);
+    chooseCharacter(character,"Your selfie");
+    lobbyStatus.textContent="Selfie bird ready!";
+  });
+
+  defaultBtn.addEventListener("click",()=>{
+    chooseCharacter(makeDefaultCharacter(),"Default character");
+    lobbyStatus.textContent="Default character selected.";
+  });
+
+  readyBtn.addEventListener("click",()=>{
+    if(!selectedCharacter) chooseCharacter(makeDefaultCharacter(),"Default character");
+    const name=(playerName.value.trim()||"Player").slice(0,18);
+    ready=true;
+    sfx("ready"); readyBtn.classList.remove("ready-pop"); void readyBtn.offsetWidth; readyBtn.classList.add("ready-pop");
+    send({type:"player_ready",name,character:selectedCharacter});
+    waitChar.src=selectedCharacter.image;waitName.textContent=name;
+    waitText.textContent=isAdmin?"You're ready. Start when everyone is ready.":"You're ready. Waiting for the admin.";
+    startBtn.hidden=!isAdmin;
+    startBtn.disabled=!allReady;
+    showView("wait");
+  });
+
+  editBtn.addEventListener("click",()=>{
+    ready=false;
+    send({type:"player_unready"});
+    showView("lobby");
+  });
+
+  startBtn.addEventListener("click",()=>{
+    if(isAdmin && allReady) send({type:"admin_start"});
+  });
+
+  function flap(){
+    const now=Date.now();
+    if(now-lastFlapAt<55)return;
+    lastFlapAt=now;
+    sfx("flap"); flapBtn.classList.remove("flap-pulse"); void flapBtn.offsetWidth; flapBtn.classList.add("flap-pulse");
+    send({type:"flap"});
+  }
+  flapBtn.addEventListener("pointerdown",e=>{e.preventDefault();flap()});
+
+  restartBtn.addEventListener("click",()=>{if(isAdmin)send({type:"admin_restart"})});
+  lobbyBtn.addEventListener("click",()=>{if(isAdmin)send({type:"admin_lobby"})});
+
+  function renderResults(data){
+    const me=data.results.find(r=>r.deviceId===data.yourDeviceId);
+    if(!me)return;
+    resultChar.src=me.character;
+    resultPlace.textContent="#"+me.position;
+    resultScore.textContent="Score "+me.score;
+    comparison.innerHTML="";
+    data.results.forEach(r=>{
+      const row=document.createElement("div");row.className="row";
+      const pos=document.createElement("b");pos.textContent="#"+r.position;
+      const img=document.createElement("img");img.src=r.character;
+      const who=document.createElement("div");
+      const strong=document.createElement("strong");strong.textContent=r.name+(r.deviceId===data.yourDeviceId?" · You":"");
+      const small=document.createElement("small");small.textContent=r.eliminated?"Eliminated":"Winner";
+      who.append(strong,small);
+      const score=document.createElement("b");score.textContent=r.score;
+      row.append(pos,img,who,score);comparison.appendChild(row);
+    });
+    adminActions.hidden=!isAdmin;
+    resultWait.hidden=isAdmin;
+    showView("result");
+  }
+
+  airconsole.onReady = function(){
+    chooseCharacter(makeDefaultCharacter(),"Default character");
+    send({type:"hello"});
+  };
+
+  airconsole.onMessage = function(from,data){
+    if(from!==AirConsole.SCREEN || !data || typeof data!=="object") return;
+
+    if(data.type==="role"){
+      isAdmin=!!data.isAdmin;
+      roleBadge.textContent=isAdmin?"ADMIN":"PLAYER";
+      startBtn.hidden=!isAdmin;
+      adminActions.hidden=!isAdmin;
+    }
+
+    if(data.type==="lobby_state"){
+      allReady=!!data.allReady;
+      startBtn.disabled=!allReady;
+      if(isAdmin && ready){
+        waitText.textContent=allReady?"Everyone is ready. You can start!":"Waiting for every player to be ready.";
+      }
+    }
+
+    if(data.type==="round_countdown"){
+      gameHint.textContent="Starting in "+data.value+"…";
+      flapBtn.classList.remove("out");
+      flapBtn.disabled=false;
+      showView("game");
+    }
+
+    if(data.type==="round_start"){
+      gameHint.textContent="Keep flying!";
+      flapBtn.classList.remove("out");
+      flapBtn.disabled=false;
+      showView("game");
+    }
+
+    if(data.type==="player_out"){
+      sfx("out");
+      flapBtn.disabled=true;
+      flapBtn.classList.add("out");
+      flapBtn.querySelector("strong").textContent="YOU'RE OUT";
+      gameHint.textContent="Watch the others finish.";
+    }
+
+    if(data.type==="results"){
+      sfx("result");
+      flapBtn.querySelector("strong").textContent="TAP TO FLAP";
+      renderResults(data);
+    }
+
+    if(data.type==="return_lobby"){
+      ready=false;
+      roleBadge.textContent=isAdmin?"ADMIN":"PLAYER";
+      lobbyStatus.textContent="Make changes, then mark yourself ready.";
+      showView("lobby");
+    }
+
+    if(data.type==="restart_round"){
+      flapBtn.querySelector("strong").textContent="TAP TO FLAP";
+      flapBtn.disabled=false;
+      flapBtn.classList.remove("out");
+      showView("game");
+    }
+
+    if(data.type==="late_join"){
+      roleBadge.textContent="WAITING";
+      lobbyStatus.textContent="A game is already in progress. You'll join the next lobby.";
+      readyBtn.disabled=true;
+    }
+
+    if(data.type==="late_join_lobby"){
+      readyBtn.disabled=false;
+      lobbyStatus.textContent="The lobby is open. Choose your character and get ready.";
+      showView("lobby");
+    }
+  };
+})();
+</script>
+</body>
+</html>

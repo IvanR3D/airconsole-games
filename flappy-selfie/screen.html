@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Flappy Selfies — AirConsole</title>
+<script src="https://www.airconsole.com/api/airconsole-1.11.0.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f4f3ee;--card:#fff;--text:#171717;--muted:#707070;--border:#d9d8d2;--yellow:#ffd84d;--green:#7bd19c;--sky:#cceeff}
+html,body{width:100%;height:100%;overflow:hidden}
+body{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
+.app{height:100vh;display:flex;flex-direction:column;padding:14px 20px;max-width:1440px;margin:auto}
+.header{height:66px;flex:0 0 66px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:44px;height:44px;display:grid;place-items:center;background:var(--yellow);border:2px solid var(--text);border-radius:13px;font-size:22px;font-weight:900;transform:rotate(-3deg)}
+.brand h1{font-size:30px;letter-spacing:-1.3px;line-height:1}
+.brand p{font-size:11px;color:var(--muted);margin-top:4px}
+.meta{font-size:12px;color:var(--muted);text-align:right}
+.meta strong{color:var(--text);font-size:16px}
+.main{flex:1;min-height:0}
+.screen{display:none;width:100%;height:100%;min-height:0;opacity:0;transform:scale(.992)}
+.screen.active{animation:screenIn .34s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes screenIn{to{opacity:1;transform:scale(1)}}
+@keyframes readyBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes cardEnter{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes countPop{0%{transform:scale(.45);opacity:0}65%{transform:scale(1.12);opacity:1}100%{transform:scale(1);opacity:1}}
+@keyframes winnerGlow{0%,100%{transform:scale(1)}50%{transform:scale(1.025)}}
+.screen.active{display:flex;align-items:center;justify-content:center}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:24px}
+.lobby{width:min(100%,1100px);height:min(100%,700px);padding:24px;display:flex;flex-direction:column;min-height:0}
+.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted);font-weight:800}
+.lobby h2,.scoreboard h2{font-size:32px;letter-spacing:-1px;margin-top:4px}
+.lobby-copy{font-size:13px;color:var(--muted);margin-top:5px}
+.players{flex:1;min-height:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:18px;align-content:start;overflow:hidden}
+.player-card{min-width:0;animation:cardEnter .32s ease both;transition:transform .18s ease,border-color .18s ease;min-height:150px;border:1px solid var(--border);border-radius:18px;background:#f8f8f5;padding:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative}
+.player-card.admin:before{content:"ADMIN";position:absolute;top:8px;left:8px;font-size:8px;font-weight:900;padding:4px 6px;border-radius:999px;background:var(--yellow);border:1px solid var(--text)}
+.avatar{width:78px;height:78px;display:grid;place-items:center;padding:7px;margin-bottom:8px}
+.avatar img{max-width:100%;max-height:100%;object-fit:contain}
+.player-card strong{font-size:13px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.player-card span{font-size:10px;color:var(--muted);margin-top:3px}
+.ready-dot{width:8px;height:8px;border-radius:50%;background:#bbb;display:inline-block;margin-right:4px}
+.player-card.ready .ready-dot{background:var(--green)}
+.player-card.ready .avatar{animation:readyBounce 1.5s ease-in-out infinite}
+.empty{border-style:dashed;color:#aaa}
+.lobby-footer{height:46px;flex:0 0 46px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px;padding-top:10px;border-top:1px solid #eee}
+.lobby-status{font-size:12px;color:var(--muted)}
+.game-wrap{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+.game-shell{position:relative;height:min(100%,760px);max-width:100%;aspect-ratio:16/9;border:1px solid var(--border);border-radius:22px;overflow:hidden;background:var(--sky)}
+#gameCanvas{width:100%;height:100%;display:block}
+.hud{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;pointer-events:none}
+.hudbox{background:rgba(255,255,255,.9);border:2px solid var(--text);border-radius:11px;padding:7px 11px;font-size:11px;font-weight:900}
+.countdown{position:absolute;inset:0;display:grid;place-items:center;background:rgba(255,255,255,.08);pointer-events:none}
+.countdown.hidden{display:none}
+.countdown b{font-size:min(18vw,150px);font-weight:950;line-height:1;text-shadow:0 4px 0 rgba(255,255,255,.7)}
+.countdown b.pop{animation:countPop .5s cubic-bezier(.2,.8,.2,1)}
+.scoreboard{width:min(100%,980px);height:min(100%,700px);padding:24px;display:flex;flex-direction:column;min-height:0}
+.results{flex:1;min-height:0;overflow:hidden;margin-top:15px}
+.result-row{display:grid;grid-template-columns:56px 64px 1fr 90px;gap:12px;align-items:center;padding:10px 4px;border-bottom:1px solid #eee}
+.position{font-size:24px;font-weight:950;text-align:center}
+.result-avatar{width:58px;height:58px;background:#f6f6f2;border-radius:12px;display:grid;place-items:center;padding:6px}
+.result-avatar img{max-width:100%;max-height:100%}
+.result-info strong{display:block;font-size:14px}
+.result-info span{font-size:10px;color:var(--muted)}
+.result-score{font-size:24px;font-weight:950;text-align:right}
+.result-row:first-child{animation:winnerGlow 1.8s ease-in-out infinite;background:linear-gradient(90deg,rgba(255,216,77,.18),transparent);border-radius:12px;padding-left:8px;padding-right:8px}
+.sound-toggle{min-height:38px;border:1px solid var(--border);border-radius:10px;background:#fff;color:var(--text);font-size:11px;font-weight:850;padding:7px 10px;cursor:pointer}
+.sound-toggle.off{opacity:.6}
+.score-footer{height:42px;flex:0 0 42px;margin-top:10px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:11px;border-top:1px solid #eee;padding-top:10px}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
+@media(max-width:900px){.players{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:650px){.players{grid-template-columns:repeat(2,minmax(0,1fr))}.brand p{display:none}}
+@media(max-height:650px){.header{height:52px;flex-basis:52px}.logo{width:36px;height:36px}.brand h1{font-size:24px}.lobby,.scoreboard{padding:16px}.player-card{min-height:120px}.avatar{width:58px;height:58px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="header">
+    <div class="brand">
+      <div class="logo">🤳</div>
+      <div><h1>Flappy Selfies</h1><p>AirConsole Multiplayer</p></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px"><button id="soundToggle" class="sound-toggle" type="button" aria-label="Toggle sound">🔊 Sound</button><div class="meta"><span id="phaseLabel">Lobby</span><br><strong id="connectedCount">0 players</strong></div></div>
+  </header>
+
+  <main class="main">
+    <section id="lobbyScreen" class="screen active">
+      <div class="panel lobby">
+        <div class="eyebrow">Multiplayer Lobby</div>
+        <h2>Selfie. Ready. Fly.</h2>
+        <p class="lobby-copy">Join from your phone, snap a selfie to get your own bird, and mark yourself ready. The first player to join is the admin.</p>
+        <div id="playerGrid" class="players"></div>
+        <div class="lobby-footer">
+          <div id="lobbyStatus" class="lobby-status">Waiting for players…</div>
+          <div class="lobby-status">Admin starts when everyone is ready.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="gameScreen" class="screen">
+      <div class="game-wrap">
+        <div class="game-shell">
+          <canvas id="gameCanvas" width="1280" height="720"></canvas>
+          <div class="hud">
+            <div class="hudbox"><span id="aliveCount">0</span> alive</div>
+            <div class="hudbox">Score <span id="topScore">0</span></div>
+          </div>
+          <div id="countdown" class="countdown hidden"><b id="countdownValue">3</b></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="scoreScreen" class="screen">
+      <div class="panel scoreboard">
+        <div class="eyebrow">Round Complete</div>
+        <h2>Scoreboard</h2>
+        <div id="resultList" class="results"></div>
+        <div class="score-footer">The admin can restart with the same characters or return everyone to the lobby.</div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const airconsole = new AirConsole();
+
+  const lobbyScreen = document.getElementById("lobbyScreen");
+  const gameScreen = document.getElementById("gameScreen");
+  const scoreScreen = document.getElementById("scoreScreen");
+  const playerGrid = document.getElementById("playerGrid");
+  const lobbyStatus = document.getElementById("lobbyStatus");
+  const phaseLabel = document.getElementById("phaseLabel");
+  const connectedCount = document.getElementById("connectedCount");
+  const gameCanvas = document.getElementById("gameCanvas");
+  const ctx = gameCanvas.getContext("2d");
+  const aliveCount = document.getElementById("aliveCount");
+  const topScore = document.getElementById("topScore");
+  const countdown = document.getElementById("countdown");
+  const countdownValue = document.getElementById("countdownValue");
+  const resultList = document.getElementById("resultList");
+  const soundToggle = document.getElementById("soundToggle");
+
+  const players = new Map();
+  const lateJoiners = new Set();
+
+  let adminDeviceId = null;
+  let phase = "lobby";
+  let roundDeviceIds = [];
+  let animationId = null;
+  let countdownTimers = [];
+  let roundStartTime = 0;
+  let pipes = [];
+  let frame = 0;
+
+  let audioCtx = null;
+  let soundOn = true;
+  let musicTimer = null;
+  let musicStep = 0;
+  let musicMode = "lobby";
+
+  function ensureAudio(){
+    if(!soundOn) return false;
+    try{
+      if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if(audioCtx.state === "suspended") audioCtx.resume();
+      return true;
+    }catch(e){ return false; }
+  }
+
+  function tone(freq=440,duration=.1,type="sine",volume=.035,delay=0){
+    if(!ensureAudio()) return;
+    const now=audioCtx.currentTime+delay;
+    const osc=audioCtx.createOscillator();
+    const gain=audioCtx.createGain();
+    osc.type=type; osc.frequency.setValueAtTime(freq,now);
+    gain.gain.setValueAtTime(.0001,now);
+    gain.gain.exponentialRampToValueAtTime(volume,now+.01);
+    gain.gain.exponentialRampToValueAtTime(.0001,now+duration);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(now); osc.stop(now+duration+.03);
+  }
+
+  function sfx(name){
+    if(name==="ready"){tone(500,.06,"sine",.025);tone(720,.08,"sine",.025,.05)}
+    if(name==="count"){tone(660,.09,"square",.025)}
+    if(name==="go"){tone(880,.08,"square",.03);tone(1175,.12,"sine",.025,.06)}
+    if(name==="score"){tone(900,.055,"sine",.022)}
+    if(name==="hit"){tone(180,.12,"sawtooth",.025);tone(120,.16,"sine",.02,.05)}
+    if(name==="finish"){tone(523,.12,"sine",.03);tone(659,.12,"sine",.03,.10);tone(784,.18,"sine",.035,.20)}
+  }
+
+  const musicPatterns={
+    lobby:[261.63,329.63,392.00,329.63,293.66,349.23,440.00,349.23],
+    game:[329.63,392.00,493.88,392.00,349.23,440.00,523.25,440.00],
+    score:[261.63,329.63,392.00,523.25,392.00,329.63,293.66,349.23]
+  };
+
+  function startMusic(mode){
+    musicMode=mode;
+    if(musicTimer){clearInterval(musicTimer);musicTimer=null;}
+    musicStep=0;
+    if(!soundOn || !ensureAudio()) return;
+    const tick=()=>{
+      const pattern=musicPatterns[musicMode]||musicPatterns.lobby;
+      const f=pattern[musicStep%pattern.length];
+      tone(f,.20,"triangle",.010);
+      if(musicStep%2===0) tone(f/2,.24,"sine",.005);
+      musicStep++;
+    };
+    tick(); musicTimer=setInterval(tick,280);
+  }
+
+  function setSound(enabled){
+    soundOn=enabled;
+    soundToggle.classList.toggle("off",!enabled);
+    soundToggle.textContent=enabled?"🔊 Sound":"🔇 Sound";
+    if(enabled){ensureAudio();startMusic(phase==="game"?"game":phase==="score"?"score":"lobby");}
+    else if(musicTimer){clearInterval(musicTimer);musicTimer=null;}
+  }
+
+  soundToggle.addEventListener("click",()=>setSound(!soundOn));
+  document.addEventListener("pointerdown",()=>{if(soundOn && !audioCtx){ensureAudio();startMusic("lobby");}},{once:true,capture:true});
+
+
+  const game = {
+    gravity: 0.44,
+    flapPower: -7.4,
+    pipeSpeed: 4.0,
+    pipeWidth: 92,
+    pipeGap: 205,
+    spawnEvery: 95,
+    playerX: 220
+  };
+
+  const palette = ["#ff6b6b","#4dabf7","#ffd43b","#69db7c","#b197fc","#ffa94d","#38d9a9","#f06595"];
+
+  function showScreen(name) {
+    lobbyScreen.classList.toggle("active", name==="lobby");
+    gameScreen.classList.toggle("active", name==="game");
+    scoreScreen.classList.toggle("active", name==="score");
+  }
+
+  function send(deviceId, data) {
+    airconsole.message(deviceId, data);
+  }
+
+  function broadcast(data) {
+    airconsole.broadcast(data);
+  }
+
+  function controllerIds() {
+    try { return airconsole.getControllerDeviceIDs() || []; }
+    catch { return []; }
+  }
+
+  function ensurePlayer(deviceId) {
+    if(players.has(deviceId)) return players.get(deviceId);
+
+    if(phase !== "lobby") {
+      lateJoiners.add(deviceId);
+      send(deviceId,{type:"late_join"});
+      return null;
+    }
+
+    const p = {
+      deviceId,
+      name:"Player",
+      ready:false,
+      character:null,
+      image:null,
+      connected:true,
+      color:palette[players.size % palette.length],
+      alive:false,
+      score:0,
+      y:0,
+      velocity:0,
+      eliminatedAt:0,
+      eliminated:true
+    };
+    players.set(deviceId,p);
+
+    if(adminDeviceId === null) adminDeviceId = deviceId;
+
+    send(deviceId,{type:"role",isAdmin:deviceId===adminDeviceId});
+    renderLobby();
+    broadcastLobbyState();
+    return p;
+  }
+
+  function reassignAdminIfNeeded() {
+    if(adminDeviceId !== null && players.has(adminDeviceId) && players.get(adminDeviceId).connected) return;
+    const next = [...players.values()].find(p=>p.connected);
+    adminDeviceId = next ? next.deviceId : null;
+    players.forEach(p=>send(p.deviceId,{type:"role",isAdmin:p.deviceId===adminDeviceId}));
+  }
+
+  function connectedLobbyPlayers() {
+    return [...players.values()].filter(p=>p.connected);
+  }
+
+  function allReady() {
+    const list=connectedLobbyPlayers();
+    return list.length>0 && list.every(p=>p.ready && p.character);
+  }
+
+  function broadcastLobbyState() {
+    const list=connectedLobbyPlayers();
+    broadcast({type:"lobby_state",allReady:allReady(),playerCount:list.length,readyCount:list.filter(p=>p.ready).length});
+  }
+
+  function renderLobby() {
+    const list=connectedLobbyPlayers();
+    connectedCount.textContent = list.length + (list.length===1?" player":" players");
+    playerGrid.innerHTML="";
+
+    list.forEach(p=>{
+      const card=document.createElement("div");
+      card.className="player-card"+(p.ready?" ready":"")+(p.deviceId===adminDeviceId?" admin":"");
+
+      const avatar=document.createElement("div");avatar.className="avatar";
+      if(p.character){
+        const img=document.createElement("img");img.src=p.character.image;img.alt=p.name+" character";avatar.appendChild(img);
+      } else {
+        avatar.textContent="🤳";avatar.style.fontSize="30px";avatar.style.color="#aaa";
+      }
+
+      const strong=document.createElement("strong");strong.textContent=p.name;
+      const state=document.createElement("span");
+      const dot=document.createElement("i");dot.className="ready-dot";
+      state.append(dot,document.createTextNode(p.ready?"Ready":"Snapping…"));
+
+      card.append(avatar,strong,state);
+      playerGrid.appendChild(card);
+    });
+
+    const fill=Math.max(0,4-list.length);
+    for(let i=0;i<fill;i++){
+      const empty=document.createElement("div");empty.className="player-card empty";empty.textContent="Waiting for player…";playerGrid.appendChild(empty);
+    }
+
+    const readyCount=list.filter(p=>p.ready).length;
+    lobbyStatus.textContent=list.length?`${readyCount}/${list.length} ready`:"Waiting for players…";
+  }
+
+  function hydrateImagesAndStart() {
+    let pending=0;
+    roundDeviceIds.forEach(id=>{
+      const p=players.get(id);
+      p.image=new Image();
+      pending++;
+      p.image.onload=p.image.onerror=()=>{pending--;if(pending===0)beginCountdown()};
+      p.image.src=p.character.image;
+    });
+    if(pending===0) beginCountdown();
+  }
+
+  function startRound() {
+    if(phase!=="lobby" || !allReady()) return;
+    phase="countdown";
+    phaseLabel.textContent="Starting";
+    showScreen("game");
+    roundDeviceIds=connectedLobbyPlayers().map(p=>p.deviceId);
+    airconsole.setActivePlayers(roundDeviceIds.length);
+
+    const n=roundDeviceIds.length;
+    roundDeviceIds.forEach((id,index)=>{
+      const p=players.get(id);
+      p.alive=true;p.eliminated=false;p.score=0;p.velocity=0;p.eliminatedAt=0;
+      const spread=Math.min(280, Math.max(90,(n-1)*55));
+      const startTop=gameCanvas.height/2-spread/2;
+      p.y=n===1?gameCanvas.height/2-30:startTop+(spread/(n-1))*index-30;
+    });
+
+    pipes=[];frame=0;topScore.textContent="0";aliveCount.textContent=String(n);
+    broadcast({type:"restart_round"});
+    hydrateImagesAndStart();
+  }
+
+  function restartRoundSameChars() {
+    if(phase!=="score") return;
+    phase="countdown";
+    phaseLabel.textContent="Starting";
+    showScreen("game");
+
+    const connected = roundDeviceIds.filter(id=>players.has(id) && players.get(id).connected);
+    roundDeviceIds = connected;
+    if(!roundDeviceIds.length){returnToLobby();return}
+
+    const n=roundDeviceIds.length;
+    roundDeviceIds.forEach((id,index)=>{
+      const p=players.get(id);
+      p.alive=true;p.eliminated=false;p.score=0;p.velocity=0;p.eliminatedAt=0;
+      const spread=Math.min(280,Math.max(90,(n-1)*55));
+      const startTop=gameCanvas.height/2-spread/2;
+      p.y=n===1?gameCanvas.height/2-30:startTop+(spread/(n-1))*index-30;
+    });
+
+    pipes=[];frame=0;topScore.textContent="0";aliveCount.textContent=String(n);
+    broadcast({type:"restart_round"});
+    beginCountdown();
+  }
+
+  function beginCountdown() {
+    countdownTimers.forEach(clearTimeout);countdownTimers=[];
+    countdown.classList.remove("hidden");
+    [3,2,1].forEach((value,index)=>{
+      const t=setTimeout(()=>{
+        countdownValue.textContent=String(value); countdownValue.classList.remove("pop"); void countdownValue.offsetWidth; countdownValue.classList.add("pop"); sfx("count");
+        roundDeviceIds.forEach(id=>send(id,{type:"round_countdown",value}));
+      },index*850);
+      countdownTimers.push(t);
+    });
+    countdownTimers.push(setTimeout(()=>{
+      countdown.classList.add("hidden");
+      phase="game";phaseLabel.textContent="Game"; sfx("go"); startMusic("game");
+      roundStartTime=performance.now();
+      roundDeviceIds.forEach(id=>send(id,{type:"round_start"}));
+      cancelAnimationFrame(animationId);
+      animationId=requestAnimationFrame(loop);
+    },2550));
+  }
+
+  function flap(deviceId) {
+    if(phase!=="game") return;
+    const p=players.get(deviceId);
+    if(!p || !p.alive || !roundDeviceIds.includes(deviceId)) return;
+    p.velocity=game.flapPower;
+  }
+
+  function spawnPipe() {
+    const margin=85;
+    const available=gameCanvas.height-game.pipeGap-margin*2;
+    const top=margin+Math.random()*available;
+    pipes.push({x:gameCanvas.width+20,top,bottom:top+game.pipeGap,scoredBy:new Set()});
+  }
+
+  function playerHitbox(p) {
+    const w=62,h=62;
+    const hb=p.character.hitbox;
+    const forgiveness=3;
+    return {
+      left:game.playerX+w*hb.left+forgiveness,
+      top:p.y+h*hb.top+forgiveness,
+      right:game.playerX+w*hb.right-forgiveness,
+      bottom:p.y+h*hb.bottom-forgiveness
+    };
+  }
+
+  function eliminate(p) {
+    if(!p.alive) return;
+    p.alive=false;p.eliminated=true;p.eliminatedAt=performance.now()-roundStartTime; sfx("hit");
+    send(p.deviceId,{type:"player_out",score:p.score});
+    aliveCount.textContent=String(roundDeviceIds.filter(id=>players.get(id)?.alive).length);
+  }
+
+  function updateGame() {
+    frame++;
+    if(frame%game.spawnEvery===0) spawnPipe();
+
+    pipes.forEach(pipe=>pipe.x-=game.pipeSpeed);
+    pipes=pipes.filter(pipe=>pipe.x>-game.pipeWidth-30);
+
+    roundDeviceIds.forEach(id=>{
+      const p=players.get(id);
+      if(!p || !p.alive) return;
+
+      p.velocity+=game.gravity;
+      p.y+=p.velocity;
+
+      const hit=playerHitbox(p);
+      if(hit.top<=0 || hit.bottom>=gameCanvas.height){eliminate(p);return}
+
+      for(const pipe of pipes){
+        if(!pipe.scoredBy.has(id) && pipe.x+game.pipeWidth<game.playerX){
+          pipe.scoredBy.add(id);p.score++; sfx("score");
+        }
+        const overlapX=hit.right>pipe.x && hit.left<pipe.x+game.pipeWidth;
+        if(overlapX && (hit.top<pipe.top || hit.bottom>pipe.bottom)){eliminate(p);break}
+      }
+    });
+
+    topScore.textContent=String(Math.max(0,...roundDeviceIds.map(id=>players.get(id)?.score||0)));
+
+    const alive=roundDeviceIds.filter(id=>players.get(id)?.alive);
+    if(alive.length===0) finishRound();
+  }
+
+  function drawBackground() {
+    ctx.clearRect(0,0,gameCanvas.width,gameCanvas.height);
+    ctx.fillStyle="#cceeff";ctx.fillRect(0,0,gameCanvas.width,gameCanvas.height);
+    ctx.fillStyle="rgba(255,255,255,.55)";
+    const offset=(frame*.35)%gameCanvas.width;
+    for(let i=-1;i<7;i++){
+      const x=i*230-offset,y=85+(i%3)*105;
+      ctx.beginPath();ctx.arc(x,y,38,0,Math.PI*2);ctx.arc(x+40,y+5,27,0,Math.PI*2);ctx.arc(x-35,y+8,25,0,Math.PI*2);ctx.fill();
+    }
+  }
+
+  function drawPipes() {
+    ctx.fillStyle="#78d39c";ctx.strokeStyle="#171717";ctx.lineWidth=4;
+    pipes.forEach(pipe=>{
+      ctx.fillRect(pipe.x,0,game.pipeWidth,pipe.top);ctx.strokeRect(pipe.x,-5,game.pipeWidth,pipe.top+5);
+      ctx.fillRect(pipe.x-7,pipe.top-26,game.pipeWidth+14,26);ctx.strokeRect(pipe.x-7,pipe.top-26,game.pipeWidth+14,26);
+      ctx.fillRect(pipe.x,pipe.bottom,game.pipeWidth,gameCanvas.height-pipe.bottom);ctx.strokeRect(pipe.x,pipe.bottom,game.pipeWidth,gameCanvas.height-pipe.bottom+5);
+      ctx.fillRect(pipe.x-7,pipe.bottom,game.pipeWidth+14,26);ctx.strokeRect(pipe.x-7,pipe.bottom,game.pipeWidth+14,26);
+    });
+  }
+
+  function drawPlayers() {
+    roundDeviceIds.forEach(id=>{
+      const p=players.get(id);
+      if(!p || !p.alive || !p.image) return;
+      const w=62,h=62;
+      ctx.save();
+      ctx.translate(game.playerX+w/2,p.y+h/2);
+      ctx.rotate(Math.max(-.3,Math.min(.55,p.velocity*.05)));
+      ctx.drawImage(p.image,-w/2,-h/2,w,h);
+      ctx.restore();
+
+      ctx.font="700 14px system-ui";ctx.textAlign="center";
+      const textWidth=ctx.measureText(p.name).width;
+      ctx.fillStyle="rgba(255,255,255,.9)";
+      ctx.fillRect(game.playerX+w/2-textWidth/2-7,p.y-24,textWidth+14,19);
+      ctx.fillStyle="#171717";ctx.fillText(p.name,game.playerX+w/2,p.y-10);
+    });
+  }
+
+  function loop() {
+    if(phase!=="game") return;
+    updateGame();
+    if(phase!=="game") return;
+    drawBackground();drawPipes();drawPlayers();
+    animationId=requestAnimationFrame(loop);
+  }
+
+  function finalResults() {
+    return roundDeviceIds.map(id=>{
+      const p=players.get(id);
+      return {
+        deviceId:id,name:p?.name||"Player",score:p?.score||0,
+        character:p?.character?.image||"",
+        eliminated:p?.eliminated!==false,
+        eliminatedAt:p?.eliminatedAt||Number.MAX_SAFE_INTEGER
+      };
+    }).sort((a,b)=>{
+      if(a.score!==b.score) return b.score-a.score;
+      return b.eliminatedAt-a.eliminatedAt;
+    }).map((r,index)=>({...r,position:index+1}));
+  }
+
+  function finishRound() {
+    cancelAnimationFrame(animationId);
+    phase="score";phaseLabel.textContent="Results";showScreen("score"); sfx("finish"); startMusic("score");
+    const results=finalResults();
+    renderResults(results);
+    roundDeviceIds.forEach(id=>send(id,{type:"results",yourDeviceId:id,results}));
+  }
+
+  function renderResults(results) {
+    resultList.innerHTML="";
+    results.forEach(r=>{
+      const row=document.createElement("div");row.className="result-row";
+      const pos=document.createElement("div");pos.className="position";pos.textContent="#"+r.position;
+      const av=document.createElement("div");av.className="result-avatar";
+      const img=document.createElement("img");img.src=r.character;img.alt=r.name+" character";av.appendChild(img);
+      const info=document.createElement("div");info.className="result-info";
+      const name=document.createElement("strong");name.textContent=r.name;
+      const state=document.createElement("span");state.textContent=r.position===1?"Winner":"Finished";
+      info.append(name,state);
+      const score=document.createElement("div");score.className="result-score";score.textContent=r.score;
+      row.append(pos,av,info,score);resultList.appendChild(row);
+    });
+  }
+
+  function returnToLobby() {
+    cancelAnimationFrame(animationId);
+    countdownTimers.forEach(clearTimeout);countdownTimers=[];
+    phase="lobby";phaseLabel.textContent="Lobby";showScreen("lobby"); startMusic("lobby");
+    airconsole.setActivePlayers(0);
+
+    players.forEach(p=>{
+      if(p.connected){p.ready=false;send(p.deviceId,{type:"return_lobby"});}
+    });
+
+    lateJoiners.forEach(id=>{
+      lateJoiners.delete(id);
+      ensurePlayer(id);
+      send(id,{type:"late_join_lobby"});
+    });
+
+    reassignAdminIfNeeded();
+    renderLobby();broadcastLobbyState();
+  }
+
+  airconsole.onReady = function() {
+    controllerIds().forEach(ensurePlayer);
+    renderLobby();
+    startMusic("lobby");
+  };
+
+  airconsole.onConnect = function(deviceId) {
+    if(deviceId===AirConsole.SCREEN) return;
+    ensurePlayer(deviceId);
+  };
+
+  airconsole.onDisconnect = function(deviceId) {
+    if(players.has(deviceId)){
+      const p=players.get(deviceId);p.connected=false;
+      if(phase==="game" && p.alive) eliminate(p);
+      if(phase==="lobby"){
+        reassignAdminIfNeeded();
+        renderLobby();broadcastLobbyState();
+      }
+    }
+  };
+
+  airconsole.onMessage = function(deviceId,data) {
+    if(!data || typeof data!=="object") return;
+
+    if(data.type==="hello"){
+      const p=ensurePlayer(deviceId);
+      if(p) send(deviceId,{type:"role",isAdmin:deviceId===adminDeviceId});
+      return;
+    }
+
+    if(phase!=="lobby" && !roundDeviceIds.includes(deviceId)){
+      send(deviceId,{type:"late_join"});
+      return;
+    }
+
+    const p=players.get(deviceId) || ensurePlayer(deviceId);
+    if(!p) return;
+
+    if(data.type==="player_ready" && phase==="lobby"){
+      p.name=(String(data.name||"Player").trim()||"Player").slice(0,18);
+      p.character=data.character;
+      p.ready=!!(data.character && data.character.image && data.character.hitbox);
+      if(p.ready) sfx("ready");
+      renderLobby();broadcastLobbyState();
+    }
+
+    if(data.type==="player_unready" && phase==="lobby"){
+      p.ready=false;renderLobby();broadcastLobbyState();
+    }
+
+    if(data.type==="admin_start" && deviceId===adminDeviceId && phase==="lobby" && allReady()){
+      startRound();
+    }
+
+    if(data.type==="flap"){
+      flap(deviceId);
+    }
+
+    if(data.type==="admin_restart" && deviceId===adminDeviceId && phase==="score"){
+      restartRoundSameChars();
+    }
+
+    if(data.type==="admin_lobby" && deviceId===adminDeviceId && phase==="score"){
+      returnToLobby();
+    }
+  };
+})();
+</script>
+</body>
+</html>
