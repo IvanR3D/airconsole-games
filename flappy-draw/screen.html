@@ -3,22 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Flappy Draw — AirConsole</title>
+<title>Flap your draw — AirConsole</title>
 <script src="https://www.airconsole.com/api/airconsole-1.11.0.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#f4f3ee;--card:#fff;--text:#171717;--muted:#707070;--border:#d9d8d2;--yellow:#ffd84d;--green:#7bd19c;--sky:#cceeff}
 html,body{width:100%;height:100%;overflow:hidden}
 body{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
-.app{height:100vh;display:flex;flex-direction:column;padding:14px 20px;max-width:1440px;margin:auto}
-.header{height:66px;flex:0 0 66px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.app{height:100vh;height:100dvh;width:100vw;overflow:hidden}
+.header{display:flex;justify-content:space-between;align-items:center;gap:16px}
 .brand{display:flex;align-items:center;gap:12px}
 .logo{width:44px;height:44px;display:grid;place-items:center;background:var(--yellow);border:2px solid var(--text);border-radius:13px;font-size:22px;font-weight:900;transform:rotate(-3deg)}
 .brand h1{font-size:30px;letter-spacing:-1.3px;line-height:1}
 .brand p{font-size:11px;color:var(--muted);margin-top:4px}
 .meta{font-size:12px;color:var(--muted);text-align:right}
 .meta strong{color:var(--text);font-size:16px}
-.main{flex:1;min-height:0}
+.main{width:100%;height:100%}
 .screen{display:none;width:100%;height:100%;min-height:0;opacity:0;transform:scale(.992)}
 .screen.active{animation:screenIn .34s cubic-bezier(.2,.8,.2,1) forwards}
 @keyframes screenIn{to{opacity:1;transform:scale(1)}}
@@ -27,8 +27,10 @@ body{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",san
 @keyframes countPop{0%{transform:scale(.45);opacity:0}65%{transform:scale(1.12);opacity:1}100%{transform:scale(1);opacity:1}}
 @keyframes winnerGlow{0%,100%{transform:scale(1)}50%{transform:scale(1.025)}}
 .screen.active{display:flex;align-items:center;justify-content:center}
+.screen:not(#gameScreen){padding:18px 20px;background:var(--bg)}
 .panel{background:var(--card);border:1px solid var(--border);border-radius:24px}
-.lobby{width:min(100%,1100px);height:min(100%,700px);padding:24px;display:flex;flex-direction:column;min-height:0}
+.lobby{width:min(100%,1100px);height:min(100%,760px);padding:24px;display:flex;flex-direction:column;min-height:0}
+.lobby .header{min-height:58px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #eee}
 .eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted);font-weight:800}
 .lobby h2,.scoreboard h2{font-size:32px;letter-spacing:-1px;margin-top:4px}
 .lobby-copy{font-size:13px;color:var(--muted);margin-top:5px}
@@ -46,10 +48,16 @@ body{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",san
 .lobby-footer{height:46px;flex:0 0 46px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px;padding-top:10px;border-top:1px solid #eee}
 .lobby-status{font-size:12px;color:var(--muted)}
 .game-wrap{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
-.game-shell{position:relative;height:min(100%,760px);max-width:100%;aspect-ratio:16/9;border:1px solid var(--border);border-radius:22px;overflow:hidden;background:var(--sky)}
+.game-shell{position:relative;width:100%;height:100%;overflow:hidden;background:var(--sky)}
 #gameCanvas{width:100%;height:100%;display:block}
-.hud{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;pointer-events:none}
-.hudbox{background:rgba(255,255,255,.9);border:2px solid var(--text);border-radius:11px;padding:7px 11px;font-size:11px;font-weight:900}
+.game-topbar{position:absolute;z-index:3;top:0;left:0;right:0;min-height:78px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:16px;background:linear-gradient(180deg,rgba(11,35,52,.62),rgba(11,35,52,0));color:#fff;pointer-events:none}
+.game-brand{display:flex;align-items:center;gap:10px;text-shadow:0 2px 10px rgba(0,0,0,.28)}
+.game-brand .logo{width:38px;height:38px;font-size:19px;color:var(--text);box-shadow:0 4px 16px rgba(0,0,0,.18)}
+.game-brand strong{display:block;font-size:24px;letter-spacing:-.8px;line-height:1}
+.game-brand span{display:block;font-size:10px;margin-top:4px;opacity:.82;text-transform:uppercase;letter-spacing:1.2px}
+.hud{display:flex;align-items:center;gap:8px;pointer-events:auto}
+.hudbox{background:rgba(255,255,255,.92);color:var(--text);border:2px solid var(--text);border-radius:11px;padding:8px 12px;font-size:11px;font-weight:900;box-shadow:0 5px 18px rgba(0,0,0,.14)}
+.game-topbar .sound-toggle{pointer-events:auto;background:rgba(255,255,255,.92)}
 .countdown{position:absolute;inset:0;display:grid;place-items:center;background:rgba(255,255,255,.08);pointer-events:none}
 .countdown.hidden{display:none}
 .countdown b{font-size:min(18vw,150px);font-weight:950;line-height:1;text-shadow:0 4px 0 rgba(255,255,255,.7)}
@@ -69,23 +77,22 @@ body{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",san
 .score-footer{height:42px;flex:0 0 42px;margin-top:10px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:11px;border-top:1px solid #eee;padding-top:10px}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
 @media(max-width:900px){.players{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:650px){.players{grid-template-columns:repeat(2,minmax(0,1fr))}.brand p{display:none}}
-@media(max-height:650px){.header{height:52px;flex-basis:52px}.logo{width:36px;height:36px}.brand h1{font-size:24px}.lobby,.scoreboard{padding:16px}.player-card{min-height:120px}.avatar{width:58px;height:58px}}
+@media(max-width:650px){.players{grid-template-columns:repeat(2,minmax(0,1fr))}.brand p{display:none}.game-brand strong{font-size:18px}.hudbox{padding:7px 9px}.game-topbar{padding:10px}.game-topbar .sound-toggle{font-size:0;width:38px;padding:0}.game-topbar .sound-toggle::first-letter{font-size:16px}}
+@media(max-height:650px){.logo{width:36px;height:36px}.brand h1{font-size:24px}.lobby,.scoreboard{padding:16px}.player-card{min-height:120px}.avatar{width:58px;height:58px}}
 </style>
 </head>
 <body>
 <div class="app">
-  <header class="header">
-    <div class="brand">
-      <div class="logo">✎</div>
-      <div><h1>Flappy Draw</h1><p>AirConsole Multiplayer</p></div>
-    </div>
-    <div style="display:flex;align-items:center;gap:10px"><button id="soundToggle" class="sound-toggle" type="button" aria-label="Toggle sound">🔊 Sound</button><div class="meta"><span id="phaseLabel">Lobby</span><br><strong id="connectedCount">0 players</strong></div></div>
-  </header>
-
   <main class="main">
     <section id="lobbyScreen" class="screen active">
       <div class="panel lobby">
+        <header class="header">
+          <div class="brand">
+            <div class="logo">✎</div>
+            <div><h1>Flap your draw</h1><p>AirConsole Multiplayer</p></div>
+          </div>
+          <div class="meta">Lobby<br><strong id="connectedCount">0 players</strong></div>
+        </header>
         <div class="eyebrow">Multiplayer Lobby</div>
         <h2>Draw. Ready. Fly.</h2>
         <p class="lobby-copy">Join from your phone, draw a character and mark yourself ready. The first player to join is the admin.</p>
@@ -101,9 +108,13 @@ body{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",san
       <div class="game-wrap">
         <div class="game-shell">
           <canvas id="gameCanvas" width="1280" height="720"></canvas>
-          <div class="hud">
-            <div class="hudbox"><span id="aliveCount">0</span> alive</div>
-            <div class="hudbox">Score <span id="topScore">0</span></div>
+          <div class="game-topbar">
+            <div class="game-brand"><div class="logo">✎</div><div><strong>Flap your draw</strong><span id="phaseLabel">Game</span></div></div>
+            <div class="hud">
+              <button id="soundToggle" class="sound-toggle" type="button" aria-label="Toggle sound">🔊 Sound</button>
+              <div class="hudbox"><span id="aliveCount">0</span> alive</div>
+              <div class="hudbox">Score <span id="topScore">0</span></div>
+            </div>
           </div>
           <div id="countdown" class="countdown hidden"><b id="countdownValue">3</b></div>
         </div>
@@ -265,9 +276,11 @@ body{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",san
       return null;
     }
 
+    let airConsoleName="Player";
+    try{airConsoleName=(airconsole.getNickname(deviceId)||"Player").trim()||"Player"}catch(e){}
     const p = {
       deviceId,
-      name:"Player",
+      name:airConsoleName.slice(0,18),
       ready:false,
       character:null,
       image:null,

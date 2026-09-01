@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Flappy Draw Controller</title>
+<title>Flap your draw — Controller</title>
 <script src="https://www.airconsole.com/api/airconsole-1.11.0.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -25,9 +25,19 @@ button{cursor:pointer}
 @keyframes resultPop{0%{transform:scale(.9);opacity:0}100%{transform:scale(1);opacity:1}}
 .view.active{display:flex}
 .card{background:var(--card);border:1px solid var(--border);border-radius:18px}
-.lobby{width:100%;height:100%;padding:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;overflow:hidden}
-.drawside{width:100%;flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.canvas-wrap{position:relative;transition:transform .18s ease,border-color .18s ease;width:min(88vw,440px);height:min(58vh,440px);aspect-ratio:1/1;flex:0 1 auto;border:2px dashed #bdbbb4;border-radius:18px;overflow:hidden;background:
+.lobby{width:100%;height:100%;padding:8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:8px;overflow-x:hidden;overflow-y:auto}
+.character-choice{width:min(92vw,460px);display:flex;align-items:center;justify-content:center;gap:9px;padding:8px 10px;background:#fff;border:1px solid var(--border);border-radius:14px;flex:0 0 auto}
+.character-choice span{font-size:11px;font-weight:850;color:var(--muted);transition:color .18s}
+.character-choice span.active{color:var(--text)}
+.source-switch{position:relative;width:52px;height:30px;display:inline-block;flex:0 0 auto}
+.source-switch input{position:absolute;opacity:0;pointer-events:none}
+.source-switch i{position:absolute;inset:0;border:2px solid var(--text);border-radius:999px;background:var(--yellow);cursor:pointer}
+.source-switch i::after{content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;border-radius:50%;background:var(--text);transition:transform .2s cubic-bezier(.2,.8,.2,1)}
+.source-switch input:checked+i{background:var(--green)}
+.source-switch input:checked+i::after{transform:translateX(22px)}
+.drawside{width:100%;flex:1 0 auto;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;transition:opacity .2s,filter .2s}
+.drawside.inactive{opacity:.42;filter:grayscale(.35);pointer-events:none}
+.canvas-wrap{position:relative;transition:transform .18s ease,border-color .18s ease;width:min(88vw,420px);height:min(48vh,420px);aspect-ratio:1/1;flex:0 1 auto;border:2px dashed #bdbbb4;border-radius:18px;overflow:hidden;background:
 linear-gradient(45deg,#f8f8f8 25%,transparent 25%),
 linear-gradient(-45deg,#f8f8f8 25%,transparent 25%),
 linear-gradient(45deg,transparent 75%,#f8f8f8 75%),
@@ -37,15 +47,21 @@ background-size:22px 22px;background-position:0 0,0 11px,11px -11px,-11px 0}
 .canvas-wrap:focus-within,.canvas-wrap.drawing-now{border-color:#8f8d86;transform:scale(1.008)}
 .placeholder{position:absolute;inset:0;display:grid;place-items:center;color:#aaa;font-size:13px;pointer-events:none}
 .placeholder.hidden{display:none}
-.tools{width:min(88vw,440px);height:48px;flex:0 0 48px;display:flex;align-items:center;justify-content:center;gap:8px;padding-top:8px}
-.toggle{position:relative;width:120px;height:38px;border:1px solid var(--border);border-radius:11px;background:#f3f3ef;display:flex;padding:3px}
-.toggle i{position:absolute;left:3px;top:3px;width:calc(50% - 3px);height:30px;border-radius:8px;background:var(--text);transition:transform .18s}
-.toggle.erase i{transform:translateX(100%)}
-.toggle button{position:relative;z-index:2;flex:1;border:0;background:transparent;font-size:10px;font-weight:800;color:var(--muted)}
-.toggle button.active{color:#fff}
+.tools{width:min(88vw,420px);flex:0 0 auto;display:flex;flex-direction:column;gap:6px;padding-top:7px}
+.tool-row{display:flex;align-items:center;justify-content:center;gap:5px;min-width:0}
+.tool-btn{height:34px;min-width:0;flex:1;border:1px solid var(--border);border-radius:9px;background:#fff;color:var(--muted);font-size:9px;font-weight:900;padding:0 6px}
+.tool-btn.active{background:var(--text);border-color:var(--text);color:#fff}
+.tool-btn:disabled{opacity:.35;cursor:not-allowed}
+.tool-btn.icon{flex:0 0 36px;font-size:15px;padding:0}
+.colors{display:flex;align-items:center;gap:5px;flex:1;min-width:0}
+.swatch{width:24px;height:24px;flex:0 0 24px;border:2px solid #fff;border-radius:50%;box-shadow:0 0 0 1px var(--border);padding:0}
+.swatch.active{box-shadow:0 0 0 2px var(--text)}
+.size-control{display:flex;align-items:center;gap:6px;flex:1;min-width:92px;padding:0 4px}
+.size-control span{font-size:9px;font-weight:900;color:var(--muted)}
+.size-control input{width:100%;accent-color:var(--text)}
 input[type=color]{width:38px;height:38px;border:1px solid var(--border);border-radius:10px;padding:3px;background:#fff}
 .small{height:38px;border:1px solid var(--border);background:white;border-radius:10px;padding:0 10px;font-size:10px;font-weight:800}
-.options{width:min(88vw,440px);flex:0 0 auto;display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:center}
+.options{width:min(88vw,420px);flex:0 0 auto;display:grid;grid-template-columns:1fr;gap:7px;align-items:center;padding-bottom:6px}
 .label{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
 .name{width:100%;height:42px;border:1px solid var(--border);border-radius:11px;padding:0 11px;font-size:16px;outline:none}
 .name:focus{border-color:var(--text)}
@@ -92,23 +108,22 @@ input[type=color]{width:38px;height:38px;border:1px solid var(--border);border-r
   .app{padding:6px}
   .top{height:40px;flex-basis:40px}
   .lobby{padding:6px;gap:6px}
-  .canvas-wrap{width:min(92vw,430px);height:min(60vh,430px)}
-  .tools,.options{width:min(92vw,430px)}
+  .canvas-wrap{width:min(92vw,410px);height:min(44vh,410px)}
+  .tools,.options{width:min(92vw,410px)}
   .options{gap:6px}
-  .preview{display:none}
   .status{display:none}
   .action{min-height:38px}
   .name{height:38px}
 }
 @media(max-width:390px){
-  .canvas-wrap{height:min(57vh,390px)}
-  .tools{height:44px;flex-basis:44px;padding-top:6px}
-  .options{grid-template-columns:1fr 1fr}
+  .canvas-wrap{height:min(40vh,360px)}
+  .tools{padding-top:6px}
+  .colors .swatch:nth-of-type(n+6){display:none}
   .options .full{grid-column:1/-1}
 }
 @media(max-height:620px){
-  .canvas-wrap{height:min(52vh,360px);width:min(78vw,360px)}
-  .tools,.options{width:min(78vw,360px)}
+  .canvas-wrap{height:min(36vh,330px);width:min(78vw,330px)}
+  .tools,.options{width:min(88vw,420px)}
   .preview,.status{display:none}
   .action{min-height:36px}
   .name{height:36px}
@@ -118,25 +133,51 @@ input[type=color]{width:38px;height:38px;border:1px solid var(--border);border-r
 <body>
 <div class="app">
   <header class="top">
-    <div class="brand"><div class="logo">✎</div><span>Flappy Draw</span></div>
+    <div class="brand"><div class="logo">✎</div><span>Flap your draw</span></div>
     <div id="roleBadge" class="role">Connecting…</div>
   </header>
 
   <section id="lobbyView" class="view active">
     <div class="card lobby">
-      <div class="drawside">
+      <div class="character-choice" role="group" aria-label="Character source">
+        <span id="defaultModeLabel" class="active">🐤 Default bird</span>
+        <label class="source-switch" title="Switch character source">
+          <input id="characterToggle" type="checkbox" aria-label="Use my drawing">
+          <i></i>
+        </label>
+        <span id="drawingModeLabel">✎ My drawing</span>
+      </div>
+
+      <div id="drawEditor" class="drawside inactive" aria-disabled="true">
         <div class="canvas-wrap">
           <canvas id="drawCanvas" width="420" height="420"></canvas>
           <div id="placeholder" class="placeholder">Draw your character</div>
         </div>
         <div class="tools">
-          <div id="modeToggle" class="toggle">
-            <i></i>
-            <button id="brushBtn" type="button" class="active">BRUSH</button>
-            <button id="eraseBtn" type="button">ERASE</button>
+          <div class="tool-row" role="toolbar" aria-label="Drawing tools">
+            <button id="brushBtn" type="button" class="tool-btn active">BRUSH</button>
+            <button id="markerBtn" type="button" class="tool-btn">MARKER</button>
+            <button id="fillBtn" type="button" class="tool-btn">FILL</button>
+            <button id="eraseBtn" type="button" class="tool-btn">ERASER</button>
           </div>
-          <input id="color" type="color" value="#171717" aria-label="Color">
-          <button id="clearBtn" type="button" class="small">Clear</button>
+          <div class="tool-row">
+            <div id="colorSwatches" class="colors" aria-label="Quick colors">
+              <button class="swatch active" type="button" data-color="#171717" style="background:#171717" aria-label="Black"></button>
+              <button class="swatch" type="button" data-color="#ff5d5d" style="background:#ff5d5d" aria-label="Red"></button>
+              <button class="swatch" type="button" data-color="#ff9f43" style="background:#ff9f43" aria-label="Orange"></button>
+              <button class="swatch" type="button" data-color="#ffd84d" style="background:#ffd84d" aria-label="Yellow"></button>
+              <button class="swatch" type="button" data-color="#45c67a" style="background:#45c67a" aria-label="Green"></button>
+              <button class="swatch" type="button" data-color="#3d8bfd" style="background:#3d8bfd" aria-label="Blue"></button>
+              <button class="swatch" type="button" data-color="#9b5de5" style="background:#9b5de5" aria-label="Purple"></button>
+            </div>
+            <input id="color" type="color" value="#171717" aria-label="Custom color">
+          </div>
+          <div class="tool-row">
+            <div class="size-control"><span>SIZE</span><input id="brushSize" type="range" min="4" max="40" value="16" aria-label="Brush size"></div>
+            <button id="undoBtn" type="button" class="tool-btn icon" aria-label="Undo" title="Undo">↶</button>
+            <button id="redoBtn" type="button" class="tool-btn icon" aria-label="Redo" title="Redo">↷</button>
+            <button id="clearBtn" type="button" class="tool-btn" style="flex:0 0 52px">CLEAR</button>
+          </div>
         </div>
       </div>
 
@@ -151,8 +192,6 @@ input[type=color]{width:38px;height:38px;border:1px solid var(--border);border-r
           <div><strong id="selectedTitle">Default character</strong><span id="selectedStatus">Ready to use</span></div>
         </div>
 
-        <button id="useDrawingBtn" class="action primary" type="button">Use Drawing</button>
-        <button id="defaultBtn" class="action" type="button">Use Default</button>
         <button id="readyBtn" class="action ready full" type="button">✓ I'm Ready</button>
         <div id="lobbyStatus" class="status full">Choose your character, then mark yourself ready.</div>
       </div>
@@ -221,17 +260,24 @@ input[type=color]{width:38px;height:38px;border:1px solid var(--border);border-r
   const drawCanvas = document.getElementById("drawCanvas");
   const ctx = drawCanvas.getContext("2d", {willReadFrequently:true});
   const placeholder = document.getElementById("placeholder");
-  const modeToggle = document.getElementById("modeToggle");
+  const drawEditor = document.getElementById("drawEditor");
+  const characterToggle = document.getElementById("characterToggle");
+  const defaultModeLabel = document.getElementById("defaultModeLabel");
+  const drawingModeLabel = document.getElementById("drawingModeLabel");
   const brushBtn = document.getElementById("brushBtn");
+  const markerBtn = document.getElementById("markerBtn");
+  const fillBtn = document.getElementById("fillBtn");
   const eraseBtn = document.getElementById("eraseBtn");
   const color = document.getElementById("color");
+  const brushSize = document.getElementById("brushSize");
+  const colorSwatches = document.getElementById("colorSwatches");
+  const undoBtn = document.getElementById("undoBtn");
+  const redoBtn = document.getElementById("redoBtn");
   const clearBtn = document.getElementById("clearBtn");
   const playerName = document.getElementById("playerName");
   const selectedPreview = document.getElementById("selectedPreview");
   const selectedTitle = document.getElementById("selectedTitle");
   const selectedStatus = document.getElementById("selectedStatus");
-  const useDrawingBtn = document.getElementById("useDrawingBtn");
-  const defaultBtn = document.getElementById("defaultBtn");
   const readyBtn = document.getElementById("readyBtn");
   const lobbyStatus = document.getElementById("lobbyStatus");
   const waitChar = document.getElementById("waitChar");
@@ -255,8 +301,11 @@ input[type=color]{width:38px;height:38px;border:1px solid var(--border);border-r
   let drawing = false;
   let hasDrawing = false;
   let tool = "brush";
+  let useCustomDrawing = false;
   let lastX = 0;
   let lastY = 0;
+  let undoStack = [];
+  let redoStack = [];
   let ready = false;
   let selectedCharacter = null;
   let lastFlapAt = 0;
@@ -373,63 +422,147 @@ input[type=color]{width:38px;height:38px;border:1px solid var(--border);border-r
 
   function chooseCharacter(character, title) {
     selectedCharacter = character;
-    selectedPreview.src = character.image;
+    if(character) selectedPreview.src=character.image; else selectedPreview.removeAttribute("src");
     selectedTitle.textContent = title;
-    selectedStatus.textContent = character.kind === "default" ? "Ready to use" : "Custom hitbox detected";
+    selectedStatus.textContent = !character ? "Draw something to continue" : character.kind === "default" ? "Ready to use" : "Your drawing is ready";
+  }
+
+  function refreshDrawingSelection(){
+    hasDrawing=!!visibleBounds(drawCanvas);
+    placeholder.classList.toggle("hidden",hasDrawing);
+    if(!useCustomDrawing) return;
+    const character=drawingCharacter();
+    chooseCharacter(character,character?"Your drawing":"My drawing");
+  }
+
+  function setCharacterMode(custom){
+    useCustomDrawing=!!custom;
+    characterToggle.checked=useCustomDrawing;
+    drawEditor.classList.toggle("inactive",!useCustomDrawing);
+    drawEditor.setAttribute("aria-disabled",String(!useCustomDrawing));
+    defaultModeLabel.classList.toggle("active",!useCustomDrawing);
+    drawingModeLabel.classList.toggle("active",useCustomDrawing);
+    if(useCustomDrawing){
+      refreshDrawingSelection();
+      lobbyStatus.textContent=hasDrawing?"Your drawing is selected.":"Draw your character, then tap I'm Ready.";
+    }else{
+      chooseCharacter(makeDefaultCharacter(),"Default bird");
+      lobbyStatus.textContent="Default bird selected. Switch to My drawing to create your own.";
+    }
   }
 
   function canvasPoint(e){
     const r=drawCanvas.getBoundingClientRect();
     return {x:(e.clientX-r.left)*drawCanvas.width/r.width,y:(e.clientY-r.top)*drawCanvas.height/r.height};
   }
+  function pushHistory(){
+    undoStack.push(ctx.getImageData(0,0,drawCanvas.width,drawCanvas.height));
+    if(undoStack.length>14) undoStack.shift();
+    redoStack=[];
+    updateHistoryButtons();
+  }
+  function updateHistoryButtons(){
+    undoBtn.disabled=undoStack.length===0;
+    redoBtn.disabled=redoStack.length===0;
+  }
+  function restoreCanvas(imageData){
+    ctx.clearRect(0,0,drawCanvas.width,drawCanvas.height);
+    ctx.putImageData(imageData,0,0);
+    refreshDrawingSelection();
+  }
+  function hexToRgba(hex){
+    const value=parseInt(hex.slice(1),16);
+    return [(value>>16)&255,(value>>8)&255,value&255,255];
+  }
+  function floodFill(x,y,hex){
+    const w=drawCanvas.width,h=drawCanvas.height;
+    x=Math.max(0,Math.min(w-1,Math.floor(x)));y=Math.max(0,Math.min(h-1,Math.floor(y)));
+    const image=ctx.getImageData(0,0,w,h),data=image.data,start=(y*w+x)*4;
+    const target=[data[start],data[start+1],data[start+2],data[start+3]],replacement=hexToRgba(hex);
+    if(target.every((v,i)=>v===replacement[i])) return;
+    const queue=new Int32Array(w*h),seen=new Uint8Array(w*h);let head=0,tail=0;
+    const first=y*w+x;queue[tail++]=first;seen[first]=1;
+    while(head<tail){
+      const pos=queue[head++],px=pos%w,py=(pos/w)|0,i=pos*4;
+      if(data[i]!==target[0]||data[i+1]!==target[1]||data[i+2]!==target[2]||data[i+3]!==target[3]) continue;
+      data[i]=replacement[0];data[i+1]=replacement[1];data[i+2]=replacement[2];data[i+3]=replacement[3];
+      if(px>0&&!seen[pos-1]){seen[pos-1]=1;queue[tail++]=pos-1}
+      if(px<w-1&&!seen[pos+1]){seen[pos+1]=1;queue[tail++]=pos+1}
+      if(py>0&&!seen[pos-w]){seen[pos-w]=1;queue[tail++]=pos-w}
+      if(py<h-1&&!seen[pos+w]){seen[pos+w]=1;queue[tail++]=pos+w}
+    }
+    ctx.putImageData(image,0,0);
+  }
   function startDraw(e){
-    e.preventDefault(); unlockAudio(); document.querySelector(".canvas-wrap")?.classList.add("drawing-now"); drawing=true; hasDrawing=true; placeholder.classList.add("hidden");
+    e.preventDefault();unlockAudio();pushHistory();document.querySelector(".canvas-wrap")?.classList.add("drawing-now");
     const p=canvasPoint(e); lastX=p.x;lastY=p.y;
+    if(tool==="fill"){
+      floodFill(p.x,p.y,color.value);document.querySelector(".canvas-wrap")?.classList.remove("drawing-now");refreshDrawingSelection();return;
+    }
+    drawing=true;hasDrawing=true;placeholder.classList.add("hidden");
     ctx.globalCompositeOperation=tool==="eraser"?"destination-out":"source-over";
+    ctx.globalAlpha=tool==="marker"?.35:1;
     ctx.fillStyle=tool==="eraser"?"#000":color.value;
-    ctx.beginPath();ctx.arc(p.x,p.y,8,0,Math.PI*2);ctx.fill();
+    const radius=Number(brushSize.value)*(tool==="eraser"?1.35:1)/2;
+    ctx.beginPath();ctx.arc(p.x,p.y,radius,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
   }
   function moveDraw(e){
     if(!drawing)return;e.preventDefault();const p=canvasPoint(e);
-    ctx.lineWidth=16;ctx.lineCap="round";ctx.lineJoin="round";
+    ctx.lineWidth=Number(brushSize.value)*(tool==="eraser"?1.35:1);ctx.lineCap="round";ctx.lineJoin="round";
     ctx.globalCompositeOperation=tool==="eraser"?"destination-out":"source-over";
+    ctx.globalAlpha=tool==="marker"?.35:1;
     ctx.strokeStyle=tool==="eraser"?"#000":color.value;
     ctx.beginPath();ctx.moveTo(lastX,lastY);ctx.lineTo(p.x,p.y);ctx.stroke();
-    lastX=p.x;lastY=p.y;
+    ctx.globalAlpha=1;lastX=p.x;lastY=p.y;
   }
-  function stopDraw(){drawing=false;document.querySelector(".canvas-wrap")?.classList.remove("drawing-now")}
+  function stopDraw(){
+    if(!drawing)return;drawing=false;ctx.globalAlpha=1;document.querySelector(".canvas-wrap")?.classList.remove("drawing-now");refreshDrawingSelection();
+  }
   drawCanvas.addEventListener("pointerdown",startDraw);
   drawCanvas.addEventListener("pointermove",moveDraw);
   window.addEventListener("pointerup",stopDraw);
+  window.addEventListener("pointercancel",stopDraw);
 
   function setTool(value){
-    tool=value;const erase=value==="eraser";
-    modeToggle.classList.toggle("erase",erase);
-    brushBtn.classList.toggle("active",!erase);
-    eraseBtn.classList.toggle("active",erase);
+    tool=value;
+    [brushBtn,markerBtn,fillBtn,eraseBtn].forEach(btn=>btn.classList.remove("active"));
+    ({brush:brushBtn,marker:markerBtn,fill:fillBtn,eraser:eraseBtn})[value].classList.add("active");
   }
   brushBtn.addEventListener("click",()=>setTool("brush"));
+  markerBtn.addEventListener("click",()=>setTool("marker"));
+  fillBtn.addEventListener("click",()=>setTool("fill"));
   eraseBtn.addEventListener("click",()=>setTool("eraser"));
 
+  characterToggle.addEventListener("change",()=>setCharacterMode(characterToggle.checked));
+  defaultModeLabel.addEventListener("click",()=>setCharacterMode(false));
+  drawingModeLabel.addEventListener("click",()=>setCharacterMode(true));
+  colorSwatches.addEventListener("click",e=>{
+    const swatch=e.target.closest(".swatch");if(!swatch)return;
+    color.value=swatch.dataset.color;
+    colorSwatches.querySelectorAll(".swatch").forEach(item=>item.classList.toggle("active",item===swatch));
+  });
+  color.addEventListener("input",()=>colorSwatches.querySelectorAll(".swatch").forEach(item=>item.classList.toggle("active",item.dataset.color.toLowerCase()===color.value.toLowerCase())));
+
+  undoBtn.addEventListener("click",()=>{
+    if(!undoStack.length)return;
+    redoStack.push(ctx.getImageData(0,0,drawCanvas.width,drawCanvas.height));
+    restoreCanvas(undoStack.pop());updateHistoryButtons();
+  });
+  redoBtn.addEventListener("click",()=>{
+    if(!redoStack.length)return;
+    undoStack.push(ctx.getImageData(0,0,drawCanvas.width,drawCanvas.height));
+    restoreCanvas(redoStack.pop());updateHistoryButtons();
+  });
+
   clearBtn.addEventListener("click",()=>{
+    if(!visibleBounds(drawCanvas))return;pushHistory();
     ctx.clearRect(0,0,drawCanvas.width,drawCanvas.height);
-    hasDrawing=false;placeholder.classList.remove("hidden");
-  });
-
-  useDrawingBtn.addEventListener("click",()=>{
-    const character=drawingCharacter();
-    if(!character){lobbyStatus.textContent="Draw something first.";return}
-    chooseCharacter(character,"Your drawing");
-    lobbyStatus.textContent="Drawing selected.";
-  });
-
-  defaultBtn.addEventListener("click",()=>{
-    chooseCharacter(makeDefaultCharacter(),"Default character");
-    lobbyStatus.textContent="Default character selected.";
+    refreshDrawingSelection();
   });
 
   readyBtn.addEventListener("click",()=>{
-    if(!selectedCharacter) chooseCharacter(makeDefaultCharacter(),"Default character");
+    if(useCustomDrawing) refreshDrawingSelection();
+    if(!selectedCharacter){lobbyStatus.textContent="Draw something first, or switch to the default bird.";return}
     const name=(playerName.value.trim()||"Player").slice(0,18);
     ready=true;
     sfx("ready"); readyBtn.classList.remove("ready-pop"); void readyBtn.offsetWidth; readyBtn.classList.add("ready-pop");
@@ -487,7 +620,14 @@ input[type=color]{width:38px;height:38px;border:1px solid var(--border);border-r
   }
 
   airconsole.onReady = function(){
-    chooseCharacter(makeDefaultCharacter(),"Default character");
+    let nickname="";
+    try{nickname=(airconsole.getNickname()||"").trim()}catch(e){}
+    if(!nickname){
+      try{const id=airconsole.getDeviceId?.();nickname=(airconsole.getNickname(id)||"").trim()}catch(e){}
+    }
+    if(nickname) playerName.value=nickname.slice(0,18);
+    setCharacterMode(false);
+    updateHistoryButtons();
     send({type:"hello"});
   };
 
